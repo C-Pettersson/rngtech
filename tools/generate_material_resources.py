@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections import OrderedDict, defaultdict
 from pathlib import Path
 
@@ -26,7 +27,11 @@ COMMON_TAG_FORMS = {
     "storage_block": "storage_blocks",
     "ore": "ores",
     "raw": "raw_materials",
+    "plate": "plates",
+    "gear": "gears",
+    "rod": "rods",
 }
+PARENT_TAG_FORMS = ("plate", "gear", "rod")
 
 NUGGET_CONVERSION_MATERIALS = {"copper", "naquadah", "netherite"}
 VANILLA_ORE_HARDNESS = {
@@ -36,6 +41,7 @@ VANILLA_ORE_HARDNESS = {
     "minecraft:deepslate_copper_ore": 1,
     "minecraft:gold_ore": 2,
     "minecraft:deepslate_gold_ore": 2,
+    "minecraft:nether_gold_ore": 2,
 }
 VANILLA_ORE_BURST_VALUES = [
     "minecraft:coal_ore",
@@ -153,6 +159,8 @@ def primary_material_item_id(catalog: dict, form: dict, material: dict) -> str:
 
 def generic_form_texture(form_id: str) -> str:
     texture_id = GENERIC_TEXTURE_ALIASES.get(form_id, form_id)
+    if not (TEXTURE_ROOT / f"materials/forms/{texture_id}.png").is_file() and (TEXTURE_ROOT / f"{form_id}.png").is_file():
+        return f"rngtech:item/{form_id}"
     return f"rngtech:item/materials/forms/{texture_id}"
 
 
@@ -413,6 +421,7 @@ def generate_common_tags(catalog: dict, ore_catalog: dict) -> None:
     item_ore_tags: list[str] = []
     block_ore_tags: list[str] = []
     raw_material_tags: list[str] = []
+    parent_tags: dict[str, list[str]] = defaultdict(list)
     for material in catalog["materials"]:
         material_id = material["id"]
         for form_id, tag_form in COMMON_TAG_FORMS.items():
@@ -435,9 +444,13 @@ def generate_common_tags(catalog: dict, ore_catalog: dict) -> None:
                     block_ore_tags.append(f"#c:ores/{material_id}")
             elif form_id == "raw" and values:
                 raw_material_tags.append(f"#c:raw_materials/{material_id}")
+            elif form_id in PARENT_TAG_FORMS and values:
+                parent_tags[tag_form].append(f"#c:{tag_form}/{material_id}")
     tag("c/tags/item/ores.json", item_ore_tags)
     tag("c/tags/block/ores.json", block_ore_tags)
     tag("c/tags/item/raw_materials.json", raw_material_tags)
+    for tag_form, values in parent_tags.items():
+        tag(f"c/tags/item/{tag_form}.json", values)
 
 
 def generate_rngtech_tags(catalog: dict, ore_catalog: dict, items: list[dict]) -> None:
@@ -519,6 +532,51 @@ def generate_circuit_tags(catalog: dict) -> None:
     ])
     for tier in ("basic", "advanced", "elite", "ultimate"):
         tag(f"c/tags/item/circuits/{tier}.json", [f"rngtech:{tier}_electric_circuit"])
+        # RNGTech recipes ask for this tag, so other mods' circuits in c:circuits do not skip RNGTech's circuit chain.
+        tag(f"rngtech/tags/item/circuits/{tier}.json", [f"rngtech:{tier}_electric_circuit"])
+
+
+def rngtech_tag_items(catalog: dict) -> dict[str, str]:
+    """Maps each RNGTech item that recipes take through an RNGTech-only tag to that tag, such as rngtech:plates/steel."""
+    forms = {form["id"]: form for form in catalog["metal_forms"]}
+    groups = {group["id"]: set(group["families"]) for group in catalog.get("material_groups", [])}
+    tagged: dict[str, str] = {}
+    for entry in catalog.get("rngtech_tags", []):
+        families = groups[entry["group"]] if "group" in entry else None
+        for material in catalog["materials"]:
+            if families is not None and material["id"] not in families:
+                continue
+            for form_id in entry["forms"]:
+                if form_excluded(material, form_id) or has_vanilla_form_mapping(catalog, material["id"], form_id):
+                    continue
+                item = f"rngtech:{item_id(forms[form_id], material)}"
+                tagged[item] = f"rngtech:{COMMON_TAG_FORMS[form_id]}/{material['id']}"
+    return tagged
+
+
+def generate_rngtech_recipe_tags(catalog: dict) -> None:
+    # Other mods' items in the matching c: tag do not satisfy these; packs add them here to let RNGTech recipes take them.
+    for item, tag_id in rngtech_tag_items(catalog).items():
+        tag(f"rngtech/tags/item/{tag_id.removeprefix('rngtech:')}.json", [item])
+
+
+COMMON_TAG_INPUT = re.compile(r'("tag"\s*:\s*")(c:[a-z_]+/[a-z_]+)(")')
+ITEM_INPUT = re.compile(r'"item"(\s*:\s*)"(rngtech:[a-z_]+)"')
+
+
+def rewrite_rngtech_tag_inputs(catalog: dict) -> None:
+    """Points recipe inputs that ask for a tagged item, by id or by its c: tag, at the item's RNGTech-only tag."""
+    tagged = rngtech_tag_items(catalog)
+    common = {f"c:{tag_id.removeprefix('rngtech:')}": tag_id for tag_id in tagged.values()}
+    for path in sorted((DATA_ROOT / "rngtech/recipe").rglob("*.json")):
+        content = path.read_text(encoding="utf-8")
+        updated = COMMON_TAG_INPUT.sub(lambda match: match.group(1) + common.get(match.group(2), match.group(2)) + match.group(3), content)
+        updated = ITEM_INPUT.sub(
+            lambda match: f'"tag"{match.group(1)}"{tagged[match.group(2)]}"' if match.group(2) in tagged else match.group(0),
+            updated,
+        )
+        if updated != content:
+            path.write_text(updated, encoding="utf-8", newline="\n")
 
 
 def generate_recipes(catalog: dict, ore_catalog: dict) -> None:
@@ -748,7 +806,7 @@ def rewrite_recipe_result(path: Path, old_id: str, new_id: str) -> None:
 
 
 def material_ore_hardness(ore_catalog: dict) -> dict[str, int]:
-    """Gates every mod's ore of a material, through its common tag, at the material's hardness."""
+    """The hardness every mod's ore of a material gets through its common tag, when a pack turns that on."""
     hardness = {"iron": 1, "copper": 1, "gold": 2}
     for ore in ore_catalog["ores"]:
         hardness[ore["material"]] = ore["hardness_level"]
@@ -761,6 +819,7 @@ def generate_ore_resources(catalog: dict, ore_catalog: dict) -> None:
     disabled_values: list[str] = []
     rngtech_ore_values: list[str] = []
     hardness_values: dict[int, list[str]] = defaultdict(list)
+    common_hardness_values: dict[int, list[dict]] = defaultdict(list)
     pickaxe_values: list[str] = []
 
     for ore in ore_catalog["ores"]:
@@ -782,7 +841,7 @@ def generate_ore_resources(catalog: dict, ore_catalog: dict) -> None:
     for vanilla_ore, hardness in VANILLA_ORE_HARDNESS.items():
         hardness_values[hardness].append(vanilla_ore)
     for material_id, hardness in material_ore_hardness(ore_catalog).items():
-        hardness_values[hardness].append({"id": f"#c:ores/{material_id}", "required": False})
+        common_hardness_values[hardness].append({"id": f"#c:ores/{material_id}", "required": False})
 
     tag("rngtech/tags/block/ores.json", rngtech_ore_values)
     for host in ("stone", "deepslate"):
@@ -800,6 +859,8 @@ def generate_ore_resources(catalog: dict, ore_catalog: dict) -> None:
     tag("rngtech/tags/block/ore_burst_targets.json", [{"id": "#c:ores", "required": False}, *VANILLA_ORE_BURST_VALUES])
     for hardness, values in sorted(hardness_values.items()):
         tag(f"rngtech/tags/block/ore_hardness/level_{hardness}.json", values)
+    for hardness, values in sorted(common_hardness_values.items()):
+        tag(f"rngtech/tags/block/ore_hardness/common/level_{hardness}.json", values)
     replace_managed_tag_values(PICKAXE_MINING_TAG, pickaxe_values, managed_ore_block_values(catalog))
     generate_ore_worldgen(ore_catalog)
 
@@ -1013,6 +1074,22 @@ def generate_coverage(catalog: dict, ore_catalog: dict, items: list[dict]) -> No
         for group in material_groups:
             families = ", ".join(f"`{family}`" for family in group["families"])
             lines.append(f"| `rngtech:materials/family/{group['id']}` | {families} | {group['reason']} |")
+    rngtech_tags = catalog.get("rngtech_tags", [])
+    if rngtech_tags:
+        lines.extend([
+            "",
+            "## RNGTech-Only Recipe Tags",
+            "",
+            "RNGTech recipes take these forms through `rngtech:<form>/<material>` tags that hold only the RNGTech item. "
+            "The items stay in the matching `c:` tags for other mods.",
+            "",
+            "| Tags | Materials | Reason |",
+            "|---|---|---|",
+        ])
+        for entry in rngtech_tags:
+            tags = ", ".join(f"`rngtech:{COMMON_TAG_FORMS[form]}/<material>`" for form in entry["forms"])
+            materials = f"`rngtech:materials/family/{entry['group']}`" if "group" in entry else "All"
+            lines.append(f"| {tags} | {materials} | {entry['reason']} |")
     lines.extend([
         "",
         "## Registered Item Counts",
@@ -1080,7 +1157,9 @@ def main() -> None:
     generate_common_tags(catalog, ore_catalog)
     generate_rngtech_tags(catalog, ore_catalog, items)
     generate_circuit_tags(catalog)
+    generate_rngtech_recipe_tags(catalog)
     generate_recipes(catalog, ore_catalog)
+    rewrite_rngtech_tag_inputs(catalog)
     generate_ore_resources(catalog, ore_catalog)
     generate_coverage(catalog, ore_catalog, items)
     print(f"Generated {len(items)} material item models and supporting resources.")

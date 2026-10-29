@@ -20,7 +20,7 @@
         },
         "G": {
             "ingredient": {
-                "item": "rngtech:tungstensteel_gear"
+                "tag": "rngtech:gears/tungstensteel"
             }
         },
         "H": {
@@ -35,7 +35,7 @@
         },
         "P": {
             "ingredient": {
-                "item": "rngtech:tungstensteel_plate"
+                "tag": "rngtech:plates/tungstensteel"
             }
         }
     },

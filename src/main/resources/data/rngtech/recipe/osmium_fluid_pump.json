@@ -14,16 +14,16 @@
   ],
   "key": {
     "E": {
-      "tag": "c:circuits/advanced"
+      "tag": "rngtech:circuits/advanced"
     },
     "F": {
       "item": "rngtech:pump_frame"
     },
     "G": {
-      "item": "rngtech:osmium_gear"
+      "tag": "rngtech:gears/osmium"
     },
     "P": {
-      "item": "rngtech:osmium_plate"
+      "tag": "rngtech:plates/osmium"
     }
   },
   "result": {

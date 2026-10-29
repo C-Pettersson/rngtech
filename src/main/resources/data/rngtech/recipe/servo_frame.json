@@ -18,7 +18,7 @@
   ],
   "key": {
     "B": {
-      "item": "rngtech:bronze_plate"
+      "tag": "rngtech:plates/bronze"
     },
     "M": {
       "item": "rngtech:mechanism"
@@ -27,7 +27,7 @@
       "item": "minecraft:redstone"
     },
     "S": {
-      "item": "rngtech:steel_rod"
+      "tag": "rngtech:rods/steel"
     }
   },
   "result": {

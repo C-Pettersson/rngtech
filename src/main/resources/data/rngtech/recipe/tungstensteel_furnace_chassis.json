@@ -14,16 +14,16 @@
   ],
   "key": {
     "B": {
-      "ingredient": { "tag": "c:circuits/elite" }
+      "ingredient": { "tag": "rngtech:circuits/elite" }
     },
     "C": {
-      "ingredient": { "tag": "c:ingots/tungstensteel" }
+      "ingredient": { "tag": "rngtech:ingots/tungstensteel" }
     },
     "F": {
       "ingredient": { "tag": "rngtech:machine_frames/exotic" }
     },
     "I": {
-      "ingredient": { "tag": "c:ingots/tungstensteel" }
+      "ingredient": { "tag": "rngtech:ingots/tungstensteel" }
     },
     "S": {
       "ingredient": { "item": "minecraft:smooth_stone" }

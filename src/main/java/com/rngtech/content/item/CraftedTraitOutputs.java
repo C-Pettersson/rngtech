@@ -2,7 +2,6 @@ package com.rngtech.content.item;
 
 import com.rngtech.content.recycling.RecyclingData;
 import com.rngtech.content.registry.ModDataComponents;
-import com.rngtech.content.tool.ToolHeadFamily;
 import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
@@ -179,7 +178,7 @@ public final class CraftedTraitOutputs {
             stack.set(
                     ModDataComponents.MACHINE_TRAITS.get(),
                     rollTraits(lucky,
-                            ModifierEligibilityProfiles.forToolHead(head.family() == ToolHeadFamily.PICK),
+                            ModifierEligibilityProfiles.forToolHead(head.family(), head.material()),
                             head.material().stage(),
                             random
                     )

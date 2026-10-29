@@ -186,6 +186,13 @@ public final class ModCapabilities {
                         .orElse(null),
                 ModBlocks.SILICA_GEL_COLUMN_CASING.get()
         );
+        event.registerBlock(
+                Capabilities.ItemHandler.BLOCK,
+                (level, pos, state, blockEntity, side) -> SilicaGelDehumidifierBlockEntity.controllerForCasing(level, pos)
+                        .map(dehumidifier -> dehumidifier.getCasingItemHandler(side))
+                        .orElse(null),
+                ModBlocks.SILICA_GEL_COLUMN_CASING.get()
+        );
         event.registerBlockEntity(
                 Capabilities.EnergyStorage.BLOCK,
                 ModBlockEntities.SOLAR_PANEL.get(),

@@ -45,6 +45,8 @@ The only valid shape is a three-block column:
 
 If either casing is missing, all three lanes pause. Nothing is lost, and work resumes as soon as the column is complete again.
 
+While the machine works, a band of wet, blue beads climbs through the glass of both casings, and condensation drips from the glass.
+
 - [Recharging beads](rngtech:silica-gel-dehumidifier/recharging-beads.md)
 
 ### Getting water out

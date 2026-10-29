@@ -7,6 +7,7 @@
 	chapter.7106E7A1B10FA050.title: "Logistics and Transport"
 	chapter.7106E7A1B10FA060.title: "Affix Forge"
 	chapter.7106E7A1B10FA070.title: "Mastery and Ascendancies"
+	chapter.7106E7A1B10FA080.title: "Work Orders"
 	chapter_group.7106E7A1B10FA000.title: "RNGTech"
 	quest.00B991D729BDFC26.quest_desc: [
 		"The &eForestry Companion&r is a cart on vanilla rails. It plants saplings beside the track and cuts the trees that grow."
@@ -60,18 +61,6 @@
 	]
 	quest.0481EE530E9C6A2E.quest_subtitle: "Better fuel for the Corrosion Cell."
 	quest.0481EE530E9C6A2E.title: "Corrosion Anodes"
-	quest.0511A72AEC9FAB27.quest_desc: [
-		"&eTin&r is the second half of the first bronze lesson."
-		""
-		"&aBuild:&r"
-		"- Collect a &eTin Ingot&r."
-		""
-		"&aUse:&r"
-		"- Crush tin when the Stage 3 bronze path asks for dust."
-		"- Treat Tin as an alloy ingredient first, not as a full machine stage."
-	]
-	quest.0511A72AEC9FAB27.quest_subtitle: "The alloy partner for copper."
-	quest.0511A72AEC9FAB27.title: "First Tin"
 	quest.053725AB57161D50.quest_desc: ["With the Affix Injector, Affix Upgrader, or Greater Affix Upgrader, the &eConservation Crystal&r gives a 25% chance to keep the catalyst."]
 	quest.055FAC8A7D35E178.quest_desc: ["The Affix Forge chapter explains affixes, Refinement Potential, and the &eAffix Forge&r."]
 	quest.05CD873FE8F814D1.quest_desc: ["The &eAscension Matrix&r makes a Magic item with one or more affixes Rare. It adds 1 to 4 affixes and upgrades or retunes one affix. It uses all the RP that the item has left."]
@@ -114,6 +103,18 @@
 	]
 	quest.08CA89C63A70CEDE.quest_subtitle: "The Steel Battery Chassis needs it."
 	quest.08CA89C63A70CEDE.title: "Calibrated Storage"
+	quest.095B2C2EAFC75846.quest_desc: [
+		"Download a job for a machine you have at the stage it needs."
+		""
+		"&aUse:&r"
+		"1. Open the machine's &eOrders&r tab and put the chip in a drive bay. Shift-click works while the tab is open."
+		"2. Select the chip and press &eActivate&r, or &eRush&r for a timed job. A loaded chip does not start on its own."
+		"3. Run the machine. Only work it finishes while the chip is active counts."
+		""
+		"A machine holds three chips and works on one. Switching keeps every chip's progress. Hold Shift on a stage job to see the items that count."
+	]
+	quest.095B2C2EAFC75846.quest_subtitle: "Pick a job you can run."
+	quest.095B2C2EAFC75846.title: "First Job Chip"
 	quest.09E6CC376427E6D3.quest_desc: [
 		"The &eCrude Recycler&r takes early items apart and gives back some of their materials. It needs no &bFE&r."
 		""
@@ -399,6 +400,13 @@
 	]
 	quest.2395BFD1C7ACB809.quest_subtitle: "Choose a path."
 	quest.2395BFD1C7ACB809.title: "Ascendancy Seal I"
+	quest.278F57CB04C541E1.quest_desc: [
+		"A finished job turns its chip into a &eCompleted Job Chip&r in the same bay. Take it out and use it to receive the reward it lists."
+		""
+		"The machine does not start another chip on its own. Activate the next one."
+	]
+	quest.278F57CB04C541E1.quest_subtitle: "Collect the pay."
+	quest.278F57CB04C541E1.title: "Job Done"
 	quest.2A87820D10501CE9.quest_desc: [
 		"Optional. Each Solid Fuel Burner accepts Gear up to its own stage."
 		"A better Heat Core gives more &bFE/t&r and burns higher fuel tiers."
@@ -425,7 +433,6 @@
 	]
 	quest.2AB169CEEBB9FA40.quest_subtitle: "Move Mastery to a better machine."
 	quest.2AB169CEEBB9FA40.title: "Soul Transfer"
-	quest.2B8333FC1B90FDF8.title: "READ: You"
 	quest.2C5B42CFDFA5C13B.quest_desc: [
 		"The &eAluminum Compressor Tank&r stores 64,000 mB loose and 1,024,000 mB compressed. It accepts Gear up to Stage 5."
 		"Craft it from a &ePressure Tank Frame&r, 4 glass, and 4 aluminum ingots."
@@ -462,7 +469,6 @@
 	]
 	quest.2DD5120E11128BFD.quest_subtitle: "Mix metals and carbon into alloys."
 	quest.2DD5120E11128BFD.title: "Alloy Furnace"
-	quest.301EC3DBE0E3AFE6.quest_desc: ["You need to be able to make electric circuit to advance into stage 3 and 4."]
 	quest.3034E1FAD40A48B2.quest_desc: [
 		"&6Uniques&r are Gear parts and Battery Cells that you find. You cannot craft them. A Unique has an orange-brown name."
 		""
@@ -530,6 +536,13 @@
 	]
 	quest.366307DF419BEB06.quest_subtitle: "One output for a field of panels."
 	quest.366307DF419BEB06.title: "Solar Array"
+	quest.36827C604EDFB930.quest_desc: [
+		"Optional. A Job Chip is a refinement target in the &eAffix Forge&r. Add a condition for more reward, remove one for an easier job, or reroll them. The listed reward follows the change."
+		""
+		"A &eVolatile Catalyst&r corrupts a chip: it may pay more, gain a free condition, or gain one that pays nothing. Take a chip out of its bay before you refine it. The Phase Array does not take chips."
+	]
+	quest.36827C604EDFB930.quest_subtitle: "Shape the job."
+	quest.36827C604EDFB930.title: "Refining Job Chips"
 	quest.36FD86C58309204A.quest_desc: ["Insert the &eEfficiency Modifier Lens&r in the focus slot of the Affix Forge. It makes efficiency affixes 3 times as likely."]
 	quest.37A6C9E1284B5D10.quest_desc: [
 		"&6RNGTech&r adds RPG elements to tech machines. Machines, Gear, tool parts, and Battery Cells roll their own rarity and affixes."
@@ -746,19 +759,6 @@
 	]
 	quest.37A6C9E1284B5D1C.quest_subtitle: "Burn fuel to make FE."
 	quest.37A6C9E1284B5D1C.title: "Crude FE Burner"
-	quest.37A6C9E1284B5D1D.quest_desc: [
-		"Optional path. The &eCopper Battery Chassis&r trades some stability for better early transfer and small burst behavior."
-		""
-		"&aBuild:&r"
-		"- Place a &eCopper Battery Chassis&r."
-		"- Install a &eCopper Battery Cell&r."
-		""
-		"&aUse:&r"
-		"- Use this path for early lines that need more &bFE/t&r than Iron can move."
-		"- Watch leakage and low stability before scaling it."
-	]
-	quest.37A6C9E1284B5D1D.quest_subtitle: "Transfer now, stability later."
-	quest.37A6C9E1284B5D1D.title: "Copper Bus"
 	quest.37A6C9E1284B5D1F.quest_desc: [
 		"The &eAffix Forge&r adds, upgrades, rerolls, and removes the affixes of an item. It needs no power."
 		""
@@ -1010,32 +1010,6 @@
 	]
 	quest.37A6C9E1284B5D34.quest_subtitle: "Build one electric Furnace to continue."
 	quest.37A6C9E1284B5D34.title: "Smelting Path Selected"
-	quest.37A6C9E1284B5D35.quest_desc: [
-		"Optional path. The &eIron Battery Chassis&r is a reliable one-cell rack with strong per-cell modifier focus."
-		""
-		"&aBuild:&r"
-		"- Place an &eIron Battery Chassis&r."
-		"- Install an &eIron Battery Cell&r."
-		""
-		"&aUse:&r"
-		"- Pick this path for predictable storage and no burst risk."
-		"- Keep a good rolled cell; it can move into later machines."
-	]
-	quest.37A6C9E1284B5D35.quest_subtitle: "Stable storage, low drama."
-	quest.37A6C9E1284B5D35.title: "Iron Rack"
-	quest.37A6C9E1284B5D36.quest_desc: [
-		"Optional path. The &eGold Battery Chassis&r is a burst bank. It can push high output for short windows, but its stability is poor."
-		""
-		"&aBuild:&r"
-		"- Place a &eGold Battery Chassis&r."
-		"- Feed it with cells that can survive the output demand."
-		""
-		"&aUse:&r"
-		"- Pick this path for startup spikes or hungry machines."
-		"- Do not treat burst output as free storage."
-	]
-	quest.37A6C9E1284B5D36.quest_subtitle: "High burst with overload risk."
-	quest.37A6C9E1284B5D36.title: "Gold Flash Bus"
 	quest.37A6C9E1284B5D37.quest_desc: [
 		"Build one Battery Chassis to continue. Either path completes this quest."
 		""
@@ -1179,33 +1153,10 @@
 	]
 	quest.37A6C9E1284B5D40.quest_subtitle: "Prepared biomass, higher fuel value."
 	quest.37A6C9E1284B5D40.title: "Rich Biomass"
-	quest.37A6C9E1284B5D41.quest_desc: [
-		"Optional read. The &eAlloy Furnace&r is the full-yield alloy path once Bronze Casing and the Bronze Alloy Crucible are reachable."
-		""
-		"&aUse:&r"
-		"- Pick this path when you want full-yield Bronze before the Stage 4 factory settles in."
-		"- Upgrade the chassis and crucible together as alloy inputs get stricter."
-		"- Keep this as a side lesson rather than a progression gate until every required component has a survival recipe."
-	]
-	quest.37A6C9E1284B5D41.quest_subtitle: "Full-yield alloys without the dust tax."
-	quest.37A6C9E1284B5D41.title: "Read: Alloy Furnace"
 	quest.37A6C9E1284B5D42.quest_desc: [
 		"The &eCopper Solid Fuel Burner&r accepts Gear up to Stage 2."
 		"A &eCopper Heat Core&r gives 40 &bFE/t&r. A &eCopper Fuel Box&r adds the Fuel Governor, which pauses the burner when the cell is full."
 	]
-	quest.37A6C9E1284B5D43.quest_desc: [
-		"Optional. &eCrude Solar Panels&r provide daylight &bFE&r without fuel. They are weak, but they teach sky access, weather loss, and side extraction."
-		""
-		"&aBuild:&r"
-		"- Place a &eCrude Solar Panel&r with open sky."
-		""
-		"&aUse:&r"
-		"- Pull &bFE&r from the panel into nearby storage or machines."
-		"- Expect lower or zero production in bad weather, at night, or in unsupported dimensions."
-		"- Treat this as supplemental power until array control opens."
-	]
-	quest.37A6C9E1284B5D43.quest_subtitle: "Fuel-free trickle power."
-	quest.37A6C9E1284B5D43.title: "Crude Solar"
 	quest.37A6C9E1284B5D45.quest_desc: [
 		"Optional. A &eTank Frame&r is the base of every &eFluid Tank&r."
 		""
@@ -1324,6 +1275,13 @@
 		""
 		"&7&oNote: You cannot select the affix that it removes. Fixed traits and base stats stay.&r"
 	]
+	quest.3A1FD024757A73C7.quest_desc: [
+		"Optional. Magic and Rare chips carry &econditions&r: a cost to the machine, such as less Processing Speed, or a rule, such as a jam resetting progress. Each one makes the reward bigger. Conditions apply only while their chip is active."
+		""
+		"&eRush&r activates a chip under a deadline of half its tier's target time for 50% more reward. The clock never stops, and the chip is lost if time runs out."
+	]
+	quest.3A1FD024757A73C7.quest_subtitle: "Harder jobs pay more."
+	quest.3A1FD024757A73C7.title: "Conditions and Rush"
 	quest.3A817746747CF255.quest_desc: ["Install a Crush Head in the Head slot of the &eMiner's Companion&r to enable Block Chew. Any Crush Head fits."]
 	quest.3A8FCB54EB8B1E89.quest_desc: [
 		"Optional. A &eCrude Solar Panel&r makes 4 &bFE/t&r on a clear day, 1 &bFE/t&r in rain, and nothing at night."
@@ -1783,6 +1741,17 @@
 		"Calibrate a &eCopper Casing&r with the &eThermal Calibration Pattern&r and Glowstone Dust."
 		"The &eBronze Furnace Chassis&r and the &eAlloy Solid Fuel Burner&r need 45 or more stability. Steel machines need 55 or more."
 	]
+	quest.6019B5AA53D9F0CD.quest_desc: [
+		"The &eDispatch Terminal&r lists six jobs of mixed tiers and machines."
+		""
+		"Its recipe needs a &eCalibrated Logic Component&r with 80% or more stability. Only the Stage 4 Calibrator's resonant recipe reaches that."
+		""
+		"- &eDownload&r takes a job as a Job Chip. Its line stays empty."
+		"- &eRefresh&r spends a Requisition to replace all six lines."
+		"- A broken terminal keeps its listing, so placing it again is no free refresh."
+	]
+	quest.6019B5AA53D9F0CD.quest_subtitle: "The job board."
+	quest.6019B5AA53D9F0CD.title: "Dispatch Terminal"
 	quest.61F18F2CD460DDD9.quest_desc: [
 		"Optional. Stage 3-4 adds more ways to make &bFE&r:"
 		"- Burn crops and biomass in the &eBio Generator&r."
@@ -1853,6 +1822,13 @@
 	]
 	quest.6B295A9B5D422CB1.quest_subtitle: "Reveal the rolls of new items."
 	quest.6B295A9B5D422CB1.title: "Unidentified Items"
+	quest.6B93582CAFA30B6D.quest_desc: [
+		"Optional. A &eRequisition&r refreshes a Dispatch Terminal's six lines."
+		""
+		"Craft two from a &eCalibrated Logic Component&r with 65% or more stability, Paper, Steel Plates, and Basic Electric Circuits. Some jobs pay Requisitions as their reward."
+	]
+	quest.6B93582CAFA30B6D.quest_subtitle: "New jobs on demand."
+	quest.6B93582CAFA30B6D.title: "Requisitions"
 	quest.6D8585E478E2A8D5.quest_desc: [
 		"The &eTungstensteel Compressor Tank&r stores 128,000 mB loose and 4,096,000 mB compressed. It accepts Gear up to Stage 7."
 		"Craft it from a &ePressure Tank Frame&r, 4 glass, 2 tungstensteel ingots, and 2 &eTitanium Casings&r."
@@ -2095,7 +2071,7 @@
 		"- 7: Tungstensteel and Nullite heads. No ore by default."
 		"- 8: Exotic heads. Naquadah ore."
 		""
-		"Ores from other mods have the hardness of their metal. By default, a vanilla stone pickaxe reaches hardness 1, and an iron or better pickaxe reaches hardness 2."
+		"Other pickaxes also mine RNGTech ore. By default, a stone pickaxe reaches hardness 1, an iron pickaxe reaches hardness 3, a diamond pickaxe reaches hardness 6, and a Netherite Pickaxe reaches every hardness."
 		""
 		"&7&oNote: The modpack can change these rules and can restrict vanilla tools.&r"
 	]
@@ -2463,20 +2439,6 @@
 	]
 	quest.74C2A8758BA6E314.quest_subtitle: "Spend Refinement Potential with care."
 	quest.74C2A8758BA6E314.title: "Affixes"
-	quest.75A6F1710FAEBD6C.quest_desc: [
-		"Optional. &eCopper Solar Panels&r are the first solar upgrade after crude daylight power."
-		""
-		"The Solar Array Controller allows you to pool multiple panels and apply bonuses."
-		""
-		"&aBuild:&r"
-		"- Craft a &eCopper Solar Panel&r."
-		""
-		"&aUse:&r"
-		"- Use it as supplemental daytime power."
-		"- Save larger solar planning for the array controller branch."
-	]
-	quest.75A6F1710FAEBD6C.quest_subtitle: "Better daylight trickle."
-	quest.75A6F1710FAEBD6C.title: "Copper Solar"
 	quest.760227B83533AF3C.quest_desc: [
 		"Optional. Place a Redstone Comparator next to an RNGTech machine. The signal strength shows the machine state:"
 		"- 15: the machine is blocked, for example with no power or a full output."
@@ -2489,6 +2451,15 @@
 	]
 	quest.760227B83533AF3C.quest_subtitle: "A comparator shows the machine state."
 	quest.760227B83533AF3C.title: "Comparator Output"
+	quest.766D5255F991FE77.quest_desc: [
+		"&eWork Orders&r are repeatable jobs for processing machines. Each job is a &eJob Chip&r that shows everything before you take it: the machine, the job, its tier, the chassis stage it needs, its conditions, and the one reward it pays."
+		""
+		"- Tier I jobs need a Stage 4 chassis, up to Stage 8 for Tier V. A machine whose top stage is lower needs only its top stage."
+		"- Crushers, Furnaces, Alloy Furnaces, Metal Presses, Melters, Resonance Calibrators, the Forestry Companion, the Component Assembler, and powered Component Recyclers take chips."
+		"- Rewards are refinement catalysts, Mastery Refunds, Requisitions, Glyphs, and Uniques. Never FE or materials."
+	]
+	quest.766D5255F991FE77.quest_subtitle: "Jobs for your machines."
+	quest.766D5255F991FE77.title: "Read: Work Orders"
 	quest.77BDE15168C209AE.quest_desc: [
 		"With an Energy Connector in its Gear tab, the &eTool Bench&r charges the Battery Cell of a tool."
 		""
@@ -2540,18 +2511,6 @@
 	quest.7BCD8236CD2689BB.quest_subtitle: "A stronger rod that takes Iron cells."
 	quest.7BCD8236CD2689BB.title: "Iron Tool Rod"
 	quest.7D07C6C36A40B121.quest_desc: ["The &eGreater Affix Upgrader&r upgrades one random affix. If all affixes are at their top tier, it retunes one affix. It costs 6 to 10 RP."]
-	quest.7E96148C6A2F7B94.quest_desc: [
-		"&eCopper&r opens early conductive parts, heat cores, cells, and sidegrade machines."
-		""
-		"&aBuild:&r"
-		"- Collect a &eCopper Ingot&r."
-		""
-		"&aUse:&r"
-		"- Use Copper for transfer, heat, and early power branches."
-		"- Do not skip the Crude Metal Press when Copper Furnace circuits block progress."
-	]
-	quest.7E96148C6A2F7B94.quest_subtitle: "Conductive parts start here."
-	quest.7E96148C6A2F7B94.title: "First Copper"
 	reward_table.078B604FCB901AA9.title: "Refine"
 	reward_table.72A0AC975B999BE5.title: "lenses"
 	task.07652CB1B5828F97.title: "Check Affixes"
@@ -2560,7 +2519,6 @@
 	task.394041CF7190669D.title: "Solid Fuel"
 	task.3CDE4FBDB48248DA.title: "Beyond"
 	task.3E395FC98DE7B1F4.title: "Unidentified?"
-	task.3E3D1BE5F2A03DE2.title: "Test"
 	task.4930BDE1CE45FD13.title: "Power"
 	task.68A63DBA22BADCFE.title: "Heat"
 }

@@ -288,6 +288,7 @@ dependencies {
     localRuntime "org.appliedenergistics:appliedenergistics2:${ae2_version}"
     localRuntime "org.appliedenergistics:guideme:${guideme_version}"
     compileOnly "org.apiguardian:apiguardian-api:${apiguardian_version}"
+    compileOnly "com.almostreliable.mods:almostunified-neoforge:${almostunified_version}:api"
     compileOnly "curse.maven:refined-storage-243076:${refined_storage_file_id}"
     localRuntime "curse.maven:refined-storage-243076:${refined_storage_file_id}"
     localRuntime "curse.maven:refined-storage-jei-integration-1230497:${refined_storage_jei_integration_file_id}"
@@ -333,7 +334,8 @@ tasks.withType(ProcessResources).configureEach {
     }
 }
 
-def githubRepository = System.getenv('GITHUB_REPOSITORY')
+// GitHub Packages rejects an owner with uppercase letters (HTTP 422), and this repository's owner has them.
+def githubRepository = System.getenv('GITHUB_REPOSITORY')?.toLowerCase(Locale.ROOT)
 
 publishing {
     publications {
@@ -441,6 +443,18 @@ tasks.register('processingBalanceSim', JavaExec) {
     javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
     def output = layout.buildDirectory.file('processing-balance/processing-balance.json').get().asFile
     args layout.projectDirectory.asFile.path, output.path
+    workingDir = layout.buildDirectory.dir('processing-balance').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+
+tasks.register('processingTreeSearch', JavaExec) {
+    group = 'balance'
+    description = 'Regenerates the ore line model tree allocations in tools/balance/processing-setups.json.'
+    dependsOn tasks.named('masteryTestClasses')
+    classpath = sourceSets.masteryTest.runtimeClasspath
+    mainClass = 'com.rngtech.rpg.ProcessingTreeSearch'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+    args layout.projectDirectory.asFile.path
     workingDir = layout.buildDirectory.dir('processing-balance').get().asFile
     doFirst { workingDir.mkdirs() }
 }

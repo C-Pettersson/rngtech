@@ -1,0 +1,157 @@
+{
+    "family": "metal_press",
+    "type": "press",
+    "filter": "item",
+    "weight": 3,
+    "parts": {
+        "min": 1,
+        "max": 2
+    },
+    "options": [
+        {
+            "item": "rngtech:iron_casing",
+            "stage": 1
+        },
+        {
+            "item": "rngtech:iron_gear",
+            "stage": 1
+        },
+        {
+            "item": "rngtech:iron_plate",
+            "stage": 1
+        },
+        {
+            "item": "rngtech:copper_casing",
+            "stage": 2
+        },
+        {
+            "item": "rngtech:copper_gear",
+            "stage": 2
+        },
+        {
+            "item": "rngtech:copper_plate",
+            "stage": 2
+        },
+        {
+            "item": "rngtech:bronze_casing",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:bronze_gear",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:bronze_plate",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:gold_casing",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:gold_gear",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:gold_plate",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:tin_gear",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:tin_plate",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:zinc_gear",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:zinc_plate",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:invar_gear",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:invar_plate",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:lead_gear",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:lead_plate",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:nickel_gear",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:nickel_plate",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:silver_gear",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:silver_plate",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:steel_casing",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:steel_gear",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:steel_plate",
+            "stage": 4
+        }
+    ],
+    "tiers": [
+        {
+            "count": {
+                "min": 48,
+                "max": 64,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 64,
+                "max": 88,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 72,
+                "max": 112,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 88,
+                "max": 136,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 88,
+                "max": 136,
+                "step": 8
+            }
+        }
+    ]
+}

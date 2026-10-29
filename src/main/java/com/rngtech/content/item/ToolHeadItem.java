@@ -117,7 +117,7 @@ public class ToolHeadItem extends Item {
         } else {
             MachineTraitTooltip.appendUnrolledTraitHeader(
                     MachineTraitRoller.refinementPotentialRange(
-                            ModifierEligibilityProfiles.forToolHead(family == ToolHeadFamily.PICK),
+                            ModifierEligibilityProfiles.forToolHead(family, material),
                             material.stage()
                     ),
                     tooltipComponents

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the Metal Press block models, part models, item models, and owned textures.
+"""Generate the Metal Press blockstates, block models, part models, item models, and owned textures.
 
 Both presses share one layout around a heated die bed. The selected Mold is the lower die on the bed, the input lies on
 it, and a ram brings the upper die down onto it; pressed parts collect in a tray at the front of the bed. The Heat Core
@@ -13,6 +13,8 @@ meter next to the heat bar. The Crude Metal Press follows its recipe: a firebric
 with copper heating coils, an iron anvil plate, two bronze columns, a bronze crosshead, and a screw spindle with a
 fly bar that turns as the iron ram comes down. Its Servo is optional and shows on a bracket behind the crosshead only
 when installed.
+
+Both presses carry the Furnace's Job Chip lamp (job_lamp.py) on the cradle beside the status lamp.
 
 The housings are static block models. The installed parts, the ram, the screw, the items, the heat glow, and the
 meters are drawn by MetalPressRenderer, whose constants match the geometry here. Run from the repository root:
@@ -28,8 +30,9 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 import furnace
+import job_lamp
 from furnace import (
-    CYLINDER, CYLINDER_FLAT, CYLINDER_R, CYLINDER_WINDOW, CYLINDER_Y, CRADLE, SIDES,
+    CYLINDER, CYLINDER_FLAT, CYLINDER_R, CYLINDER_WINDOW, CYLINDER_Y, CRADLE, JOB_LAMP, JOB_LAMP_FACES, SIDES,
     blotches, box, cradle_elements, cylinder_elements, heat_bar, lamp, noisy, panel_seams, plinth,
     port_elements, shade, stack, write_json,
 )
@@ -156,9 +159,10 @@ def cabinet_elements():
 
 
 def east_side_elements():
-    """The Furnace's cell cradle, lamp, and atmosphere cylinder, fed into the bed and the cabinet."""
+    """The Furnace's cell cradle, lamps, and atmosphere cylinder, fed into the bed and the cabinet."""
     elements = cradle_elements(feed_to=CYLINDER[1] - CYLINDER_R)
     elements.append(lamp(*LAMP))
+    elements.append(job_lamp.element(*JOB_LAMP, JOB_LAMP_FACES))
     elements += cylinder_elements(CYLINDER, CYLINDER_R, CYLINDER_FLAT, CYLINDER_Y, CYLINDER_WINDOW, "east")
     top = CYLINDER_Y[1] + 0.75
     elements.append(box((CABINET[1][0] - 0.25, top + 0.25, CYLINDER[1] - 0.25), (CYLINDER[0] - 0.5, top + 0.75, CYLINDER[1] + 0.25),
@@ -325,6 +329,7 @@ SHARED_TEXTURES = {
     "heat_bar": FURNACE_TEX + "heat_bar",
     "tray": TEX + "tray",
     "rack": TEX + "rack",
+    **job_lamp.TEXTURE,
 }
 STEEL_TEXTURES = {
     **SHARED_TEXTURES,
@@ -367,6 +372,8 @@ def write_models() -> None:
     write_json(MODELS / "block/crude_metal_press.json", model(CRUDE_TEXTURES, crude_elements()))
     write_json(MODELS / "block/crude_metal_press_active.json",
                {"parent": "rngtech:block/crude_metal_press", "textures": {"lamp": FURNACE_TEX + "lamp_on"}})
+    for name in ("metal_press", "crude_metal_press"):
+        job_lamp.write_blockstate(name, f"rngtech:block/{name}", f"rngtech:block/{name}_active", "rngtech:block/furnace/job_lamp")
 
     # Item models carry the Gear of the press's stage, which only the renderer draws in the world: a plate die, the
     # raised ram, the Heat Core, and on the Steel press its Servo. They leave out what hides inside the crown or

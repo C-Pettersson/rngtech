@@ -4,7 +4,10 @@ import com.rngtech.content.entity.ForestryCartEntity;
 import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.item.FluidConnectorItem;
 import com.rngtech.content.item.ItemConnectorItem;
+import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.content.workorder.DriveBays;
+import com.rngtech.content.workorder.WorkOrderDiscovery;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.progression.ForestryCompanionPassiveTree;
@@ -15,6 +18,9 @@ import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveNode;
 import com.rngtech.rpg.progression.PassiveProgressionView;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
@@ -23,18 +29,21 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu {
+public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu, WorkOrderMenuView {
     public static final int TAB_CART = 0;
     public static final int TAB_STATS = 1;
     public static final int TAB_MASTERY = 2;
+    public static final int TAB_ORDERS = 3;
     public static final int BUTTON_TOGGLE_SCAN_DEBUG = 0;
     public static final int BUTTON_RELEASE_MANAGEMENT_VIEW = 1;
     public static final int BUTTON_TOGGLE_MANUAL_SPEED = 2;
@@ -103,6 +112,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
     private final ForestryCartEntity cart;
     private final PassiveProgressionView passiveProgressionView =
             MasteryMenuSupport.progressionView(this::hasPassiveNodeIndex, this::machineLevel, this::unspentPassivePoints, MachineMasteryFamily.FORESTRY.startNodeId());
+    private final DataSlot ordersShown;
     private int selectedTab = TAB_CART;
     private boolean managementViewer = true;
 
@@ -166,13 +176,31 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
         ));
 
         addPlayerInventory(playerInventory);
+        IItemHandler bays = playerInventory.player.level().isClientSide ? DriveBays.client(this) : new DriveBays(cart);
+        for (int bay = 0; bay < MachineWorkOrders.SLOTS; bay++) {
+            addSlot(new DriveBaySlot(bays, bay, () -> selectedTab == TAB_ORDERS));
+        }
         addDataSlots(data);
+        ordersShown = addDataSlot(WorkOrderDiscovery.shownSlot(playerInventory.player, cart));
+    }
+
+    @Override public WorkOrderHost workOrderHost() { return cart; }
+    @Override public boolean workOrdersShown() { return ordersShown.get() != 0; }
+    @Override public String workOrderFamily() { return WorkOrderFamilies.of(MachineMasteryFamily.FORESTRY); }
+    @Override public int workOrderStage() { return ascendancyEntryStage(); }
+    @Override public int workOrderMasteryLevel() { return machineLevel(); }
+    @Override public WorkOrderMenuSupport.View workOrderView() {
+        return MasteryMenuSupport.workOrders(data, DATA_MACHINE_PROGRESSION_START);
+    }
+    @Override public ItemStack workOrderChip(int bay) {
+        return bay >= 0 && bay < MachineWorkOrders.SLOTS ? getSlot(HOTBAR_END + bay).getItem() : ItemStack.EMPTY;
     }
 
     public void selectTab(int tab) {
         selectedTab = switch (tab) {
             case TAB_STATS -> TAB_STATS;
             case TAB_MASTERY -> TAB_MASTERY;
+            case TAB_ORDERS -> TAB_ORDERS;
             default -> TAB_CART;
         };
     }
@@ -439,6 +467,10 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (id >= WorkOrderMenuSupport.BUTTON_SELECT_TAB && id <= WorkOrderMenuSupport.BUTTON_SELECT_TAB + TAB_ORDERS) {
+            selectTab(id - WorkOrderMenuSupport.BUTTON_SELECT_TAB);
+            return true;
+        }
         MegaPassiveNode passiveNode = MegaPassiveTree.byButtonId(id);
         if (passiveNode != null) {
             if (player.level().isClientSide) {
@@ -504,7 +536,15 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
 
         ItemStack stack = slot.getItem();
         moved = stack.copy();
-        if (index < PLAYER_INVENTORY_START) {
+        if (index >= HOTBAR_END) {
+            if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (selectedTab == TAB_ORDERS && index >= PLAYER_INVENTORY_START && JobChipItem.isWorkOrder(stack)) {
+            if (!moveItemStackTo(stack, HOTBAR_END, HOTBAR_END + MachineWorkOrders.SLOTS, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (index < PLAYER_INVENTORY_START) {
             if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
                 return ItemStack.EMPTY;
             }
@@ -561,7 +601,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
                         column + row * 9 + 9,
                         39 + column * 18,
                         116 + row * 18,
-                        () -> selectedTab == TAB_CART
+                        () -> selectedTab == TAB_CART || selectedTab == TAB_ORDERS
                 ));
             }
         }
@@ -572,7 +612,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
                     column,
                     39 + column * 18,
                     174,
-                    () -> selectedTab == TAB_CART
+                    () -> selectedTab == TAB_CART || selectedTab == TAB_ORDERS
             ));
         }
     }

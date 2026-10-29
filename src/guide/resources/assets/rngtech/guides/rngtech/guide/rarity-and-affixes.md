@@ -86,7 +86,7 @@ An illegal or failed refinement costs nothing: no catalyst and no RP. If an add 
 
 ## Corruption
 
-A <ItemLink id="rngtech:volatile_catalyst" /> corrupts a finished machine part or Battery Cell in the [Affix Forge](rngtech:affix-forge/corrupting-with-a-volatile-catalyst.md), or a placed machine in its Refinement tab. It costs no RP, and it is the only thing that can change a Unique. Machine and chassis items, Tool Heads, Tool Rods, companions, and unidentified or stripped items cannot be corrupted as items; place a machine first and corrupt it from its Refinement tab.
+A <ItemLink id="rngtech:volatile_catalyst" /> corrupts a finished machine part or Battery Cell in the [Affix Forge](rngtech:affix-forge/corrupting-with-a-volatile-catalyst.md), or a placed machine in its Refinement tab. It costs no RP, and it is the only thing that can change a Unique. Machine and chassis items, Tool Heads, Tool Rods, companions, and unidentified or stripped items cannot be corrupted as items; place a machine first and corrupt it from its Refinement tab. You can corrupt a [Job Chip](rngtech:work-orders/refining-and-corrupting-chips.md) in the Affix Forge. There, the outcomes change the job's reward instead of a stat.
 
 The catalyst rolls one outcome, and every outcome leaves the item **Corrupted**:
 
@@ -111,3 +111,4 @@ A **Corrupted** item can never be refined again: the Affix Forge, Phase Array, T
 - [What rolls traits](rngtech:rarity-and-affixes/what-rolls-traits.md)
 - [Identification](rngtech:rarity-and-affixes/identification.md)
 - [Refining](rngtech:rarity-and-affixes/refining.md)
+- [Mirrored items](rngtech:rarity-and-affixes/mirrored-items.md)

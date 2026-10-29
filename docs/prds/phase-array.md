@@ -1,10 +1,10 @@
 # PRD: Phase Array
 
-> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and the [Exotic Affix Forge](https://c-pettersson.github.io/rngtech/exotic-affix-forge/) wiki page for current behavior.
+> Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and the [Phase Array](https://c-pettersson.github.io/rngtech/phase-array/) wiki page for current behavior.
 
 PRD status: Accepted
 
-Implementation status: Prototype
+Implementation status: Implemented
 
 Release: Not scheduled
 
@@ -240,16 +240,10 @@ RP binds first: a fresh Rare item spends its budget on about a dozen Resonates a
 
 ## Glyphs and Work Orders
 
-Glyphs have no recipe. This PRD ships the item and its default sources. All six challenge loot tables are empty today; these are their first default entries, and each one is an RNGTech machine challenge, never vanilla loot. Draft:
+Glyphs have no recipe. This PRD ships the item and its default sources. It first shipped six machine-challenge sources (Mastery milestones, high-stability calibrations, Stage 7+ forestry heads, unstable Vacuum Collapse cycles, and high-level Crusher jams); they were removed on 2026-10-26, because the Glyphs dropped on top of the machine or blocked its output slot. Machines now roll no loot on their own events.
 
 | Source | Condition | Glyph |
 |---|---|---|
-| `rngtech:challenges/mastery_level` | Level 20, 40, 60, 80, and 100 | Tier I at 20 and 40, Tier II at 60 and 80, Tier III at 100 |
-| `rngtech:challenges/calibration` | Stage 6 or higher, 90% stability or higher | 15% chance of Tier II; Stage 8 at 95% gives Tier III |
-| `rngtech:challenges/forestry_harvest` | A Stage 7 or higher cutting head | 2% chance of Tier II |
-| `rngtech:challenges/vacuum_collapse` | Instability 60 or higher | 10% chance of Tier III; 90 or higher gives Tier IV |
-| `rngtech:challenges/crusher_jam` | Processing Level 7 or higher | 5% chance of Tier I |
-| `rngtech:challenges/heat_failure` | Never | Failing on purpose should not pay |
 | Dormant Machine, woken | By site | Collapsed Workshop and Cart Siding Tier I, Calibration Vault and Flooded Foundry Tier II, Nether Smeltworks Tier III, End Relay Tier IV |
 | Pack makers | Any | `/give`, quests, other mods' loot, or a recipe they add. A plain `rngtech:glyph` stack with no tier reads as Tier I. |
 
@@ -406,7 +400,7 @@ Resolved 2026-10-21:
 - Reforge keeps Strain. A reforge is not a cheap Temper.
 - Every stage is accepted, and operations spend a little RP, so RP stays the ceiling.
 - Operations are `rngtech:phase_array` recipes.
-- Default Glyph sources are the existing challenge loot tables and Dormant Machines. Tier V comes from Work Orders only.
+- Default Glyph sources are Dormant Machines, and Work Orders once they land. The machine-challenge tables were removed on 2026-10-26. Tier V comes from Work Orders only.
 - The Cradle screen follows the Dormant Machine's graphical panel.
 - Glyphs are seated in the Cradle, one seat per tier, like the Affix Forge's installed upgrades, after locking them into Coils one by one proved hard to read in playtest (resolved 2026-10-22). A seated Glyph can be taken back out.
 - Drained Battery Cells leave through the Cradle's bottom face, as Structure says; the Non-Goal rules out automating the pulse, not emptying the sockets. Nothing enters by automation.

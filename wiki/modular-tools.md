@@ -100,7 +100,7 @@ wiki:
     },
 ) }}
 
-**Modular Field Tools** are RNGTech's picks, hammers, shovels, diggers, axes, and treefellers. Each one is built at the [Tool Bench](tool-bench.md) from a separate **Tool Head** and **Tool Rod**, and each part keeps its own rarity and affixes. They are also how you mine the harder RNGTech ores; vanilla pickaxes only reach the first two ore-hardness levels by default.
+**Modular Field Tools** are RNGTech's picks, hammers, shovels, diggers, axes, and treefellers. Each one is built at the [Tool Bench](tool-bench.md) from a separate **Tool Head** and **Tool Rod**, and each part keeps its own rarity and affixes. They mine RNGTech ores early, and other pickaxes also mine them by their tier.
 
 ## Parts
 
@@ -147,9 +147,18 @@ RNGTech ores have a **hardness** from 1 to 8, separate from vanilla mining tiers
 | Nullite | 7 | 7 | None by default |
 | Exotic | 8 | 8 | Naquadah |
 
-Other mods' ores of the same metal share its hardness, so another mod's Tin Ore is hardness 2 like RNGTech's.
+Hardness applies to RNGTech's ores and to vanilla Iron, Copper, and Gold ore. Other mods' ores have no hardness, unless your modpack turns it on for them.
 
-By default, a vanilla stone pickaxe reaches hardness 1 and an iron or better pickaxe reaches hardness 2. Other mods' pickaxes and drills follow the same rule by their tier. Beyond that you need Modular tools. Modpacks can change these rules and can weaken or disable vanilla tools; see [Ore progression](modpack-creators.md#ore-progression).
+Other pickaxes also mine RNGTech ore, by their tier:
+
+| Pickaxe | Ore hardness |
+|---|---:|
+| Stone | 1 |
+| Iron | 3 |
+| Diamond | 6 |
+| Netherite Pickaxe | 8 |
+
+Other mods' pickaxes and drills follow the same rule by their tier. Only the vanilla Netherite Pickaxe counts as netherite tier, so other mods' best pickaxes reach hardness 6. Modpacks can change these rules and can weaken or disable vanilla tools. See [Ore progression](modpack-creators.md#ore-progression).
 
 ## Tool behavior
 
@@ -159,7 +168,7 @@ By default, a vanilla stone pickaxe reaches hardness 1 and an iron or better pic
 - **Self Repair** heads and rods restore 3 to 8 durability, depending on the affix tier, every 7.5 seconds while the tool sits idle in your hotbar or offhand. A head and rod that both have it add together. Mining pauses the repair.
 - **Battery Cells** in your inventory recharge the tool's installed cell, first inventory slot first, up to the tool's FE transfer rate. Only cells within the rod's Battery Support count, the same limit that decides which cells you can install.
 - **Vein Miner**, a rare Pick Head affix, breaks connected ore of the same type, up to the Vein Mine Limit. Each block after the first costs extra FE; when the cell cannot pay it, the rest of the vein stays. Sneak while mining to break only the block you aim at.
-- **Ore Burst** speeds up mining on ore for Picks and Hammers. It needs the Ore Burst suffix on a part and an Ore Burst material: a Copper, Nullite, or Exotic head, or a {{ item('rngtech:copper_conduit_tool_rod') }}, {{ item('rngtech:sparksteel_routed_tool_rod') }}, {{ item('rngtech:nullite_phase_tool_rod') }}, or {{ item('rngtech:exotic_harmonic_tool_rod') }}. Each ore it breaks costs extra FE, and without enough FE the ore mines at normal speed.
+- **Ore Burst** speeds up mining on ore for Picks and Hammers. It needs an Ore Burst material: a Copper, Nullite, or Exotic head, or a {{ item('rngtech:copper_conduit_tool_rod') }}, {{ item('rngtech:sparksteel_routed_tool_rod') }}, {{ item('rngtech:nullite_phase_tool_rod') }}, or {{ item('rngtech:exotic_harmonic_tool_rod') }}. Only a Pick or Hammer head of an Ore Burst material can roll an Ore Burst Speed suffix. Each ore it breaks costs extra FE, and without enough FE the ore mines at normal speed.
 - **Luck** can add extra drops from ores and logs broken by the tool. Each point, up to 5, gives every drop a 15% chance of one extra copy. It does nothing with Silk Touch, and nothing for machines, chests, or mobs.
 
 ## Data values

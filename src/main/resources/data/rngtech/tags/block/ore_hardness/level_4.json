@@ -4,14 +4,6 @@
     "rngtech:aluminum_ore",
     "rngtech:deepslate_aluminum_ore",
     "rngtech:osmium_ore",
-    "rngtech:deepslate_osmium_ore",
-    {
-      "id": "#c:ores/aluminum",
-      "required": false
-    },
-    {
-      "id": "#c:ores/osmium",
-      "required": false
-    }
+    "rngtech:deepslate_osmium_ore"
   ]
 }

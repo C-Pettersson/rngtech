@@ -196,13 +196,14 @@ Every node in this machine's ascendancies. See [Machine Mastery](machine-mastery
 
 ## Screen
 
-The Furnace screen has five tabs:
+The Furnace screen has six tabs:
 
 - **Process**: input and output lanes, live heat, failure strain, and energy or fuel. Electric stages add the Nitrogen gauge at the right edge. Hover for exact temperatures. Hover a lane's progress bar for its time remaining and expected items per minute with your Gear and Mastery applied (chance bonuses such as Super Output are not counted).
 - **Gear**: Heat Core and Battery Cell slots.
 - **Stats**: the machine's current stats, including traits, Gear, and Mastery.
 - **Refinement**: refine the placed Furnace's traits with a catalyst.
 - **Mastery**: machine XP, level, and the passive tree.
+- **Orders**: three drive bays for [Job Chips](work-orders.md), with each chip's job, progress, and the Activate, Pause, Rush, and Abandon buttons.
 
 ## Data values
 

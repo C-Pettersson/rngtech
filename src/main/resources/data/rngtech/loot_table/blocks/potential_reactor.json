@@ -11,7 +11,8 @@
               "function": "minecraft:copy_components",
               "include": [
                 "rngtech:machine_traits",
-                "rngtech:reactor_burn_history"
+                "rngtech:reactor_burn_history",
+                "rngtech:mirrored"
               ],
               "source": "block_entity"
             }

@@ -1,0 +1,48 @@
+{
+    "family": "melter",
+    "type": "melt",
+    "filter": "setting",
+    "weight": 2,
+    "tiers": [
+        {
+            "count": {
+                "min": 16000,
+                "max": 24000,
+                "step": 2000
+            },
+            "min": 50
+        },
+        {
+            "count": {
+                "min": 21333,
+                "max": 32000,
+                "step": 2000
+            },
+            "min": 55
+        },
+        {
+            "count": {
+                "min": 26666,
+                "max": 40000,
+                "step": 2000
+            },
+            "min": 60
+        },
+        {
+            "count": {
+                "min": 32000,
+                "max": 48000,
+                "step": 2000
+            },
+            "min": 70
+        },
+        {
+            "count": {
+                "min": 37333,
+                "max": 56000,
+                "step": 2000
+            },
+            "min": 80
+        }
+    ]
+}

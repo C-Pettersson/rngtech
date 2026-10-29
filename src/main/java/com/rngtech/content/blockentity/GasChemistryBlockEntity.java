@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.chemistry.GasChemistryMachine;
 import com.rngtech.content.energy.CombustionMixture;
@@ -9,6 +10,7 @@ import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.menu.GasChemistryMenu;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.purge.FluidOutputOverflow;
 import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
@@ -111,7 +113,6 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_ENERGY_TRANSFER = 13;
     private static final int DATA_PROCESSING_SPEED = 14;
     private static final int DATA_EFFICIENCY = 15;
-    private static final int DATA_MAX_TEMPERATURE = 16;
     private static final int DATA_REFINEMENT_POTENTIAL = 17;
     private static final int DATA_FLAT_ENERGY_GENERATION = 18;
     private static final int DATA_BASE_ENERGY_GENERATION = 19;
@@ -121,6 +122,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_SECONDARY_OUTPUT_FLUID_ID = 23;
     private static final int DATA_MIXTURE = 24;
     private static final int DATA_EXHAUST_PER_CYCLE = 25;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 26;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
     private static final double EPSILON = 1.0E-9;
@@ -231,12 +233,13 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private final IEnergyStorage trackedGeneratorEnergyView = energyFlow.track(generatorEnergyView);
     private final IEnergyStorage trackedConsumerEnergyView = energyFlow.track(consumerEnergyView);
     private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::batteryCellStack);
+    private final BulkSpeedState bulkSpeed = new BulkSpeedState();
     private final ContainerData menuData = new ContainerData() {
         @Override
         public int get(int index) {
             MachineStatAccumulator stats = effectiveStats();
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> activeTicks;
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
@@ -244,7 +247,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
                 case DATA_INPUT -> inputTank.getFluidAmount();
                 case DATA_OUTPUT -> outputTank.getFluidAmount();
                 case DATA_SECONDARY_OUTPUT -> secondaryOutputTank.getFluidAmount();
-                case DATA_TANK_CAPACITY -> TANK_CAPACITY;
+                case DATA_TANK_CAPACITY -> inputTank.getCapacity();
                 case DATA_STATUS -> statusCode();
                 case DATA_ENERGY_DELTA -> currentEnergyDelta();
                 case DATA_ENERGY_GENERATION -> (int) Math.round(stats.effectiveEnergyGenerationMultiplier() * STAT_SCALE);
@@ -254,7 +257,6 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
-                case DATA_MAX_TEMPERATURE -> scaledStat(stats, MachineStat.MAX_TEMPERATURE);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
                 case DATA_WATER_FLUID_ID -> BuiltInRegistries.FLUID.getId(waterTank.getFluid().getFluid());
                 case DATA_INPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(inputTank.getFluid().getFluid());
@@ -262,6 +264,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
                 case DATA_SECONDARY_OUTPUT_FLUID_ID -> BuiltInRegistries.FLUID.getId(secondaryOutputTank.getFluid().getFluid());
                 case DATA_MIXTURE -> mixture;
                 case DATA_EXHAUST_PER_CYCLE -> exhaustPerCycle();
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(machine.stage());
                 default -> 0;
             };
         }
@@ -272,7 +275,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_EXHAUST_PER_CYCLE + 1;
+            return DATA_PACK_GENERATION_MULTIPLIER + 1;
         }
     };
 
@@ -297,6 +300,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, GasChemistryBlockEntity gasChemistry) {
+        gasChemistry.updateTankCapacity(gasChemistry.effectiveStats());
         boolean worked = gasChemistry.tickRecipe();
         boolean exported = gasChemistry.machine == GasChemistryMachine.SYNGAS_COMBUSTOR && gasChemistry.exportEnergy(level, pos);
         BaseMachineBlock.setActive(level, pos, state, worked);
@@ -304,6 +308,17 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
             gasChemistry.setChanged();
         }
         gasChemistry.syncVisualState(level);
+    }
+
+    /** Fluid Capacity sizes every tank; fluid above a smaller capacity stays until it drains. */
+    private void updateTankCapacity(MachineStatAccumulator stats) {
+        int capacity = Math.max(TANK_CAPACITY, (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY)));
+        if (inputTank.getCapacity() != capacity) {
+            waterTank.setCapacity(capacity);
+            inputTank.setCapacity(capacity);
+            outputTank.setCapacity(capacity);
+            secondaryOutputTank.setCapacity(capacity);
+        }
     }
 
     private boolean isCombustor() {
@@ -389,7 +404,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     GasProcessorVisualState currentProcessorVisualState() {
         IEnergyStorage cell = batteryCellStorage();
-        float capacity = TANK_CAPACITY;
+        float capacity = inputTank.getCapacity();
         return new GasProcessorVisualState(
                 isActive(),
                 (float) effectiveStats().value(MachineStat.PROCESSING_SPEED),
@@ -724,11 +739,37 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private boolean tickGasification() {
         CoalGasificationRecipe recipe = currentGasificationRecipe();
         if (recipe == null || !canRunGasification(recipe)) {
+            interruptRecipe(recipe == null);
             resetActiveRecipe(recipe == null ? 0 : recipe.processingTicks(), recipe == null ? 0 : recipe.energy());
             return false;
         }
-        activeTicks = adjustedTicks(recipe.processingTicks());
-        activeEnergy = adjustedEnergy(recipe.energy());
+        return tickProcess(recipe, recipe.processingTicks(), recipe.energy(), () -> {
+            processInventory.extractItem(SLOT_PROCESS_INPUT, 1, false);
+            waterTank.drain(recipe.waterInput().amount(), IFluidHandler.FluidAction.EXECUTE);
+            outputTank.fill(recipe.outputFluid(), IFluidHandler.FluidAction.EXECUTE);
+            mergeResidue(recipe.residue());
+        });
+    }
+
+    /**
+     * One tick of a powered gas process. A job may finish at once through Instant Process, paying its whole FE, and each
+     * finished job feeds Bulk Speed.
+     */
+    private boolean tickProcess(Object recipe, int baseTicks, long baseEnergy, Runnable complete) {
+        if (progress == 0 && bulkSpeed.startRecipe(recipe)) {
+            setChanged();
+        }
+        activeTicks = adjustedTicks(baseTicks);
+        activeEnergy = adjustedEnergy(baseEnergy);
+        if (progress == 0 && level != null && ProcessingChance.rollInstant(level, effectiveStats())) {
+            int fullCost = (int) Math.min(Integer.MAX_VALUE, activeEnergy);
+            if (consumeEnergy(fullCost, true) >= fullCost) {
+                consumeEnergy(fullCost, false);
+                markInstantProcess();
+                completeProcess(complete);
+                return true;
+            }
+        }
         int cost = Math.max(1, Mth.ceil(activeEnergy / (double) activeTicks));
         if (consumeEnergy(cost, true) < cost) {
             return false;
@@ -736,13 +777,22 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         consumeEnergy(cost, false);
         progress++;
         if (progress >= activeTicks) {
-            processInventory.extractItem(SLOT_PROCESS_INPUT, 1, false);
-            waterTank.drain(recipe.waterInput().amount(), IFluidHandler.FluidAction.EXECUTE);
-            outputTank.fill(recipe.outputFluid(), IFluidHandler.FluidAction.EXECUTE);
-            mergeResidue(recipe.residue());
-            finishRecipe();
+            completeProcess(complete);
         }
         return true;
+    }
+
+    private void completeProcess(Runnable complete) {
+        complete.run();
+        finishRecipe();
+        bulkSpeed.recordProcess(effectiveTraits());
+    }
+
+    /** Losing the recipe part-way through a job breaks the Bulk Speed chain; a full output only pauses it. */
+    private void interruptRecipe(boolean recipeLost) {
+        if (recipeLost && progress > 0 && bulkSpeed.reset()) {
+            setChanged();
+        }
     }
 
     private boolean tickCombustion() {
@@ -811,25 +861,16 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     private boolean tickReforming() {
         GasReformingRecipe recipe = currentReformingRecipe();
         if (recipe == null || !canRunReforming(recipe)) {
+            interruptRecipe(recipe == null);
             resetActiveRecipe(recipe == null ? 0 : recipe.processingTicks(), recipe == null ? 0 : recipe.energy());
             return false;
         }
-        activeTicks = adjustedTicks(recipe.processingTicks());
-        activeEnergy = adjustedEnergy(recipe.energy());
-        int cost = Math.max(1, Mth.ceil(activeEnergy / (double) activeTicks));
-        if (consumeEnergy(cost, true) < cost) {
-            return false;
-        }
-        consumeEnergy(cost, false);
-        progress++;
-        if (progress >= activeTicks) {
+        return tickProcess(recipe, recipe.processingTicks(), recipe.energy(), () -> {
             inputTank.drain(recipe.gasInput().amount(), IFluidHandler.FluidAction.EXECUTE);
             waterTank.drain(recipe.waterInput().amount(), IFluidHandler.FluidAction.EXECUTE);
             outputTank.fill(recipe.hydrogenFluid(), IFluidHandler.FluidAction.EXECUTE);
             secondaryOutputTank.fill(recipe.byproductFluid(), IFluidHandler.FluidAction.EXECUTE);
-            finishRecipe();
-        }
-        return true;
+        });
     }
 
     private CoalGasificationRecipe currentGasificationRecipe() {
@@ -992,7 +1033,8 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     private long adjustedGeneration(long baseEnergy, int processingTicks) {
         MachineStatAccumulator stats = effectiveStats();
-        return Math.max(1L, Mth.lfloor(stats.generatedEnergyTotal(baseEnergy, processingTicks) * stats.value(MachineStat.EFFICIENCY)));
+        return Math.max(1L, Mth.lfloor(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(baseEnergy, processingTicks) * stats.value(MachineStat.EFFICIENCY),
+                machine.stage())));
     }
 
     private boolean canAcceptOutput(FluidTank tank, FluidStack output) {
@@ -1004,7 +1046,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
-        return cachedStats(0L);
+        return cachedStats(bulkSpeed.count());
     }
 
     @Override
@@ -1024,6 +1066,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         if (hasCatalystGearSlot()) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, catalystStack());
         }
+        bulkSpeed.apply(stats, effectiveTraits());
         return stats;
     }
 
@@ -1205,6 +1248,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         tag.putInt("ActiveTicks", activeTicks);
         tag.putLong("ActiveEnergy", activeEnergy);
         tag.putDouble("EnergyCarry", energyCarry);
+        bulkSpeed.save(tag);
         if (isCombustor()) {
             tag.putInt("Mixture", mixture);
             tag.putDouble("BurnProgress", burnProgress);
@@ -1227,6 +1271,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
         activeTicks = tag.getInt("ActiveTicks");
         activeEnergy = tag.getLong("ActiveEnergy");
         energyCarry = tag.getDouble("EnergyCarry");
+        bulkSpeed.load(tag);
         if (isCombustor()) {
             mixture = tag.contains("Mixture") ? CombustionMixture.clamp(tag.getInt("Mixture")) : CombustionMixture.RATED_MIXTURE;
             // Combustors saved before mixtures kept whole-tick progress and charged their exhaust at the end of the cycle.
@@ -1273,7 +1318,8 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getTankCapacity(int tank) {
-            return exposedTank(tank) == null ? 0 : TANK_CAPACITY;
+            FluidTank exposed = exposedTank(tank);
+            return exposed == null ? 0 : exposed.getCapacity();
         }
 
         @Override

@@ -1,0 +1,28 @@
+{
+  "replace": false,
+  "values": [
+    "#c:rods/iron",
+    "#c:rods/copper",
+    "#c:rods/bronze",
+    "#c:rods/tin",
+    "#c:rods/zinc",
+    "#c:rods/gold",
+    "#c:rods/steel",
+    "#c:rods/invar",
+    "#c:rods/nickel",
+    "#c:rods/lead",
+    "#c:rods/silver",
+    "#c:rods/aluminum",
+    "#c:rods/sparksteel",
+    "#c:rods/osmium",
+    "#c:rods/titanium",
+    "#c:rods/arclite",
+    "#c:rods/tungsten",
+    "#c:rods/tungstensteel",
+    "#c:rods/nullite",
+    "#c:rods/aethergold",
+    "#c:rods/platinum",
+    "#c:rods/netherite",
+    "#c:rods/naquadah"
+  ]
+}

@@ -1,5 +1,7 @@
 package com.rngtech.rpg;
 
+import com.rngtech.rpg.workorder.WorkOrderConditions;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -23,6 +25,10 @@ public final class MachineModifierText {
     }
 
     public static MutableComponent definitionStats(ModifierDefinition definition) {
+        Component rule = WorkOrderConditions.ruleText(definition);
+        if (rule != null) {
+            return rule.copy();
+        }
         if (ModifierEligibilityProfiles.isBatteryChassisBalanceMode(definition)) {
             return Component.translatable(MachineBehavior.CHARGE_BALANCER.translationKey());
         }
@@ -44,6 +50,10 @@ public final class MachineModifierText {
     }
 
     public static MutableComponent tooltipLine(MachineModifier modifier) {
+        Component condition = WorkOrderConditions.effectText(modifier);
+        if (condition != null) {
+            return condition.copy();
+        }
         if (ModifierEligibilityProfiles.isBatteryChassisBalanceMode(modifier)) {
             return Component.translatable("rngtech.tooltip.modifier.balance_mode");
         }
@@ -71,15 +81,21 @@ public final class MachineModifierText {
     }
 
     public static MutableComponent tierTooltipLine(MachineModifier modifier) {
-        return Component.translatable("rngtech.tooltip.modifier_tier.effect", rangeEffectWithStat(modifier), modifier.tier());
+        Component condition = WorkOrderConditions.effectText(modifier);
+        return Component.translatable("rngtech.tooltip.modifier_tier.effect", condition != null ? condition : rangeEffectWithStat(modifier), modifier.tier());
     }
 
     /** The tier line with the top tier this affix can reach, so a four-tier affix at Tier 4 reads as finished. */
     public static MutableComponent tierTooltipLine(MachineModifier modifier, int topTier) {
-        return Component.translatable("rngtech.tooltip.modifier_tier.effect.of", rangeEffectWithStat(modifier), modifier.tier(), topTier);
+        Component condition = WorkOrderConditions.effectText(modifier);
+        return Component.translatable("rngtech.tooltip.modifier_tier.effect.of", condition != null ? condition : rangeEffectWithStat(modifier), modifier.tier(), topTier);
     }
 
     public static MutableComponent fullEffect(MachineModifier modifier) {
+        Component condition = WorkOrderConditions.effectText(modifier);
+        if (condition != null) {
+            return condition.copy();
+        }
         if (ModifierEligibilityProfiles.isBatteryChassisBalanceMode(modifier)) {
             return Component.translatable("rngtech.tooltip.modifier.balance_mode.effect");
         }
@@ -90,6 +106,10 @@ public final class MachineModifierText {
     }
 
     public static MutableComponent compactEffect(MachineModifier modifier) {
+        Component condition = WorkOrderConditions.effectText(modifier);
+        if (condition != null) {
+            return condition.copy();
+        }
         if (ModifierEligibilityProfiles.isBatteryChassisBalanceMode(modifier)) {
             return Component.translatable("rngtech.tooltip.modifier.balance_mode.effect");
         }

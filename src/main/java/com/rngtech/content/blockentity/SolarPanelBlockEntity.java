@@ -153,7 +153,7 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
         double generationScale = stats.value(MachineStat.ENERGY_GENERATION)
                 / Math.max(0.0001, stats.baseValue(MachineStat.ENERGY_GENERATION));
         double efficiency = Math.max(0.01, stats.value(MachineStat.EFFICIENCY));
-        double generation = environmentalBase * generationScale * efficiency;
+        double generation = RNGTechConfig.generatedEnergy(environmentalBase * generationScale * efficiency, block.material().stage());
         generation = applyPeakSolarBonus(level, status, stats, generation);
         return Math.max(0, (int) Math.floor(generation));
     }

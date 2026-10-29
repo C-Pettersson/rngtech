@@ -18,13 +18,13 @@
   ],
   "key": {
     "C": {
-      "tag": "c:circuits/ultimate"
+      "tag": "rngtech:circuits/ultimate"
     },
     "L": {
       "item": "rngtech:lubricant_bucket"
     },
     "N": {
-      "tag": "c:ingots/nullite"
+      "tag": "rngtech:ingots/nullite"
     },
     "R": {
       "item": "minecraft:redstone"

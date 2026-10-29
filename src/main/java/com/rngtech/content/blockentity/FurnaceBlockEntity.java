@@ -8,14 +8,13 @@ import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.item.UniquePartItem;
-import com.rngtech.content.loot.ChallengeContext;
-import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.machine.FurnaceChassisMaterial;
 import com.rngtech.content.menu.FurnaceMenu;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModTags;
+import com.rngtech.content.workorder.WorkOrderEligibility;
 import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
@@ -38,10 +37,16 @@ import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
+import com.rngtech.rpg.workorder.WorkReport;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -73,7 +78,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
+public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost, WorkOrderHost {
     public static final int MAX_PROCESSING_SLOTS = 4;
     /** Every lane shares the furnace's one Gear slot, so one Heat Core drives a whole Lead Furnace. */
     public static final int MAX_GEAR_SLOTS = 1;
@@ -362,6 +367,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, FurnaceBlockEntity furnace) {
+        furnace.tickWorkOrders(level);
         furnace.beginEnergyTelemetryTick();
         furnace.atmosphere.beginTick();
         furnace.releaseRemovedGear(level);
@@ -815,6 +821,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
         }
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.FURNACE);
+        WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (isElectric() && !hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -1112,9 +1119,12 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
 
         result = withLedger(recipe, stats, input, result, outputSlot, reserved);
+        String inputId = BuiltInRegistries.ITEM.getKey(input.getItem()).toString();
         input.shrink(1);
         mergeOutput(outputSlot, result);
         grantRecipeXp(recipe);
+        workOrderWork(new WorkReport(WorkObjectiveType.SMELT, WorkOrderEligibility.smeltStage(recipe), isElectric() ? heatSlider : 0, inputId, 1)
+                .withTicks(recipe.processingTicks()));
         refundClosedLoopEnergy(recipe, stats);
         return true;
     }
@@ -1171,6 +1181,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         internalEnergy = Math.min(capacity, stored + refund);
     }
 
+    /** The material stage of a recipe's metal, read from its failure or malformed material, or 0 when it names none. */
     private void grantRecipeXp(FurnaceRecipe recipe) {
         if (recipe.machineXp() <= 0) {
             return;
@@ -1228,8 +1239,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         mergeOutput(outputSlot, result);
         resetCycle(lane);
         resetBulkSpeed();
-        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.HEAT_FAILURE,
-                ChallengeContext.of(this).withRecipeStage(recipe.machineXpBand()), inventory, outputSlot);
+        workOrderSetback(WorkOrderConditions.BRITTLE_LINING);
         setChanged();
         return true;
     }
@@ -1554,7 +1564,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     /** Lane stats follow the base stats and the lane's input item, whose tags pick the lane bonuses. */
     private MachineStatAccumulator statsForLane(int lane) {
         Item input = inventory.getStackInSlot(inputSlot(lane)).getItem();
-        return laneStatsCaches[lane].get(baseEffectiveStats(), input, 0L, laneStatsBuilders.get(lane));
+        return laneStatsCaches[lane].get(baseEffectiveStats(), input, 0L, null, laneStatsBuilders.get(lane));
     }
 
     private MachineStatAccumulator buildLaneStats(int lane) {
@@ -2033,50 +2043,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 return stack;
             }
             if (processingLaneSlots && hasMasteryBehavior("EVEN_FEED")) {
-                return insertEvenly(stack, simulate);
+                // Even Feed ignores the offered lane.
+                return EvenLaneFeed.insert(inventory, firstSlot, activeProcessingSlots(), stack, simulate);
             }
             return inventory.insertItem(mappedSlot(slot), stack, simulate);
-        }
-
-        /**
-         * Even Feed ignores the offered lane: each item goes to the emptiest active lane that can take it, so a trickle
-         * or a bulk shipment spreads across every lane instead of filling lane 1 first.
-         */
-        private ItemStack insertEvenly(ItemStack stack, boolean simulate) {
-            int lanes = activeProcessingSlots();
-            int[] counts = new int[lanes];
-            int[] room = new int[lanes];
-            for (int lane = 0; lane < lanes; lane++) {
-                int slot = firstSlot + lane;
-                ItemStack existing = inventory.getStackInSlot(slot);
-                counts[lane] = existing.getCount();
-                if (existing.isEmpty() || ItemStack.isSameItemSameComponents(existing, stack)) {
-                    room[lane] = Math.max(0, Math.min(inventory.getSlotLimit(slot), stack.getMaxStackSize()) - existing.getCount());
-                }
-            }
-            int[] added = new int[lanes];
-            int remaining = stack.getCount();
-            while (remaining > 0) {
-                int best = -1;
-                for (int lane = 0; lane < lanes; lane++) {
-                    if (added[lane] < room[lane] && (best < 0 || counts[lane] + added[lane] < counts[best] + added[best])) {
-                        best = lane;
-                    }
-                }
-                if (best < 0) {
-                    break;
-                }
-                added[best]++;
-                remaining--;
-            }
-            if (!simulate) {
-                for (int lane = 0; lane < lanes; lane++) {
-                    if (added[lane] > 0) {
-                        inventory.insertItem(firstSlot + lane, stack.copyWithCount(added[lane]), false);
-                    }
-                }
-            }
-            return remaining == stack.getCount() ? stack : stack.copyWithCount(remaining);
         }
 
         @Override
@@ -2165,9 +2135,18 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
     }
     @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FURNACE; }
+    @Override public double masteryXpGain() { return MachineMasteryHost.xpGain(effectiveStats()); }
     @Override public int ascendancyEntryStage() { return furnaceMaterial().stage(); }
 
     @Override public MachineProgressionState machineProgression() { return super.machineProgression().forFamily(masteryFamily()); }
+    @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
+    @Override public int workOrderStage() { return ascendancyEntryStage(); }
+    @Override public int workOrderMasteryLevel() { return masteryState().level(); }
+    @Override public String workOrderAscendancy() { return masteryState().ascendancy(); }
+    @Override public double workOrderStat(String stat) {
+        MachineStat value = MachineStat.bySerializedName(stat);
+        return value == null ? 0 : effectiveStats().value(value);
+    }
 
     @Override public void masteryChanged() { resetAllCycles(); resetBulkSpeed(); clampInternalEnergy(); setChanged(); }
 

@@ -9,8 +9,6 @@ import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.item.UniquePartItem;
-import com.rngtech.content.loot.ChallengeContext;
-import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
 import com.rngtech.content.menu.AlloyFurnaceMenu;
 import com.rngtech.content.menu.MasteryMenuSupport;
@@ -42,10 +40,16 @@ import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
+import com.rngtech.rpg.workorder.WorkReport;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -76,7 +80,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
+public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost, WorkOrderHost {
     private final RecipeCache<AlloyFurnaceRecipe> recipes = new RecipeCache<>(1);
     private static final RecipeInputFilter<AlloyFurnaceRecipeInput, AlloyFurnaceRecipe> INPUT_FILTER = new RecipeInputFilter<>(
             ModRecipes.ALLOY_FURNACE_TYPE::get,
@@ -321,6 +325,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AlloyFurnaceBlockEntity furnace) {
+        furnace.tickWorkOrders(level);
         tickFurnace(level, pos, state, furnace);
         furnace.syncVisualState(level);
     }
@@ -688,6 +693,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         applyGearStats(stats, crucibleStack());
         applyGearStats(stats, servoStack());
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
+        WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
                     ModifierSlot.IMPLICIT,
@@ -821,6 +827,9 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         }
         consumeInputs(consumed);
         mergeOutput(result);
+        workOrderWork(new WorkReport(WorkObjectiveType.ALLOY, recipe.minimumComponentStage(), heatSlider,
+                BuiltInRegistries.ITEM.getKey(baseResult.getItem()).toString(), baseResult.getCount() * batch)
+                .withTicks(recipe.processingTicks() / Math.max(1, baseResult.getCount())));
         lastRecipe = recipe;
         escapement.completed();
         completeCycle();
@@ -1056,8 +1065,22 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     @Override
+    public double masteryXpGain() {
+        return MachineMasteryHost.xpGain(effectiveStats());
+    }
+
+    @Override
     public int ascendancyEntryStage() {
         return chassis().stage();
+    }
+
+    @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
+    @Override public int workOrderStage() { return ascendancyEntryStage(); }
+    @Override public int workOrderMasteryLevel() { return masteryState().level(); }
+    @Override public String workOrderAscendancy() { return masteryState().ascendancy(); }
+    @Override public double workOrderStat(String stat) {
+        MachineStat value = MachineStat.bySerializedName(stat);
+        return value == null ? 0 : effectiveStats().value(value);
     }
 
     @Override
@@ -1104,8 +1127,7 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         pourContinues = false;
         resetCycle();
         resetBulkSpeed();
-        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.HEAT_FAILURE,
-                ChallengeContext.of(this).withRecipeStage(recipe.minimumComponentStage()), processInventory, SLOT_OUTPUT);
+        workOrderSetback(WorkOrderConditions.BRITTLE_LINING);
         setChanged();
         return true;
     }

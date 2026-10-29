@@ -2,7 +2,7 @@
 
 Source: [draft design](machine-ascendancies.md).
 
-Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `feature/machine-ascendancies`. All eight delivery phases are in: the framework, loop audit, Seals, UI, all fourteen launch ascendancies, and their documentation. They still need an in-game playtest.
+Status: **Implemented** for the 2.0 release — PRD accepted 2026-09-29 on `feature/machine-ascendancies`, merged in #17. All eight delivery phases are in: the framework, loop audit, Seals, UI, all fourteen launch ascendancies, and their documentation. They are playtested.
 
 ## Scope checklist
 
@@ -14,7 +14,7 @@ Status: **Prototype** for the 2.0 release — PRD accepted 2026-09-29 on `featur
 - [x] Seals: items, recipes, `rngtech:ascendancy_seal_recipes_enabled` condition and config key, entry gate, server actions.
 - [x] UI: Ascendancy panel and choose dialog in `MasteryScreenSupport`, client sync, Bonus Summary section, Jade line, JEI.
 - [x] Crusher and Furnace content with their new stats, Stats tab rows shown only when granted, and shared mechanics.
-- [ ] In-game playtest of every family's ascendancies and the Ascendancy panel.
+- [x] In-game playtest of every family's ascendancies and the Ascendancy panel.
 - [x] Alloy Furnace, Metal Press, Resonance Calibrator, Melter, and Forestry Companion content.
 - [x] Canonical documentation, Machine Stats entries, implementation matrix, getting-started, quests, and ModDex view.
 

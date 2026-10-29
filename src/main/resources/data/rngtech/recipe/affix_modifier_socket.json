@@ -14,13 +14,13 @@
   ],
   "key": {
     "G": {
-      "item": "rngtech:bronze_gear"
+      "tag": "rngtech:gears/bronze"
     },
     "L": {
       "item": "minecraft:lapis_lazuli"
     },
     "P": {
-      "item": "rngtech:bronze_plate"
+      "tag": "rngtech:plates/bronze"
     },
     "Q": {
       "item": "minecraft:quartz"

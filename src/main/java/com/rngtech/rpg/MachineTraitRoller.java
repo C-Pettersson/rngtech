@@ -569,7 +569,8 @@ public final class MachineTraitRoller {
 
     private static RollTuning tuningFor(ModifierEligibilityProfile profile) {
         return switch (profile.id()) {
-            case "tool_head", "pick_head", "tool_rod", "modular_tool" -> MODULAR_TOOL_ROLL_TUNING;
+            case "tool_head", "treefeller_head", "ore_burst_head", "pick_head", "ore_burst_pick_head", "tool_rod", "modular_tool" ->
+                    MODULAR_TOOL_ROLL_TUNING;
             default -> DEFAULT_ROLL_TUNING;
         };
     }

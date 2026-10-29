@@ -1,14 +1,17 @@
 package com.rngtech.content.menu;
 
 import com.rngtech.content.blockentity.RefinableMachine;
+import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.item.RefinementLensItem;
 import com.rngtech.content.item.RefinementModifierItem;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.rpg.CorruptionOutcome;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
 import com.rngtech.rpg.ModifierLensTag;
+import com.rngtech.rpg.corruption.CorruptionCatalog;
 import com.rngtech.rpg.refinement.RefinementAction;
 import com.rngtech.rpg.refinement.RefinementEngine;
 import com.rngtech.rpg.refinement.RefinementModifier;
@@ -17,11 +20,14 @@ import com.rngtech.rpg.refinement.RefinementResult;
 import com.rngtech.rpg.refinement.RefinementSelection;
 import com.rngtech.rpg.refinement.RefinementTargets;
 import com.rngtech.rpg.unique.UniqueItems;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
@@ -36,6 +42,7 @@ public final class RefinementMenuSupport {
     public static final int REFINEMENT_TARGET_SLOT_X = 24;
     public static final int REFINEMENT_CONSUMABLE_SLOT_X = 68;
     public static final int REFINEMENT_SLOT_Y = 42;
+    public static final String MIRRORED_FAILURE = "rngtech.refinement.failure.mirrored";
 
     public static ItemStack machineDisplayStack(ItemLike item, MachineTraits traits) {
         ItemStack stack = new ItemStack(item);
@@ -68,6 +75,10 @@ public final class RefinementMenuSupport {
         ItemStack consumable = machine.getRefinementInventory().getStackInSlot(0);
         if (!(consumable.getItem() instanceof RefinementConsumableItem refinementItem)) {
             showFailure(player, "rngtech.refinement.failure.invalid_consumable");
+            return false;
+        }
+        if (machine.isMirrored()) {
+            showFailure(player, MIRRORED_FAILURE);
             return false;
         }
 
@@ -113,11 +124,21 @@ public final class RefinementMenuSupport {
             showFailure(player, "rngtech.refinement.failure.invalid_consumable");
             return false;
         }
+        if (refinementItem.operation() == RefinementOperation.MIRROR) {
+            return mirror(player, inventory, target);
+        }
+        if (RefinementTargets.isMirrored(target)) {
+            showFailure(player, MIRRORED_FAILURE);
+            return false;
+        }
         if (refinementItem.operation() == RefinementOperation.CORRUPT
                 && !RefinementTargets.storedTraits(target).isCorrupted()
                 && !RefinementTargets.canCorrupt(target)) {
             showFailure(player, "rngtech.refinement.failure.cannot_corrupt");
             return false;
+        }
+        if (refinementItem.operation() == RefinementOperation.CORRUPT && RefinementTargets.isJobChip(target)) {
+            return corruptJobChip(player, inventory, target);
         }
         if (requireSelection && refinementItem.operation().requiresForgeSelection()) {
             RefinementAction action = refinementItem.operation().action();
@@ -167,6 +188,56 @@ public final class RefinementMenuSupport {
             shrinkStack(inventory, SLOT_MODIFIER);
         }
         showSuccess(player, result);
+        return true;
+    }
+
+    /**
+     * A Mirror Catalyst: the target stays as it was, and the player gets one Mirrored copy of it. No focus item works
+     * with the Mirror, so a filled focus slot stops it. A tank's copy is empty, so the Mirror never copies fluid.
+     */
+    private static boolean mirror(Player player, ItemStackHandler inventory, ItemStack target) {
+        if (RefinementTargets.isMirrored(target)) {
+            showFailure(player, MIRRORED_FAILURE);
+            return false;
+        }
+        if (!RefinementTargets.canMirror(target)) {
+            showFailure(player, "rngtech.refinement.failure.cannot_mirror");
+            return false;
+        }
+        if (inventory.getSlots() > SLOT_MODIFIER && !inventory.getStackInSlot(SLOT_MODIFIER).isEmpty()) {
+            showFailure(player, "rngtech.refinement.failure.focus_rejects_mirror");
+            return false;
+        }
+        ItemStack copy = target.copyWithCount(1);
+        copy.set(ModDataComponents.MIRRORED.get(), Unit.INSTANCE);
+        copy.remove(ModDataComponents.TANK_CONTENTS.get());
+        shrinkStack(inventory, SLOT_CONSUMABLE);
+        ItemHandlerHelper.giveItemToPlayer(player, copy);
+        player.displayClientMessage(Component.translatable("rngtech.refinement.success.mirror"), true);
+        return true;
+    }
+
+    /**
+     * A Volatile Catalyst on a Job Chip: the outcome rolls on the shared corruption odds, a Corruption Ward included, and
+     * the chip's own outcomes apply, which change its pay rather than machine stats. A corrupted chip takes no more.
+     */
+    private static boolean corruptJobChip(Player player, ItemStackHandler inventory, ItemStack target) {
+        MachineTraits traits = RefinementTargets.storedTraits(target);
+        if (traits.isCorrupted()) {
+            showFailure(player, "rngtech.refinement.failure.cannot_corrupt");
+            return false;
+        }
+        boolean warded = modifier(inventory) == RefinementModifier.CORRUPTION_WARD;
+        CorruptionOutcome outcome = CorruptionCatalog.active().rollOutcome(warded, player.level().random);
+        WorkOrderConditions.Rolled corrupted = WorkOrderConditions.corrupt(JobChipItem.data(target), traits, outcome, player.level().random);
+        ItemStack refinedTarget = target.copy();
+        JobChipItem.setJob(refinedTarget, corrupted.order(), corrupted.traits());
+        inventory.setStackInSlot(SLOT_TARGET, refinedTarget);
+        shrinkStack(inventory, SLOT_CONSUMABLE);
+        if (warded) {
+            shrinkStack(inventory, SLOT_MODIFIER);
+        }
+        showSuccess(player, RefinementResult.success(corrupted.traits(), 0, "rngtech.refinement.success.corrupt." + outcome.getSerializedName(), true, warded));
         return true;
     }
 

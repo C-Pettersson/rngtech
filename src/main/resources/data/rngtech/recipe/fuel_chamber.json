@@ -20,7 +20,7 @@
       "item": "minecraft:coal"
     },
     "P": {
-      "item": "rngtech:iron_plate"
+      "tag": "rngtech:plates/iron"
     }
   },
   "result": {

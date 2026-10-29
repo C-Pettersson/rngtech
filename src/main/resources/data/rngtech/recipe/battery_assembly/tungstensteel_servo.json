@@ -20,13 +20,13 @@
     },
     {
       "ingredient": {
-        "tag": "c:ingots/tungstensteel"
+        "tag": "rngtech:ingots/tungstensteel"
       },
       "count": 2
     },
     {
       "ingredient": {
-        "tag": "c:circuits/ultimate"
+        "tag": "rngtech:circuits/ultimate"
       }
     },
     {

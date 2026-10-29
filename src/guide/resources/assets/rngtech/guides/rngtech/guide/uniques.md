@@ -30,7 +30,14 @@ Every copy of a Unique has the same stat lines, but each copy rolls its own valu
 Ranges are listed worst roll to best. Flat lines with whole-number ranges, such as Jam Recovery, roll whole numbers.
 
 - [Fortress Heater Element](rngtech:uniques/fortress-heater-element.md)
-- [Igloo Basement Thermostat](rngtech:uniques/igloo-basement-thermostat.md)
+
+### Igloo Basement Thermostat
+
+A cold-running Heat Core for presses and furnaces that punish unstable heat. Its base stats, including maximum temperature, are a Bronze Heat Core's, so it is no use for hot alloys.
+
+- **Signature:** (40–80)% more Temperature Stability, (40–80)% more Overheat Tolerance, and Power Grace, which normal parts only have on Stage 6 and higher Servos.
+- **Drop Forge:** +(5–15)% Heat Window.
+- **Drawback:** (35–20)% less Heat Transfer, which slows heating and recovery, including in the Melter.
 
 ### Mineshaft Worn Pick-Jaw
 
@@ -40,13 +47,7 @@ A Stage 2 Crush Head that crushes at hardness 3, one level above its stage. Its 
 - **Rockbreaker:** +(10–30)% Jam Recovery.
 - **Drawbacks:** +(8–3)% Jam Chance per Cycle, on every craft and not only under-level ones, and (30–15)% increased Energy Use.
 
-### Crying Crucible
-
-A Bronze-class Alloy Crucible with the same three input slots, tuned for blend recipes.
-
-- **Signature:** +(20–40)% Blend Speed and +(25–50) °C Blend Heat Reduction on blend recipes. These are the Blendwright's stats, and they stack with that ascendancy.
-- **Drawbacks:** (40–20)% increased Energy Use, and (40–20)% less Stability, which raises failure strain on recipes that can fail.
-
+- [Crying Crucible](rngtech:uniques/crying-crucible.md)
 - [Trial Vault Escapement](rngtech:uniques/trial-vault-escapement.md)
 - [Witch-Bottle Reflux Pump](rngtech:uniques/witch-bottle-reflux-pump.md)
 - [Ancient Echo Control Board](rngtech:uniques/ancient-echo-control-board.md)

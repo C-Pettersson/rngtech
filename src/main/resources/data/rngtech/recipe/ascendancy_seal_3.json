@@ -26,7 +26,7 @@
   "key": {
     "C": {
       "ingredient": {
-        "tag": "c:circuits/ultimate"
+        "tag": "rngtech:circuits/ultimate"
       }
     },
     "D": {
@@ -51,7 +51,7 @@
     },
     "X": {
       "ingredient": {
-        "item": "rngtech:naquadah_plate"
+        "tag": "rngtech:plates/naquadah"
       }
     }
   },

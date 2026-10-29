@@ -1,5 +1,6 @@
 package com.rngtech.content.menu;
 
+import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.chemistry.GasChemistryMachine;
 import com.rngtech.content.energy.CombustionMixture;
@@ -50,7 +51,6 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
     private static final int DATA_ENERGY_TRANSFER = 13;
     private static final int DATA_PROCESSING_SPEED = 14;
     private static final int DATA_EFFICIENCY = 15;
-    private static final int DATA_MAX_TEMPERATURE = 16;
     private static final int DATA_REFINEMENT_POTENTIAL = 17;
     private static final int DATA_FLAT_ENERGY_GENERATION = 18;
     private static final int DATA_BASE_ENERGY_GENERATION = 19;
@@ -60,7 +60,8 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
     private static final int DATA_SECONDARY_OUTPUT_FLUID_ID = 23;
     private static final int DATA_MIXTURE = 24;
     private static final int DATA_EXHAUST_PER_CYCLE = 25;
-    private static final int DATA_COUNT = 26;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 26;
+    private static final int DATA_COUNT = 27;
     private static final int BUTTON_MIXTURE_BASE = 8000;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_INPUT_SLOT = 0;
@@ -127,6 +128,9 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
     }
 
     public float progressFill() {
+        if (instantFlash()) {
+            return 1.0F;
+        }
         int ticks = data.get(DATA_PROCESSING_TICKS);
         return ticks <= 0 ? 0.0F : Mth.clamp((float) data.get(DATA_PROGRESS) / (float) ticks, 0.0F, 1.0F);
     }
@@ -165,8 +169,13 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
         return BUTTON_MIXTURE_BASE + CombustionMixture.clamp(mixture);
     }
 
+    /** Whether the bar should flash for a job that just finished instantly. */
+    public boolean instantFlash() {
+        return data.get(DATA_PROGRESS) == BaseMachineBlockEntity.INSTANT_FLASH_PROGRESS;
+    }
+
     public int progress() {
-        return data.get(DATA_PROGRESS);
+        return Math.max(0, data.get(DATA_PROGRESS));
     }
 
     public int processingTicks() {
@@ -279,10 +288,6 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
 
     public static int efficiencyDataIndex() {
         return DATA_EFFICIENCY;
-    }
-
-    public static int maxTemperatureDataIndex() {
-        return DATA_MAX_TEMPERATURE;
     }
 
     public static int refinementPotentialDataIndex() {
@@ -453,5 +458,10 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
         public boolean isActive() {
             return activeSupplier.getAsBoolean();
         }
+    }
+
+    /** The pack's config multiplier on this generator's FE, global times stage. */
+    public double packGenerationMultiplier() {
+        return GenerationMenuSupport.packMultiplier(data.get(DATA_PACK_GENERATION_MULTIPLIER));
     }
 }

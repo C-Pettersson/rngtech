@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the Crusher block models, part models, item models, and owned textures.
+"""Generate the Crusher blockstates, block models, part models, item models, and owned textures.
 
 The design is a double-roll crusher. Feed drops from a hopper on top into the nip between two
 toothed rolls, whose end faces show through the open front of the crushing chamber; the crushed
@@ -12,8 +12,9 @@ the batching Tungstensteel and Exotic chassis, twice more as smaller secondary r
 by CrusherRenderer, whose constants match the geometry here. With no head installed only the bare
 shafts show. Every metal chassis shares one housing and differs by its shell, trim, and the hopper
 rim in the metal at the top of its recipe; Iron, Copper, and Bronze stand on the smooth stone of
-their recipe. The Wooden Crusher is a Stage 0 plank frame in its recipe's materials. Run from the
-repository root:
+their recipe. The Wooden Crusher is a Stage 0 plank frame in its recipe's materials. Every
+chassis carries the Job Chip lamp (job_lamp.py) on its header, across from the status lamp. Run from
+the repository root:
 
     python tools/blockmodels/crusher.py
 """
@@ -26,6 +27,8 @@ import random
 from pathlib import Path
 
 from PIL import Image, ImageDraw
+
+import job_lamp
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "src/main/resources/assets/rngtech"
@@ -62,6 +65,9 @@ METER = ((12.5, 6.0, 11.0), (12.75, 10.5, 14.0))
 METER_SEGMENTS = 4
 MOTOR_X, MOTOR_Y = 2.0, 5.25
 CELL_X, CELL_Y, CELL_Z = 14.0, 4.25, 12.75
+# Job Chip lamp on the header beam, across from the status lamp.
+JOB_LAMP = ((3.25, 11.5, 0.0), (5.0, 12.25, 0.25))
+JOB_LAMP_FACES = ("north", "east", "west", "up", "down")
 
 METAL_CHASSIS = ("iron", "copper", "bronze", "steel", "aluminum", "titanium", "tungstensteel", "exotic")
 HEAVY = ("tungstensteel", "exotic")
@@ -222,6 +228,7 @@ def metal_housing(heavy):
                         faces=("north", "up", "down"), uv={"north": [0, 0, 11, 1.25]}))
     elements.append(box((11.0, 11.5, 0.0), (12.75, 12.25, 0.25), "lamp", faces=("north", "east", "west", "up", "down"),
                         extra={"neoforge_data": {"block_light": 15, "sky_light": 15}}))
+    elements.append(job_lamp.element(*JOB_LAMP, JOB_LAMP_FACES))
     elements += hopper_elements("shell", "rim", "throat")
     elements += shaft_elements(heavy)
 
@@ -271,6 +278,7 @@ def wooden_housing():
     # Header plank and stick braces across the back of the frame.
     elements.append(box((2.0, HEADER_Y0, 0.25), (14.0, HEADER_Y1, 2.5), "boards_edge", faces=("north", "south", "up", "down")))
     elements.append(box((2.0, HEADER_Y0, 7.5), (14.0, HEADER_Y1, 9.5), "boards_edge", faces=("north", "south", "up", "down")))
+    elements.append(job_lamp.element(*JOB_LAMP, JOB_LAMP_FACES))
     elements += hopper_elements("boards_v", "boards_edge", "throat")
     elements += shaft_elements(False)
     # Plank crate behind the frame, framed in dark oak, with the cable socket on its back.
@@ -307,13 +315,14 @@ SHARED_TEXTURES = {
     "lamp": TEX + "lamp_off",
     "plinth_top": TEX + "plinth_top",
     "plinth_side": TEX + "plinth_side",
+    **job_lamp.TEXTURE,
 }
 WOOD_KEYS = ("post", "post_end", "boards", "boards_v", "boards_edge", "dark", "port")
 
 
 def wood_textures():
     textures = {key: TEX + f"wood/{key}" for key in WOOD_KEYS}
-    textures.update({"particle": TEX + "wood/boards", "throat": TEX + "wood/throat", "shaft": TEX + "shaft"})
+    textures.update({"particle": TEX + "wood/boards", "throat": TEX + "wood/throat", "shaft": TEX + "shaft", **job_lamp.TEXTURE})
     return textures
 
 
@@ -358,6 +367,10 @@ def write_models() -> None:
             "textures": SHARED_TEXTURES,
             "elements": item_roll_elements(heavy) + housing,
         })
+    job_lamp.write_part(MODELS / "block/crusher/job_lamp.json", *JOB_LAMP, JOB_LAMP_FACES)
+    for chassis in METAL_CHASSIS + ("wooden",):
+        name = f"{chassis}_crusher_chassis"
+        job_lamp.write_blockstate(name, f"rngtech:block/{name}", f"rngtech:block/{name}_active", "rngtech:block/crusher/job_lamp")
     for chassis in METAL_CHASSIS:
         name = f"{chassis}_crusher_chassis"
         parent = "crusher_heavy" if chassis in HEAVY else "crusher"

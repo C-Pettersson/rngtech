@@ -13,6 +13,7 @@ import com.rngtech.rpg.ModifierEligibilityProfiles;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -123,6 +124,7 @@ public class ForestryCartItem extends Item {
         }
         cart.setMachineTraits(traits(stack));
         cart.setMachineProgression(stack.getOrDefault(ModDataComponents.MACHINE_PROGRESSION.get(), MachineProgressionState.EMPTY));
+        cart.setWorkOrders(stack.getOrDefault(ModDataComponents.WORK_ORDERS.get(), MachineWorkOrders.EMPTY));
         cart.setRouteDirection(direction);
         level.addFreshEntity(cart);
         if (player == null || !player.getAbilities().instabuild) {

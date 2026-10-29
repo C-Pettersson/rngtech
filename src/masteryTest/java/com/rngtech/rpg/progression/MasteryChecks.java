@@ -59,8 +59,15 @@ public final class MasteryChecks {
         iconTextures();
         checks += AscendancyChecks.run();
         checks += SoulTransferChecks.run();
+        checks += com.rngtech.rpg.workorder.WorkOrderStorageChecks.run();
+        checks += com.rngtech.rpg.workorder.WorkOrderRuleChecks.run();
+        checks += com.rngtech.rpg.workorder.WorkOrderTemplateChecks.run();
+        checks += com.rngtech.rpg.workorder.WorkOrderConditionChecks.run();
+        checks += com.rngtech.rpg.workorder.WorkOrderRefinementChecks.run();
         checks += com.rngtech.rpg.dormant.DormantChecks.run();
         checks += PartGenerationChecks.run();
+        checks += com.rngtech.rpg.RollReadChecks.run();
+        checks += com.rngtech.rpg.SharedAffixChecks.run();
         checks += com.rngtech.rpg.PhaseArrayChecks.run();
         checks += com.rngtech.rpg.AnnealingChecks.run();
         checks += CrusherYieldChecks.run();
@@ -79,6 +86,7 @@ public final class MasteryChecks {
         checks += com.rngtech.rpg.VoidCatalystChainChecks.run();
         checks += com.rngtech.rpg.HeatProgressionChecks.run();
         checks += com.rngtech.rpg.SmeltGateChecks.run();
+        checks += com.rngtech.rpg.ProcessingSetupChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();
         ForestryCartRulesChecks.run();

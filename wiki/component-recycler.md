@@ -105,7 +105,7 @@ Each recipe has a minimum processing level. To run it, both the Recycler's stage
 
 Powered Recyclers have a Gear tab with:
 
-- one **Disassembly Head** slot (required). The head sets the processing level, speed, and stability. Heads range from {{ item('rngtech:iron_disassembly_head') }} to {{ item('rngtech:exotic_disassembly_head') }}, and the head's stage cannot exceed the Recycler's.
+- one **Disassembly Head** slot (required). The head sets the processing level and speed. Heads range from {{ item('rngtech:iron_disassembly_head') }} to {{ item('rngtech:exotic_disassembly_head') }}, and the head's stage cannot exceed the Recycler's.
 - one **Recovery Filter** slot (optional). A filter unlocks the extra returns marked "needs a Recovery Filter" in the table below. Filters run from {{ item('rngtech:iron_recovery_filter') }} to {{ item('rngtech:steel_recovery_filter') }} and are shared with the [Potential Reactor](potential-reactor.md). Like the head, the filter's stage cannot exceed the Recycler's.
 - one **Battery Cell** slot (optional) for extra FE storage.
 
@@ -129,12 +129,13 @@ The Component Recycler uses the `rngtech:component_recycling` recipe type. Use t
 
 ## Screen
 
-Powered Recyclers have four tabs:
+Powered Recyclers have five tabs:
 
 - **Process**: the input, three outputs, progress, and energy. With JEI installed, click the progress bar to browse recycling recipes.
 - **Gear**: Disassembly Head, Recovery Filter, and Battery Cell slots.
 - **Stats**: the machine's current stats, including traits and Gear.
 - **Refinement**: refine the placed Recycler's traits with a catalyst.
+- **Orders**: three drive bays for [Job Chips](work-orders.md), with each chip's job, progress, and the Activate, Pause, Rush, and Abandon buttons.
 
 The Crude Recycler has only its Process screen.
 

@@ -4,7 +4,7 @@
 
 PRD status: Accepted
 
-Implementation status: Prototype
+Implementation status: Implemented
 
 Release: 2.0
 
@@ -168,53 +168,14 @@ Uniques come from vanilla places by default. Pack makers can move them to RNGTec
 A pack maker can use any of these options, alone or together:
 
 1. **Switch off defaults:** set `uniques.loot.enabled=false`, or `uniques.loot.<id>.enabled=false` for one Unique.
-2. **Challenge loot:** add the Unique to one of RNGTech's [challenge loot tables](#challenge-loot) with a datapack, for example as a reward for a Stage 6+ heat failure or a Mastery level.
-3. **Quests and commands:** give the plain item, for example as an FTB Quests item reward. A Unique with no traits counts as unidentified, so each player rolls their own copy on identification. `/rngtech unique give <player> <id>` gives an unidentified copy for testing and command-based quests.
-4. **Own loot:** replace or extend any loot table or loot modifier with ordinary datapacks.
+2. **Quests and commands:** give the plain item, for example as an FTB Quests item reward. A Unique with no traits counts as unidentified, so each player rolls their own copy on identification. `/rngtech unique give <player> <id>` gives an unidentified copy for testing and command-based quests.
+3. **Own loot:** replace or extend any loot table or loot modifier with ordinary datapacks.
 
 The same options work for the [Volatile Catalyst](corruption.md#sources), whose recipe can be switched off by config.
 
 ### Challenge loot
 
-RNGTech rolls a loot table when certain machine events happen. Every table ships empty, so default play is unchanged, and pack makers fill them by datapack. A table that is still empty is skipped without rolling.
-
-| Table | Rolled when | Context available to conditions |
-|---|---|---|
-| `rngtech:challenges/calibration` | A calibration completes | family, chassis stage, recipe stage, result stability |
-| `rngtech:challenges/crusher_jam` | A Crusher jams | chassis stage, recipe Processing Level, head Processing Level |
-| `rngtech:challenges/heat_failure` | A Furnace, Alloy Furnace, or Metal Press cycle fails | family, chassis stage, recipe stage, failure cause |
-| `rngtech:challenges/vacuum_collapse` | A Vacuum Collapse cycle completes | chassis stage, instability |
-| `rngtech:challenges/forestry_harvest` | A Forestry cart harvests a tree or crop | cutting tool stage, ascendancy |
-| `rngtech:challenges/mastery_level` | A machine gains a Mastery level | family, new level, ascendancy |
-
-- Results go into the machine's output slots when they fit, or drop on top of the machine. Forestry results go into the cart's inventory. Mastery level results drop on top of the machine.
-- New loot item conditions read the context: `rngtech:machine_family`, `rngtech:machine_stage`, `rngtech:recipe_stage`, `rngtech:calibration_stability`, `rngtech:instability`, `rngtech:mastery_level`, and `rngtech:ascendancy`. Each takes an optional `min` and `max`, or an id.
-- The family is the Mastery family id, or `vacuum_collapse_generator`. The machine stage is the chassis stage, or the cutting tool head's stage for a Forestry harvest. The recipe stage is the recipe's XP band, the Alloy Furnace's minimum component stage, the calibration minimum stage, or a jam's recipe Processing Level. Instability is the Vacuum Collapse instability times 100.
-- The tables can hold anything, not only Uniques: catalysts, Seals, or pack items. Pack makers own the loop safety of what they add. RNGTech's shipped tables stay empty.
-
-Example datapack entry that moves the Fortress Heater Element from Nether fortress chests to Stage 4+ heat failures, after the pack sets `uniques.loot.fortress_heater_element.enabled=false`:
-
-```json
-{
-    "type": "rngtech:challenge",
-    "pools": [
-        {
-            "rolls": 1,
-            "conditions": [
-                { "condition": "rngtech:machine_stage", "min": 4 },
-                { "condition": "minecraft:random_chance", "chance": 0.02 }
-            ],
-            "entries": [
-                {
-                    "type": "minecraft:item",
-                    "name": "rngtech:fortress_heater_element",
-                    "functions": [{ "function": "rngtech:unidentified_unique" }]
-                }
-            ]
-        }
-    ]
-}
-```
+Removed 2026-10-26. Machines no longer roll loot on their own events: loose items on top of a factory machine are bad design, and a Glyph or Unique in an output slot blocked the machine and flowed down automated lines. Packs move Uniques to quests or their own loot instead. The `rngtech:challenge` loot type and its context conditions stay for features that roll a reward table, such as Work Orders.
 
 ## Launch Uniques
 
@@ -270,7 +231,7 @@ The Voltaic Potato Battery Cell moves onto the catalog with no stat lines: it st
 - **Identity:** a Bronze-class crucible tuned for blend recipes. It has the same fixed input-slot count as the Bronze crucible, so it does not skip the Steel crucible.
 - **Signature:** +(20–40)% Blend Speed and +(25–50) °C Blend Heat Reduction, which normally come only from Blendwright. Blend Heat Reduction is in degrees; Blendwright's Cold Mixing grants 100 °C.
 - **Ascendancy hook:** the signature itself stacks with Blendwright.
-- **Drawback:** (40–20)% increased Energy Usage, and (40–20)% less Stability, which raises failure strain on failure-bearing recipes. The draft's less Temperature Stability was dropped: blend recipes need 0.9 Temperature Stability and have no failure output, so it blocked every blend.
+- **Drawback:** (40–20)% increased Energy Usage, and (40–20)% less Overheat Tolerance, which lowers the overheat line so failure-bearing recipes run hot build strain sooner. Overheat Tolerance never drops the line below the safe maximum, so it cannot block a recipe. The draft's less Temperature Stability was dropped: blend recipes need 0.9 Temperature Stability and have no failure output, so it blocked every blend. The later less Stability drawback was replaced in alpha.4 because the Alloy Furnace never reads Stability.
 - **Why:** it opens a blend-recipe Alloy Furnace before the ascendancy, and rewards Blendwright players who accept more failures.
 
 ### Trial Vault Escapement
@@ -379,7 +340,7 @@ Launch Uniques carry no yield stats, apart from the Pick-Jaw's Output Amount pen
     - domain checks.
 3. **Sources:**
     - the `rngtech:unique_loot_enabled` condition and config keys, the `rngtech:unidentified_unique` loot function, per-Unique loot tables and modifiers, and the Potato cell on the new condition;
-    - the `rngtech:challenge` loot context, the six empty challenge tables and their event hooks, and the context conditions;
+    - the `rngtech:challenge` loot context and the context conditions (the six machine-event tables and hooks shipped here were removed on 2026-10-26);
     - `/rngtech unique give`.
 4. **Launch content:** the eight Uniques, the three new behaviors, textures, and language keys.
 5. **UI:** unidentified and identified tooltips, the Shift roll view, dimmed unread stats, JEI pages, and foil.
@@ -471,5 +432,5 @@ Resolved 2026-10-05:
 
 Resolved 2026-10-06:
 
-- Vanilla sources are the default for Uniques. Pack makers can switch each Unique to RNGTech challenges through challenge loot tables, to quest rewards, or to their own sources, using config and datapacks without code.
+- Vanilla sources are the default for Uniques. Pack makers can switch each Unique to quest rewards or to their own sources, using config and datapacks without code. (Machine-event challenge tables were also an option until 2026-10-26.)
 - The Volatile Catalyst has no vanilla source. See [Corruption: Sources](corruption.md#sources).

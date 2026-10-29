@@ -69,7 +69,7 @@ Chest → Potential Reactor → Component Recycler → storage
 | Slot | Required | What it does |
 |---|---|---|
 | Reactor Chamber | Yes | Sets the reactor's stage, which gates salvage fuel, and adds FE generation and stability. |
-| Recovery Filter | No | Returns residue from salvage fuel. Without one, residue is lost. Can also roll efficiency and speed. |
+| Recovery Filter | No | Returns residue from salvage fuel. Without one, residue is lost. Can also roll efficiency, speed, and stability. |
 | Containment Lining | No | Raises stability, which increases the FE you recover. |
 
 | Stage | Reactor Chamber | Recovery Filter | Containment Lining |

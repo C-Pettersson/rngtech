@@ -9,7 +9,7 @@
   "key": {
     "C": { "item": "rngtech:basic_electric_circuit" },
     "G": { "item": "minecraft:glass_pane" },
-    "P": { "item": "rngtech:iron_plate" },
+    "P": { "tag": "rngtech:plates/iron" },
     "R": { "item": "minecraft:redstone" },
     "W": { "item": "rngtech:cable" }
   },

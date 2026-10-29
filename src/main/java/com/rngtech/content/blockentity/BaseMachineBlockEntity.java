@@ -21,18 +21,19 @@ import com.rngtech.content.block.ResonanceCalibratorBlock;
 import com.rngtech.content.block.SolarArrayControllerBlock;
 import com.rngtech.content.block.SolarPanelBlock;
 import com.rngtech.content.block.SolidFuelBurnerBlock;
+import com.rngtech.content.block.WorkOrderMachineBlock;
 import com.rngtech.content.item.RefinementConsumableItem;
-import com.rngtech.content.loot.ChallengeContext;
-import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.PhaseArrayRules;
-import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.workorder.LoadedWorkOrder;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkOrderHost;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -142,6 +143,12 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         return traits == null ? MachineTraits.EMPTY : traits;
     }
 
+    /** Placing a Mirrored machine item keeps its component, and the block loot table copies it back to the drop. */
+    @Override
+    public boolean isMirrored() {
+        return components().has(ModDataComponents.MIRRORED.get());
+    }
+
     @Override
     public void setMachineTraits(MachineTraits traits) {
         setComponents(DataComponentMap.builder()
@@ -181,6 +188,7 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
                 components().get(ModDataComponents.MACHINE_TRAITS.get()),
                 components().get(ModDataComponents.MACHINE_PROGRESSION.get()),
                 localKey,
+                activeWorkOrderConditions(),
                 statsBuilder
         );
     }
@@ -231,6 +239,54 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
             behaviors = MegaPassiveTree.behaviors(state);
         }
         return behaviors.contains(behavior);
+    }
+
+    /** The Work Orders loaded into this machine, stored as a component so they drop with it. */
+    public MachineWorkOrders workOrders() {
+        MachineWorkOrders orders = components().get(ModDataComponents.WORK_ORDERS.get());
+        return orders == null ? MachineWorkOrders.EMPTY : orders;
+    }
+
+    /** The active Job Chip's traits while it has conditions to apply, else null; a stats cache key. */
+    private Object activeWorkOrderConditions() {
+        LoadedWorkOrder active = workOrders().activeOrder();
+        return active == null || active.fulfilled() || active.traits().modifiers().isEmpty() ? null : active.traits();
+    }
+
+    /** The world's game time for Rush deadlines; 0 before the machine is in a world. */
+    public long workOrderGameTime() {
+        return level == null ? 0 : level.getGameTime();
+    }
+
+    /**
+     * Drops expired Rush chips about once a second, and lights the Job Chip lamp to match, which also catches a machine
+     * placed from an item that carries an active chip.
+     */
+    protected void tickWorkOrders(Level level) {
+        if (this instanceof WorkOrderHost host && level.getGameTime() % 20 == 0) {
+            host.workOrderTick();
+            syncWorkOrderLamp();
+        }
+    }
+
+    public void setWorkOrders(MachineWorkOrders orders) {
+        DataComponentMap.Builder builder = DataComponentMap.builder().addAll(components());
+        builder.set(ModDataComponents.WORK_ORDERS.get(), orders == null || orders.isEmpty() ? null : orders);
+        setComponents(builder.build());
+        setChanged();
+        syncWorkOrderLamp();
+    }
+
+    /** Lights the model's Job Chip lamp while a chip is active, on machines that have one. */
+    private void syncWorkOrderLamp() {
+        BlockState state = getBlockState();
+        if (level == null || level.isClientSide || !state.hasProperty(WorkOrderMachineBlock.WORK_ORDER)) {
+            return;
+        }
+        boolean lit = workOrders().activeOrder() != null;
+        if (state.getValue(WorkOrderMachineBlock.WORK_ORDER) != lit) {
+            level.setBlock(worldPosition, state.setValue(WorkOrderMachineBlock.WORK_ORDER, lit), Block.UPDATE_CLIENTS);
+        }
     }
 
     public void setMachineProgression(MachineProgressionState progression) {
@@ -321,13 +377,6 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
     @Override
     public ItemStackHandler getRefinementInventory() {
         return refinementInventory;
-    }
-
-    /** Rolls the Mastery level challenge loot on top of the machine; this satisfies {@link MachineMasteryHost}. */
-    public void masteryLevelGained(MachineProgressionState state) {
-        if (this instanceof MachineMasteryHost host && level != null && !level.isClientSide) {
-            ChallengeLoot.drop(level, worldPosition, ChallengeLoot.MASTERY_LEVEL, ChallengeContext.of(host).withMasteryLevel(state.level()));
-        }
     }
 
     public void dropRefinementInventory(Level level) {

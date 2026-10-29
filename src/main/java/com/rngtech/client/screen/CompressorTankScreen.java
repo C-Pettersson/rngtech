@@ -1,7 +1,9 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.blockentity.CompressorTankBlockEntity;
+import com.rngtech.content.machine.CompressorTankMaterial;
 import com.rngtech.content.menu.CompressorTankMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class CompressorTankScreen extends AbstractContainerScreen<CompressorTankMenu> {
+public class CompressorTankScreen extends AbstractContainerScreen<CompressorTankMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -25,8 +27,6 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int ENERGY_BAR_X = 22;
     private static final int LOOSE_FLUID_BAR_X = 88;
     private static final int COMPRESSED_FLUID_BAR_X = 104;
@@ -79,18 +79,35 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
     private static final int[] PLAIN_STAT_DATA_INDICES = {CompressorTankMenu.fluidCapacityStatDataIndex()};
     private static final MachineStat[] PLAIN_STAT_TYPES = {MachineStat.FLUID_CAPACITY};
 
+    private final MachineTabs tabs;
+
     public CompressorTankScreen(CompressorTankMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 240;
         imageHeight = 200;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        MachineTabs.Builder builder = MachineTabs.builder(this)
+                .processing(CompressorTankMenu.TAB_PROCESSING, ModBlocks.COMPRESSOR_TANKS.get(CompressorTankMaterial.IRON).get());
+        if (menu.supportsCompression()) {
+            builder.gear(CompressorTankMenu.TAB_GEAR);
+        }
+        tabs = builder
+                .stats(CompressorTankMenu.TAB_STATS)
+                .refinement(CompressorTankMenu.TAB_REFINEMENT)
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -100,7 +117,7 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
 
         if (menu.selectedTab() == CompressorTankMenu.TAB_PROCESSING) {
@@ -115,6 +132,7 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != CompressorTankMenu.TAB_STATS) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -133,20 +151,9 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                menu.selectTab(CompressorTankMenu.TAB_PROCESSING);
-                return true;
-            }
-            if (menu.supportsCompression() && isOverTab(mouseX, mouseY, 1)) {
-                menu.selectTab(CompressorTankMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                menu.selectTab(CompressorTankMenu.TAB_STATS);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 3)) {
-                menu.selectTab(CompressorTankMenu.TAB_REFINEMENT);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                menu.selectTab(tab);
                 return true;
             }
             if (menu.selectedTab() == CompressorTankMenu.TAB_REFINEMENT
@@ -168,27 +175,6 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), menu.selectedTab() == CompressorTankMenu.TAB_PROCESSING);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == CompressorTankMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == CompressorTankMenu.TAB_STATS);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == CompressorTankMenu.TAB_REFINEMENT);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
     }
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
@@ -689,11 +675,5 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
         guiGraphics.fill(left, top, left + 18, top + 18, 0xFF373737);
         guiGraphics.fill(left + 1, top + 1, left + 17, top + 17, 0xFFE0E0E0);
         guiGraphics.fill(left + 2, top + 2, left + 16, top + 16, 0xFF8B8B8B);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 }

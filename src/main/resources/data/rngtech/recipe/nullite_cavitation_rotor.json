@@ -20,7 +20,7 @@
         },
         "G": {
             "ingredient": {
-                "item": "rngtech:nullite_gear"
+                "tag": "rngtech:gears/nullite"
             }
         },
         "H": {
@@ -35,12 +35,12 @@
         },
         "P": {
             "ingredient": {
-                "item": "rngtech:nullite_plate"
+                "tag": "rngtech:plates/nullite"
             }
         },
         "U": {
             "ingredient": {
-                "tag": "c:circuits/ultimate"
+                "tag": "rngtech:circuits/ultimate"
             }
         }
     },

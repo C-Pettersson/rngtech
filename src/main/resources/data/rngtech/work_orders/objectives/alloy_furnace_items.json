@@ -1,0 +1,81 @@
+{
+    "family": "alloy_furnace",
+    "type": "alloy",
+    "filter": "item",
+    "weight": 3,
+    "parts": {
+        "min": 1,
+        "max": 2
+    },
+    "options": [
+        {
+            "item": "rngtech:bronze_ingot",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:invar_ingot",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:steel_ingot",
+            "stage": 3
+        },
+        {
+            "item": "rngtech:arclite_ingot",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:sparksteel_ingot",
+            "stage": 4
+        },
+        {
+            "item": "rngtech:aethergold_ingot",
+            "stage": 6
+        },
+        {
+            "item": "rngtech:nullite_ingot",
+            "stage": 6
+        },
+        {
+            "item": "rngtech:tungstensteel_ingot",
+            "stage": 6
+        }
+    ],
+    "tiers": [
+        {
+            "count": {
+                "min": 20,
+                "max": 28,
+                "step": 4
+            }
+        },
+        {
+            "count": {
+                "min": 28,
+                "max": 40,
+                "step": 4
+            }
+        },
+        {
+            "count": {
+                "min": 36,
+                "max": 56,
+                "step": 4
+            }
+        },
+        {
+            "count": {
+                "min": 44,
+                "max": 64,
+                "step": 4
+            }
+        },
+        {
+            "count": {
+                "min": 44,
+                "max": 64,
+                "step": 4
+            }
+        }
+    ]
+}

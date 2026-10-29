@@ -38,7 +38,9 @@ Each Unique comes from one kind of place.
 | {{ item('rngtech:trial_vault_escapement') }} | Servo | Stage 6 | Ominous trial vaults, 3% per vault |
 | {{ item('rngtech:ancient_echo_control_board') }} | Control Board | Stage 6 | Ancient city chests, 4% |
 
-Your modpack may move Uniques to other sources, such as quest rewards or machine challenges.
+About 1 [Work Order](work-orders.md#rewards) in 130 pays an unidentified Unique instead. Jobs with Prestige pay one more often. It is most often one that fits the job's machine.
+
+Your modpack may move Uniques to other sources, such as quest rewards.
 
 ## Identifying a Unique
 
@@ -57,7 +59,7 @@ Once identified, the tooltip shows each rolled value. Hold **Shift** to see each
 - Stats a Unique gives a machine, such as Blend Speed or Jam Chance per Cycle, appear on that machine's Stats tab while the Unique is installed. See [Machine Stats](machine-stats.md#unique-stats).
 - Uniques keep their rolls when you break the machine they are in.
 
-Uniques have no Refinement Potential and cannot be refined: the [Affix Forge](affix-forge.md) and [Phase Array](phase-array.md) refuse every catalyst except the {{ item('rngtech:volatile_catalyst') }}. [Corruption](rarity-and-affixes.md#corruption) is the only way to change a Unique, once: Reforged rerolls every ranged stat line inside its range, Blessed and Blighted add an implicit from the Unique's part, and Warped leaves it unchanged. The [Component Recycler](component-recycler.md) and [Potential Reactor](potential-reactor.md) will not take them either.
+Uniques have no Refinement Potential and cannot be refined: the [Affix Forge](affix-forge.md) and [Phase Array](phase-array.md) refuse every catalyst except the {{ item('rngtech:volatile_catalyst') }}. A {{ item('rngtech:mirror_catalyst') }} cannot copy a Unique. [Corruption](rarity-and-affixes.md#corruption) is the only way to change a Unique, once: Reforged rerolls every ranged stat line inside its range, Blessed and Blighted add an implicit from the Unique's part, and Warped leaves it unchanged. The [Component Recycler](component-recycler.md) and [Potential Reactor](potential-reactor.md) will not take them either.
 
 ## The Uniques
 
@@ -92,7 +94,7 @@ A Stage 2 Crush Head that crushes at hardness 3, one level above its stage. Its 
 A Bronze-class Alloy Crucible with the same three input slots, tuned for blend recipes.
 
 - **Signature:** +(20–40)% Blend Speed and +(25–50) °C Blend Heat Reduction on blend recipes. These are the Blendwright's stats, and they stack with that ascendancy.
-- **Drawbacks:** (40–20)% increased Energy Use, and (40–20)% less Stability, which raises failure strain on recipes that can fail.
+- **Drawbacks:** (40–20)% increased Energy Use, and (40–20)% less Overheat Tolerance. The overheat line sits lower, so recipes that can fail build failure strain sooner when you run them hot. Blend recipes cannot fail, and the safe maximum does not change.
 
 ### Trial Vault Escapement
 

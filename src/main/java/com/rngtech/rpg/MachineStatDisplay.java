@@ -133,7 +133,14 @@ public final class MachineStatDisplay {
      * where {@code other} folds in speed, efficiency, stability, and machine-specific effects. An unknown base omits the
      * base and other lines.
      */
-    public static List<Component> generationBreakdown(double finalPerTick, double basePerTick, double multiplier, double flatPerTick) {
+    /** The Energy Generation hover: final FE/t, then each source, with the pack's config multiplier on its own line. */
+    public static List<Component> generationBreakdown(
+            double finalPerTick,
+            double basePerTick,
+            double multiplier,
+            double flatPerTick,
+            double packMultiplier
+    ) {
         List<Component> lines = new ArrayList<>();
         lines.add(Component.translatable("rngtech.stat.energy_generation.breakdown.final", energyRate(finalPerTick)));
         if (basePerTick > EPSILON) {
@@ -146,11 +153,19 @@ public final class MachineStatDisplay {
                     formatSignedNumber(Math.round(flatPerTick)) + " FE/t"
             ));
         }
-        double other = generationOtherFactor(finalPerTick, basePerTick, multiplier, flatPerTick);
+        if (Math.abs(packMultiplier - 1.0) >= 0.005) {
+            lines.add(packGenerationLine(packMultiplier));
+        }
+        double other = generationOtherFactor(finalPerTick, basePerTick, multiplier, flatPerTick) / Math.max(0.0001, packMultiplier);
         if (Math.abs(other - 1.0) >= 0.005) {
             lines.add(Component.translatable("rngtech.stat.energy_generation.breakdown.other", formatMultiplierDelta(other)));
         }
         return lines;
+    }
+
+    /** The hover line naming the pack's config multiplier for a generator's FE. */
+    public static Component packGenerationLine(double packMultiplier) {
+        return Component.translatable("rngtech.stat.energy_generation.breakdown.pack", formatMultiplierDelta(packMultiplier));
     }
 
     /** The share of final FE/t not explained by base, multiplier, and flat generation; 1 when the base is unknown. */

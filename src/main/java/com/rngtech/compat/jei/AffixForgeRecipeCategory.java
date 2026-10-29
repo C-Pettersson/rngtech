@@ -2,6 +2,7 @@ package com.rngtech.compat.jei;
 
 import com.rngtech.RNGTech;
 import com.rngtech.content.machine.CrusherChassisMaterial;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.refinement.RefinementTargets;
@@ -20,6 +21,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -81,14 +83,21 @@ public final class AffixForgeRecipeCategory implements IRecipeCategory<AffixForg
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AffixForgeJeiRecipe recipe, IFocusGroup focuses) {
-        List<ItemStack> targets = recipe.operation() == RefinementOperation.CORRUPT ? corruptionTargets() : refinementTargets();
+        boolean mirror = recipe.operation() == RefinementOperation.MIRROR;
+        List<ItemStack> targets = switch (recipe.operation()) {
+            case CORRUPT -> corruptionTargets();
+            case MIRROR -> mirrorTargets();
+            default -> refinementTargets();
+        };
         IRecipeSlotBuilder targetSlot = slot(builder, RecipeIngredientRole.INPUT, TARGET_X, SLOT_Y)
                 .addItemStacks(targets)
                 .addRichTooltipCallback((view, tooltip) -> {
                     tooltip.add(Component.translatable("rngtech.jei.affix_forge.target"));
-                    tooltip.add(Component.translatable(recipe.operation() == RefinementOperation.CORRUPT
-                            ? "rngtech.jei.affix_forge.target.corrupt.tooltip"
-                            : "rngtech.jei.affix_forge.target.tooltip"));
+                    tooltip.add(Component.translatable(switch (recipe.operation()) {
+                        case CORRUPT -> "rngtech.jei.affix_forge.target.corrupt.tooltip";
+                        case MIRROR -> "rngtech.jei.affix_forge.target.mirror.tooltip";
+                        default -> "rngtech.jei.affix_forge.target.tooltip";
+                    }));
                 });
         slot(builder, RecipeIngredientRole.INPUT, CATALYST_X, SLOT_Y)
                 .addItemStack(recipe.catalyst())
@@ -113,10 +122,12 @@ public final class AffixForgeRecipeCategory implements IRecipeCategory<AffixForg
                     });
         }
         IRecipeSlotBuilder outputSlot = slot(builder, RecipeIngredientRole.OUTPUT, OUTPUT_X, SLOT_Y)
-                .addItemStacks(targets)
+                .addItemStacks(mirror ? targets.stream().map(AffixForgeRecipeCategory::mirrored).toList() : targets)
                 .addRichTooltipCallback((view, tooltip) -> {
                     tooltip.add(Component.translatable("rngtech.jei.affix_forge.output"));
-                    tooltip.add(Component.translatable("rngtech.jei.affix_forge.output.tooltip"));
+                    tooltip.add(Component.translatable(mirror
+                            ? "rngtech.jei.affix_forge.output.mirror.tooltip"
+                            : "rngtech.jei.affix_forge.output.tooltip"));
                 });
         builder.createFocusLink(targetSlot, outputSlot);
     }
@@ -166,6 +177,22 @@ public final class AffixForgeRecipeCategory implements IRecipeCategory<AffixForg
                 .filter(RefinementTargets::canCorrupt)
                 .toList();
         return targets.isEmpty() ? refinementTargets() : targets;
+    }
+
+    /** Parts, cells, machine items, and Job Chips a Mirror Catalyst copies. */
+    private static List<ItemStack> mirrorTargets() {
+        List<ItemStack> targets = BuiltInRegistries.ITEM.stream()
+                .filter(AffixForgeRecipeCategory::isRngTechItem)
+                .map(ItemStack::new)
+                .filter(RefinementTargets::canMirror)
+                .toList();
+        return targets.isEmpty() ? refinementTargets() : targets;
+    }
+
+    private static ItemStack mirrored(ItemStack stack) {
+        ItemStack copy = stack.copy();
+        copy.set(ModDataComponents.MIRRORED.get(), Unit.INSTANCE);
+        return copy;
     }
 
     private static boolean isRngTechItem(Item item) {

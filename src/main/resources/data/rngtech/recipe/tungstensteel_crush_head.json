@@ -14,14 +14,14 @@
   ],
   "key": {
     "B": {
-      "ingredient": { "item": "rngtech:titanium_plate" }
+      "ingredient": { "tag": "rngtech:plates/titanium" }
     },
     "K": {
       "ingredient": { "item": "rngtech:calibrated_kinetic_component" },
       "calibration": { "family": "kinetic", "min_stage": 1, "min_stability": 75 }
     },
     "P": {
-      "ingredient": { "item": "rngtech:tungstensteel_plate" }
+      "ingredient": { "tag": "rngtech:plates/tungstensteel" }
     },
     "R": {
       "ingredient": { "item": "minecraft:redstone_block" }

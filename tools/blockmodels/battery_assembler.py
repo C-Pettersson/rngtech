@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the Component Assembler block model, part models, item model, and owned textures.
+"""Generate the Component Assembler blockstate, block model, part models, item model, and owned textures.
 
 The Component Assembler (resource id battery_assembler) is an assembly bed on the slate plinth. Its
 four input slots are four jig pockets along the front of the bed, and the part being assembled stands
@@ -8,7 +8,8 @@ recipe, carries a bridge, a carriage, and a quill with a gripper and dosing nozz
 the head picks from each filled pocket in turn and sets down on the nest, then doses the assembly
 fluid. Behind the bed, a cabinet holds the four-slot output rack as four cubbies, the assembly fluid in
 a glass reservoir lying on its roof, the Battery Cell in a cradle beside the reservoir with its charge
-meter on the east face, and the cable port on its back.
+meter on the east face, and the cable port on its back. The status lamp and the Job Chip lamp
+(job_lamp.py) sit on the cabinet front above the cubbies.
 
 The bed, gantry frame, cabinet, and reservoir frame are a static block model. The bridge, carriage,
 and quill are part models moved by BatteryAssemblerRenderer, which also draws the items, the fluid,
@@ -25,6 +26,8 @@ import random
 from pathlib import Path
 
 from PIL import Image, ImageDraw
+
+import job_lamp
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "src/main/resources/assets/rngtech"
@@ -76,6 +79,9 @@ TANK_RAIL = 0.5
 # Battery Cell cradle on the roof beside the reservoir; the cell lies along z.
 CRADLE = ((12.25, 12.0, 11.0), (14.75, 12.5, 14.75))
 SADDLE_ZS = (11.5, 13.75)
+# Job Chip lamp on the cabinet front, across from the status lamp and clear of the gantry post.
+JOB_LAMP = ((2.75, CUBBY_Y1 + 0.5, CABINET[0][2] - 0.25), (4.25, CUBBY_Y1 + 1.25, CABINET[0][2]))
+JOB_LAMP_FACES = ("north", "east", "west", "up", "down")
 
 
 def r(value: float) -> float:
@@ -207,11 +213,12 @@ def cabinet_elements():
         elements.append(box((x0, CUBBY_Y0, gz0 + CUBBY_DEPTH), (x1, CUBBY_Y1, gz0 + CUBBY_DEPTH + 0.01), "cubby", faces=("north",)))
         # Copper lip along the front of each cubby.
         elements.append(box((x0, CUBBY_Y0, gz0 - 0.25), (x1, CUBBY_Y0 + 0.5, gz0 + 0.25), "trim", faces=("north", "up", "east", "west")))
-    # Teal band and copper trim round the cabinet top, the port, the meter, and the lamp.
+    # Teal band and copper trim round the cabinet top, the port, the meter, and the lamps.
     elements.append(box((gx0 - 0.1, gy1 - 1.25, gz0 - 0.1), (gx1 + 0.1, gy1 - 0.75, gz1 + 0.1), "band", faces=SIDES))
     elements.append(box(*PORT, {"south": "port", "*": "casing"}, faces=("south", "east", "west", "up", "down"), uv={"south": [0, 0, 16, 16]}))
     elements.append(box(*METER, {"east": "meter", "*": "trim"}, faces=("north", "south", "east", "up", "down"), uv={"east": [0, 0, 3, 4.5]}))
     elements.append(lamp((12.5, CUBBY_Y1 + 0.5, gz0 - 0.25), (14.0, CUBBY_Y1 + 1.25, gz0)))
+    elements.append(job_lamp.element(*JOB_LAMP, JOB_LAMP_FACES))
     return elements
 
 
@@ -279,6 +286,7 @@ HOUSING_TEXTURES = {
     "cubby": TEX + "cubby",
     "tank_end": TEX + "tank_end",
     "tank_rail": TEX + "rail",
+    **job_lamp.TEXTURE,
 }
 PART_TEXTURES = {
     "beam": TEX + "beam",
@@ -309,6 +317,9 @@ def write_models() -> None:
     })
     write_json(MODELS / "block/battery_assembler_active.json", {
         "parent": "rngtech:block/battery_assembler", "textures": {"lamp": CRUSHER + "lamp_on"}})
+    job_lamp.write_part(MODELS / "block/battery_assembler/job_lamp.json", *JOB_LAMP, JOB_LAMP_FACES)
+    job_lamp.write_blockstate("battery_assembler", "rngtech:block/battery_assembler", "rngtech:block/battery_assembler_active",
+                              "rngtech:block/battery_assembler/job_lamp")
     # The item shows the head parked over the nest.
     write_json(MODELS / "item/battery_assembler.json", {
         "parent": "minecraft:block/block",

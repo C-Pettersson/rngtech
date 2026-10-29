@@ -4,6 +4,8 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.entity.ForestryCartEntity;
 import com.rngtech.content.menu.ForestryCartMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
+import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.progression.ForestryCompanionPassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MegaPassiveNode;
@@ -24,17 +26,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu> {
+public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
     private static final int TEXT = 0xFF3F3F3F;
     private static final int TEXT_MUTED = 0xFF6B6B6B;
+    private static final int ORDERS_ACCENT = 0xFF4E8A3A;
     private static final int ENERGY = 0xFFB43B28;
     private static final int FORESTRY = 0xFF4E8B54;
     private static final int WARNING = 0xFFB45B4A;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int ENERGY_GAUGE_X = 214;
     private static final int ENERGY_GAUGE_Y = 42;
     private static final int ENERGY_GAUGE_WIDTH = 12;
@@ -69,6 +70,8 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final MachineTabs tabs;
+    private final WorkOrdersTab workOrdersTab;
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new java.util.HashMap<>();
@@ -84,6 +87,13 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
         imageHeight = BASE_IMAGE_HEIGHT;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .tab(ForestryCartMenu.TAB_CART, "rngtech.tab.cart", ModItems.FORESTRY_CART.get())
+                .stats(ForestryCartMenu.TAB_STATS)
+                .mastery(ForestryCartMenu.TAB_MASTERY)
+                .orders(ForestryCartMenu.TAB_ORDERS, menu::workOrdersShown)
+                .build();
+        workOrdersTab = new WorkOrdersTab(menu, ORDERS_ACCENT);
         masterySupport = new MasteryScreenSupport<>(
                 ForestryCompanionPassiveTree.TREE,
                 ForestryCompanionPassiveTree.TREE.nodes(),
@@ -140,6 +150,11 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     }
 
     @Override
+    public MachineTabs machineTabs() {
+        return tabs;
+    }
+
+    @Override
     protected void init() {
         updateImageSizeForSelectedTab();
         super.init();
@@ -149,23 +164,33 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
         renderSupplySlotHint(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY) {
             masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
+        if (menu.selectedTab() == ForestryCartMenu.TAB_ORDERS) {
+            List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
+            if (!orderTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
+            }
+        }
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == ForestryCartMenu.TAB_CART) {
             renderCart(guiGraphics);
         } else if (menu.selectedTab() == ForestryCartMenu.TAB_STATS) {
             renderStats(guiGraphics);
+        } else if (menu.selectedTab() == ForestryCartMenu.TAB_ORDERS) {
+            renderPlayerInventoryFrames(guiGraphics);
+            workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         } else {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
@@ -174,6 +199,7 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() == ForestryCartMenu.TAB_CART) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
             MachineScreenStyle.drawClippedCentered(guiGraphics, font, Component.translatable("rngtech.gear.battery_cell.short"), 51, 39, 30, TEXT_MUTED);
@@ -186,6 +212,8 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
                     RANGE_ICON_X + ICON_SIZE / 2, RANGE_ICON_Y + 2, ICON_SIZE - 2, 0xFFE0E0E0);
         } else if (menu.selectedTab() == ForestryCartMenu.TAB_STATS) {
             drawStatsLabels(guiGraphics);
+        } else if (menu.selectedTab() == ForestryCartMenu.TAB_ORDERS) {
+            guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         } else {
             masterySupport.drawLabels(guiGraphics, font, imageWidth);
         }
@@ -194,16 +222,13 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                selectTab(ForestryCartMenu.TAB_CART);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                selectTab(tab);
                 return true;
             }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                selectTab(ForestryCartMenu.TAB_STATS);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                selectTab(ForestryCartMenu.TAB_MASTERY);
+            if (menu.selectedTab() == ForestryCartMenu.TAB_ORDERS
+                    && workOrdersTab.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
                 return true;
             }
             if (menu.selectedTab() == ForestryCartMenu.TAB_CART
@@ -271,26 +296,6 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.cart"), menu.selectedTab() == ForestryCartMenu.TAB_CART);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == ForestryCartMenu.TAB_STATS);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.mastery.short"), menu.selectedTab() == ForestryCartMenu.TAB_MASTERY);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        MachineScreenStyle.drawClippedCentered(guiGraphics, font, label, x + TAB_WIDTH / 2, y + 7, TAB_WIDTH - 8, selected ? TEXT : 0xFF2F2F2F);
     }
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
@@ -844,6 +849,9 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
     private void selectTab(int tab) {
         masterySupport.resetDragging();
         menu.selectTab(tab);
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+        }
         updateImageSizeForSelectedTab();
         if (menu.selectedTab() == ForestryCartMenu.TAB_MASTERY) {
             masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);
@@ -898,12 +906,6 @@ public class ForestryCartScreen extends AbstractContainerScreen<ForestryCartMenu
         guiGraphics.fill(left, top, left + 18, top + 18, 0xFF373737);
         guiGraphics.fill(left + 1, top + 1, left + 17, top + 17, 0xFFE0E0E0);
         guiGraphics.fill(left + 2, top + 2, left + 16, top + 16, 0xFF8B8B8B);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 
     private boolean inBounds(double mouseX, double mouseY, int x, int y, int width, int height) {

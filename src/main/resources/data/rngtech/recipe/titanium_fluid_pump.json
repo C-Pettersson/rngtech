@@ -14,16 +14,16 @@
   ],
   "key": {
     "E": {
-      "tag": "c:circuits/elite"
+      "tag": "rngtech:circuits/elite"
     },
     "F": {
       "item": "rngtech:pump_frame"
     },
     "G": {
-      "item": "rngtech:titanium_gear"
+      "tag": "rngtech:gears/titanium"
     },
     "P": {
-      "item": "rngtech:titanium_plate"
+      "tag": "rngtech:plates/titanium"
     }
   },
   "result": {

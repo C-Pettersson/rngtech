@@ -10,6 +10,7 @@ import com.rngtech.content.blockentity.MachineInfoSnapshot;
 import com.rngtech.content.blockentity.PotentialReactorBlockEntity;
 import com.rngtech.content.blockentity.UniversalConnectorBlockEntity;
 import com.rngtech.content.cable.NetworkBridgeType;
+import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.menu.UniversalConnectorAccess;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
@@ -18,11 +19,16 @@ import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.progression.AscendancyCatalog;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.workorder.LoadedWorkOrder;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkObjective;
+import com.rngtech.rpg.workorder.WorkOrderHost;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
@@ -58,6 +64,8 @@ import java.util.Locale;
 
 @WailaPlugin(RNGTech.MOD_ID)
 public final class RNGTechJadePlugin implements IWailaPlugin {
+    private static final String WORK_ORDER_DATA_KEY = "WorkOrders";
+
     @Override
     public void register(IWailaCommonRegistration registration) {
         registration.registerBlockDataProvider(MachineStateProvider.MACHINE, BlockEntity.class);
@@ -123,10 +131,30 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                 payout.putInt("repeats", reactor.inputGearRepeats());
                 tag.put(REPEAT_PAYOUT_DATA_KEY, payout);
             }
+            if (accessor.getBlockEntity() instanceof WorkOrderHost host && !host.workOrders().isEmpty()) {
+                tag.put(WORK_ORDER_DATA_KEY, workOrderData(host));
+            }
             CompoundTag connectorInfo = connectorInfo(accessor);
             if (connectorInfo != null) {
                 tag.put(CONNECTOR_DATA_KEY, connectorInfo);
             }
+        }
+
+        /** The machine's chips for Jade: the active job, its progress and Rush seconds left, and how many chips are loaded and done. */
+        private static CompoundTag workOrderData(WorkOrderHost host) {
+            CompoundTag data = new CompoundTag();
+            MachineWorkOrders orders = host.workOrders();
+            data.putInt("loaded", orders.orders().size());
+            data.putInt("done", (int) orders.orders().stream().filter(LoadedWorkOrder::fulfilled).count());
+            LoadedWorkOrder active = orders.activeOrder();
+            if (active != null) {
+                WorkObjective.CODEC.encodeStart(NbtOps.INSTANCE, active.order().objective()).result().ifPresent(job -> data.put("job", job));
+                data.putLong("progress", active.totalProgress());
+                if (active.rushed()) {
+                    data.putLong("rush", Math.max(0, (active.rushDeadline() - host.workOrderGameTime()) / 20));
+                }
+            }
+            return data;
         }
 
         @Override
@@ -157,8 +185,31 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                 appendRefinement(tooltip, info, details);
                 appendAscendancy(tooltip, accessor, details);
             }
+            appendWorkOrders(tooltip, accessor, accessor.showDetails());
             appendConnectorEnergy(tooltip, accessor);
             appendConnectorBridge(tooltip, accessor);
+        }
+
+        private static void appendWorkOrders(ITooltip tooltip, BlockAccessor accessor, boolean details) {
+            if (!accessor.getServerData().contains(WORK_ORDER_DATA_KEY)) {
+                return;
+            }
+            CompoundTag data = accessor.getServerData().getCompound(WORK_ORDER_DATA_KEY);
+            if (data.contains("job")) {
+                WorkObjective job = WorkObjective.CODEC.parse(NbtOps.INSTANCE, data.get("job")).result().orElse(null);
+                if (job != null) {
+                    tooltip.add(Component.translatable("rngtech.jade.work_order.active", JobChipItem.objectiveText(job)));
+                    tooltip.add(Component.translatable("rngtech.jade.work_order.progress", JobChipItem.progressText(job, data.getLong("progress"))));
+                }
+                if (data.contains("rush")) {
+                    tooltip.add(Component.translatable("rngtech.jade.work_order.rush", JobChipItem.clock(data.getLong("rush"))).withStyle(ChatFormatting.GOLD));
+                }
+            } else {
+                tooltip.add(Component.translatable("rngtech.jade.work_order.idle"));
+            }
+            if (details) {
+                tooltip.add(Component.translatable("rngtech.jade.work_order.loaded", data.getInt("loaded"), data.getInt("done")));
+            }
         }
 
         private boolean owns(BlockAccessor accessor) {

@@ -22,7 +22,7 @@
   "key": {
     "C": {
       "ingredient": {
-        "tag": "c:circuits/elite"
+        "tag": "rngtech:circuits/elite"
       }
     },
     "D": {
@@ -42,12 +42,12 @@
     },
     "N": {
       "ingredient": {
-        "item": "rngtech:nullite_plate"
+        "tag": "rngtech:plates/nullite"
       }
     },
     "T": {
       "ingredient": {
-        "item": "rngtech:tungstensteel_plate"
+        "tag": "rngtech:plates/tungstensteel"
       }
     }
   },

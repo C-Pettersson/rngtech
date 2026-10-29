@@ -5,6 +5,7 @@ import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.item.RefinementLensItem;
 import com.rngtech.content.item.RefinementModifierItem;
 import com.rngtech.content.menu.AffixForgeMenu;
+import com.rngtech.content.menu.RefinementMenuSupport;
 import com.rngtech.rpg.CorruptionOutcome;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierText;
@@ -330,6 +331,12 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
         if (focusMessage != null) {
             return lockedOperationLines(focusMessage);
         }
+        if (RefinementTargets.isMirrored(target)) {
+            return List.of(new OutcomeLine(Component.translatable(RefinementMenuSupport.MIRRORED_FAILURE), TEXT_BAD));
+        }
+        if (operation == RefinementOperation.MIRROR) {
+            return mirrorLines(target);
+        }
 
         RefinementModifier refinementModifier = modifier();
         Set<ModifierLensTag> lensTags = lensTags();
@@ -359,6 +366,20 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
             return lines;
         }
         return crystalOutcomeLines(operation);
+    }
+
+    /** A Mirror Catalyst copies the target as it is, so its preview says only what the copy is or what stops it. */
+    private List<OutcomeLine> mirrorLines(ItemStack target) {
+        if (!RefinementTargets.canMirror(target)) {
+            return List.of(new OutcomeLine(Component.translatable("rngtech.refinement.failure.cannot_mirror"), TEXT_BAD));
+        }
+        if (!modifierStack().isEmpty()) {
+            return List.of(new OutcomeLine(Component.translatable("rngtech.refinement.failure.focus_rejects_mirror"), TEXT_BAD));
+        }
+        return List.of(
+                new OutcomeLine(Component.translatable("rngtech.refinement.preview.mirror"), TEXT_GOOD),
+                new OutcomeLine(Component.translatable("rngtech.refinement.preview.mirror_locked"), TEXT_MUTED)
+        );
     }
 
     private static RefinementResult dryRun(
@@ -437,6 +458,7 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
             );
             case TARGETED_ADD_OR_UPGRADE -> candidateLines(candidateDefinitions(operation.targetStats()));
             case CORRUPT -> corruptionLines();
+            case MIRROR -> mirrorLines(targetStack());
         };
     }
 
@@ -1013,6 +1035,10 @@ public class AffixForgeScreen extends AbstractContainerScreen<AffixForgeMenu> {
     }
 
     private void drawRpLabel(GuiGraphics guiGraphics) {
+        if (RefinementTargets.isMirrored(targetStack())) {
+            drawClipped(guiGraphics, Component.translatable("rngtech.tooltip.mirrored"), RP_X + 4, RP_Y + 4, RP_WIDTH - 8, TEXT_BAD);
+            return;
+        }
         if (targetTraits().isCorrupted()) {
             drawClipped(guiGraphics, Component.translatable("rngtech.tooltip.corrupted"), RP_X + 4, RP_Y + 4, RP_WIDTH - 8, TEXT_BAD);
             return;

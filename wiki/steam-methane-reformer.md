@@ -79,9 +79,11 @@ Shifting the Carbon Monoxide from one Methane reform adds 500 mB of Hydrogen, ab
 The Gear tab has four slots:
 
 - **Heat Core** (required): Stage 6 or higher, so a {{ item('rngtech:titanium_heat_core') }} or an {{ item('rngtech:exotic_heat_core') }}.
-- **Catalyst Bed** (required): a {{ item('rngtech:reforming_catalyst_bed') }}. Like other machine parts, it rolls its own affixes, and they apply to the Reformer.
+- **Catalyst Bed** (required): a {{ item('rngtech:reforming_catalyst_bed') }}. Its Processing Speed, Energy Usage, and Instant Process, with its rolled affixes, apply to the Reformer.
 - **Battery Cell** (optional): Stage 6 or higher, such as an {{ item('rngtech:arclite_battery_cell') }}. It adds energy storage on top of the small internal buffer.
 - **Servo** (optional): {{ item('rngtech:steel_servo') }} or better. A {{ item('rngtech:nullite_servo') }} also auto-purges: when an output tank is full, it voids the extra gas instead of stopping the machine.
+
+The Heat Core only sets which recipes can run. Its stats do nothing in the Reformer. The Servo adds its Processing Speed, Energy Usage, and Instant Process, like the Catalyst Bed.
 
 ### Automation
 

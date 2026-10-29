@@ -1,12 +1,12 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "tools",
+  "category": "equipment",
   "ingredients": [
     {
       "item": "rngtech:basic_item_connector"
     },
     {
-      "tag": "c:circuits/basic"
+      "tag": "rngtech:circuits/basic"
     },
     {
       "item": "minecraft:redstone"

@@ -20,13 +20,13 @@
     },
     {
       "ingredient": {
-        "tag": "c:ingots/nullite"
+        "tag": "rngtech:ingots/nullite"
       },
       "count": 2
     },
     {
       "ingredient": {
-        "tag": "c:circuits/ultimate"
+        "tag": "rngtech:circuits/ultimate"
       }
     },
     {

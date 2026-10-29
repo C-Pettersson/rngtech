@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: battery-chassis.md
-  position: 2
+  position: 3
   icon: rngtech:iron_battery_chassis
 ---
 

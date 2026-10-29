@@ -9,7 +9,7 @@
   "key": {
     "B": { "item": "minecraft:blaze_powder" },
     "C": { "item": "rngtech:steel_casing" },
-    "P": { "item": "rngtech:titanium_plate" }
+    "P": { "tag": "rngtech:plates/titanium" }
   },
   "result": {
     "id": "rngtech:ammonia_catalyst_bed"

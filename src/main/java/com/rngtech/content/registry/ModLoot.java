@@ -3,6 +3,8 @@ package com.rngtech.content.registry;
 import com.rngtech.RNGTech;
 import com.rngtech.content.loot.ChallengeCondition;
 import com.rngtech.content.loot.ChallengeLoot;
+import com.rngtech.content.loot.SetOrderCountFunction;
+import com.rngtech.content.loot.SetOrderTierFunction;
 import com.rngtech.content.loot.UnidentifiedUniqueFunction;
 import com.rngtech.content.loot.UniqueLootEnabledCondition;
 
@@ -31,6 +33,10 @@ public final class ModLoot {
             registerIds();
     public static final DeferredHolder<LootItemFunctionType<?>, LootItemFunctionType<UnidentifiedUniqueFunction>> UNIDENTIFIED_UNIQUE =
             FUNCTIONS.register("unidentified_unique", () -> new LootItemFunctionType<>(UnidentifiedUniqueFunction.CODEC));
+    public static final DeferredHolder<LootItemFunctionType<?>, LootItemFunctionType<SetOrderTierFunction>> SET_ORDER_TIER =
+            FUNCTIONS.register("set_order_tier", () -> new LootItemFunctionType<>(SetOrderTierFunction.CODEC));
+    public static final DeferredHolder<LootItemFunctionType<?>, LootItemFunctionType<SetOrderCountFunction>> SET_ORDER_COUNT =
+            FUNCTIONS.register("set_order_count", () -> new LootItemFunctionType<>(SetOrderCountFunction.CODEC));
 
     public static void register(IEventBus bus) {
         ChallengeLoot.registerParamSet();

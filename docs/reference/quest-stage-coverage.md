@@ -1,6 +1,6 @@
 # Quest Stage Coverage
 
-Status: Prototype
+Status: Implemented
 
 The optional quest extra contains several chapters under `extras/ftbquests/config/ftbquests/quests/chapters/`, with text in the adjacent `lang/en_us.snbt` file. It is a pack-author guide, not a requirement of standalone RNGTech.
 

@@ -3,6 +3,8 @@ package com.rngtech.client.screen;
 import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.menu.FurnaceMenu;
+import com.rngtech.content.menu.WorkOrderMenuSupport;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.progression.FurnacePassiveTree;
@@ -20,7 +22,7 @@ import net.minecraft.world.entity.player.Inventory;
 import java.util.List;
 import java.util.Map;
 
-public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
+public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implements MachineTabs.Host {
     private static final int BASE_IMAGE_WIDTH = 240;
     private static final int BASE_IMAGE_HEIGHT = 200;
     private static final int PANEL = 0xFFC6C6C6;
@@ -38,10 +40,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
-    private static final int TAB_WIDTH = 42;
-    private static final int TAB_SPACING = 44;
-    private static final int STATUS_ICON_X = 114;
-    private static final int STATUS_ICON_Y = 28;
+    private static final int STATUS_ICON_X = 86;
+    private static final int MULTI_LANE_STATUS_ICON_Y = 28;
+    private static final int SINGLE_LANE_STATUS_ICON_Y = 36;
     private static final int ICON_SIZE = 12;
     private static final int BAR_Y = 28;
     private static final int BAR_WIDTH = 10;
@@ -155,6 +156,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private static final Map<MegaPassiveNode, ResourceLocation> MASTERY_ICON_TEXTURES = createMasteryIconTextures();
 
     private final MasteryScreenSupport<MegaPassiveNode> masterySupport;
+    private final WorkOrdersTab workOrdersTab;
+    private final MachineTabs tabs;
     private final HeatSlider heatSlider = new HeatSlider(86, 81, 69);
     private final NitrogenGauge nitrogenGauge = new NitrogenGauge(NITROGEN_GAUGE_X, BAR_Y);
 
@@ -172,6 +175,14 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         imageHeight = BASE_IMAGE_HEIGHT;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .processing(FurnaceMenu.TAB_PROCESSING, ModBlocks.FURNACE.get())
+                .gear(FurnaceMenu.TAB_GEAR)
+                .stats(FurnaceMenu.TAB_CONFIGURATION)
+                .refinement(FurnaceMenu.TAB_REFINEMENT)
+                .mastery(FurnaceMenu.TAB_MASTERY)
+                .orders(FurnaceMenu.TAB_ORDERS, menu::workOrdersShown)
+                .build();
         masterySupport = new MasteryScreenSupport<>(
                 FurnacePassiveTree.TREE,
                 FurnacePassiveTree.TREE.nodes(),
@@ -211,6 +222,12 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                         0xFF6D4A24
                 )
         );
+        workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
@@ -223,10 +240,17 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY) {
             masterySupport.renderTooltips(guiGraphics, font, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        }
+        if (menu.selectedTab() == FurnaceMenu.TAB_ORDERS) {
+            List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
+            if (!orderTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
+            }
         }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
@@ -235,7 +259,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
 
         if (menu.selectedTab() == FurnaceMenu.TAB_PROCESSING) {
@@ -246,6 +270,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             renderConfiguration(guiGraphics);
         } else if (menu.selectedTab() == FurnaceMenu.TAB_REFINEMENT) {
             renderRefinement(guiGraphics);
+        } else if (menu.selectedTab() == FurnaceMenu.TAB_ORDERS) {
+            workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         } else {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
@@ -254,6 +280,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != FurnaceMenu.TAB_CONFIGURATION && menu.selectedTab() != FurnaceMenu.TAB_MASTERY) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -265,7 +292,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             drawConfigurationLabels(guiGraphics);
         } else if (menu.selectedTab() == FurnaceMenu.TAB_REFINEMENT) {
             drawRefinementLabels(guiGraphics);
-        } else {
+        } else if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY) {
             masterySupport.drawLabels(guiGraphics, font, imageWidth);
         }
     }
@@ -278,24 +305,13 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
             return true;
         }
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                selectTab(FurnaceMenu.TAB_PROCESSING);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                selectTab(tab);
                 return true;
             }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                selectTab(FurnaceMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                selectTab(FurnaceMenu.TAB_CONFIGURATION);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 3)) {
-                selectTab(FurnaceMenu.TAB_REFINEMENT);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 4)) {
-                selectTab(FurnaceMenu.TAB_MASTERY);
+            if (menu.selectedTab() == FurnaceMenu.TAB_ORDERS
+                    && workOrdersTab.mouseClicked(mouseX, mouseY, button, leftPos, topPos, imageWidth, imageHeight)) {
                 return true;
             }
             if (menu.selectedTab() == FurnaceMenu.TAB_REFINEMENT
@@ -333,6 +349,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (menu.selectedTab() == FurnaceMenu.TAB_ORDERS) {
+            return workOrdersTab.mouseScrolled(scrollY);
+        }
         if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY
                 && masterySupport.mouseScrolled(mouseX, mouseY, scrollX, scrollY, leftPos, topPos, imageWidth, imageHeight)) {
             return true;
@@ -343,6 +362,9 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     private void selectTab(int tab) {
         masterySupport.resetDragging();
         menu.selectTab(tab);
+        if (minecraft != null && minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
+        }
         updateImageSizeForSelectedTab();
         if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY) {
             masterySupport.clampAfterGeometryChange(imageWidth, imageHeight);
@@ -395,28 +417,6 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), menu.selectedTab() == FurnaceMenu.TAB_PROCESSING);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == FurnaceMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == FurnaceMenu.TAB_CONFIGURATION);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == FurnaceMenu.TAB_REFINEMENT);
-        renderTab(guiGraphics, 4, Component.translatable("rngtech.tab.mastery.short"), menu.selectedTab() == FurnaceMenu.TAB_MASTERY);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
     }
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
@@ -495,6 +495,11 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     }
 
     /** The Bloomer's ledger fills a thin line along the bottom edge of a lane's progress bar. */
+    /** The status row sits 3 px above the first progress bar, which is lower with one lane than with stacked lanes. */
+    private int statusIconY() {
+        return menu.activeProcessingSlots() == 1 ? SINGLE_LANE_STATUS_ICON_Y : MULTI_LANE_STATUS_ICON_Y;
+    }
+
     private void renderLedgerBar(GuiGraphics guiGraphics, int lane, int barY) {
         float ledger = menu.ledgerProgress(lane);
         if (ledger < 0.0F) {
@@ -519,8 +524,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
     }
 
     private void renderStatusIcon(GuiGraphics guiGraphics) {
-        renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
-        MachineScreenStyle.renderStatusGlyph(guiGraphics, leftPos + STATUS_ICON_X, topPos + STATUS_ICON_Y, statusState());
+        renderIconBox(guiGraphics, STATUS_ICON_X, statusIconY());
+        MachineScreenStyle.renderStatusGlyph(guiGraphics, leftPos + STATUS_ICON_X, topPos + statusIconY(), statusState());
     }
 
     private void renderConfiguration(GuiGraphics guiGraphics) {
@@ -685,7 +690,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
                 mouseX,
                 mouseY,
                 STATUS_ICON_X,
-                STATUS_ICON_Y,
+                statusIconY(),
                 ICON_SIZE,
                 ICON_SIZE,
                 Component.translatable("rngtech.furnace.tooltip.status", statusComponent())
@@ -912,12 +917,6 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> {
         guiGraphics.fill(left, top, left + ICON_SIZE, top + ICON_SIZE, 0xFF373737);
         guiGraphics.fill(left + 1, top + 1, left + ICON_SIZE - 1, top + ICON_SIZE - 1, PANEL_LIGHT);
         guiGraphics.fill(left + 2, top + 2, left + ICON_SIZE - 2, top + ICON_SIZE - 2, PANEL_DARK);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
     @Override public boolean keyPressed(int key, int scan, int modifiers) {
         if (menu.selectedTab() == FurnaceMenu.TAB_MASTERY && masterySupport.keyPressed(key, scan, modifiers, imageWidth, imageHeight)) { return true; }

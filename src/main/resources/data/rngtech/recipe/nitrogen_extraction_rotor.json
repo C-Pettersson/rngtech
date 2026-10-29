@@ -15,7 +15,7 @@
     "key": {
         "G": {
             "ingredient": {
-                "item": "rngtech:titanium_gear"
+                "tag": "rngtech:gears/titanium"
             }
         },
         "H": {
@@ -30,7 +30,7 @@
         },
         "P": {
             "ingredient": {
-                "item": "rngtech:titanium_plate"
+                "tag": "rngtech:plates/titanium"
             }
         },
         "R": {

@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class ComponentRecyclerBlock extends BaseMachineBlock {
+public class ComponentRecyclerBlock extends WorkOrderMachineBlock {
     /** Where the item being recycled lies, in model pixels; see tools/blockmodels/component_recycler.py. */
     private static final double TABLE_Z = 5.0;
     private static final double TABLE_TOP = 7.0;

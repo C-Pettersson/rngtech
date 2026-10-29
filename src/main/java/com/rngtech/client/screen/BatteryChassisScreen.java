@@ -1,6 +1,8 @@
 package com.rngtech.client.screen;
 
+import com.rngtech.content.energy.BatteryChassisMaterial;
 import com.rngtech.content.menu.BatteryChassisMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.client.gui.GuiGraphics;
@@ -8,7 +10,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassisMenu> {
+public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassisMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -18,8 +20,6 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
     private static final int ENERGY_DARK = 0xFF4F5E5D;
     private static final int TRANSFER = 0xFFB45A28;
     private static final int STAT_ACCENT = 0xFF7F9ED7;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
@@ -54,18 +54,32 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
             MachineStat.GLOBAL_MODIFIER_STRENGTH
     };
 
+    private final MachineTabs tabs;
+
     public BatteryChassisScreen(BatteryChassisMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 240;
         imageHeight = 200;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .processing(BatteryChassisMenu.TAB_STATUS, ModBlocks.BATTERY_CHASSIS.get(BatteryChassisMaterial.IRON).get())
+                .gear(BatteryChassisMenu.TAB_GEAR)
+                .stats(BatteryChassisMenu.TAB_STATS)
+                .refinement(BatteryChassisMenu.TAB_REFINEMENT)
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -75,7 +89,7 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
 
         if (menu.selectedTab() == BatteryChassisMenu.TAB_STATUS) {
@@ -90,6 +104,7 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != BatteryChassisMenu.TAB_STATS) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -108,20 +123,9 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                menu.selectTab(BatteryChassisMenu.TAB_STATUS);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                menu.selectTab(BatteryChassisMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                menu.selectTab(BatteryChassisMenu.TAB_STATS);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 3)) {
-                menu.selectTab(BatteryChassisMenu.TAB_REFINEMENT);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                menu.selectTab(tab);
                 return true;
             }
             if (menu.selectedTab() == BatteryChassisMenu.TAB_REFINEMENT
@@ -140,27 +144,6 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), menu.selectedTab() == BatteryChassisMenu.TAB_STATUS);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == BatteryChassisMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == BatteryChassisMenu.TAB_STATS);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == BatteryChassisMenu.TAB_REFINEMENT);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
     }
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
@@ -381,6 +364,8 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
                         ? "rngtech.battery_chassis.tooltip.burst_connector_limited"
                         : "rngtech.battery_chassis.tooltip.burst",
                 CompactValueText.energyRate(menu.burstOutput()),
+                menu.burstWindow(),
+                menu.burstDuration(),
                 connectorCapText(menu.outputConnectorCap()),
                 CompactValueText.energyRate(menu.lastOutput())
         );
@@ -468,11 +453,5 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
         guiGraphics.fill(left, top, left + 18, top + 18, 0xFF373737);
         guiGraphics.fill(left + 1, top + 1, left + 17, top + 17, 0xFFE0E0E0);
         guiGraphics.fill(left + 2, top + 2, left + 16, top + 16, 0xFF8B8B8B);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 }

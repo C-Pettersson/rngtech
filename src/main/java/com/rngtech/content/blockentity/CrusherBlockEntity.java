@@ -8,8 +8,6 @@ import com.rngtech.content.item.CrushHeadItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.UniquePartItem;
-import com.rngtech.content.loot.ChallengeContext;
-import com.rngtech.content.loot.ChallengeLoot;
 import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.menu.CrusherMenu;
@@ -37,11 +35,17 @@ import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveNode;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.progression.PassiveStatType;
+import com.rngtech.rpg.workorder.WorkObjectiveType;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
+import com.rngtech.rpg.workorder.WorkReport;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -66,7 +70,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.List;
 
-public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost {
+public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, MachineMasteryHost, WorkOrderHost {
     public static final int STATUS_READY = 0;
     public static final int STATUS_MISSING_CRUSH_HEAD = 1;
     public static final int STATUS_NO_INPUT = 2;
@@ -246,6 +250,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity crusher) {
+        crusher.tickWorkOrders(level);
         tickWork(level, pos, state, crusher);
         crusher.syncVisualState(level);
     }
@@ -311,8 +316,11 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 crusher.markInstantProcess();
                 BaseMachineBlock.setActive(level, pos, state, true);
                 crusher.consumeWorkingEnergy(fullEnergyCost, false);
+                String input = crusher.inputId();
                 int completed = crusher.process(recipe, stats, level, jobs);
                 crusher.grantRecipeXp(recipe, completed);
+                crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, recipe.requiredProcessingLevel(), 0, input, completed)
+                        .withTicks(recipe.processingTicks()));
                 crusher.bulkSpeed.recordProcesses(crusher.activeTraits(), completed);
                 crusher.finishCraft();
                 crusher.setChanged();
@@ -326,8 +334,11 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         crusher.visualCraftTicks = adjustedProcessingTicks(recipe, stats, jobs);
 
         if (crusher.progress >= adjustedProcessingTicks(recipe, stats, jobs)) {
+            String input = crusher.inputId();
             int completed = crusher.process(recipe, stats, level, jobs);
             crusher.grantRecipeXp(recipe, completed);
+            crusher.workOrderWork(new WorkReport(WorkObjectiveType.CRUSH, recipe.requiredProcessingLevel(), 0, input, completed)
+                        .withTicks(recipe.processingTicks()));
             crusher.bulkSpeed.recordProcesses(crusher.activeTraits(), completed);
             crusher.finishCraft();
         }
@@ -815,6 +826,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
             ComponentBaseStatCatalog.applyAttributeAffixes(stats, crushHead);
         }
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.CRUSHER);
+        WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             try (MachineStatAccumulator.Source ignored = stats.source(MachineStatAccumulator.NO_BATTERY_SOURCE)) {
                 stats.scaleBonus(MachineStat.OUTPUT_AMOUNT, noBatteryOutputMultiplier(stats));
@@ -1087,8 +1099,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         resetProgress();
         jawJamTicks = ticks;
         dropJamDebris(recipe);
-        ChallengeLoot.reward(level, worldPosition, ChallengeLoot.CRUSHER_JAM,
-                ChallengeContext.of(this).withRecipeStage(recipe.requiredProcessingLevel()), inventory, SLOT_OUTPUT);
+        workOrderSetback(WorkOrderConditions.JAMMED_LINE);
         return true;
     }
 
@@ -1553,9 +1564,24 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.CRUSHER; }
+    @Override public double masteryXpGain() { return MachineMasteryHost.xpGain(effectiveStats()); }
     @Override public int ascendancyEntryStage() { return chassisMaterial().stage(); }
 
     @Override public MachineProgressionState machineProgression() { return super.machineProgression().forFamily(masteryFamily()); }
+    /** The registry id of the item in the main input slot, for Work Order item jobs. */
+    private String inputId() {
+        ItemStack input = inventory.getStackInSlot(SLOT_INPUT_A);
+        return input.isEmpty() ? "" : BuiltInRegistries.ITEM.getKey(input.getItem()).toString();
+    }
+
+    @Override public String workOrderFamily() { return WorkOrderFamilies.of(masteryFamily()); }
+    @Override public int workOrderStage() { return ascendancyEntryStage(); }
+    @Override public int workOrderMasteryLevel() { return masteryState().level(); }
+    @Override public String workOrderAscendancy() { return masteryState().ascendancy(); }
+    @Override public double workOrderStat(String stat) {
+        MachineStat value = MachineStat.bySerializedName(stat);
+        return value == null ? 0 : effectiveStats().value(value);
+    }
 
     @Override public boolean masteryGearAllows(MachineProgressionState state) {
         if (MegaPassiveTree.has(state, "BLOCK_BATTERY") && isBatteryCell(inventory.getStackInSlot(SLOT_FUEL))) { return false; }

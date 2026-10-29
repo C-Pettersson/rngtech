@@ -15,7 +15,7 @@
   "key": {
     "B": {
       "ingredient": {
-        "tag": "c:circuits/basic"
+        "tag": "rngtech:circuits/basic"
       }
     },
     "I": {
@@ -30,7 +30,7 @@
     },
     "S": {
       "ingredient": {
-        "item": "rngtech:steel_plate"
+        "tag": "rngtech:plates/steel"
       }
     },
     "X": {

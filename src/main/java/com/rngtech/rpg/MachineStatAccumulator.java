@@ -426,6 +426,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.EFFICIENCY, 1.0);
         stats.baseValues.put(MachineStat.STABILITY, 1.0);
         stats.baseValues.put(MachineStat.FLUID_TRANSFER, 1000.0);
+        stats.baseValues.put(MachineStat.FLUID_CAPACITY, 8000.0);
         return stats;
     }
 
@@ -442,6 +443,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.EFFICIENCY, 1.0);
         stats.baseValues.put(MachineStat.STABILITY, 1.0);
         stats.baseValues.put(MachineStat.FLUID_TRANSFER, 1000.0);
+        stats.baseValues.put(MachineStat.FLUID_CAPACITY, 8000.0);
         return stats;
     }
 
@@ -595,6 +597,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.ENERGY_USAGE, 1.0);
         stats.baseValues.put(MachineStat.EFFICIENCY, 1.0);
         stats.baseValues.put(MachineStat.STABILITY, 1.0);
+        stats.baseValues.put(MachineStat.FLUID_CAPACITY, 4000.0);
         return stats;
     }
 
@@ -614,6 +617,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.MAX_TEMPERATURE, 0.0);
         stats.baseValues.put(MachineStat.TEMPERATURE_STABILITY, 1.0);
         stats.baseValues.put(MachineStat.STABILITY, 1.0);
+        stats.baseValues.put(MachineStat.FLUID_CAPACITY, 8000.0);
         return stats;
     }
 
@@ -630,6 +634,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.EFFICIENCY, 1.0);
         stats.baseValues.put(MachineStat.PROCESSING_SPEED, 1.0);
         stats.baseValues.put(MachineStat.STABILITY, 1.0);
+        stats.baseValues.put(MachineStat.FLUID_CAPACITY, 8000.0);
         return stats;
     }
 
@@ -649,6 +654,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.TEMPERATURE_STABILITY, 1.0);
         stats.baseValues.put(MachineStat.STABILITY, 1.0);
         stats.baseValues.put(MachineStat.FLUID_TRANSFER, 1000.0);
+        stats.baseValues.put(MachineStat.FLUID_CAPACITY, 4000.0);
         return stats;
     }
 

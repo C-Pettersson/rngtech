@@ -17,10 +17,10 @@
             "tag": "rngtech:machine_frames/exotic"
         },
         "P": {
-            "item": "rngtech:naquadah_plate"
+            "tag": "rngtech:plates/naquadah"
         },
         "U": {
-            "tag": "c:circuits/ultimate"
+            "tag": "rngtech:circuits/ultimate"
         }
     },
     "result": {

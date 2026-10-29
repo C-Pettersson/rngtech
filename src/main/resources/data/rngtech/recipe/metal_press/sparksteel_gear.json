@@ -8,7 +8,7 @@
   "type": "rngtech:metal_press",
   "group": "metal_press_gears",
   "ingredient": {
-    "tag": "c:ingots/sparksteel"
+    "tag": "rngtech:ingots/sparksteel"
   },
   "input_count": 3,
   "mold": {

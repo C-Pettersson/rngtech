@@ -29,9 +29,33 @@ public final class StatBreakdownCache {
     }
 
     static List<Component> tooltip(MachineStat stat) {
+        if (Minecraft.getInstance().player == null) {
+            return List.of();
+        }
+        Map<MachineStat, StatBreakdown> current = current();
+        if (current == null) {
+            return List.of(Component.translatable("rngtech.stat.breakdown.pending").withStyle(ChatFormatting.GRAY));
+        }
+        StatBreakdown breakdown = current.get(MachineStatAccumulator.accumulationStat(stat));
+        if (breakdown == null) {
+            return List.of(
+                    Component.translatable(stat.translationKey()),
+                    Component.translatable("rngtech.stat.breakdown.none").withStyle(ChatFormatting.GRAY)
+            );
+        }
+        return StatBreakdownText.lines(breakdown);
+    }
+
+    /** The stat's breakdown, or null until the server answers. Asking keeps the cache refreshing while a Stats tab shows. */
+    static StatBreakdown breakdown(MachineStat stat) {
+        Map<MachineStat, StatBreakdown> current = current();
+        return current == null ? null : current.get(MachineStatAccumulator.accumulationStat(stat));
+    }
+
+    private static Map<MachineStat, StatBreakdown> current() {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null) {
-            return List.of();
+            return null;
         }
         int openContainerId = minecraft.player.containerMenu.containerId;
         if (openContainerId != containerId) {
@@ -45,17 +69,7 @@ public final class StatBreakdownCache {
             requestedAt = now;
             PacketDistributor.sendToServer(new StatBreakdownRequestPayload(openContainerId));
         }
-        if (breakdowns == null) {
-            return List.of(Component.translatable("rngtech.stat.breakdown.pending").withStyle(ChatFormatting.GRAY));
-        }
-        StatBreakdown breakdown = breakdowns.get(MachineStatAccumulator.accumulationStat(stat));
-        if (breakdown == null) {
-            return List.of(
-                    Component.translatable(stat.translationKey()),
-                    Component.translatable("rngtech.stat.breakdown.none").withStyle(ChatFormatting.GRAY)
-            );
-        }
-        return StatBreakdownText.lines(breakdown);
+        return breakdowns;
     }
 
     public static void accept(int payloadContainerId, List<StatBreakdown> payloadBreakdowns) {

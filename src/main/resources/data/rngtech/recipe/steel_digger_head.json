@@ -9,13 +9,13 @@
   ],
   "key": {
     "G": {
-      "item": "rngtech:steel_gear"
+      "tag": "rngtech:gears/steel"
     },
     "R": {
-      "item": "rngtech:steel_rod"
+      "tag": "rngtech:rods/steel"
     },
     "P": {
-      "item": "rngtech:steel_plate"
+      "tag": "rngtech:plates/steel"
     }
   },
   "pattern": [

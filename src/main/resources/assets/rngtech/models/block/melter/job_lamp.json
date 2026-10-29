@@ -1,0 +1,42 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "rngtech:block/work_order/lamp_on",
+    "lit": "rngtech:block/work_order/lamp_on"
+  },
+  "elements": [
+    {
+      "from": [
+        5.48,
+        11.08,
+        1.23
+      ],
+      "to": [
+        6.77,
+        11.67,
+        1.52
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lit"
+        },
+        "east": {
+          "texture": "#lit"
+        },
+        "west": {
+          "texture": "#lit"
+        },
+        "up": {
+          "texture": "#lit"
+        },
+        "down": {
+          "texture": "#lit"
+        }
+      },
+      "neoforge_data": {
+        "block_light": 15,
+        "sky_light": 15
+      }
+    }
+  ]
+}

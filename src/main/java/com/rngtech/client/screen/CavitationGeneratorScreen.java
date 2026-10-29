@@ -3,6 +3,7 @@ package com.rngtech.client.screen;
 import com.rngtech.content.blockentity.CavitationGeneratorBlockEntity;
 import com.rngtech.content.energy.CavitationRotorDynamics;
 import com.rngtech.content.menu.CavitationGeneratorMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.ChatFormatting;
@@ -15,7 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import java.util.List;
 import java.util.Locale;
 
-public class CavitationGeneratorScreen extends AbstractContainerScreen<CavitationGeneratorMenu> {
+public class CavitationGeneratorScreen extends AbstractContainerScreen<CavitationGeneratorMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -27,8 +28,6 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final int PROGRESS = 0xFF8B6F4A;
     private static final int STRAIN = 0xFFD38A35;
     private static final int WEAR = 0xFFB45B4A;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
@@ -47,7 +46,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final int ENERGY_METER_WIDTH = 12;
     private static final int ENERGY_METER_HEIGHT = 52;
     private static final int STATUS_ICON_X = 84;
-    private static final int STATUS_ICON_Y = 30;
+    private static final int STATUS_ICON_Y = 34;
     private static final int GENERATION_ICON_X = 100;
     private static final int OUTPUT_ICON_X = 116;
     private static final int PRESSURE_ICON_X = 132;
@@ -75,8 +74,8 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     private static final int PITTED_LABEL_Y = 47;
     private static final int PITTED_SLOT_X = 192;
     private static final int PITTED_SLOT_Y = 61;
-    private static final int PROCESSING_LEVEL_ICON_X = 184;
-    private static final int PROCESSING_LEVEL_ICON_Y = 78;
+    private static final int PROCESSING_LEVEL_ICON_X = 148;
+    private static final int PROCESSING_LEVEL_ICON_Y = STATUS_ICON_Y;
     private static final int PROCESSING_LEVEL_MAX = 4;
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.energy_generation",
@@ -112,18 +111,32 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
             MachineStat.FLUID_TRANSFER
     };
 
+    private final MachineTabs tabs;
+
     public CavitationGeneratorScreen(CavitationGeneratorMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 240;
         imageHeight = 200;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
+        tabs = MachineTabs.builder(this)
+                .processing(CavitationGeneratorMenu.TAB_PROCESSING, ModBlocks.CAVITATION_GENERATOR.get())
+                .gear(CavitationGeneratorMenu.TAB_GEAR)
+                .stats(CavitationGeneratorMenu.TAB_STATS)
+                .refinement(CavitationGeneratorMenu.TAB_REFINEMENT)
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -133,15 +146,13 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == CavitationGeneratorMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
-        } else if (menu.selectedTab() == CavitationGeneratorMenu.TAB_GEAR) {
-            renderGear(guiGraphics);
         } else if (menu.selectedTab() == CavitationGeneratorMenu.TAB_STATS) {
             MachineScreenStyle.renderStatPanel(guiGraphics, leftPos, topPos, STAT_PANEL_X, STAT_PANEL_Y, STAT_PANEL_WIDTH, statLines().length, ENERGY);
-        } else {
+        } else if (menu.selectedTab() == CavitationGeneratorMenu.TAB_REFINEMENT) {
             RefinementScreenStyle.render(guiGraphics, leftPos, topPos, menu.machineTraits(), ENERGY);
         }
     }
@@ -149,6 +160,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != CavitationGeneratorMenu.TAB_STATS) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -170,11 +182,10 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            for (int index = 0; index < 4; index++) {
-                if (isOverTab(mouseX, mouseY, index)) {
-                    menu.selectTab(index);
-                    return true;
-                }
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                menu.selectTab(tab);
+                return true;
             }
             if (menu.selectedTab() == CavitationGeneratorMenu.TAB_REFINEMENT
                     && RefinementScreenStyle.handleApplyClick(this, menu, mouseX, mouseY)) {
@@ -227,20 +238,6 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(guiGraphics, 0, Component.translatable("rngtech.tab.processing.short"), menu.selectedTab() == CavitationGeneratorMenu.TAB_PROCESSING);
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == CavitationGeneratorMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == CavitationGeneratorMenu.TAB_STATS);
-        renderTab(guiGraphics, 3, Component.translatable("rngtech.tab.refinement.short"), menu.selectedTab() == CavitationGeneratorMenu.TAB_REFINEMENT);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, selected ? PANEL : 0xFF9A9A9A);
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
     }
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
@@ -303,6 +300,16 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         renderHorizontalMeter(guiGraphics, PROGRESS_BAR_X, WEAR_BAR_Y, PROCESS_BAR_WIDTH, STRAIN_WEAR_BAR_HEIGHT, menu.wearProgress(), WEAR);
         renderSpeedGauge(guiGraphics);
         renderProcessingIcons(guiGraphics);
+        MachineScreenStyle.renderProcessingLevelSquare(
+                guiGraphics,
+                leftPos,
+                topPos,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                menu.processingLevel(),
+                PROCESSING_LEVEL_MAX,
+                ENERGY
+        );
         renderPurgeButtons(guiGraphics);
     }
 
@@ -394,19 +401,6 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         return String.format(Locale.ROOT, "%.2f", value);
     }
 
-    private void renderGear(GuiGraphics guiGraphics) {
-        MachineScreenStyle.renderProcessingLevelSquare(
-                guiGraphics,
-                leftPos,
-                topPos,
-                PROCESSING_LEVEL_ICON_X,
-                PROCESSING_LEVEL_ICON_Y,
-                menu.processingLevel(),
-                PROCESSING_LEVEL_MAX,
-                ENERGY
-        );
-    }
-
     private void renderProcessingIcons(GuiGraphics guiGraphics) {
         renderIconBox(guiGraphics, STATUS_ICON_X, STATUS_ICON_Y);
         guiGraphics.fill(leftPos + STATUS_ICON_X + 3, topPos + STATUS_ICON_Y + 3, leftPos + STATUS_ICON_X + 9, topPos + STATUS_ICON_Y + 9, statusColor());
@@ -474,23 +468,20 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     }
 
     private void renderValueTooltips(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (menu.selectedTab() == CavitationGeneratorMenu.TAB_GEAR) {
-            MachineScreenStyle.renderStatusSquareTooltip(
-                    guiGraphics,
-                    font,
-                    leftPos,
-                    topPos,
-                    mouseX,
-                    mouseY,
-                    PROCESSING_LEVEL_ICON_X,
-                    PROCESSING_LEVEL_ICON_Y,
-                    Component.translatable("rngtech.gear.tooltip.processing_level", menu.processingLevel())
-            );
-            return;
-        }
         if (menu.selectedTab() != CavitationGeneratorMenu.TAB_PROCESSING) {
             return;
         }
+        MachineScreenStyle.renderStatusSquareTooltip(
+                guiGraphics,
+                font,
+                leftPos,
+                topPos,
+                mouseX,
+                mouseY,
+                PROCESSING_LEVEL_ICON_X,
+                PROCESSING_LEVEL_ICON_Y,
+                Component.translatable("rngtech.gear.tooltip.processing_level", menu.processingLevel())
+        );
         if (renderPurgeTooltips(guiGraphics, mouseX, mouseY)) {
             return;
         }
@@ -656,7 +647,8 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
                 lines.toArray(MachineScreenStyle.StatLine[]::new),
                 menu.energyPerTick(),
                 menu.statValue(CavitationGeneratorMenu.baseEnergyGenerationDataIndex()),
-                menu.statValue(CavitationGeneratorMenu.flatEnergyGenerationDataIndex())
+                menu.statValue(CavitationGeneratorMenu.flatEnergyGenerationDataIndex()),
+                menu.packGenerationMultiplier()
         );
     }
 
@@ -682,11 +674,5 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         guiGraphics.fill(left, top, left + 18, top + 18, 0xFF373737);
         guiGraphics.fill(left + 1, top + 1, left + 17, top + 17, 0xFFE0E0E0);
         guiGraphics.fill(left + 2, top + 2, left + 16, top + 16, 0xFF8B8B8B);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 }

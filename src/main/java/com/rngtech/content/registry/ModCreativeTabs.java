@@ -74,7 +74,6 @@ public final class ModCreativeTabs {
                     .icon(() -> ModItems.IRON_CRUSH_HEAD.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.FURNACE_MACHINE_CHASSIS.get());
-                        output.accept(ModItems.WASHER_MACHINE_CHASSIS.get());
                         output.accept(ModItems.SOLID_FUEL_BURNER_MACHINE_CHASSIS.get());
                         output.accept(ModItems.AFFIX_FORGE.get());
                         output.accept(ModItems.EXOTIC_AFFIX_FORGE.get());
@@ -313,6 +312,9 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.STABILIZATION_CRYSTAL.get());
                         output.accept(ModItems.NULL_CRYSTAL.get());
                         output.accept(ModItems.VOLATILE_CATALYST.get());
+                        output.accept(ModItems.MIRROR_CATALYST.get());
+                        output.accept(ModItems.DISPATCH_TERMINAL.get());
+                        output.accept(ModItems.REQUISITION.get());
                         output.accept(ModItems.PHASE_EMITTER.get());
                         output.accept(ModItems.PHASE_COIL.get());
                         for (int tier = 1; tier <= PhaseArrayRules.GLYPH_TIERS; tier++) {

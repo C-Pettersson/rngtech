@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class AlloyFurnaceBlock extends BaseMachineBlock {
+public class AlloyFurnaceBlock extends WorkOrderMachineBlock {
     private final AlloyFurnaceChassisMaterial material;
 
     public AlloyFurnaceBlock(AlloyFurnaceChassisMaterial material, Properties properties) {

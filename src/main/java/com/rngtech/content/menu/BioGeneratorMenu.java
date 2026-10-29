@@ -71,7 +71,8 @@ public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreak
     private static final int DATA_CAPTURE = 38;
     private static final int DATA_METHANE_RATE = 39;
     private static final int DATA_VENT_RATE = 40;
-    private static final int DATA_COUNT = 41;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 41;
+    private static final int DATA_COUNT = 42;
     private static final int BUTTON_RETENTION_BASE = 9000;
     private static final int STAT_SCALE = 100;
     private static final int FUEL_SLOT = 0;
@@ -501,5 +502,10 @@ public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreak
         public boolean isActive() {
             return activeSupplier.getAsBoolean();
         }
+    }
+
+    /** The pack's config multiplier on this generator's FE, global times stage. */
+    public double packGenerationMultiplier() {
+        return GenerationMenuSupport.packMultiplier(data.get(DATA_PACK_GENERATION_MULTIPLIER));
     }
 }

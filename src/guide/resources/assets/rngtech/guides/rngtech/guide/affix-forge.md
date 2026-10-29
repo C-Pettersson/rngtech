@@ -33,6 +33,7 @@ item_ids:
   - rngtech:destabilization_crystal
   - rngtech:stabilization_crystal
   - rngtech:volatile_catalyst
+  - rngtech:mirror_catalyst
 ---
 
 # Affix Forge
@@ -45,28 +46,22 @@ item_ids:
 - **Mastery:** No
 - **Tool:** <ItemLink id="minecraft:wooden_pickaxe" />
 
-The **Affix Forge** is RNGTech's early refinement station. Put in a machine item, machine part, Battery Cell, Tool Head, Tool Rod, or companion item, add a catalyst, and the forge adds, upgrades, rerolls, or removes that item's rolled affixes. It needs no power. Three reusable upgrades unlock stronger catalysts and the optional focus slot.
+The **Affix Forge** is RNGTech's early refinement station. Put in a machine item, machine part, Battery Cell, Tool Head, Tool Rod, companion item, or [Job Chip](rngtech:work-orders.md), add a catalyst, and the forge adds, upgrades, rerolls, or removes that item's rolled affixes. It needs no power. Three reusable upgrades unlock stronger catalysts and the optional focus slot.
 
 The forge refines items, not placed machines. To refine a machine that is already placed, use the Refinement tab in that machine's own screen. For the endgame bench where you choose the affix, see the [Phase Array](rngtech:phase-array.md).
+
+You can read a forge from the outside. The item in the target slot stands on the iron plate in the middle, inside the lapis ring, and the catalyst lies in the copper dish at the front. Each upgrade appears once it is installed. The Lens Array is a magnifier on a boom over the target, with a lens on each side, and a modifier lens in the focus slot clips to its front. The Modifier Socket is the copper claw cup on the stand on the right, where a modifier crystal in the focus slot turns. The Resonance Matrix is the violet crystal glowing in the tower on the left. Without an upgrade, its mount stays bare, and a lens or crystal in the focus slot lies on that mount. When a Reforge succeeds, the lapis ring and the matrix flare, the Lens Array shines down on the target, and the target turns once.
 
 ## Usage
 
 - [How refinement works](rngtech:affix-forge/how-refinement-works.md)
-
-### Using the forge
-
-1. Put the item you want to refine in the **target** slot. The RP readout on the left shows its remaining budget.
-2. Put a catalyst in the **catalyst** slot. The outcome panel previews what it will do and its RP cost range.
-3. Optionally, put a lens or modifier crystal in the **focus** slot.
-4. Click **Reforge**. On success, the item changes in place and the catalyst is used up.
-
-The modifier list shows the item's current affixes. You cannot pick which affix to add or upgrade; the forge rolls it for you. Shift-click moves items into the right slot.
-
+- [Using the forge](rngtech:affix-forge/using-the-forge.md)
 - [Catalysts](rngtech:affix-forge/catalysts.md)
 - [Upgrades](rngtech:affix-forge/upgrades.md)
 - [Modifier lenses](rngtech:affix-forge/modifier-lenses.md)
 - [Modifier crystals](rngtech:affix-forge/modifier-crystals.md)
 - [Corrupting with a Volatile Catalyst](rngtech:affix-forge/corrupting-with-a-volatile-catalyst.md)
+- [Copying with a Mirror Catalyst](rngtech:affix-forge/copying-with-a-mirror-catalyst.md)
 
 ### Automation
 
@@ -82,13 +77,7 @@ With JEI installed, the catalysts are listed under the Affix Forging category.
 
 ## Obtaining
 
-### Crafting
-
-<RecipesFor id="rngtech:affix_forge" />
-
-- Requires the Copper material to be enabled.
-
-The forge does not roll rarity or affixes itself. Its recipe needs the Copper material to be enabled.
+- [Crafting](rngtech:affix-forge/crafting.md)
 
 ### Breaking
 

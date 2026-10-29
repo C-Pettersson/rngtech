@@ -2,13 +2,13 @@
 
 Source: [draft design](phase-array.md).
 
-Status: **Prototype**. The PRD was accepted on 2026-10-21 and every delivery phase is in on `feature/gear-crafting-refinement-7baeee`. The Exotic Affix Forge is replaced. Everything still needs an in-game playtest.
+Status: **Implemented**. The PRD was accepted on 2026-10-21 and every delivery phase merged to `main` in #205. The Exotic Affix Forge is replaced. The in-game playtest is done; the open questions below stay open.
 
 ## Scope checklist
 
 - [x] Draft the PRD and this state page.
 - [x] Resolve the decisions and accept the PRD. The open questions stay open for the simulation and formation phases.
-- [ ] Create a feature branch from clean `main`.
+- [x] Create a feature branch from clean `main`.
 - [x] Simulation: `./gradlew phaseArraySim`, `tools/balance/phase-array-scenarios.json`, and the PRD's numbers set from it.
 - [x] Parts and formation: Emitter, Coil, Glyph, their profiles, the line pattern, formation, and the Cradle rename.
 - [x] Operations with instant outcomes: the `rngtech:phase_array` recipe type, the Cradle screen, charge, and every operation through the refinement library.
@@ -17,13 +17,13 @@ Status: **Prototype**. The PRD was accepted on 2026-10-21 and every delivery pha
 - [x] Removal of the Exotic Affix Forge operations, history, recipe type, menu, screen, JEI category, and config keys (phase 4), then its catalyst item, wiki page, guide pages, and quest text (phase 7).
 - [x] Balance-world setup `rngbalance:phase_array`.
 - [x] Documentation: wiki page, Rarity and Affixes, Machine Stats, Battery Cells, Modpack Creators, the implementation matrix, the GuideME guide, Machine Design Notes, and quests.
-- [ ] In-game playtest of every operation and outcome.
+- [x] In-game playtest of every operation and outcome.
 
 ## Decisions
 
 Recorded 2026-10-21 while drafting:
 
-- Default Glyph sources are the existing challenge loot tables and Dormant Machines. Work Orders add the main supply later, and this PRD does not wait for them.
+- Default Glyph sources are the existing challenge loot tables and Dormant Machines. Work Orders add the main supply later, and this PRD does not wait for them. (Superseded 2026-10-26: the challenge tables were removed, so Dormant Machines are the only default source until Work Orders.)
 - Tier V Glyphs have no source until Work Orders. No interim source is added.
 - Every stage is accepted, and operations spend a little RP, so RP stays the ceiling.
 - Operations are `rngtech:phase_array` recipes.
@@ -52,6 +52,8 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 
 ## Progress log
 
+- 2026-10-28: a Cradle loaded from an Exotic Affix Forge save lost the forge's items, because it read only its own `Items` and `Cells`. It now reads the forge's `ProcessInventory` and `GearInventory`: the target, output, and Battery Cell move into the Cradle's slots, and the catalyst, or anything else without a slot, is held on the Cradle and drops once a player is within 16 blocks or the Cradle breaks. `exoticForgeSaveKeepsItsItems` covers it.
+- 2026-10-26: the machine-challenge Glyph sources are gone. Machines roll no loot on their own events, because the Glyph dropped on top of the machine or blocked its output. Dormant Machines are the only default source until Work Orders land. The wiki, the JEI Glyph page, and the pack-maker page say so.
 - 2026-10-22: playtest retune. Resonate costs 2 RP instead of 1, and Imprint needs a Tier IV Glyph instead of Tier II, in the recipes, the `prd` scenario, and the PRD. `phaseArraySim` reran: a fresh Rare Stage 8 item now stops on RP for 91% of runs after 18 pulses at Quality 22, where it stopped on Strain after 25 pulses at Quality 25, so the PRD's model table and its reading of the limits are rewritten. The GameTest that loads Resonate checks 2 RP.
 - 2026-10-22: Glyph seats. The Cradle has five Glyph seats, one per tier; a Glyph of that tier or higher opens every position of its tier, and taking it out closes them. Coils carry no tier of their own any more: `rngtech:coil_tier`, the lock-in click, and the Coil item's tier tooltip are gone, and a Coil's `tier` block state is a display the Cradle sets to the tier its position runs at. Shift-clicking a Glyph fills its own seat first, then the spend slot. The balance-world setup seats a Glyph of every tier, the GameTests seat Glyphs, and the wiki, guide, quests, and PRD describe seats.
 - 2026-10-22: pack-maker levers. Hold Chance, Overhold Chance, the Partial window, Fracture per Strain, the Quality curve, the stage factors, the parts' charge store and rate, and the Glyph floors are `phaseArray.*` keys in `rngtech-common.toml`, read through `PhaseArrayRules` with the PRD's numbers as defaults when no config is loaded, so the domain checks and the simulation keep their values. The operations' costs were already recipes and RP already had `calibration.refinementPotentialBonus`; the Modpack Creators page lists the keys.

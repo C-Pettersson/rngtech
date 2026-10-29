@@ -1,7 +1,22 @@
 {
   "variants": {
-    "part=lower": { "model": "rngtech:block/silica_gel_column_casing_lower" },
-    "part=single": { "model": "rngtech:block/silica_gel_column_casing" },
-    "part=upper": { "model": "rngtech:block/silica_gel_column_casing_upper" }
+    "active=false,part=lower": {
+      "model": "rngtech:block/silica_gel_column_casing_lower"
+    },
+    "active=true,part=lower": {
+      "model": "rngtech:block/silica_gel_column_casing_lower_active"
+    },
+    "active=false,part=single": {
+      "model": "rngtech:block/silica_gel_column_casing"
+    },
+    "active=true,part=single": {
+      "model": "rngtech:block/silica_gel_column_casing"
+    },
+    "active=false,part=upper": {
+      "model": "rngtech:block/silica_gel_column_casing_upper"
+    },
+    "active=true,part=upper": {
+      "model": "rngtech:block/silica_gel_column_casing_upper_active"
+    }
   }
 }

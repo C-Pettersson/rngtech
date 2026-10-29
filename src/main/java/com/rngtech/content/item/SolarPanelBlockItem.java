@@ -1,5 +1,6 @@
 package com.rngtech.content.item;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.energy.SolarPanelMaterial;
 import com.rngtech.rpg.MachineType;
 
@@ -36,8 +37,8 @@ public class SolarPanelBlockItem extends MachineBlockItem {
         ).withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(Component.translatable(
                 "rngtech.tooltip.solar_panel.output",
-                material.clearGeneration(),
-                material.rainGeneration()
+                Math.round(RNGTechConfig.generatedEnergy(material.clearGeneration(), material.stage())),
+                Math.round(RNGTechConfig.generatedEnergy(material.rainGeneration(), material.stage()))
         ).withStyle(ChatFormatting.GRAY));
     }
 }

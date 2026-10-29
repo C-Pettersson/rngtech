@@ -107,25 +107,24 @@ The `notes` field must explicitly state whether the design avoided detached stat
 Every machine screen uses the same high-level structure:
 
 ```text
-┌──────────────────────────────────────────────┐
-│ Tabs: Process | Gear | Stats | Refine         │
-├──────────────────────────────────────────────┤
-│ Machine title                                │
-│                                              │
-│ [Left inputs]   [Center progress + status]   [Right outputs/meters]
-│                                              │
-│ Inventory                                    │
-│ [9 columns x 3 player inventory rows]        │
-│ [9 columns x 1 hotbar row]                   │
-└──────────────────────────────────────────────┘
+            ┌──────────────────────────────────────────────┐
+┌─────────┐ │ Machine title                                │
+│ Process ├─┤                                              │
+├─────────┤ │ [Left inputs]   [Center progress + status]   [Right outputs/meters]
+│ Gear    │ │                                              │
+├─────────┤ │ Inventory                                    │
+│ Stats   │ │ [9 columns x 3 player inventory rows]        │
+├─────────┤ │ [9 columns x 1 hotbar row]                   │
+│ Refine… │ └──────────────────────────────────────────────┘
+└─────────┘
 ```
 
 ### Required zones
 
 | Zone                   | Required behavior                                                                                                                                                               |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tabs                   | Top of the screen. Keep tab order stable: `Process`, `Gear`, `Stats`, `Refine`.                                                                                                 |
-| Title                  | Upper-left of the page body, directly under tabs. Use the machine display name.                                                                                                 |
+| Tabs                   | Down the panel's left edge, drawn by the shared `MachineTabs` widget. Keep tab order stable: `Process`, `Gear`, `Stats`, `Refinement`, `Mastery`.                              |
+| Title                  | Upper-left of the page body. Use the machine display name.                                                                                                                      |
 | Left lane              | Inputs and required resources. This includes consumed energy, gas, fluid, items, catalysts, fuel, or plates.                                                                      |
 | Center lane            | Process state and progress-attached status only. Use horizontal left-to-right progress unless the machine has no timed process. Do not add permanent process acronyms.          |
 | Progress/status module | For timed machines, status icons must be visually attached to the progress bar. Use a stacked status row under/over progress when same-row placement would crowd output meters. |
@@ -167,6 +166,8 @@ Rules:
 - If a machine needs a deliberately smaller auxiliary meter, make the difference meaningful: label it, frame it differently, or move it to `Stats`. Do not mix random meter heights for visual decoration.
 - Adjacent output meters on the right should feel like a coordinated output cluster, not unrelated widgets.
 - Meter height and baseline are reserved before status icon layout. If a status icon row would force unequal meters, change the status rail orientation instead of changing the meters.
+- The center lane stacks in one order, top to bottom: status squares, the progress bar, readout bars (strain, wear, bonus), then graphs and setting dials (retention, speed, depth). The status squares sit 3 px above the first bar under them. A graph that explains a dial sits directly above it. A thin bar that fills alongside the progress bar, like the Crusher's output bonus, may sit directly above it so the progress bar keeps its slot alignment. The Wooden Composter keeps its status row under its progress bar, because its item grid fills the space above.
+- Where the layout allows it, such as one input and one output, the input and output slot frames share a row, and the bottom of the progress bar lines up with the bottom of the slot frames. The progress group (status squares, bonus bar, progress bar) is centered vertically against the energy meter.
 
 ## Tabs
 
@@ -187,6 +188,10 @@ Use for read-only numbers: energy capacity, input/output rate, efficiency, heat,
 Use only for machines with refinement behavior: recipe tuning, catalyst selection, quality filters, tiered outputs, or secondary processing modes. If the machine has no refine behavior, the tab may remain disabled or reserved, depending on the existing UI convention.
 
 Tab order must not change per machine. Tab availability may change, but the player's muscle memory should remain intact.
+
+### Tab rail
+
+Every tabbed machine screen builds its tabs with `MachineTabs` instead of drawing its own. Each tab is a 16 px item icon and its full name, stacked down the panel's left edge, so adding a tab costs one row instead of a wider strip. When the screen has no room left of the panel for the names, the tabs collapse to an icon rail with the name on hover and the open tab's name at the right of the title row. When even the rail does not fit, such as the expanded Mastery tree or a panel wider than the screen, the icon tabs move above the panel. The tab rectangles are reported to JEI as exclusion areas.
 
 ## Component Grammar
 
@@ -750,7 +755,7 @@ When a machine has no timed process, leave the center lane empty or use a meanin
 
 Before accepting a new or revised machine GUI, verify:
 
-- The tab row is present and the tab order is stable.
+- The tab rail is present and the tab order is stable.
 - The machine title is visible at the top-left of the page body.
 - Inputs and consumed resources are on the left.
 - The center lane contains only progress, timed work, progress-attached status, or an intentional empty space.

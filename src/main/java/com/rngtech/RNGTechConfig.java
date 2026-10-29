@@ -7,8 +7,10 @@ import com.rngtech.content.material.OreDefinition;
 import com.rngtech.rpg.unique.UniqueCatalog;
 import com.rngtech.rpg.unique.UniqueDefinition;
 
+import net.minecraft.util.Mth;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.Map;
 
 public final class RNGTechConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+    private static final int MAX_GENERATOR_STAGE = 8;
 
     public static final ModConfigSpec.IntValue CRUSHER_BASE_INPUT_SLOTS = BUILDER
             .comment("The base number of crusher input slots before modifiers are applied.")
@@ -85,6 +88,12 @@ public final class RNGTechConfig {
             .comment("Whether Solar Panels and Solar Array Controllers generate FE in dimensions other than the Overworld, Nether, and End.")
             .define("solar.dimensions.other", false);
 
+    public static final ModConfigSpec.DoubleValue ENERGY_GENERATION_MULTIPLIER = BUILDER
+            .comment("Multiplier applied to the FE every RNGTech generator makes, after machine stats and together with energy.stageGenerationMultiplier. Fuel burn time, heat, and byproducts stay the same, so FE per item scales too. Use it to match another energy mod in a modpack.")
+            .defineInRange("energy.generationMultiplier", 1.0D, 0.01D, 100.0D);
+
+    public static final List<ModConfigSpec.DoubleValue> ENERGY_STAGE_GENERATION_MULTIPLIERS = defineStageGenerationMultipliers();
+
     public static final ModConfigSpec.IntValue CALIBRATION_STABILITY_BONUS = BUILDER
             .comment("Flat stability adjustment applied to all calibrated outputs. Use negative values to make calibration more punishing.")
             .defineInRange("calibration.stabilityBonus", 0, -100, 100);
@@ -120,6 +129,14 @@ public final class RNGTechConfig {
     public static final ModConfigSpec.BooleanValue VOLATILE_CATALYST_RECIPES_ENABLED = BUILDER
             .comment("Whether the default Volatile Catalyst recipe loads. Disable it to award catalysts through quests, loot, or custom recipes instead.")
             .define("corruption.volatileCatalystRecipesEnabled", true);
+
+    public static final ModConfigSpec.BooleanValue WORK_ORDER_RECIPES_ENABLED = BUILDER
+            .comment("Whether the default Work Order recipes load: the Dispatch Terminal and Requisitions. Disable it to award them through quests, loot, or custom recipes instead.")
+            .define("workOrders.recipesEnabled", true);
+
+    public static final ModConfigSpec.BooleanValue WORK_ORDER_RANDOM_ENABLED = BUILDER
+            .comment("Whether the Dispatch Terminal and /rngtech work_order give random roll random jobs from the objectives. Disable it to list only the job templates a datapack puts in the terminal's pool.")
+            .define("workOrders.randomOrdersEnabled", true);
 
     public static final ModConfigSpec.EnumValue<RestrictedToolMode> RESTRICTED_TOOLS_MODE = BUILDER
             .comment("What happens to tools in the rngtech:restricted_tools item tag (stone through netherite pickaxes, axes, and shovels by default; wooden tools reach no ore and stay free). NORMAL leaves them alone; WEAKENED slows their mining by restrictedTools.weakenedSpeedMultiplier; USELESS makes them mine, harvest, strip, and flatten like an empty hand.")
@@ -206,6 +223,7 @@ public final class RNGTechConfig {
     private static final OreWorldgenConfig ORE_WORLDGEN_CONFIG = defineOreWorldgen();
     public static final ModConfigSpec.BooleanValue ORE_WORLDGEN_ENABLED = ORE_WORLDGEN_CONFIG.enabled();
     public static final ModConfigSpec.EnumValue<VanillaOreBridgePolicy> ORE_VANILLA_BRIDGE_POLICY = ORE_WORLDGEN_CONFIG.bridgePolicy();
+    public static final ModConfigSpec.BooleanValue ORE_COMMON_TAG_HARDNESS = ORE_WORLDGEN_CONFIG.commonTagHardness();
     public static final Map<String, ModConfigSpec.BooleanValue> ORE_WORLDGEN = ORE_WORLDGEN_CONFIG.materials();
 
     public static final ModConfigSpec SPEC = BUILDER.build();
@@ -239,6 +257,31 @@ public final class RNGTechConfig {
         return new UniqueLootConfig(enabled, Collections.unmodifiableMap(values));
     }
 
+    private static List<ModConfigSpec.DoubleValue> defineStageGenerationMultipliers() {
+        List<ModConfigSpec.DoubleValue> values = new ArrayList<>();
+        for (int stage = 1; stage <= MAX_GENERATOR_STAGE; stage++) {
+            values.add(BUILDER
+                    .comment("Multiplier applied to the FE of Stage " + stage + " RNGTech generators, together with energy.generationMultiplier. A generator's stage is the stage of its Heat Core, Collapse Nozzle, or Cavitation Rotor when it uses one, or else the machine's own stage.")
+                    .defineInRange("energy.stageGenerationMultiplier.stage" + stage, 1.0D, 0.01D, 100.0D));
+        }
+        return Collections.unmodifiableList(values);
+    }
+
+    /** The pack's FE multiplier for a Stage {@code stage} generator; stages outside 1 to 8 use the nearest one. */
+    public static double stageGenerationMultiplier(int stage) {
+        return ENERGY_STAGE_GENERATION_MULTIPLIERS.get(Mth.clamp(stage, 1, MAX_GENERATOR_STAGE) - 1).get();
+    }
+
+    /** The pack's global and stage multipliers together, for a Stage {@code stage} generator. */
+    public static double packGenerationMultiplier(int stage) {
+        return ENERGY_GENERATION_MULTIPLIER.get() * stageGenerationMultiplier(stage);
+    }
+
+    /** {@code energy} FE from a Stage {@code stage} RNGTech generator, scaled by the pack's global and stage multipliers. */
+    public static double generatedEnergy(double energy, int stage) {
+        return energy * packGenerationMultiplier(stage);
+    }
+
     /** Whether the default loot tables may drop {@code uniqueId}. */
     public static boolean uniqueLootEnabled(String uniqueId) {
         ModConfigSpec.BooleanValue unique = UNIQUE_LOOT.get(uniqueId);
@@ -253,7 +296,10 @@ public final class RNGTechConfig {
                 .define("enabled", true);
         ModConfigSpec.EnumValue<VanillaOreBridgePolicy> bridgePolicy = BUILDER
                 .comment("How far pickaxes that are not Modular tools reach on ore hardness, by their vanilla tier. Items in the rngtech:ore_reach data map use their listed level instead.")
-                .defineEnum("vanillaToolBridgePolicy", VanillaOreBridgePolicy.EARLY_BRIDGE);
+                .defineEnum("vanillaToolBridgePolicy", VanillaOreBridgePolicy.TIER_LADDER);
+        ModConfigSpec.BooleanValue commonTagHardness = BUILDER
+                .comment("Whether other mods' ores in a metal's c:ores/<metal> tag get that metal's ore hardness, through the rngtech:ore_hardness/common/level_<n> block tags. Off keeps hardness on RNGTech's own ores and the vanilla ores it lists, so other mods' pickaxes still mine their own ores. Turn it on for a pack where RNGTech gates all ore progression, and give other mods' tools an rngtech:ore_reach entry.")
+                .define("commonOreTagHardness", false);
         Map<String, ModConfigSpec.BooleanValue> values = new LinkedHashMap<>();
         for (OreDefinition ore : OreCatalog.ores()) {
             values.put(ore.materialId(), BUILDER
@@ -262,7 +308,7 @@ public final class RNGTechConfig {
         }
         BUILDER.pop();
         BUILDER.pop();
-        return new OreWorldgenConfig(enabled, bridgePolicy, Collections.unmodifiableMap(values));
+        return new OreWorldgenConfig(enabled, bridgePolicy, commonTagHardness, Collections.unmodifiableMap(values));
     }
 
     public enum DormantFailedAbsorb {
@@ -281,6 +327,7 @@ public final class RNGTechConfig {
         BOOTSTRAP_ONLY,
         EARLY_BRIDGE,
         VANILLA_TIER_MAPPING,
+        TIER_LADDER,
         MODULAR_ONLY
     }
 
@@ -290,6 +337,7 @@ public final class RNGTechConfig {
     private record OreWorldgenConfig(
             ModConfigSpec.BooleanValue enabled,
             ModConfigSpec.EnumValue<VanillaOreBridgePolicy> bridgePolicy,
+            ModConfigSpec.BooleanValue commonTagHardness,
             Map<String, ModConfigSpec.BooleanValue> materials
     ) {
     }

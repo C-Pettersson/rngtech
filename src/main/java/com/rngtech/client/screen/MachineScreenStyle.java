@@ -11,6 +11,8 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatDisplay;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
+import com.rngtech.rpg.StatBreakdown;
+import com.rngtech.rpg.unique.UniqueStatReaders;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
@@ -48,6 +50,11 @@ final class MachineScreenStyle {
     private static final int AFFIX_ROW_TOP_OFFSET = 3;
     private static final int AFFIX_ROW_HEIGHT = 20;
     private static final int FOOTER_PADDING = 4;
+    private static final int DELTA_COLUMN_WIDTH = 30;
+    private static final int DELTA_COLUMN_GAP = 8;
+    private static final int DELTA_DIVIDER = 0xFFA8A8A8;
+    private static final int DELTA_HELPS = 0xFF2E7A3C;
+    private static final int DELTA_COSTS = 0xFF9A3A2A;
     private static final int COMPACT_HEADER_HEIGHT = 12;
     private static final int COMPACT_ROW_TOP_OFFSET = 3;
     private static final int COMPACT_ROW_HEIGHT = 9;
@@ -225,19 +232,25 @@ final class MachineScreenStyle {
             int accent
     ) {
         guiGraphics.drawString(font, title, x + 8, y + 4, TEXT, false);
+        boolean showDeltas = Arrays.stream(statLines).anyMatch(statLine -> statLine.stat != null);
+        int deltaRight = x + width - 8;
+        int deltaLeft = deltaRight - DELTA_COLUMN_WIDTH;
+        int valueRight = showDeltas ? deltaLeft - DELTA_COLUMN_GAP : deltaRight;
+        if (showDeltas) {
+            Component caption = Component.translatable("rngtech.stat.vs_base");
+            guiGraphics.drawString(font, caption, deltaRight - font.width(caption), y + 4, TEXT_MUTED, false);
+        }
         int rowY = y + HEADER_HEIGHT + ROW_TOP_OFFSET;
         for (StatLine statLine : statLines) {
             int valueColor = statLine.enhanced() ? TEXT_ENHANCED : TEXT_VALUE;
             if (statLine.enhanced()) {
                 guiGraphics.fill(x + 6, rowY, x + width - 6, rowY + ROW_HEIGHT - 1, ROW_ENHANCED);
-                guiGraphics.fill(x + 6, rowY, x + width - 5, rowY + 1, accent);
-                guiGraphics.fill(x + 6, rowY + ROW_HEIGHT - 2, x + width - 5, rowY + ROW_HEIGHT - 1, accent);
             }
             drawGlyph(guiGraphics, x + 7, rowY + 2, accent, statLine.pipCount(), statLine.enhanced());
 
             int labelX = x + 18;
             int valueWidth = font.width(statLine.value());
-            int valueX = x + width - 8 - valueWidth;
+            int valueX = valueRight - valueWidth;
             int labelWidth = Math.max(0, valueX - labelX - 6);
             if (labelWidth > 0) {
                 guiGraphics.drawString(
@@ -250,8 +263,52 @@ final class MachineScreenStyle {
                 );
             }
             guiGraphics.drawString(font, statLine.value(), valueX, rowY + 2, valueColor, false);
+            if (showDeltas) {
+                int dividerX = deltaLeft - DELTA_COLUMN_GAP / 2;
+                guiGraphics.fill(dividerX, rowY + 2, dividerX + 1, rowY + ROW_HEIGHT - 3, DELTA_DIVIDER);
+                StatDelta delta = statDelta(statLine.stat);
+                if (delta != null) {
+                    guiGraphics.drawString(font, delta.text(), deltaRight - font.width(delta.text()), rowY + 2, delta.helps() ? DELTA_HELPS : DELTA_COSTS, false);
+                }
+            }
             rowY += ROW_HEIGHT;
         }
+    }
+
+    private record StatDelta(String text, boolean helps) {
+    }
+
+    /** How far a stat sits from its base, from the server's breakdown: a whole-number step, a flat amount, or a percent change. */
+    private static StatDelta statDelta(MachineStat stat) {
+        if (stat == null) {
+            return null;
+        }
+        StatBreakdown breakdown = StatBreakdownCache.breakdown(stat);
+        if (breakdown == null) {
+            return null;
+        }
+        double base = breakdown.base();
+        double change = breakdown.finalValue() - base;
+        if (Math.abs(change) < EPSILON) {
+            return null;
+        }
+        String text;
+        if (UniqueStatReaders.wholeNumber(stat)) {
+            text = signedCompact(change);
+        } else if (Math.abs(base) < EPSILON) {
+            text = signedCompact(change) + (MachineStatDisplay.statValue(stat, 1.0).endsWith("%") ? "%" : "");
+        } else {
+            text = signedCompact(Math.round(change / Math.abs(base) * 100.0)) + "%";
+        }
+        return new StatDelta(text, change > 0.0 != UniqueStatReaders.lowerIsBetter(stat));
+    }
+
+    private static String signedCompact(double value) {
+        double magnitude = Math.abs(value);
+        String number = magnitude >= 1_000_000.0
+                ? MachineStatDisplay.formatNumber(magnitude / 1_000_000.0) + "M"
+                : magnitude >= 1_000.0 ? MachineStatDisplay.formatNumber(magnitude / 1_000.0) + "k" : MachineStatDisplay.formatNumber(magnitude);
+        return (value > 0.0 ? "+" : "-") + number;
     }
 
     static void drawClippedCentered(
@@ -497,17 +554,24 @@ final class MachineScreenStyle {
             StatLine[] statLines,
             double finalPerTick,
             double basePerTick,
-            double flatPerTick
+            double flatPerTick,
+            double packMultiplier
     ) {
         for (int index = 0; index < Math.min(stats.length, statLines.length); index++) {
             if (stats[index] == MachineStat.ENERGY_GENERATION) {
-                statLines[index] = generationBreakdownLine(statLines[index], finalPerTick, basePerTick, flatPerTick);
+                statLines[index] = generationBreakdownLine(statLines[index], finalPerTick, basePerTick, flatPerTick, packMultiplier);
             }
         }
         return statLines;
     }
 
-    static StatLine generationBreakdownLine(StatLine line, double finalPerTick, double basePerTick, double flatPerTick) {
+    static StatLine generationBreakdownLine(
+            StatLine line,
+            double finalPerTick,
+            double basePerTick,
+            double flatPerTick,
+            double packMultiplier
+    ) {
         double multiplier = line.strength();
         return new StatLine(
                 line.label(),
@@ -516,7 +580,31 @@ final class MachineScreenStyle {
                 false,
                 multiplier > 1.001,
                 Component.empty(),
-                MachineStatDisplay.generationBreakdown(finalPerTick, basePerTick, multiplier, flatPerTick)
+                MachineStatDisplay.generationBreakdown(finalPerTick, basePerTick, multiplier, flatPerTick, packMultiplier)
+        ).withStat(line.stat);
+    }
+
+    /**
+     * For a row whose stat is already FE/t, as on the Solid Fuel Burner: shows the FE/t after the pack's config
+     * multiplier and names that multiplier on hover. The row's strength stays the stat, which drives its pips.
+     */
+    static StatLine withPackGeneration(StatLine line, double packMultiplier) {
+        if (Math.abs(packMultiplier - 1.0) < 0.005) {
+            return line;
+        }
+        List<Component> lines = new ArrayList<>(line.tooltipLines);
+        if (lines.isEmpty() && !line.tooltip().getString().isEmpty()) {
+            lines.add(line.tooltip());
+        }
+        lines.add(MachineStatDisplay.packGenerationLine(packMultiplier));
+        return new StatLine(
+                line.label(),
+                MachineStatDisplay.energyRate(line.strength() * packMultiplier),
+                line.strength(),
+                line.integral,
+                line.enhanced(),
+                Component.empty(),
+                lines
         ).withStat(line.stat);
     }
 
@@ -812,7 +900,6 @@ final class MachineScreenStyle {
             int rowColor = index % 2 == 0 ? ROW_DARK : ROW_LIGHT;
             guiGraphics.fill(left + 6, rowY, left + width - 6, rowY + ROW_HEIGHT - 1, rowColor);
             guiGraphics.fill(left + 6, rowY, left + 7, rowY + ROW_HEIGHT - 1, accent);
-            guiGraphics.fill(left + width - 7, rowY, left + width - 6, rowY + ROW_HEIGHT - 1, FRAME_DARK);
             rowY += ROW_HEIGHT;
         }
     }

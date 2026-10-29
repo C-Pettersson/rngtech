@@ -3,9 +3,15 @@ package com.rngtech.content.menu;
 import com.rngtech.content.block.ComponentRecyclerBlock;
 import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
+import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.registry.ModMenus;
+import com.rngtech.content.workorder.DriveBays;
+import com.rngtech.content.workorder.WorkOrderDiscovery;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.workorder.MachineWorkOrders;
+import com.rngtech.rpg.workorder.WorkOrderFamilies;
+import com.rngtech.rpg.workorder.WorkOrderHost;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -15,20 +21,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class ComponentRecyclerMenu extends AbstractContainerMenu implements StatBreakdownMenu {
+public class ComponentRecyclerMenu extends AbstractContainerMenu implements StatBreakdownMenu, WorkOrderMenuView {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
     public static final int TAB_REFINEMENT = 3;
+    public static final int TAB_ORDERS = 4;
 
     private static final int DATA_PROGRESS = 0;
     private static final int DATA_PROCESSING_TICKS = 1;
@@ -60,7 +69,9 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
     private final ComponentRecyclerBlockEntity recycler;
     private final ItemStackHandler refinementTarget = new ItemStackHandler(1);
     private final boolean manual;
+    private final DataSlot ordersShown;
     private int selectedTab = TAB_PROCESSING;
+    private ContainerData workOrderData;
 
     public ComponentRecyclerMenu(int containerId, Inventory playerInventory, RegistryFriendlyByteBuf extraData) {
         this(
@@ -117,7 +128,15 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
         addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
 
         addPlayerInventory(playerInventory);
+        IItemHandler bays = playerInventory.player.level().isClientSide ? DriveBays.client(this) : new DriveBays(recycler);
+        for (int bay = 0; bay < MachineWorkOrders.SLOTS; bay++) {
+            addSlot(new DriveBaySlot(bays, bay, () -> selectedTab == TAB_ORDERS));
+        }
         addDataSlots(data);
+        workOrderData = playerInventory.player.level().isClientSide ? new SimpleContainerData(WorkOrderMenuSupport.FIELD_COUNT)
+                : WorkOrderMenuSupport.data(recycler);
+        addDataSlots(workOrderData);
+        ordersShown = addDataSlot(WorkOrderDiscovery.shownSlot(playerInventory.player, recycler));
     }
 
     public void selectTab(int tab) {
@@ -129,8 +148,19 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
             case TAB_GEAR -> TAB_GEAR;
             case TAB_STATS -> TAB_STATS;
             case TAB_REFINEMENT -> TAB_REFINEMENT;
+            case TAB_ORDERS -> TAB_ORDERS;
             default -> TAB_PROCESSING;
         };
+    }
+
+    @Override public WorkOrderHost workOrderHost() { return recycler; }
+    @Override public boolean workOrdersShown() { return ordersShown.get() != 0; }
+    @Override public String workOrderFamily() { return WorkOrderFamilies.COMPONENT_RECYCLER; }
+    @Override public int workOrderStage() { return recycler.workOrderStage(); }
+    @Override public int workOrderMasteryLevel() { return 0; }
+    @Override public WorkOrderMenuSupport.View workOrderView() { return WorkOrderMenuSupport.view(workOrderData, 0); }
+    @Override public ItemStack workOrderChip(int bay) {
+        return bay >= 0 && bay < MachineWorkOrders.SLOTS ? getSlot(HOTBAR_END + bay).getItem() : ItemStack.EMPTY;
     }
 
     public int selectedTab() {
@@ -243,6 +273,10 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
         if (manual) {
             return false;
         }
+        if (id >= WorkOrderMenuSupport.BUTTON_SELECT_TAB && id <= WorkOrderMenuSupport.BUTTON_SELECT_TAB + TAB_ORDERS) {
+            selectTab(id - WorkOrderMenuSupport.BUTTON_SELECT_TAB);
+            return true;
+        }
         if (id != RefinementMenuSupport.BUTTON_APPLY) {
             return false;
         }
@@ -277,7 +311,15 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
         ItemStack stack = slot.getItem();
         moved = stack.copy();
 
-        if (isOutputSlot(index)) {
+        if (index >= HOTBAR_END) {
+            if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (selectedTab == TAB_ORDERS && index >= PLAYER_INVENTORY_START && JobChipItem.isWorkOrder(stack)) {
+            if (!moveItemStackTo(stack, HOTBAR_END, HOTBAR_END + MachineWorkOrders.SLOTS, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (isOutputSlot(index)) {
             if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, true)) {
                 return ItemStack.EMPTY;
             }

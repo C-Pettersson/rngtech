@@ -7,6 +7,8 @@ import { checkAscendancyDocs } from "./export-ascendancy-data.mjs";
 import { checkRecipeLoopMutations, checkRecipeLoops } from "./check-recipe-loops.mjs";
 import { checkRecyclingReturns } from "./check-recycling-returns.mjs";
 import { checkVolatileCatalyst } from "./check-volatile-catalyst.mjs";
+import { checkMirrorCatalyst } from "./check-mirror-catalyst.mjs";
+import { checkWorkOrders } from "./check-work-orders.mjs";
 
 const { server, url } = await startModdexServer({ port: 0, log: false });
 
@@ -118,6 +120,8 @@ try {
     await checkRecyclingReturns();
     await checkAscendancySeals();
     await checkVolatileCatalyst();
+    await checkMirrorCatalyst();
+    await checkWorkOrders();
     await checkUniques();
     await checkScreenStrings();
     await checkAscendancyView(url);
@@ -218,8 +222,8 @@ try {
     const bronzeCasingRecipe = data.rbom.recipes.find((recipe) => recipe.id === "rngtech:materials/bronze_casing");
     const bronzeCasingPressRecipe = data.rbom.recipes.find((recipe) => recipe.id === "rngtech:metal_press/bronze_casing");
     if (bronzeCasingRecipes[0] !== "rngtech:materials/bronze_casing"
-            || !bronzeCasingRecipe?.inputs?.some((input) => input.id === "c:ingots/bronze" && input.count === 5)
-            || !bronzeCasingRecipe.inputs?.some((input) => input.id === "c:nuggets/bronze" && input.count === 3)
+            || !bronzeCasingRecipe?.inputs?.some((input) => input.id === "rngtech:ingots/bronze" && input.count === 5)
+            || !bronzeCasingRecipe.inputs?.some((input) => input.id === "rngtech:nuggets/bronze" && input.count === 3)
             || !bronzeCasingPressRecipe?.inputs?.some((input) =>
                     input.id === "rngtech:casing_mold"
                     && input.reusable
@@ -507,8 +511,8 @@ try {
     }
     const fuelBox = stagePreview?.items?.find((item) => item.id === "rngtech:copper_fuel_box");
     if (fuelBox?.modifierCoverage?.profileId !== "fuel_box"
-            || fuelBox.modifierCoverage.prefixGroups !== 4
-            || fuelBox.modifierCoverage.suffixGroups !== 5) {
+            || fuelBox.modifierCoverage.prefixGroups !== 3
+            || fuelBox.modifierCoverage.suffixGroups !== 3) {
         throw new Error("Stage preview did not include expected modifier coverage for Copper Fuel Box.");
     }
     const expectedQuestItems = new Map([

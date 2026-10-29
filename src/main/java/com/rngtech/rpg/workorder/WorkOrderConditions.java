@@ -1,0 +1,381 @@
+package com.rngtech.rpg.workorder;
+
+import com.rngtech.rpg.CorruptionOutcome;
+import com.rngtech.rpg.MachineCorruption;
+import com.rngtech.rpg.MachineModifier;
+import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
+import com.rngtech.rpg.MachineTraitRoller;
+import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.ModifierDefinition;
+import com.rngtech.rpg.ModifierEligibilityProfile;
+import com.rngtech.rpg.ModifierOperation;
+import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.ModifierValueRange;
+import com.rngtech.rpg.Rarity;
+
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.RandomSource;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * A Job Chip's conditions: affixes from a {@code work_order} profile per family, rolled by rarity when a job is listed.
+ * Prefixes are pressure conditions, costs on the machine's stats while the chip is active. Suffixes are rule conditions
+ * on the job: one resets progress on a machine event, and one raises a stage job's minimum. Every condition adds Bounty,
+ * and the rule conditions add a Prestige too. Draft numbers, to tune with the processing balance simulation.
+ */
+public final class WorkOrderConditions {
+    public static final String STARVED_FEED = "starved_feed";
+    public static final String POWER_SURCHARGE = "power_surcharge";
+    public static final String SHORT_CREW = "short_crew";
+    public static final String COLD_START = "cold_start";
+    public static final String HAND_FEEDING = "hand_feeding";
+    public static final String BRITTLE_LINING = "brittle_lining";
+    public static final String JAMMED_LINE = "jammed_line";
+    public static final String DEEP_ORE = "deep_ore";
+    public static final String UNSTEADY_HANDS = "unsteady_hands";
+    public static final String FINE_TOLERANCE = "fine_tolerance";
+    public static final String SHORT_FUSE = "short_fuse";
+    /** Short Fuse's extra Rush reward per tier, in percent. It pays only when the chip is Rushed, so it adds no Bounty. */
+    private static final int[] FUSE_BONUS = {25, 40, 60};
+
+    /** Draft rarity weights for a listed job: Normal, Magic, Rare. */
+    private static final int[] RARITY_WEIGHTS = {50, 35, 15};
+    private static final Set<String> ALL = Set.of();
+    /** The families whose machines roll Instant Process Chance, so of Hand Feeding costs them something. */
+    public static final Set<String> INSTANT_PROCESS = Set.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter",
+            "resonance_calibrator", "component_assembler", "component_recycler");
+
+    /**
+     * One condition: its affix definition, the families that can read it (none listed means every family), the filter a
+     * job needs for it to roll (null for any job), whether it is a pressure condition applied to the machine's stats, and
+     * its Bounty for each tier and Prestige.
+     */
+    public record Condition(ModifierDefinition definition, Set<String> families, WorkFilter needs, boolean pressure,
+            int[] bounty, int prestige) {
+        public String id() {
+            return definition.id();
+        }
+
+        boolean fits(String family, WorkObjective objective) {
+            return (families.isEmpty() || families.contains(family))
+                    && (needs == null || objective.parts().stream().anyMatch(part -> needs.id().equals(part.filter())));
+        }
+
+        /** The Bounty this condition adds at {@code tier}; an untiered condition reads tier 0 as its one tier. */
+        public int bounty(int tier) {
+            return bounty[Math.clamp(tier, 1, bounty.length) - 1];
+        }
+    }
+
+    private static final List<Condition> CONDITIONS = List.of(
+            new Condition(tiered(STARVED_FEED, ModifierSlot.PREFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.LESS,
+                    range(0.80, 0.85), range(0.75, 0.80), range(0.70, 0.75)), ALL, null, true, new int[] {15, 22, 30}, 0),
+            new Condition(tiered(POWER_SURCHARGE, ModifierSlot.PREFIX, MachineStat.ENERGY_USAGE, ModifierOperation.INCREASED_PERCENT,
+                    whole(25, 33), whole(34, 41), whole(42, 50)), Set.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter",
+                    "resonance_calibrator", "component_assembler", "component_recycler"), null, true, new int[] {10, 17, 25}, 0),
+            new Condition(fixed(SHORT_CREW, ModifierSlot.PREFIX, MachineStat.BATCH_SIZE, ModifierOperation.ADD, -1),
+                    Set.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter", "resonance_calibrator"), null, true, new int[] {30}, 0),
+            new Condition(tiered(COLD_START, ModifierSlot.PREFIX, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.DECREASED_PERCENT,
+                    whole(10, 13), whole(14, 16), whole(17, 20)), Set.of("furnace", "alloy_furnace", "metal_press"), null, true, new int[] {15, 20, 25}, 0),
+            new Condition(fixed(HAND_FEEDING, ModifierSlot.SUFFIX, MachineStat.INSTANT_PROCESS_CHANCE, ModifierOperation.LESS, 0),
+                    INSTANT_PROCESS, null, true, new int[] {20}, 0),
+            new Condition(rule(BRITTLE_LINING), Set.of("furnace", "alloy_furnace", "metal_press"), null, false, new int[] {35}, 1),
+            new Condition(rule(JAMMED_LINE), Set.of("crusher"), null, false, new int[] {30}, 1),
+            new Condition(rule(DEEP_ORE), ALL, WorkFilter.STAGE, false, new int[] {25}, 1),
+            new Condition(tiered(UNSTEADY_HANDS, ModifierSlot.PREFIX, MachineStat.STABILITY, ModifierOperation.DECREASED_PERCENT,
+                    whole(10, 13), whole(14, 16), whole(17, 20)), Set.of("resonance_calibrator", "metal_press"), null, true, new int[] {15, 20, 25}, 0),
+            new Condition(rule(FINE_TOLERANCE), Set.of("resonance_calibrator"), WorkFilter.SETTING, false, new int[] {35}, 1),
+            new Condition(tiered(SHORT_FUSE, ModifierSlot.SUFFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.ADD,
+                    whole(25, 35), whole(36, 47), whole(48, 60)), ALL, null, false, new int[] {0, 0, 0}, 0));
+
+    private WorkOrderConditions() {
+    }
+
+    public static List<Condition> all() {
+        return CONDITIONS;
+    }
+
+    public static Condition get(String id) {
+        return CONDITIONS.stream().filter(condition -> condition.id().equals(id)).findFirst().orElse(null);
+    }
+
+    /** The conditions {@code family} can read, as an eligibility profile. */
+    public static ModifierEligibilityProfile profile(String family) {
+        return new ModifierEligibilityProfile("work_order_" + family, Set.of(),
+                CONDITIONS.stream().filter(condition -> condition.families().isEmpty() || condition.families().contains(family))
+                        .map(Condition::definition).toList());
+    }
+
+    /**
+     * The conditions one chip can carry: its family's, less any its job cannot use, such as Deep Ore without a stage part.
+     * Refinement rolls from this, so a refined chip never gains a condition that would only add Bounty.
+     */
+    public static ModifierEligibilityProfile profile(WorkOrder order) {
+        return new ModifierEligibilityProfile("work_order_" + order.family(), Set.of(),
+                CONDITIONS.stream().filter(condition -> condition.fits(order.family(), order.objective())).map(Condition::definition).toList());
+    }
+
+    /** The conditions that apply to the machine and its counting: the chip's affixes, plus a Blighted chip's extra condition. */
+    public static List<MachineModifier> active(MachineTraits traits) {
+        List<MachineModifier> active = new ArrayList<>(traits.modifiers());
+        if (traits.corruption() != null && traits.corruption().outcome() == CorruptionOutcome.BLIGHTED) {
+            active.addAll(traits.corruption().modifiers());
+        }
+        return active;
+    }
+
+    /** The conditions that pay: the chip's affixes, plus a Blessed chip's cost-free condition. */
+    public static List<MachineModifier> rewarded(MachineTraits traits) {
+        List<MachineModifier> rewarded = new ArrayList<>(traits.modifiers());
+        if (traits.corruption() != null && traits.corruption().outcome() == CorruptionOutcome.BLESSED) {
+            rewarded.addAll(traits.corruption().modifiers());
+        }
+        return rewarded;
+    }
+
+    /** The Bounty the chip's paying conditions add. */
+    public static int bounty(MachineTraits traits) {
+        int bounty = 0;
+        for (MachineModifier modifier : rewarded(traits)) {
+            Condition condition = get(modifier.affixId());
+            bounty += condition == null ? 0 : condition.bounty(modifier.tier());
+        }
+        return bounty;
+    }
+
+    /** The Prestige the chip's paying conditions add. */
+    public static int prestige(MachineTraits traits) {
+        int prestige = 0;
+        for (MachineModifier modifier : rewarded(traits)) {
+            Condition condition = get(modifier.affixId());
+            prestige += condition == null ? 0 : condition.prestige();
+        }
+        return prestige;
+    }
+
+    /** {@code order} with its Bounty and Prestige moved from what {@code before}'s conditions paid to what {@code after}'s pay. */
+    public static WorkOrder rebalance(WorkOrder order, MachineTraits before, MachineTraits after) {
+        return new WorkOrder(order.family(), order.tier(), order.objective(), order.minStage(), order.minMasteryLevel(),
+                Math.max(0, order.bounty() - bounty(before) + bounty(after)), Math.max(0, order.prestige() - prestige(before) + prestige(after)),
+                order.rewards(), order.template(), order.name(), order.rewardTable());
+    }
+
+    /**
+     * A Volatile Catalyst's result on a chip for a rolled {@code outcome}. Blessed pays half again, adds a Prestige, or adds
+     * a condition that pays with no cost. Blighted adds a condition that costs with no pay. Reforged rerolls the conditions
+     * at the chip's rarity; Warped rerolls each condition's value within its tier. Every outcome leaves the chip Corrupted.
+     */
+    public static Rolled corrupt(WorkOrder order, MachineTraits traits, CorruptionOutcome outcome, RandomSource random) {
+        WorkOrder next = order;
+        MachineTraits nextTraits = traits;
+        MachineCorruption corruption = MachineCorruption.of(outcome);
+        switch (outcome) {
+            case BLESSED -> {
+                int kind = random.nextInt(3);
+                MachineModifier extra = kind == 2 ? extraCondition(order, traits, random) : null;
+                if (extra != null) {
+                    corruption = new MachineCorruption(outcome, List.of(extra), List.of());
+                    Condition condition = get(extra.affixId());
+                    next = order.withBounty(order.bounty() + condition.bounty(extra.tier()));
+                    next = new WorkOrder(next.family(), next.tier(), next.objective(), next.minStage(), next.minMasteryLevel(), next.bounty(),
+                            next.prestige() + condition.prestige(), next.rewards(), next.template(), next.name(), next.rewardTable());
+                } else if (kind == 1) {
+                    next = new WorkOrder(order.family(), order.tier(), order.objective(), order.minStage(), order.minMasteryLevel(), order.bounty(),
+                            order.prestige() + 1, order.rewards(), order.template(), order.name(), order.rewardTable());
+                } else {
+                    next = order.withBounty(WorkOrder.rushAmount(order.bounty()));
+                }
+            }
+            case BLIGHTED -> {
+                MachineModifier extra = extraCondition(order, traits, random);
+                if (extra != null) {
+                    corruption = new MachineCorruption(outcome, List.of(extra), List.of());
+                }
+            }
+            case REFORGED -> {
+                Rolled rerolled = roll(rebalance(order, traits, MachineTraits.EMPTY), traits.rarity(), random);
+                nextTraits = new MachineTraits(traits.rarity(), traits.refinementPotential(), rerolled.traits().modifiers(), List.of());
+                next = rerolled.order();
+            }
+            case WARPED -> {
+                List<MachineModifier> warped = new ArrayList<>();
+                for (MachineModifier modifier : traits.modifiers()) {
+                    Condition condition = get(modifier.affixId());
+                    warped.add(condition == null ? modifier : condition.definition().roll(Math.max(1, modifier.tier()), random));
+                }
+                nextTraits = new MachineTraits(traits.rarity(), traits.refinementPotential(), warped, List.of());
+            }
+            default -> { }
+        }
+        return new Rolled(next, nextTraits.withCorruption(corruption));
+    }
+
+    /**
+     * One more condition the chip's job can carry, from a group it does not have yet, at its first tier, or null when none
+     * is left. A corruption's modifiers keep no tier, so a tiered roll would pay one tier and read back another.
+     */
+    private static MachineModifier extraCondition(WorkOrder order, MachineTraits traits, RandomSource random) {
+        Set<String> groups = new HashSet<>();
+        traits.modifiers().forEach(modifier -> groups.add(modifier.modGroup()));
+        List<Condition> open = CONDITIONS.stream().filter(condition -> condition.fits(order.family(), order.objective()))
+                .filter(condition -> !groups.contains(condition.definition().modGroup())).toList();
+        if (open.isEmpty()) { return null; }
+        return open.get(random.nextInt(open.size())).definition().roll(1, random);
+    }
+
+    /** A job's rarity, by the draft weights. */
+    public static Rarity rollRarity(RandomSource random) {
+        int pick = random.nextInt(RARITY_WEIGHTS[0] + RARITY_WEIGHTS[1] + RARITY_WEIGHTS[2]);
+        return pick < RARITY_WEIGHTS[0] ? Rarity.NORMAL : pick < RARITY_WEIGHTS[0] + RARITY_WEIGHTS[1] ? Rarity.MAGIC : Rarity.RARE;
+    }
+
+    /** A rolled job: the order with its conditions' Bounty and Prestige added, and the chip's traits. */
+    public record Rolled(WorkOrder order, MachineTraits traits) { }
+
+    /**
+     * Rolls {@code order}'s conditions at {@code rarity}, or at a rolled rarity when it is null: none for Normal, one or
+     * two for Magic, three or four for Rare, at most one prefix and one suffix on Magic and three of each on Rare, each
+     * from a different group and readable by the order's family. Fewer roll when the family has fewer to offer.
+     */
+    public static Rolled roll(WorkOrder order, Rarity rarity, RandomSource random) {
+        Rarity rolledRarity = rarity == null ? rollRarity(random) : rarity;
+        int wanted = switch (rolledRarity) {
+            case MAGIC -> 1 + random.nextInt(2);
+            case RARE -> 3 + random.nextInt(2);
+            default -> 0;
+        };
+        int slotLimit = rolledRarity == Rarity.RARE ? 3 : 1;
+        List<Condition> pool = new ArrayList<>(CONDITIONS.stream().filter(condition -> condition.fits(order.family(), order.objective())).toList());
+        List<MachineModifier> modifiers = new ArrayList<>();
+        Set<String> groups = new HashSet<>();
+        for (int count = 0; count < wanted; count++) {
+            List<Condition> open = pool.stream()
+                    .filter(condition -> !groups.contains(condition.definition().modGroup()))
+                    .filter(condition -> modifiers.stream().filter(modifier -> modifier.slot() == condition.definition().slot()).count() < slotLimit)
+                    .toList();
+            if (open.isEmpty()) { break; }
+            Condition picked = open.get(random.nextInt(open.size()));
+            int tier = picked.definition().isTiered() ? 1 + random.nextInt(picked.definition().tierRanges().size()) : 1;
+            modifiers.add(picked.definition().roll(tier, random));
+            groups.add(picked.definition().modGroup());
+        }
+        int stage = WorkOrder.tierStage(order.tier());
+        MachineTraitRoller.RefinementPotentialRange potential = MachineTraitRoller.refinementPotentialRange(profile(order), stage);
+        MachineTraits traits = new MachineTraits(rolledRarity, potential.min() + random.nextInt(potential.max() - potential.min() + 1), modifiers, List.of());
+        int bounty = order.bounty() + bounty(traits);
+        int prestige = order.prestige() + prestige(traits);
+        return new Rolled(new WorkOrder(order.family(), order.tier(), order.objective(), order.minStage(), order.minMasteryLevel(), bounty, prestige,
+                order.rewards(), order.template(), order.name(), order.rewardTable()), traits);
+    }
+
+    /** A condition's cost or rule as a player reads it, such as "26% less Processing Speed", or null for another modifier. */
+    public static Component effectText(MachineModifier modifier) {
+        Condition condition = get(modifier.affixId());
+        if (condition == null) { return null; }
+        String key = "rngtech.work_order.condition." + condition.id() + ".effect";
+        return switch (condition.id()) {
+            case STARVED_FEED -> Component.translatable(key, Math.round((1 - modifier.value()) * 100));
+            case POWER_SURCHARGE, COLD_START, UNSTEADY_HANDS -> Component.translatable(key, Math.round(modifier.value()));
+            case SHORT_FUSE -> Component.translatable(key, Math.round(modifier.value()), FUSE_BONUS[Math.clamp(modifier.tier(), 1, FUSE_BONUS.length) - 1]);
+            default -> Component.translatable(key);
+        };
+    }
+
+    /** A rule condition's rule, for a list of what a refinement can add, or null for a pressure condition or another affix. */
+    public static Component ruleText(ModifierDefinition definition) {
+        Condition condition = get(definition.id());
+        if (condition == null || condition.pressure()) { return null; }
+        return Component.translatable("rngtech.work_order.condition." + condition.id() + (SHORT_FUSE.equals(condition.id()) ? ".rule" : ".effect"));
+    }
+
+    /** How much shorter Short Fuse makes the Rush clock, in percent; a Blessed Short Fuse costs nothing. */
+    public static int fuse(MachineTraits traits) {
+        if (traits == null) { return 0; }
+        int percent = 0;
+        for (MachineModifier modifier : active(traits)) {
+            if (SHORT_FUSE.equals(modifier.affixId())) { percent = Math.max(percent, (int) Math.round(modifier.value())); }
+        }
+        return Math.clamp(percent, 0, 90);
+    }
+
+    /** Short Fuse's extra Rush reward in percent; a Blighted Short Fuse pays nothing. */
+    public static int fuseBonus(MachineTraits traits) {
+        if (traits == null) { return 0; }
+        int bonus = 0;
+        for (MachineModifier modifier : rewarded(traits)) {
+            if (SHORT_FUSE.equals(modifier.affixId())) { bonus = Math.max(bonus, FUSE_BONUS[Math.clamp(modifier.tier(), 1, FUSE_BONUS.length) - 1]); }
+        }
+        return bonus;
+    }
+
+    /** Whether {@code traits} carry the condition {@code id}, a Blighted chip's extra condition included. */
+    public static boolean has(MachineTraits traits, String id) {
+        return traits != null && active(traits).stream().anyMatch(modifier -> modifier.affixId().equals(id));
+    }
+
+    /**
+     * Whether {@code report} counts toward {@code order}'s {@code part} under {@code traits}: Deep Ore raises a stage part's
+     * minimum to the next stage with work, or leaves it when the tier's chassis has none above.
+     */
+    public static boolean counts(WorkOrder order, WorkPart part, WorkReport report, MachineTraits traits) {
+        if (has(traits, DEEP_ORE) && WorkFilter.STAGE.id().equals(part.filter())) {
+            return new WorkPart(part.type(), part.filter(), minimum(order, part, traits), part.item(), part.target()).counts(report);
+        }
+        return part.counts(report);
+    }
+
+    /**
+     * Whether work that misses {@code part} sets it back to 0: a streak's work below its minimum, and a stability job's
+     * work below its minimum under Fine Tolerance.
+     */
+    public static boolean breaks(WorkPart part, MachineTraits traits) {
+        return WorkFilter.STREAK.id().equals(part.filter()) || (has(traits, FINE_TOLERANCE) && WorkFilter.SETTING.id().equals(part.filter()));
+    }
+
+    /** The minimum {@code order}'s stage part needs under {@code traits}, for counting and the job's Shift list. */
+    public static int minimum(WorkOrder order, WorkPart part, MachineTraits traits) {
+        return has(traits, DEEP_ORE) && WorkFilter.STAGE.id().equals(part.filter())
+                ? WorkOrderFamilies.deepMinimum(order.family(), order.tier(), part.minimum()) : part.minimum();
+    }
+
+    /**
+     * Applies the active chip's pressure conditions to a machine's stats, after its Gear, tree, and ascendancy effects,
+     * labelled as Work Order costs in a stat breakdown.
+     */
+    public static void apply(MachineStatAccumulator stats, LoadedWorkOrder active) {
+        if (active == null || active.fulfilled()) { return; }
+        for (MachineModifier modifier : active(active.traits())) {
+            Condition condition = get(modifier.affixId());
+            if (condition == null || !condition.pressure()) { continue; }
+            stats.apply(Component.translatable("rngtech.stat.breakdown.source.work_order",
+                            Component.translatable("rngtech.work_order.condition." + condition.id())),
+                    new MachineModifier(ModifierSlot.IMPLICIT, modifier.stat(), modifier.operation(), modifier.value()));
+        }
+    }
+
+    private static ModifierDefinition tiered(String id, ModifierSlot slot, MachineStat stat, ModifierOperation operation, ModifierValueRange... tiers) {
+        return ModifierDefinition.rollable(id, id, slot, stat, operation, List.of(tiers));
+    }
+
+    private static ModifierDefinition fixed(String id, ModifierSlot slot, MachineStat stat, ModifierOperation operation, double value) {
+        return ModifierDefinition.rollableUntiered(id, id, slot, stat, operation, ModifierValueRange.fixed(value));
+    }
+
+    /** A rule condition changes no stat; the machine or the counting reads it by id. */
+    private static ModifierDefinition rule(String id) {
+        return fixed(id, ModifierSlot.SUFFIX, MachineStat.PROCESSING_SPEED, ModifierOperation.ADD, 0);
+    }
+
+    private static ModifierValueRange range(double min, double max) {
+        return new ModifierValueRange(min, max, false);
+    }
+
+    private static ModifierValueRange whole(double min, double max) {
+        return new ModifierValueRange(min, max, true);
+    }
+}

@@ -16,7 +16,8 @@
     "header": "rngtech:block/component_recycler/header",
     "grate": "rngtech:block/component_recycler/grate",
     "tray": "rngtech:block/component_recycler/tray",
-    "table": "rngtech:block/component_recycler/table"
+    "table": "rngtech:block/component_recycler/table",
+    "job_lamp": "rngtech:block/work_order/lamp_off"
   },
   "elements": [
     {
@@ -1068,6 +1069,35 @@
       "neoforge_data": {
         "block_light": 15,
         "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        3.25,
+        12.75,
+        0.0
+      ],
+      "to": [
+        5.0,
+        13.25,
+        0.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#job_lamp"
+        },
+        "east": {
+          "texture": "#job_lamp"
+        },
+        "west": {
+          "texture": "#job_lamp"
+        },
+        "up": {
+          "texture": "#job_lamp"
+        },
+        "down": {
+          "texture": "#job_lamp"
+        }
       }
     },
     {

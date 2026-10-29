@@ -46,6 +46,8 @@ public final class RefinementEngine {
     private static final int ASCENSION_CATALYST_MINIMUM_POTENTIAL = ASCENSION_CATALYST_POTENTIAL_COST + 1;
     private static final String CORRUPTED_FAILURE = "rngtech.refinement.failure.corrupted";
     private static final String UNIQUE_FAILURE = "rngtech.refinement.failure.unique";
+    /** A Mirror Catalyst copies an item stack in the Affix Forge; a placed machine has no stack to copy. */
+    private static final String MIRROR_FORGE_ONLY_FAILURE = "rngtech.refinement.failure.mirror_forge_only";
 
     public static RefinementResult apply(
             MachineType machineType,
@@ -179,6 +181,7 @@ public final class RefinementEngine {
             case FULL_REROLL -> fullReroll(profile, traits, componentStage, modifier, lensTags, random);
             case FILL_OPEN_SLOTS -> fillOpenSlots(profile, traits, componentStage, modifier, lensTags, random);
             case CORRUPT -> corrupt(profile, traits, componentStage, modifier, unique, random);
+            case MIRROR -> RefinementResult.failure(traits, MIRROR_FORGE_ONLY_FAILURE);
         };
     }
 
@@ -605,10 +608,10 @@ public final class RefinementEngine {
         return Math.min(costRange.max(), Math.max(costRange.min(), tierMinimum));
     }
 
-    /** A lens biases which affix every catalyst adds, upgrades, rerolls or removes; the Volatile Catalyst picks none. */
+    /** A lens biases which affix every catalyst adds, upgrades, rerolls or removes; the Volatile and Mirror Catalysts pick none. */
     public static boolean operationSupportsLens(RefinementOperation operation) {
         return switch (operation.action()) {
-            case CORRUPT, TARGETED_ADD_OR_UPGRADE -> false;
+            case CORRUPT, MIRROR, TARGETED_ADD_OR_UPGRADE -> false;
             default -> true;
         };
     }

@@ -19,7 +19,7 @@
   "key": {
     "A": {
       "ingredient": {
-        "tag": "c:circuits/advanced"
+        "tag": "rngtech:circuits/advanced"
       }
     },
     "B": {
@@ -44,7 +44,7 @@
     },
     "T": {
       "ingredient": {
-        "item": "rngtech:titanium_plate"
+        "tag": "rngtech:plates/titanium"
       }
     },
     "X": {

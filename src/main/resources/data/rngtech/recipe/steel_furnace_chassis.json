@@ -14,16 +14,16 @@
   ],
   "key": {
     "B": {
-      "ingredient": { "tag": "c:circuits/advanced" }
+      "ingredient": { "tag": "rngtech:circuits/advanced" }
     },
     "C": {
-      "ingredient": { "tag": "c:ingots/steel" }
+      "ingredient": { "tag": "rngtech:ingots/steel" }
     },
     "F": {
       "ingredient": { "tag": "rngtech:machine_frames/reinforced" }
     },
     "I": {
-      "ingredient": { "tag": "c:ingots/steel" }
+      "ingredient": { "tag": "rngtech:ingots/steel" }
     },
     "S": {
       "ingredient": { "item": "minecraft:smooth_stone" }

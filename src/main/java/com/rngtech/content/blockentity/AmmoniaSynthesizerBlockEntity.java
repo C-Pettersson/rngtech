@@ -54,6 +54,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
     private final RecipeCache<AmmoniaSynthesisRecipe> recipes = new RecipeCache<>(1);
     private final RecipeCache<UreaSynthesisRecipe> ureaRecipes = new RecipeCache<>(1);
+    private final BulkSpeedState bulkSpeed = new BulkSpeedState();
     public static final int SLOT_CATALYST_BED = 0;
     public static final int GEAR_SLOT_COUNT = 1;
     public static final int STATUS_READY = 0;
@@ -134,14 +135,14 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         public int get(int index) {
             MachineStatAccumulator stats = effectiveStats();
             return switch (index) {
-                case DATA_PROGRESS -> progress;
+                case DATA_PROGRESS -> syncedProgress(0, progress);
                 case DATA_PROCESSING_TICKS -> activeTicks;
                 case DATA_ENERGY -> energyStorage.getEnergyStored();
                 case DATA_ENERGY_CAPACITY -> energyStorage.getMaxEnergyStored();
                 case DATA_NITROGEN -> nitrogenTank.getFluidAmount();
                 case DATA_HYDROGEN -> hydrogenTank.getFluidAmount();
                 case DATA_AMMONIA -> outputTank.getFluidAmount();
-                case DATA_TANK_CAPACITY -> TANK_CAPACITY;
+                case DATA_TANK_CAPACITY -> nitrogenTank.getCapacity();
                 case DATA_STATUS -> statusCode();
                 case DATA_ENERGY_USAGE -> scaledStat(stats, MachineStat.ENERGY_USAGE);
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
@@ -177,6 +178,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AmmoniaSynthesizerBlockEntity synthesizer) {
+        synthesizer.updateTankCapacity(synthesizer.effectiveStats());
         synthesizer.repairMisroutedInputFluids();
         boolean worked = synthesizer.tickRecipe();
         BaseMachineBlock.setActive(level, pos, state, worked);
@@ -243,9 +245,9 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
                 isActive(),
                 (float) effectiveStats().value(MachineStat.PROCESSING_SPEED),
                 activeTicks <= 0 ? 0.0F : Mth.clamp(progress / (float) activeTicks, 0.0F, 1.0F),
-                nitrogenTank.getFluidAmount() / (float) TANK_CAPACITY,
-                hydrogenTank.getFluidAmount() / (float) TANK_CAPACITY,
-                outputTank.getFluidAmount() / (float) TANK_CAPACITY,
+                nitrogenTank.getFluidAmount() / (float) nitrogenTank.getCapacity(),
+                hydrogenTank.getFluidAmount() / (float) hydrogenTank.getCapacity(),
+                outputTank.getFluidAmount() / (float) outputTank.getCapacity(),
                 isCatalystBed(catalystStack())
         );
     }
@@ -406,7 +408,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     private boolean tickRecipe() {
         UreaSynthesisRecipe urea = currentUreaRecipe();
         if (urea != null && canRunUrea(urea)) {
-            return runCycle(true, urea.processingTicks(), urea.energy(), () -> {
+            return runCycle(urea, true, urea.processingTicks(), urea.energy(), () -> {
                 outputTank.drain(urea.ammoniaInput().amount(), IFluidHandler.FluidAction.EXECUTE);
                 carbonTank.drain(urea.carbonInput().amount(), IFluidHandler.FluidAction.EXECUTE);
                 ItemStack made = urea.resultStack();
@@ -416,25 +418,40 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         }
         AmmoniaSynthesisRecipe recipe = currentRecipe();
         if (recipe == null || !canRun(recipe)) {
+            // Losing the recipe part-way through a job breaks the Bulk Speed chain; a full output only pauses it.
+            if (recipe == null && progress > 0 && bulkSpeed.reset()) {
+                setChanged();
+            }
             progress = 0;
             activeTicks = recipe == null ? 0 : recipe.processingTicks();
             activeEnergy = recipe == null ? 0 : recipe.energy();
             return false;
         }
-        return runCycle(false, recipe.processingTicks(), recipe.energy(), () -> {
+        return runCycle(recipe, false, recipe.processingTicks(), recipe.energy(), () -> {
             nitrogenTank.drain(recipe.nitrogenInput().amount(), IFluidHandler.FluidAction.EXECUTE);
             hydrogenTank.drain(recipe.hydrogenInput().amount(), IFluidHandler.FluidAction.EXECUTE);
             outputTank.fill(recipe.outputFluid(), IFluidHandler.FluidAction.EXECUTE);
         });
     }
 
-    private boolean runCycle(boolean urea, int ticks, int energy, Runnable complete) {
+    /** A job may finish at once through Instant Process, paying its whole FE, and each finished job feeds Bulk Speed. */
+    private boolean runCycle(Object recipe, boolean urea, int ticks, int energy, Runnable complete) {
         if (urea != ureaCycle) {
             ureaCycle = urea;
             progress = 0;
         }
+        if (progress == 0 && bulkSpeed.startRecipe(recipe)) {
+            setChanged();
+        }
         activeTicks = adjustedTicks(ticks);
         activeEnergy = adjustedEnergy(energy);
+        if (progress == 0 && level != null && ProcessingChance.rollInstant(level, effectiveStats())
+                && energyStorage.consumeEnergy(activeEnergy, true) >= activeEnergy) {
+            energyStorage.consumeEnergy(activeEnergy, false);
+            markInstantProcess();
+            completeCycle(complete);
+            return true;
+        }
         int cost = Math.max(1, Mth.ceil(activeEnergy / (double) activeTicks));
         if (energyStorage.consumeEnergy(cost, true) < cost) {
             return false;
@@ -442,10 +459,15 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         energyStorage.consumeEnergy(cost, false);
         progress++;
         if (progress >= activeTicks) {
-            complete.run();
-            progress = 0;
+            completeCycle(complete);
         }
         return true;
+    }
+
+    private void completeCycle(Runnable complete) {
+        complete.run();
+        progress = 0;
+        bulkSpeed.recordProcess(effectiveTraits());
     }
 
     private UreaSynthesisRecipe currentUreaRecipe() {
@@ -553,7 +575,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     }
 
     public MachineStatAccumulator effectiveStats() {
-        return cachedStats(0L);
+        return cachedStats(bulkSpeed.count());
     }
 
     @Override
@@ -563,11 +585,23 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         if (isCatalystBed(catalystStack())) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, catalystStack());
         }
+        bulkSpeed.apply(stats, effectiveTraits());
         return stats;
     }
 
     private static int scaledStat(MachineStatAccumulator stats, MachineStat stat) {
         return Mth.floor(stats.value(stat) * STAT_SCALE);
+    }
+
+    /** Fluid Capacity sizes all four tanks; fluid above a smaller capacity stays until it drains. */
+    private void updateTankCapacity(MachineStatAccumulator stats) {
+        int capacity = Math.max(TANK_CAPACITY, (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY)));
+        if (nitrogenTank.getCapacity() != capacity) {
+            nitrogenTank.setCapacity(capacity);
+            hydrogenTank.setCapacity(capacity);
+            outputTank.setCapacity(capacity);
+            carbonTank.setCapacity(capacity);
+        }
     }
 
     private FluidTank tank(net.minecraft.world.level.material.Fluid acceptedFluid) {
@@ -623,6 +657,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         tag.putInt("Progress", progress);
         tag.putInt("ActiveTicks", activeTicks);
         tag.putInt("ActiveEnergy", activeEnergy);
+        bulkSpeed.save(tag);
     }
 
     @Override
@@ -642,6 +677,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
         progress = tag.getInt("Progress");
         activeTicks = tag.getInt("ActiveTicks");
         activeEnergy = tag.getInt("ActiveEnergy");
+        bulkSpeed.load(tag);
     }
 
     private void dropSlot(Level level, ItemStackHandler inventory, int slot) {
@@ -671,7 +707,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getTankCapacity(int tank) {
-            return TANK_CAPACITY;
+            return nitrogenTank.getCapacity();
         }
 
         @Override

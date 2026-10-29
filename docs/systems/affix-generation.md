@@ -21,7 +21,7 @@ When an item stack is created, its identity may add an authored base stat profil
 
 Current generation rolls rarity and Refinement Potential independently. Rarity controls starting affix count, while Refinement Potential comes from component stage. Starting modifiers do not spend or reduce that rolled potential.
 
-Current prototype rarity weights are stage-sensitive. Stage `0` targets roll `35%` Normal, `50%` Magic, and `15%` Rare. Stage `1-4` targets roll `70%` Magic and `30%` Rare with no natural Normal outcome, making early crafted gear reliably show affixes while it is still likely to be replaced later. Stage `5+` targets roll `50%` Normal, `40%` Magic, and `10%` Rare. Unique remains authored-only.
+Current rarity weights are stage-sensitive. Stage `0` targets roll `35%` Normal, `50%` Magic, and `15%` Rare. Stage `1-4` targets roll `70%` Magic and `30%` Rare with no natural Normal outcome, making early crafted gear reliably show affixes while it is still likely to be replaced later. Stage `5+` targets roll `50%` Normal, `40%` Magic, and `10%` Rare. Unique remains authored-only.
 
 After rarity and slot-count rules choose a slot, generation uses two weighted steps. First, it filters legal affix families by target profile, slot, `CAN_ROLL`, target stats, and `mod_group` conflicts, then chooses one family by roll weight. Second, it chooses a tier for that family by combining the global tier weight, the family's tier weight, and component-stage weighting. Rarity controls affix count only; it does not control tier eligibility. Ordinary families default to family weight `100` and equal tier base weights unless code overrides them.
 
@@ -77,6 +77,8 @@ Initial v1 family weights are static Java metadata:
 | Crush Head prefix families | `65` |
 | Miner's Companion filter slots | `60` |
 | Control, Drive, and Reserve attribute suffixes | `50` each |
+| Studious (Mastery XP gain) suffix | `50` |
+| Twinned (Batch Size) prefix | `15` |
 
 Old saved modifiers that only have stat, operation, value, and slot still decode. They receive a default group derived from operation and stat so legacy stat-only data remains valid and still participates in duplicate checks.
 
@@ -94,6 +96,9 @@ Current slot rule of thumb:
 | Energy generation and energy usage | Suffix |
 | Input, output, and addon slots | Suffix |
 | Control, Drive, and Reserve attribute points | Suffix on Mastery machines and their Gear |
+| Studious Mastery XP gain | Suffix on Mastery machines and their Gear |
+| Twinned Batch Size | Prefix on batching recipe machines other than the Crusher |
+| Fluid capacity | Flat prefix and percent suffix on the Fluid Pump and fluid-handling machines |
 | Output amount | Suffix |
 | Heat insulation | Implicit when authored onto a concrete item or part identity; not randomly rolled |
 | Instant Process and Super Output chance | Suffix |
@@ -128,7 +133,7 @@ Two stats bend the increased layer:
 - `ENERGY_USAGE` divides by its reductions instead of subtracting them, so one large roll cannot empty the bucket and hit the usage floor: `(base + additions) * more and less factors * (1 + increased / 100) / (1 + reduced / 100)`.
 - Crusher `OUTPUT_AMOUNT` bends its increased bucket with a soft cap; see [Crusher Yield](../reference/machine-stats.md#crusher-yield).
 
-Status: Prototype
+Status: Implemented
 
 Player-facing wording uses **increased**, **reduced**, **more**, and **less** explicitly. The internal `DECREASED_PERCENT` operation is displayed as reduced. Mastery fixed values and ceilings resolve after ordinary modifiers; see [hard constraints](machine-mastery.md#modifier-keywords-and-hard-constraints).
 
@@ -172,7 +177,7 @@ Example: an energy-generation affix at tier 2 rolls one value from `4-10%`, such
 
 ## Attribute suffixes
 
-Status: Prototype
+Status: Implemented
 
 Machines with [Machine Mastery](machine-mastery.md#attributes) and the Gear they accept roll flat Control, Drive, and Reserve suffixes through the `HAS_MASTERY_ATTRIBUTES` capability: the Crusher, Furnace, electric Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, and Forestry Companion, and Crush Heads, Heat Cores, Servos, Fluid Pumps, Alloy Crucibles, Resonance Coils, Control Boards, and Stabilizer Matrices. Each attribute is its own modifier group with roll weight `50`, so one item can hold up to three attribute suffixes but never two of one attribute.
 
@@ -190,6 +195,28 @@ A Tier 3 roll is worth about six travel nodes. Corruption's Blessed outcome can 
 
 The design follows Path of Exile's split between regular gearing and attribute stacking. A direct stat suffix is better for a machine that only has travel points. An attribute suffix is better for a build that takes increased-attribute nodes, attribute scaling notables, or an actuation keystone.
 
+## Studious
+
+Status: Implemented
+
+The same hosts can roll Studious, a suffix in its own `mastery_xp_gain` group with roll weight `50`: increased Mastery XP gain. Like attribute points, a Studious roll on a part is machine-wide, and every Studious roll on the machine and its Gear adds to one increased bucket. The bonus scales each grant after the recipe's XP band, counted in quarter points so small grants keep it. It speeds leveling only; it adds no passive points past the level cap.
+
+| Tier | Increased Mastery XP gain |
+|---:|---:|
+| 1 | `5-8%` |
+| 2 | `9-14%` |
+| 3 | `15-22%` |
+| 4 | `23-32%` |
+| 5 | `33-45%` |
+
+The choice is the attribute choice in time: a direct stat now, or a faster climb to the nodes that pay for the build.
+
+## Twinned
+
+Status: Implemented
+
+Twinned is a rare `ADD BATCH_SIZE` prefix (roll weight `15`) for the recipe machines that batch: the Furnace, electric Furnace, Alloy Furnace, Melter, Metal Press, and Resonance Calibrator, through the `HAS_BATCHING` capability. It shares the `dense_parallel` group with Crusher Throughput, which the Crusher keeps instead. Its tiers follow the input-slot shape: `+1` at Tier 1-3, `+2` at Tier 4-6, and `+3` at Tier 7. Batch Overhead still applies to every extra item, so a larger batch trades cycle time for items per cycle.
+
 ## Code-Backed Modifier Ranges
 
 The code-backed source for modifier value ranges is `ModifierEligibilityProfiles`. Each `ModifierDefinition` owns its affix id, modifier group, slot, `CAN_ROLL` flag, family roll weight, optional tier weights, target effects, and tier ranges.
@@ -206,6 +233,8 @@ Most current rollable stat effects use the shared percent tier table above. Crus
 | `ENERGY_USAGE` | Suffix | `DECREASED_PERCENT` | Shared percent table |
 | `OUTPUT_AMOUNT` | Suffix | `INCREASED_PERCENT` | Shared percent table; clean yield table on the Crusher and Crush Head |
 | `INPUT_SLOTS` / fuel slots | Suffix | `ADD` | Flat slot table |
+| `FLUID_CAPACITY` flat | Prefix | `ADD` | `250-500 mB` at Tier 1 to `6,500-9,000 mB` at Tier 7 |
+| `FLUID_CAPACITY` | Suffix | `INCREASED_PERCENT` | Shared percent table |
 | Battery Chassis Charged Storage | Prefix | `MORE ENERGY_CAPACITY` | Untiered fixed `2.0x` multiplier after `10` minutes with stored energy |
 | Battery Chassis Balance Mode | Prefix | Behavioral `CHARGE_BALANCER` | Single-tier charge-balancing behavior; fills and drains installed cells evenly |
 | Battery Chassis Additional Battery Slots | Prefix | `ADD BATTERY_SLOTS` | Battery Chassis slot table |
@@ -401,7 +430,7 @@ Fixed authored modifiers do not use tier ranges unless a specific item stores on
 
 `INSTANT_PROCESS_CHANCE` is checked when eligible processing starts. Powered machines only complete instantly when they can pay the full adjusted craft FE up front; otherwise the process continues through normal progress. Fuel-driven furnace processing spends normal fuel work when the instant outcome succeeds.
 
-Status: Prototype
+Status: Implemented
 
 ## Eligibility
 

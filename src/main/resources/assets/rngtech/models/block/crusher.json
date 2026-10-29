@@ -17,7 +17,8 @@
     "terminal": "rngtech:block/crusher/terminal",
     "lamp": "rngtech:block/crusher/lamp_off",
     "plinth_top": "rngtech:block/crusher/plinth_top",
-    "plinth_side": "rngtech:block/crusher/plinth_side"
+    "plinth_side": "rngtech:block/crusher/plinth_side",
+    "job_lamp": "rngtech:block/work_order/lamp_off"
   },
   "elements": [
     {
@@ -282,6 +283,35 @@
       "neoforge_data": {
         "block_light": 15,
         "sky_light": 15
+      }
+    },
+    {
+      "from": [
+        3.25,
+        11.5,
+        0.0
+      ],
+      "to": [
+        5.0,
+        12.25,
+        0.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#job_lamp"
+        },
+        "east": {
+          "texture": "#job_lamp"
+        },
+        "west": {
+          "texture": "#job_lamp"
+        },
+        "up": {
+          "texture": "#job_lamp"
+        },
+        "down": {
+          "texture": "#job_lamp"
+        }
       }
     },
     {

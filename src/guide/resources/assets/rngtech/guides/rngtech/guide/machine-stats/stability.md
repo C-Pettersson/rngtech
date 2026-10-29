@@ -19,3 +19,4 @@ Stability means something different on each machine:
 | [Resonance Calibrator](rngtech:resonance-calibrator.md) | Higher stability floor on calibrated outputs. |
 | [Solar Panel](rngtech:solar-panel.md) Array Controller | Recovers part of the weather penalty. |
 | [Modular tools](rngtech:modular-tools.md) | Above 1.0, a per-block chance to skip both the durability and FE cost. 1.10 is a 10% chance. |
+| [Battery Chassis](rngtech:battery-chassis.md) | Below 1.0, part of each [burst](rngtech:battery-chassis/burst.md) is lost. |

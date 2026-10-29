@@ -12,10 +12,12 @@ const JAM_DEBRIS = "rngtech:jam_debris";
 const CONDITION = "rngtech:volatile_catalyst_recipes_enabled";
 const LOOT_DIRECTORIES = ["loot_table", "loot_tables", "loot_modifiers"];
 const RECLAIM_TYPES = new Set(["rngtech:component_recycling", "rngtech:potential_reactor"]);
+// Fulfilled Work Orders are machine challenges too; their reward table may pay the catalyst from Tier III.
+const WORK_ORDER_REWARDS = "rngtech/loot_table/challenges/work_order.json";
 
 /**
  * The Volatile Catalyst is gated by RNGTech challenges only: every recipe that makes it carries the config condition so
- * pack makers can turn it off, no loot table or loot modifier hands it out, and neither the catalyst nor Jam Debris can
+ * pack makers can turn it off, no loot table or loot modifier hands it out except the Work Order rewards, and neither the catalyst nor Jam Debris can
  * be recycled or fed to the Potential Reactor. The loop audit must see Jam Debris as a Crusher jam output.
  */
 export async function checkVolatileCatalyst({ log = true } = {}) {
@@ -46,7 +48,8 @@ export async function checkVolatileCatalyst({ log = true } = {}) {
     for (const namespace of await readdir(DATA_ROOT)) {
         for (const directory of LOOT_DIRECTORIES) {
             for (const { file, text } of await jsonFiles(path.join(DATA_ROOT, namespace, directory), true)) {
-                if (text.includes(`"${CATALYST}"`)) {
+                const relative = path.relative(DATA_ROOT, file).replaceAll(path.sep, "/");
+                if (text.includes(`"${CATALYST}"`) && relative !== WORK_ORDER_REWARDS) {
                     failures.push(`${path.relative(PROJECT_ROOT, file).replaceAll(path.sep, "/")} hands out ${CATALYST}`);
                 }
             }
@@ -62,7 +65,7 @@ export async function checkVolatileCatalyst({ log = true } = {}) {
         throw new Error(`Volatile Catalyst check failed:\n${failures.map((failure) => `- ${failure}`).join("\n")}`);
     }
     if (log) {
-        console.log(`Volatile Catalyst PASS: ${recipes} recipe(s) carry ${CONDITION}, no loot or recycling source, `
+        console.log(`Volatile Catalyst PASS: ${recipes} recipe(s) carry ${CONDITION}, no loot source but Work Order rewards, no recycling source, `
             + `${audit.jamDebrisSources} Crusher recipes jam into Jam Debris`);
     }
     return recipes;

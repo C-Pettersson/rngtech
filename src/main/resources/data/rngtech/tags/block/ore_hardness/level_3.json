@@ -6,18 +6,6 @@
     "rngtech:lead_ore",
     "rngtech:deepslate_lead_ore",
     "rngtech:silver_ore",
-    "rngtech:deepslate_silver_ore",
-    {
-      "id": "#c:ores/nickel",
-      "required": false
-    },
-    {
-      "id": "#c:ores/lead",
-      "required": false
-    },
-    {
-      "id": "#c:ores/silver",
-      "required": false
-    }
+    "rngtech:deepslate_silver_ore"
   ]
 }

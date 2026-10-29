@@ -36,17 +36,6 @@
                     "value": 15
                 }
             ]
-        },
-        {
-            "id": "efficiency",
-            "weight": 50,
-            "modifiers": [
-                {
-                    "stat": "efficiency",
-                    "operation": "increased_percent",
-                    "value": 10
-                }
-            ]
         }
     ],
     "blighted": [

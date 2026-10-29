@@ -1,9 +1,11 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.item.AmmoniaPartItem;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.menu.AmmoniaFuelCellMenu;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
@@ -85,6 +87,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     private static final int DATA_FLAT_ENERGY_GENERATION = 13;
     private static final int DATA_BASE_ENERGY_GENERATION = 14;
     private static final int DATA_FUEL_HYDROGEN = 15;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 16;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
     private static final Direction[] ENERGY_OUTPUT_DIRECTIONS = {
@@ -161,7 +164,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
                 case DATA_ENERGY -> energyStored();
                 case DATA_ENERGY_CAPACITY -> energyCapacity();
                 case DATA_AMMONIA -> ammoniaTank.getFluidAmount();
-                case DATA_TANK_CAPACITY -> TANK_CAPACITY;
+                case DATA_TANK_CAPACITY -> ammoniaTank.getCapacity();
                 case DATA_FUEL_HYDROGEN -> burnsHydrogen() ? 1 : 0;
                 case DATA_STATUS -> statusCode();
                 case DATA_ENERGY_PER_TICK -> currentEnergyPerTick();
@@ -172,6 +175,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
                 case DATA_EFFICIENCY -> scaledStat(stats, MachineStat.EFFICIENCY);
                 case DATA_PROCESSING_SPEED -> scaledStat(stats, MachineStat.PROCESSING_SPEED);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(refinementComponentStage());
                 default -> 0;
             };
         }
@@ -182,7 +186,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getCount() {
-            return DATA_FUEL_HYDROGEN + 1;
+            return DATA_PACK_GENERATION_MULTIPLIER + 1;
         }
     };
 
@@ -200,6 +204,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, AmmoniaFuelCellBlockEntity fuelCell) {
+        fuelCell.updateTankCapacity(fuelCell.effectiveStats());
         boolean worked = fuelCell.tickRecipe();
         boolean exported = fuelCell.exportEnergy(level, pos);
         if (worked) {
@@ -261,11 +266,19 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
         }
     }
 
+    /** Fluid Capacity sizes the fuel tank; fluid above a smaller capacity stays until it is burned. */
+    private void updateTankCapacity(MachineStatAccumulator stats) {
+        int capacity = Math.max(TANK_CAPACITY, (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY)));
+        if (ammoniaTank.getCapacity() != capacity) {
+            ammoniaTank.setCapacity(capacity);
+        }
+    }
+
     private AmmoniaFuelCellVisualState currentVisualState() {
         ItemStack residue = processInventory.getStackInSlot(SLOT_RESIDUE);
         return new AmmoniaFuelCellVisualState(
                 isMembrane(membraneStack()),
-                ammoniaTank.getFluidAmount() / (float) TANK_CAPACITY,
+                ammoniaTank.getFluidAmount() / (float) ammoniaTank.getCapacity(),
                 residue.isEmpty() ? 0.0F : residue.getCount() / (float) Math.min(residue.getMaxStackSize(), processInventory.getSlotLimit(SLOT_RESIDUE)),
                 burnsHydrogen()
         );
@@ -615,7 +628,8 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
     private long adjustedEnergy(AmmoniaPowerCycleRecipe recipe) {
         MachineStatAccumulator stats = effectiveStats();
         int ticks = adjustedTicks(recipe);
-        return Math.max(1L, Mth.lfloor(stats.generatedEnergyTotal(recipe.energy(), ticks) * stats.value(MachineStat.EFFICIENCY)));
+        return Math.max(1L, Mth.lfloor(RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(recipe.energy(), ticks) * stats.value(MachineStat.EFFICIENCY),
+                refinementComponentStage())));
     }
 
     public MachineStatAccumulator effectiveStats() {
@@ -681,7 +695,7 @@ public class AmmoniaFuelCellBlockEntity extends BaseMachineBlockEntity
 
         @Override
         public int getTankCapacity(int tank) {
-            return TANK_CAPACITY;
+            return tank == 0 ? ammoniaTank.getCapacity() : 0;
         }
 
         @Override

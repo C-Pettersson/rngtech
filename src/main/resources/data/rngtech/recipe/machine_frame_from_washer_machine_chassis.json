@@ -1,0 +1,13 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "category": "misc",
+    "ingredients": [
+        {
+            "item": "rngtech:washer_machine_chassis"
+        }
+    ],
+    "result": {
+        "count": 1,
+        "id": "rngtech:machine_frame"
+    }
+}

@@ -38,6 +38,15 @@ Generated from `src/main/resources/data/rngtech/materials/catalog.json` and `src
 |---|---|---|
 | `rngtech:materials/family/alloys` | `bronze`, `steel`, `invar`, `sparksteel`, `arclite`, `tungstensteel`, `nullite`, `aethergold` | Shared recipe and datapack hook for alloy-backed material families. |
 
+## RNGTech-Only Recipe Tags
+
+RNGTech recipes take these forms through `rngtech:<form>/<material>` tags that hold only the RNGTech item. The items stay in the matching `c:` tags for other mods.
+
+| Tags | Materials | Reason |
+|---|---|---|
+| `rngtech:plates/<material>`, `rngtech:gears/<material>`, `rngtech:rods/<material>` | All | Made in the Metal Press or by hand, so other mods' plates, gears, and rods do not skip that step. |
+| `rngtech:ingots/<material>`, `rngtech:nuggets/<material>` | `rngtech:materials/family/alloys` | Made in the Alloy Furnace, so other mods' alloys do not skip it. |
+
 ## Registered Item Counts
 
 - Registered metal form items: 223

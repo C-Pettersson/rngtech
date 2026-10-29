@@ -10,7 +10,7 @@
     "B": { "item": "rngtech:bus_bar" },
     "C": { "item": "rngtech:titanium_casing" },
     "M": { "item": "rngtech:fuel_cell_membrane" },
-    "P": { "item": "rngtech:titanium_plate" }
+    "P": { "tag": "rngtech:plates/titanium" }
   },
   "result": {
     "id": "rngtech:ammonia_fuel_cell"

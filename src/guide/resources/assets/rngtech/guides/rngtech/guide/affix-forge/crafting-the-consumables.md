@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting the consumables"
   parent: affix-forge.md
-  position: 6
+  position: 8
   icon: rngtech:affix_forge
 ---
 
@@ -38,6 +38,8 @@ The Volatile Catalyst asks you to make three machines go wrong on purpose:
 
 - **Calibrated Kinetic Component** must be a Kinetic calibration, Stage 5+, stability 20-35.
 - Requires the Sparksteel material to be enabled.
+
+The Mirror Catalyst has no recipe. Only a [Work Order](rngtech:work-orders/rewards.md) of Tier IV or V can pay it.
 
 Upgrades. The Resonance Matrix needs calibrated components from a [Resonance Calibrator](rngtech:resonance-calibrator.md):
 

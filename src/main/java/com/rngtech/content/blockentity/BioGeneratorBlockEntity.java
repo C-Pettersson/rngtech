@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.energy.BiogasDigestion;
 import com.rngtech.content.item.BatteryCellItem;
@@ -7,6 +8,7 @@ import com.rngtech.content.item.BiogasMembraneItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.menu.BioGeneratorMenu;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
@@ -138,6 +140,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     private static final int DATA_CAPTURE = 38;
     private static final int DATA_METHANE_RATE = 39;
     private static final int DATA_VENT_RATE = 40;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 41;
     /** Recovery is synced in tenths of a percent, rates in hundredths of a mB per tick. */
     private static final int RECOVERY_SCALE = 1000;
     private static final int RATE_SCALE = 100;
@@ -254,6 +257,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
                 case DATA_CAPTURE -> capturesCarbon() ? 1 : 0;
                 case DATA_METHANE_RATE -> (int) Math.round(lastMethane * RATE_SCALE);
                 case DATA_VENT_RATE -> (int) Math.round(lastVented * RATE_SCALE);
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(refinementComponentStage());
                 default -> 0;
             };
         }
@@ -264,7 +268,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
 
         @Override
         public int getCount() {
-            return DATA_VENT_RATE + 1;
+            return DATA_PACK_GENERATION_MULTIPLIER + 1;
         }
     };
 
@@ -923,7 +927,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
     private double ratedGeneration(MachineStatAccumulator stats) {
         double multiplier = Math.max(0.1, stats.effectiveEnergyGenerationMultiplier());
         double flatBonus = Math.max(0.0, stats.effectiveFlatEnergyGenerationBonus());
-        return BASE_GENERATION_RATE * multiplier + flatBonus;
+        return RNGTechConfig.generatedEnergy(BASE_GENERATION_RATE * multiplier + flatBonus, refinementComponentStage());
     }
 
     /** Digestion and engine FE/t at the selected retention. */

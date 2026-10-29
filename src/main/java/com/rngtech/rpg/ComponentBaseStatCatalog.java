@@ -59,6 +59,8 @@ public final class ComponentBaseStatCatalog {
      * to the machine as rolled, so a percent affix scales the machine's tanks.
      */
     private static final Set<MachineStat> HOST_STATS = Set.of(MachineStat.FLUID_CAPACITY);
+    private static final List<MachineStat> SOLAR_EXTENDER_UTILITY_STATS = List.of(
+            MachineStat.CLEAR_SKY_AMPLIFICATION, MachineStat.MOONLIGHT_CONVERSION, MachineStat.WEATHER_RECOVERY);
 
     /**
      * How a part stat reaches the host. {@code INCREASED} joins the host's increased bucket: the part's base is a percent,
@@ -223,9 +225,9 @@ public final class ComponentBaseStatCatalog {
     }
 
     /**
-     * Control, Drive, and Reserve rolled or corrupted on a part. They describe the machine rather than the part, and the machine adds
-     * them before its Mastery attribute conversions, separately from {@link #applyEffectiveContribution}, because the
-     * Furnace applies each Heat Core to one lane while attributes belong to the whole machine.
+     * Control, Drive, Reserve, and Mastery XP gain rolled or corrupted on a part. They describe the machine rather than the part,
+     * and the machine adds them before its Mastery attribute conversions, separately from {@link #applyEffectiveContribution},
+     * because the Furnace applies each Heat Core to one lane while these belong to the whole machine.
      */
     public static void applyAttributeAffixes(MachineStatAccumulator target, ItemStack stack) {
         if (profile(stack) == null) {
@@ -234,12 +236,12 @@ public final class ComponentBaseStatCatalog {
         try (MachineStatAccumulator.Source ignored = target.source(stack.getHoverName())) {
             MachineTraits traits = componentTraits(stack);
             for (MachineModifier modifier : traits.modifiers()) {
-                if (modifier.slot().isAffix() && MachineStat.isAttribute(modifier.stat())) {
+                if (modifier.slot().isAffix() && MachineStat.isMachineWide(modifier.stat())) {
                     target.apply(modifier);
                 }
             }
             for (MachineModifier corrupted : corruptionEffects(traits)) {
-                if (MachineStat.isAttribute(corrupted.stat())) {
+                if (MachineStat.isMachineWide(corrupted.stat())) {
                     target.apply(corrupted);
                 }
             }
@@ -287,7 +289,7 @@ public final class ComponentBaseStatCatalog {
 
         // Corruption stats the part does not carry, such as a Crush Head's Jam Recovery, act on the host directly.
         for (MachineModifier corrupted : corruptionEffects(traits)) {
-            if (!profile.mergeRules().containsKey(corrupted.stat()) && !MachineStat.isAttribute(corrupted.stat())) {
+            if (!profile.mergeRules().containsKey(corrupted.stat()) && !MachineStat.isMachineWide(corrupted.stat())) {
                 target.apply(corrupted);
             }
         }
@@ -542,7 +544,8 @@ public final class ComponentBaseStatCatalog {
                 .increased(MachineStat.OUTPUT_AMOUNT, crushHeadOutputPercent(material))
                 .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
                 .add(MachineStat.SUPER_OUTPUT_CHANCE, 0.0)
-                .add(MachineStat.CRUSHER_SALVAGE_CHANCE, 0.0);
+                .add(MachineStat.CRUSHER_SALVAGE_CHANCE, 0.0)
+                .add(MachineStat.NO_BATTERY_OUTPUT_RETENTION, 0.0);
         return builder.build();
     }
 
@@ -558,6 +561,8 @@ public final class ComponentBaseStatCatalog {
                 .more(MachineStat.COOLING_RATE, 1.0)
                 .more(MachineStat.OVERHEAT_TOLERANCE, 1.0)
                 .more(MachineStat.PROCESSING_SPEED, material.processingSpeed())
+                .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
+                .add(MachineStat.SUPER_OUTPUT_CHANCE, 0.0)
                 .build();
     }
 
@@ -580,6 +585,7 @@ public final class ComponentBaseStatCatalog {
         return builder()
                 .add(MachineStat.INPUT_SLOTS, material.fuelSlots())
                 .more(MachineStat.FUEL_EFFICIENCY, material.fuelEfficiency())
+                .more(MachineStat.FUEL_DURATION, 1.0)
                 .more(MachineStat.STABILITY, material.stability())
                 .build();
     }
@@ -598,6 +604,7 @@ public final class ComponentBaseStatCatalog {
                 .more(MachineStat.EFFICIENCY, material.efficiency())
                 .more(MachineStat.PROCESSING_SPEED, material.processingSpeed())
                 .more(MachineStat.OUTPUT_AMOUNT, 1.0)
+                .more(MachineStat.STABILITY, 1.0)
                 .build();
     }
 
@@ -612,6 +619,7 @@ public final class ComponentBaseStatCatalog {
             case VOID_CHAMBER -> builder()
                     .add(MachineStat.PROCESSING_LEVEL, material.stage())
                     .more(MachineStat.ENERGY_GENERATION, material.generation())
+                    .more(MachineStat.PROCESSING_SPEED, 1.0)
                     .more(MachineStat.STABILITY, material.stability())
                     .build();
             case COLLAPSE_NOZZLE -> builder()
@@ -622,6 +630,7 @@ public final class ComponentBaseStatCatalog {
             case DIMENSIONAL_STABILIZER -> builder()
                     .more(MachineStat.STABILITY, material.stability())
                     .more(MachineStat.EFFICIENCY, 1.0 + (material.stage() - 6) * 0.04)
+                    .more(MachineStat.PROCESSING_SPEED, 1.0)
                     .build();
             default -> null;
         };
@@ -644,6 +653,8 @@ public final class ComponentBaseStatCatalog {
                 .more(MachineStat.TEMPERATURE_STABILITY, 1.0 / material.strainMultiplier())
                 .more(MachineStat.OUTPUT_AMOUNT, material.outputMultiplier())
                 .more(MachineStat.FLUID_TRANSFER, material.fluidTransferMultiplier())
+                .more(MachineStat.PROCESSING_SPEED, 1.0)
+                .more(MachineStat.STABILITY, 1.0)
                 .build();
     }
 
@@ -655,11 +666,12 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile disassemblyHead(DisassemblyHeadMaterial material) {
+    static Profile disassemblyHead(DisassemblyHeadMaterial material) {
         return builder()
                 .add(MachineStat.PROCESSING_LEVEL, material.stage())
                 .more(MachineStat.PROCESSING_SPEED, material.processingSpeed())
                 .more(MachineStat.STABILITY, material.stability())
+                .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
                 .build();
     }
 
@@ -676,6 +688,7 @@ public final class ComponentBaseStatCatalog {
                 .more(MachineStat.TEMPERATURE_STABILITY, percentMultiplier(material.temperatureStabilityPercent()))
                 .more(MachineStat.OVERHEAT_TOLERANCE, percentMultiplier(material.overheatTolerancePercent()))
                 .more(MachineStat.FLUID_TRANSFER, 1.0)
+                .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
                 .build();
     }
 
@@ -695,13 +708,10 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile ammoniaCatalystBed() {
+    static Profile ammoniaCatalystBed() {
         return builder()
                 .more(MachineStat.ENERGY_USAGE, 1.0)
                 .more(MachineStat.PROCESSING_SPEED, 1.0)
-                .more(MachineStat.EFFICIENCY, 1.0)
-                .more(MachineStat.STABILITY, 1.0)
-                .more(MachineStat.FLUID_TRANSFER, 1.0)
                 .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
                 .buildWithoutSummary();
     }
@@ -711,35 +721,35 @@ public final class ComponentBaseStatCatalog {
                 .more(MachineStat.ENERGY_GENERATION, 1.0)
                 .more(MachineStat.PROCESSING_SPEED, 1.0)
                 .more(MachineStat.EFFICIENCY, 1.0)
-                .more(MachineStat.STABILITY, 1.0)
-                .more(MachineStat.FLUID_TRANSFER, 1.0)
                 .buildWithoutSummary();
     }
 
-    private static Profile reformingCatalystBed(int stage) {
+    static Profile reformingCatalystBed(int stage) {
         return builder()
                 .add(MachineStat.PROCESSING_LEVEL, stage)
                 .more(MachineStat.PROCESSING_SPEED, 1.0 + stage * 0.03)
-                .more(MachineStat.EFFICIENCY, 1.0 + stage * 0.02)
-                .more(MachineStat.STABILITY, 1.0 + stage * 0.02)
-                .add(MachineStat.FLUID_TRANSFER, stage * 150.0)
+                .more(MachineStat.ENERGY_USAGE, 1.0)
+                .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
                 .build();
     }
 
     static Profile solarArrayExtender(SolarArrayExtenderMaterial material) {
-        return builder()
+        ProfileBuilder builder = builder()
                 .add(MachineStat.SOLAR_PANEL_LIMIT, material.rangeBonus())
-                .more(MachineStat.ENERGY_GENERATION, material.generationMultiplier())
-                .add(material.implicitBonusStat(), material.implicitBonusPercent())
-                .build();
+                .more(MachineStat.ENERGY_GENERATION, material.generationMultiplier());
+        for (MachineStat stat : SOLAR_EXTENDER_UTILITY_STATS) {
+            builder.add(stat, stat == material.implicitBonusStat() ? material.implicitBonusPercent() : 0.0);
+        }
+        return builder.build();
     }
 
-    private static Profile resonanceCoil(CalibrationGearMaterial material) {
+    static Profile resonanceCoil(CalibrationGearMaterial material) {
         return builder()
                 .add(MachineStat.PROCESSING_LEVEL, material.stage())
                 .more(MachineStat.CALIBRATION_QUALITY, percentMultiplier(material.qualityPercent()))
                 .more(MachineStat.ENERGY_USAGE, 1.0)
                 .more(MachineStat.PROCESSING_SPEED, resonanceCoilProcessingSpeed(material))
+                .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
                 .build();
     }
 
@@ -751,12 +761,14 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
-    private static Profile stabilizerMatrix(CalibrationGearMaterial material) {
+    static Profile stabilizerMatrix(CalibrationGearMaterial material) {
         return builder()
                 .more(MachineStat.STABILITY, percentMultiplier(Math.max(4, material.stage() * 3)))
                 .more(MachineStat.CALIBRATION_QUALITY, percentMultiplier(material.qualityPercent() / 2.0))
                 .more(MachineStat.CATALYST_EFFICIENCY, percentMultiplier(material.catalystEfficiencyPercent()))
                 .more(MachineStat.ENERGY_USAGE, 1.0)
+                .more(MachineStat.CALIBRATION_PRECISION, 1.0)
+                .add(MachineStat.REFINEMENT_POTENTIAL_BONUS, 0.0)
                 .build();
     }
 

@@ -19,7 +19,7 @@ A machine's final stats come from several layers:
 
 Open a machine's **Stats** tab to see the result. Hover a row to see what the stat does. Stats that only exist on some machines appear only where they apply.
 
-Hold **Shift** while hovering a row to see the math behind it. The breakdown lists the base value, each flat addition, the increased and more modifiers, and any fixed value or cap. Every line names its source: an affix, an installed part, a Mastery node, an ascendancy, or a penalty such as a missing Battery Cell. Each installed part counts as one line. Its own affixes are already included in that line, so hover the part itself to see them.
+The **vs base** column shows how far each stat sits from its base: a step for whole-number stats like Input Slots, otherwise a percent change. Green means the change helps and red means it costs, so a higher Energy Use shows red. Hold **Shift** while hovering a row to see the math behind it. The breakdown lists the base value, each flat addition, the increased and more modifiers, and any fixed value or cap. Every line names its source: an affix, an installed part, a Mastery node, an ascendancy, or a penalty such as a missing Battery Cell. Each installed part counts as one line. Its own affixes are already included in that line, so hover the part itself to see them.
 
 Affixes change stats in four ways. **Increased** and **reduced** percentages add together, while **more** and **less** multiply separately on top. Flat additions, such as "+2,000 FE", come first. Reduced Energy Use divides the cost instead, so it never reaches zero. See [Rarity and Affixes](rarity-and-affixes.md#reading-the-tooltip).
 
@@ -53,6 +53,7 @@ Stability means something different on each machine:
 | [Resonance Calibrator](resonance-calibrator.md) | Higher stability floor on calibrated outputs. |
 | [Solar Panel](solar-panel.md) Array Controller | Recovers part of the weather penalty. |
 | [Modular tools](modular-tools.md) | Above 1.0, a per-block chance to skip both the durability and FE cost. 1.10 is a 10% chance. |
+| [Battery Chassis](battery-chassis.md) | Below 1.0, part of each [burst](battery-chassis.md#burst) is lost. |
 
 ### Crusher stats
 
@@ -72,12 +73,13 @@ These come from Crusher prefixes and start at 0.
 |---|---|---|---|
 | Energy Capacity | How much FE the machine can store in its own buffer. Processing machines keep only a small buffer; a [Battery Cell](battery-cells.md) gives real storage. On a [Battery Chassis](battery-chassis.md) it scales the installed cells while they stay inside. | Every FE machine, Battery Chassis, and Battery Cells. | Higher |
 | Flat Energy Capacity | Fixed FE added to the buffer before percentage bonuses. | Machines and Battery Cells that roll a flat capacity prefix. | Higher |
-| Energy Transfer | Rate FE can move through storage: a Battery Cell's input rate and a Battery Chassis's transfer rating. Generators and processing machines have no FE limit of their own; the receiver or [connector tier](universal-cable.md#energy) sets the rate. | Battery Cells, Battery Chassis. | Higher |
-| Efficiency | More FE from the same fuel or recipe on generators, and less loss when a Battery Chassis or Cell charges and discharges. It does **not** cut the FE cost of processing recipes. | Generators, Battery Chassis, Battery Cells. | Higher |
+| Energy Transfer | Rate FE can move through storage: a Battery Cell's input rate, and on a Battery Chassis a raise to each installed cell's rates. Generators and processing machines have no FE limit of their own; the receiver or [connector tier](universal-cable.md#energy) sets the rate. | Battery Cells, Battery Chassis. | Higher |
+| Efficiency | More FE from the same fuel or recipe on generators, and less loss when a Battery Chassis charges and discharges. It does **not** cut the FE cost of processing recipes. | Generators, Battery Chassis. | Higher |
 | Idle Loss | Stored FE lost while sitting idle. | Battery Cells, Battery Chassis. | Lower |
 | Battery Slots | Active Battery Cell slots. | [Battery Chassis](battery-chassis.md). | Higher |
-| Burst Transfer | Burst output rating, as a multiple of the transfer rating, on chassis with a burst identity. Output still cannot exceed what the installed cells deliver. | [Battery Chassis](battery-chassis.md). | Higher |
-| Burst Duration | Ticks a burst can last before it has to recover. | [Battery Chassis](battery-chassis.md). | Higher |
+| Burst Transfer | Output during a [burst](battery-chassis.md#burst), as a multiple of the installed cells' rated output. | [Battery Chassis](battery-chassis.md). | Higher |
+| Burst Duration | Ticks of burst the window holds. It refills one tick for each tick without a burst. | [Battery Chassis](battery-chassis.md). | Higher |
+| Global Modifier Strength | How strongly the chassis's Capacity and Energy Transfer affixes act on each installed cell. | [Battery Chassis](battery-chassis.md). | Higher |
 
 ## Heat
 
@@ -98,7 +100,7 @@ Heat machines must warm up to a recipe's temperature before they start, and can 
 
 | Stat | What it does | Used by | Better |
 |---|---|---|---|
-| Energy Generation | FE the machine produces. On Solar Panels and Solid Fuel Burners it is FE/t directly; on recipe generators and the Bio Generator it multiplies the recipe or fuel's output, and flat rolls add FE/t on top. The Stats tab shows the final FE/t; hover it for the breakdown. | Every generator. | Higher |
+| Energy Generation | FE the machine produces. On Solar Panels and Solid Fuel Burners it is FE/t directly; on recipe generators and the Bio Generator it multiplies the recipe or fuel's output, and flat rolls add FE/t on top. The Stats tab shows the final FE/t; hover it for the breakdown. If your modpack changes RNGTech's energy settings, the hover shows them as **Pack setting**. | Every generator. | Higher |
 | Fuel Duration | Makes each fuel item burn longer. Generators keep the same FE/t; the Stage 0 Furnace smelts more per item. | [Furnace](furnace.md) (Stage 0), [Bio Generator](bio-generator.md), [Solid Fuel Burner](solid-fuel-burner.md). | Higher |
 | Fuel Efficiency | More value from each fuel item. Longer burns on the Stage 0 Furnace and Solid Fuel Burner, more total FE on the Bio Generator. Shown as **Bio Conversion** on the Algae Photobioreactor, where it scales algae output. | [Furnace](furnace.md) (Stage 0), [Solid Fuel Burner](solid-fuel-burner.md), [Bio Generator](bio-generator.md), [Algae Photobioreactor](algae-photobioreactor.md). | Higher |
 
@@ -138,7 +140,7 @@ All of these are better higher. See [Solar Panel](solar-panel.md).
 
 | Stat | What it does | Used by | Better |
 |---|---|---|---|
-| Fluid Capacity | Size of the machine's fluid tank. Fluid Pumps can roll it for the machine they sit in. | [Melter](melter.md), [Corrosion Cell](corrosion-cell.md), [Compressor Tanks](compressor-tank.md), the Forestry Companion's water tank. | Higher |
+| Fluid Capacity | Size of the machine's fluid tanks. Fluid Pumps can roll it for the machine they sit in, and machines that process or burn fluid can roll it themselves. It never makes a tank smaller than its normal size. | [Melter](melter.md), [Corrosion Cell](corrosion-cell.md), [Component Assembler](component-assembler.md), [Coal Gasifier](coal-gasifier.md), [Syngas Combustor](syngas-combustor.md), [Steam Methane Reformer](steam-methane-reformer.md), [Cavitation Generator](cavitation-generator.md), [Ammonia Synthesizer](ammonia-synthesizer.md), [Fuel Cell](ammonia-fuel-cell.md), [Compressor Tanks](compressor-tank.md), the Forestry Companion's water tank. | Higher |
 | Fluid Transfer | How fast fluid moves in or out, in mB/t. Usually set by an installed Fluid Pump; on Compressor Tanks it is the compression rate before Servos. | [Component Assembler](component-assembler.md), [Corrosion Cell](corrosion-cell.md), [Melter](melter.md), [Cavitation Generator](cavitation-generator.md), [Compressor Tanks](compressor-tank.md). | Higher |
 | Compression Ratio | How much fluid a Steel or higher Compressor Tank packs into its compressed store. Set by the tank's material. | [Compressor Tanks](compressor-tank.md). | Higher |
 

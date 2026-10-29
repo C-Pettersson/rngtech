@@ -119,6 +119,7 @@
     "rngtech:naquadah_ore",
     "rngtech:deepslate_naquadah_ore",
     "rngtech:phase_emitter",
-    "rngtech:phase_coil"
+    "rngtech:phase_coil",
+    "rngtech:dispatch_terminal"
   ]
 }

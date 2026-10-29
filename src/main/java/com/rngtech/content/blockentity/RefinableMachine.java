@@ -21,4 +21,9 @@ public interface RefinableMachine {
     }
 
     ItemStackHandler getRefinementInventory();
+
+    /** Whether this machine was placed from a Mirror Catalyst's copy, which its Refinement tab refuses. */
+    default boolean isMirrored() {
+        return false;
+    }
 }

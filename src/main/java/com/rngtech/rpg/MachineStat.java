@@ -138,7 +138,9 @@ public enum MachineStat implements StringRepresentable {
     FE_RECOVERY,
     GLYPH_SALVAGE,
     STRAIN_MERCY,
-    PRIMED_CHARGE_RATE;
+    PRIMED_CHARGE_RATE,
+    /** Increased Mastery XP gain; read only as an increased bucket, so it needs no base value. */
+    MASTERY_XP_GAIN;
 
     public static final Codec<MachineStat> CODEC = Codec.STRING.comapFlatMap(
             name -> {
@@ -188,6 +190,11 @@ public enum MachineStat implements StringRepresentable {
     /** Control, Drive, and Reserve: the Mastery attributes. */
     public static boolean isAttribute(MachineStat stat) {
         return stat == CONTROL || stat == DRIVE || stat == RESERVE;
+    }
+
+    /** Stats a part rolls for the whole Mastery machine: the attributes and Mastery XP gain skip the part's local scaling. */
+    public static boolean isMachineWide(MachineStat stat) {
+        return isAttribute(stat) || stat == MASTERY_XP_GAIN;
     }
 
     public String translationKey() {

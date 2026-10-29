@@ -23,7 +23,7 @@
       "ingredient": { "item": "rngtech:fuel_chamber" }
     },
     "G": {
-      "ingredient": { "tag": "c:ingots/bronze" }
+      "ingredient": { "tag": "rngtech:ingots/bronze" }
     },
     "H": {
       "ingredient": { "item": "rngtech:bronze_casing" }

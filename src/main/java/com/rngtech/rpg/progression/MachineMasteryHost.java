@@ -1,5 +1,8 @@
 package com.rngtech.rpg.progression;
 
+import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
+
 import java.util.List;
 
 public interface MachineMasteryHost {
@@ -10,19 +13,22 @@ public interface MachineMasteryHost {
     int ascendancyEntryStage();
 
     default MachineProgressionState masteryState() { return machineProgression().forFamily(masteryFamily()); }
+
+    /** 1 plus the machine's increased Mastery XP gain; the stat has no base, so only its increased bucket counts. */
+    static double xpGain(MachineStatAccumulator stats) {
+        return Math.max(0.0, 1.0 + stats.increasedPercent(MachineStat.MASTERY_XP_GAIN) / 100.0);
+    }
     default boolean masteryGearAllows(MachineProgressionState state) { return true; }
+    /** The Mastery XP multiplier from Studious rolls on the machine and its Gear. */
+    default double masteryXpGain() { return 1.0; }
     default void masteryChanged() { }
 
     default void grantMasteryXp(long amount, int quarters) {
         MachineProgressionState previous = masteryState();
-        MachineProgressionState next = MegaPassiveTree.follow(previous.withAddedScaledXp(amount, quarters), this::masteryGearAllows);
+        MachineProgressionState next = MegaPassiveTree.follow(previous.withAddedScaledXp(amount, quarters, masteryXpGain()), this::masteryGearAllows);
         setMachineProgression(next);
         if (!previous.allocatedNodes().equals(next.allocatedNodes())) { masteryChanged(); }
-        if (next.level() > previous.level()) { masteryLevelGained(next); }
     }
-
-    /** Runs after XP raises the Mastery level, such as to roll the Mastery level challenge loot. */
-    default void masteryLevelGained(MachineProgressionState state) { }
 
     default void applyMasteryState(MachineProgressionState state) {
         setMachineProgression(MegaPassiveTree.follow(state.forFamily(masteryFamily()), this::masteryGearAllows));

@@ -12,6 +12,7 @@ import mezz.jei.api.gui.ingredient.ICraftingGridHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategoryExtension;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
@@ -39,12 +40,13 @@ public final class CalibratedCraftingCategoryExtension implements ICraftingCateg
     ) {
         CalibratedShapedRecipe recipe = recipeHolder.value();
         List<DisplaySlot> displaySlots = displaySlots(recipe);
-        List<Pair<String, Ingredient>> ingredients = displaySlots.stream()
-                .map(slot -> Pair.of(slot.name(), slot.ingredient()))
+        CraftingTransferVariants variants = CraftingTransferVariants.forOpenMenu();
+        List<Pair<String, List<ItemStack>>> inputs = displaySlots.stream()
+                .map(slot -> Pair.of(slot.name(), variants.stacks(slot.ingredient(), slot::accepts)))
                 .toList();
-        List<IRecipeSlotBuilder> slotBuilders = craftingGridHelper.createAndSetNamedIngredients(
+        List<IRecipeSlotBuilder> slotBuilders = craftingGridHelper.createAndSetNamedInputs(
                 builder,
-                ingredients,
+                inputs,
                 getWidth(recipeHolder),
                 getHeight(recipeHolder)
         );
@@ -109,5 +111,8 @@ public final class CalibratedCraftingCategoryExtension implements ICraftingCateg
             Ingredient ingredient,
             Optional<CalibrationRequirement> requirement
     ) {
+        private boolean accepts(ItemStack stack) {
+            return ingredient.test(stack) && requirement.map(value -> value.test(stack)).orElse(true);
+        }
     }
 }

@@ -10,6 +10,7 @@ import com.rngtech.content.item.DisassemblyHeadItem;
 import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.ForestryCartItem;
 import com.rngtech.content.item.FurnaceChassisBlockItem;
+import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.item.MachineBlockItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.MinersCompanionItem;
@@ -23,7 +24,6 @@ import com.rngtech.content.item.ToolRodItem;
 import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.recycling.RecyclingData;
 import com.rngtech.content.registry.ModDataComponents;
-import com.rngtech.content.tool.ToolHeadFamily;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineTraitRoller;
 import com.rngtech.rpg.MachineTraits;
@@ -33,6 +33,8 @@ import com.rngtech.rpg.ModifierEligibilityProfiles;
 import com.rngtech.rpg.Rarity;
 import com.rngtech.rpg.corruption.CorruptionCatalog;
 import com.rngtech.rpg.unique.UniqueItems;
+import com.rngtech.rpg.workorder.WorkOrder;
+import com.rngtech.rpg.workorder.WorkOrderConditions;
 
 import net.minecraft.world.item.ItemStack;
 
@@ -48,7 +50,21 @@ public final class RefinementTargets {
                 || stack.getItem() instanceof MinersCompanionItem
                 || stack.getItem() instanceof ForestryCartItem
                 || stack.getItem() instanceof ToolHeadItem
-                || stack.getItem() instanceof ToolRodItem);
+                || stack.getItem() instanceof ToolRodItem
+                || isJobChip(stack));
+    }
+
+    /** A Job Chip with a job, which refines its conditions. A blank chip has none to refine. */
+    public static boolean isJobChip(ItemStack stack) {
+        return JobChipItem.isWorkOrder(stack) && JobChipItem.data(stack) != null;
+    }
+
+    /**
+     * Whether the Phase Array takes this stack. It refines permanent Gear, so it turns away Job Chips, a consumable. It
+     * takes a Mirrored copy but reports it locked.
+     */
+    public static boolean canPhase(ItemStack stack) {
+        return canRefine(stack) && !isJobChip(stack);
     }
 
     /**
@@ -57,9 +73,32 @@ public final class RefinementTargets {
      * placed machines are corrupted through their Refinement tabs instead.
      */
     public static boolean canCorrupt(ItemStack stack) {
+        if (isJobChip(stack)) {
+            return !isCorrupted(stack);
+        }
         return canRefine(stack)
                 && (stack.getItem() instanceof MachinePartItem || stack.getItem() instanceof BatteryCellItem)
                 && CorruptionCatalog.active().canCorrupt(eligibilityProfile(stack).id());
+    }
+
+    /**
+     * Whether a Mirror Catalyst may copy this stack: a Gear part, Battery Cell, machine item, or Job Chip that is not a
+     * Unique and is not itself a Mirrored copy. Corrupted items may be copied.
+     */
+    public static boolean canMirror(ItemStack stack) {
+        return canRefine(stack)
+                && !isMirrored(stack)
+                && !UniqueItems.isUnique(stack)
+                && storedTraits(stack).rarity() != Rarity.UNIQUE
+                && (isJobChip(stack)
+                || stack.getItem() instanceof MachinePartItem
+                || stack.getItem() instanceof BatteryCellItem
+                || stack.getItem() instanceof MachineBlockItem);
+    }
+
+    /** A Mirror Catalyst's copy, which no refinement path changes. */
+    public static boolean isMirrored(ItemStack stack) {
+        return stack.has(ModDataComponents.MIRRORED.get());
     }
 
     public static boolean isCorrupted(ItemStack stack) {
@@ -93,6 +132,9 @@ public final class RefinementTargets {
     }
 
     public static ModifierEligibilityProfile eligibilityProfile(ItemStack stack) {
+        if (isJobChip(stack)) {
+            return WorkOrderConditions.profile(JobChipItem.data(stack));
+        }
         if (stack.getItem() instanceof UniquePartItem part) {
             return ModifierEligibilityProfiles.forUniquePart(part.partType());
         }
@@ -112,7 +154,7 @@ public final class RefinementTargets {
             return ModifierEligibilityProfiles.forMachinePart(part.partType(), part.machineType());
         }
         if (stack.getItem() instanceof ToolHeadItem head) {
-            return ModifierEligibilityProfiles.forToolHead(head.family() == ToolHeadFamily.PICK);
+            return ModifierEligibilityProfiles.forToolHead(head.family(), head.material());
         }
         if (stack.getItem() instanceof ToolRodItem) {
             return ModifierEligibilityProfiles.forMachine(MachineType.TOOL_ROD);
@@ -121,6 +163,9 @@ public final class RefinementTargets {
     }
 
     public static int componentStage(ItemStack stack) {
+        if (isJobChip(stack)) {
+            return WorkOrder.tierStage(JobChipItem.data(stack).tier());
+        }
         if (stack.getItem() instanceof BatteryCellItem cell) {
             return cell.material().stage();
         }
@@ -252,7 +297,12 @@ public final class RefinementTargets {
         return MachineImplicitCatalog.storedTraits(traits == null ? MachineTraits.EMPTY : traits);
     }
 
+    /** Stores refined traits. A Job Chip also moves its Bounty, Prestige, and listed reward with its conditions. */
     public static void setTraits(ItemStack stack, MachineTraits traits) {
+        if (isJobChip(stack)) {
+            JobChipItem.setConditions(stack, traits);
+            return;
+        }
         stack.set(ModDataComponents.MACHINE_TRAITS.get(), traits);
     }
 

@@ -20,10 +20,19 @@ const TAB_PRESETS = new Map([
 ]);
 
 const DEFAULT_TAB_LABELS = new Map([
-    ["PROCESSING", "rngtech.tab.processing.short"],
+    ["PROCESSING", "rngtech.tab.processing"],
     ["GEAR", "rngtech.tab.gear"],
     ["STATS", "rngtech.tab.stats"],
-    ["REFINEMENT", "rngtech.tab.refinement.short"]
+    ["REFINEMENT", "rngtech.tab.refinement"]
+]);
+
+// MachineTabs.Builder presets and the lang key each one labels its tab with.
+const BUILDER_TAB_LABELS = new Map([
+    ["processing", "rngtech.tab.processing"],
+    ["gear", "rngtech.tab.gear"],
+    ["stats", "rngtech.tab.stats"],
+    ["refinement", "rngtech.tab.refinement"],
+    ["mastery", "rngtech.tab.mastery"]
 ]);
 
 export async function buildGuiLayoutData() {
@@ -98,7 +107,7 @@ function extractScreenLayout(file, source, helperConstants) {
         y: findAssignedInt(source, "titleLabelY", constants, helperConstants) ?? 6
     };
 
-    const tabs = extractTabs(source, constants, helperConstants);
+    const tabs = extractTabs(source);
     const tabByConstant = new Map(tabs.map((tab) => [tab.sourceConstant, tab.id]));
     const elements = [
         ...extractSlotElements(source, screenClass, constants, helperConstants, tabByConstant),
@@ -165,17 +174,19 @@ function findAssignedInt(source, name, constants, helperConstants) {
     return match ? evalIntExpression(match[1], constants, helperConstants) : null;
 }
 
-function extractTabs(source, constants, helperConstants) {
-    const tabCalls = [...source.matchAll(/renderTab\s*\(\s*guiGraphics\s*,\s*([^,]+),\s*Component\.translatable\("([^"]+)"\)\s*,\s*menu\.selectedTab\(\)\s*==\s*([A-Za-z0-9_]+)\.([A-Z0-9_]+)\s*\)/g)];
-    const tabWidth = constants.TAB_WIDTH ?? 54;
-    const tabSpacing = constants.TAB_SPACING ?? tabWidth + 2;
-    const renderTabMethod = extractMethod(source, "renderTab") ?? "";
-    const tabBaseX = evalIntExpression(renderTabMethod.match(/int\s+x\s*=\s*leftPos\s*\+\s*([^;]+?index\s*\*\s*[A-Z0-9_]+)\s*;/)?.[1]?.replace(/\+\s*index\s*\*\s*[A-Z0-9_]+/, "") ?? "8", constants, helperConstants) ?? 8;
-    const tabY = evalIntExpression(renderTabMethod.match(/int\s+y\s*=\s*topPos\s*\+\s*([^;]+);/)?.[1] ?? "-20", constants, helperConstants) ?? -20;
+function extractTabs(source) {
+    // MachineTabs places tabs at runtime; the editor keeps showing them as a top strip.
+    const tabWidth = 54;
+    const tabSpacing = 56;
+    const tabBaseX = 8;
+    const tabY = -20;
+    const builderStart = source.indexOf("MachineTabs.builder(");
+    const builderEnd = builderStart < 0 ? -1 : source.indexOf(".build()", builderStart);
+    const builder = builderEnd < 0 ? "" : source.slice(builderStart, builderEnd);
+    const tabCalls = [...builder.matchAll(/\.(processing|gear|stats|refinement|mastery|tab)\s*\(\s*(?:[A-Za-z0-9_]+\.)?(TAB_[A-Z0-9_]+)\s*(?:,\s*"([^"]+)")?/g)];
 
-    const tabs = tabCalls.map((match) => {
-        const index = evalIntExpression(match[1], constants, helperConstants) ?? Number(match[1]) ?? 0;
-        const sourceConstant = match[4];
+    const tabs = tabCalls.map((match, index) => {
+        const sourceConstant = match[2];
         const preset = TAB_PRESETS.get(sourceConstant) ?? "CUSTOM";
         return {
             id: preset === "CUSTOM" ? kebabCase(sourceConstant.replace(/^TAB_/, "")) : preset.toLowerCase(),
@@ -183,7 +194,7 @@ function extractTabs(source, constants, helperConstants) {
             kind: preset === "CUSTOM" ? "CUSTOM" : "PRESET",
             preset,
             sourceConstant,
-            labelKey: match[2],
+            labelKey: match[1] === "tab" ? match[3] : BUILDER_TAB_LABELS.get(match[1]),
             x: tabBaseX + index * tabSpacing,
             y: tabY,
             width: tabWidth,
@@ -195,32 +206,8 @@ function extractTabs(source, constants, helperConstants) {
         };
     });
 
-    if (tabs.length) {
+    if (tabs.length && source.includes("menu.selectedTab()")) {
         return uniqueTabs(tabs);
-    }
-
-    const simpleTabCalls = [...source.matchAll(/\btab\s*\(\s*guiGraphics\s*,\s*(\d+)\s*,\s*Component\.translatable\("([^"]+)"\)\s*\)/g)];
-    if (simpleTabCalls.length) {
-        return simpleTabCalls.map((match) => {
-            const index = Number(match[1]);
-            const preset = ["PROCESSING", "GEAR", "STATS", "REFINEMENT"][index] ?? "CUSTOM";
-            return {
-                id: preset === "CUSTOM" ? `custom-${index}` : preset.toLowerCase(),
-                type: "TAB",
-                kind: preset === "CUSTOM" ? "CUSTOM" : "PRESET",
-                preset,
-                sourceConstant: `TAB_${preset}`,
-                labelKey: match[2],
-                x: tabBaseX + index * tabSpacing,
-                y: tabY,
-                width: tabWidth,
-                height: 21,
-                tooltip: { enabled: false, text: "" },
-                description: preset === "CUSTOM"
-                    ? "Custom tab loaded from screen source."
-                    : `${preset} tab loaded from screen source.`
-            };
-        });
     }
 
     if (!source.includes("menu.selectedTab()")) {

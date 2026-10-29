@@ -27,7 +27,7 @@
     },
     "C": {
       "ingredient": {
-        "tag": "c:circuits/advanced"
+        "tag": "rngtech:circuits/advanced"
       }
     },
     "K": {
@@ -47,7 +47,7 @@
     },
     "S": {
       "ingredient": {
-        "item": "rngtech:sparksteel_plate"
+        "tag": "rngtech:plates/sparksteel"
       }
     }
   },

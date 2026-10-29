@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class FurnaceBlock extends BaseMachineBlock {
+public class FurnaceBlock extends WorkOrderMachineBlock {
     private final FurnaceChassisMaterial material;
 
     public FurnaceBlock(Properties properties) {

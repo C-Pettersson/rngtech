@@ -21,6 +21,7 @@ These items roll rarity, affixes, and RP when you craft them:
 | [Battery Cells](battery-cells.md) | {{ item('rngtech:iron_battery_cell') }} and every other material cell |
 | Modular tool parts | Tool Heads and Tool Rods for [Modular Tools](modular-tools.md) |
 | Companions | The Forestry Companion cart from the [Forestry Cart Station](forestry-cart-station.md), and the {{ item('rngtech:miners_companion') }} |
+| [Job Chips](work-orders.md) | A Dispatch Terminal rolls a chip when it lists the job. A chip's affixes are [conditions](work-orders.md#conditions), which cost the machine and add reward. |
 
 A few blocks never roll traits: the [Affix Forge](affix-forge.md) and the Phase Cradle of the [Phase Array](phase-array.md), the Crude Component Recycler, the wooden and silica-gel machines such as the [Wooden Composter](wooden-composter.md), the [Algae Photobioreactor](algae-photobioreactor.md), and cables and connectors. Assembled modular tools carry no traits of their own. Their Tool Head and Tool Rod do.
 
@@ -155,6 +156,8 @@ Machines with [Machine Mastery](machine-mastery.md) and the Gear they take can r
 
 They roll on the Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, and Forestry Companion, and on Crush Heads, Heat Cores, Servos, Fluid Pumps, Alloy Crucibles, Resonance Coils, Control Boards, and Stabilizer Matrices. A part that sits in a machine without Mastery, such as a Heat Core in a Solid Fuel Burner, gets nothing from them.
 
+The same machines and parts can roll **Studious** (of Study): increased Mastery XP gain, from 5–8% at Tier 1 to 33–45% at Tier 5. It also counts for the whole machine, and Studious rolls on the machine and its Gear add together. The machine levels faster. It gets no extra passive points.
+
 ## Notable affixes
 
 Most affixes simply raise or lower a [stat](machine-stats.md). A few change how the machine behaves.
@@ -163,7 +166,7 @@ Most affixes simply raise or lower a [stat](machine-stats.md). A few change how 
 
 A suffix for processing machines. Each completed process adds 1% Processing Speed, up to 100%. Powered machines keep the same FE per craft, so their FE/t rises as they speed up. The bonus resets when the chain is interrupted, for example by invalid input, missing Gear, or a different recipe. Topping up the input with more of the same item keeps it.
 
-Bulk Speed works on the Crusher, electric Furnace, Alloy Furnace, Component Assembler, Component Recycler, Metal Press, Melter, Resonance Calibrator, Potential Reactor, and Corrosion Cell. On the two generators it can double FE/t at its cap. It can also roll on the Coal Gasifier, Steam Methane Reformer, and Ammonia Synthesizer, where it has no effect.
+Bulk Speed works on the Crusher, electric Furnace, Alloy Furnace, Component Assembler, Component Recycler, Metal Press, Melter, Resonance Calibrator, Coal Gasifier, Steam Methane Reformer, Ammonia Synthesizer, Potential Reactor, and Corrosion Cell. On the two generators it can double FE/t at its cap.
 
 Bulk Speed takes the processing-speed group, so it never appears alongside another speed suffix.
 
@@ -188,6 +191,8 @@ A suffix that halves the failure strain a heat machine takes when its power drop
 | Super Output | A small chance to add one extra copy of the recipe's base output. |
 | Charged Storage | Battery Chassis only. 100% more installed-cell capacity after the chassis has held energy for 10 minutes straight. |
 | Additional Battery Slots | Battery Chassis only. Unlocks up to four extra cell slots. |
+| Twinned | Rare prefix on the Furnace, Alloy Furnace, Melter, Metal Press, and Resonance Calibrator. Adds 1 to 3 Batch Size. Each extra item in a batch still makes the cycle longer. It cannot roll beside the Crusher's Throughput. |
+| Brimming and Depth | Fluid Capacity on the Fluid Pump and on machines with tanks that process or burn fluid: the Melter, Component Assembler, Corrosion Cell, Coal Gasifier, Syngas Combustor, Steam Methane Reformer, Cavitation Generator, Ammonia Synthesizer, and Fuel Cell. Brimming adds a flat amount and Depth adds a percentage. All tanks of the machine grow together. A tank never gets smaller than its normal size. Fluid and Compressor Tanks do not roll it. |
 | Vein Miner | Rare Pick Head prefix. The Pick breaks connected ore of the same type, at an extra FE cost per block. |
 | Self Repair | Tool Head and Tool Rod prefix. Restores durability every 7.5 seconds while the tool sits idle in your hotbar or offhand. |
 
@@ -231,6 +236,7 @@ Refinement changes an item's rolled affixes with a consumable **catalyst**. You 
 - **promote** a Magic item to Rare with an Ascension Catalyst or Ascension Matrix.
 - **remove** or **reroll** affixes.
 - **corrupt** a finished item with a {{ item('rngtech:volatile_catalyst') }}, a one-way gamble described in [Corruption](#corruption).
+- **copy** an item with a {{ item('rngtech:mirror_catalyst') }}, described in [Mirrored items](#mirrored-items).
 
 You choose the catalyst, but the game picks which affix it adds or upgrades. In the Affix Forge, modifier lenses can tilt the odds towards a family you want.
 
@@ -240,10 +246,11 @@ Where to refine:
 - **Placed machines** in the Refinement tab of the machine's own screen.
 - **Tool Heads and Tool Rods**, even inside an assembled tool, in the [Tool Bench](tool-bench.md) Refine tab.
 - **Chosen operations** in the [Phase Array](phase-array.md), the endgame bench, which spends only a little RP per pulse.
+- **Job Chips** in the Affix Forge. The forge adds, removes, upgrades, and rerolls their [conditions](work-orders.md#refining-and-corrupting-chips). The Phase Array does not accept Job Chips.
 
 ## Corruption
 
-A {{ item('rngtech:volatile_catalyst') }} corrupts a finished machine part or Battery Cell in the [Affix Forge](affix-forge.md#corrupting-with-a-volatile-catalyst), or a placed machine in its Refinement tab. It costs no RP, and it is the only thing that can change a Unique. Machine and chassis items, Tool Heads, Tool Rods, companions, and unidentified or stripped items cannot be corrupted as items; place a machine first and corrupt it from its Refinement tab.
+A {{ item('rngtech:volatile_catalyst') }} corrupts a finished machine part or Battery Cell in the [Affix Forge](affix-forge.md#corrupting-with-a-volatile-catalyst), or a placed machine in its Refinement tab. It costs no RP, and it is the only thing that can change a Unique. Machine and chassis items, Tool Heads, Tool Rods, companions, and unidentified or stripped items cannot be corrupted as items; place a machine first and corrupt it from its Refinement tab. You can corrupt a [Job Chip](work-orders.md#refining-and-corrupting-chips) in the Affix Forge. There, the outcomes change the job's reward instead of a stat.
 
 The catalyst rolls one outcome, and every outcome leaves the item **Corrupted**:
 
@@ -270,14 +277,14 @@ A corruption implicit is one fixed value, with no tier or range. It sits outside
 | Heat Core | 10% increased Max Temperature, 15% increased Temperature Stability, 15% increased Overheat Tolerance, 10% increased Heat Transfer, 10% increased Fuel Efficiency, 20% reduced Thermal Mass, or Power Grace | 20% less Temperature Stability, or 25% increased Thermal Mass |
 | Crush Head | +1 Processing Level (rare), +25% Jam Recovery, 10% increased Processing Speed, or 10% more Processing Speed | 25% more Jam Chance, or 15% less Processing Speed |
 | Servo | Power Grace, Auto Purge, 15% increased Overheat Tolerance, 10% increased Processing Speed, 15% increased Stability, 15% reduced Energy Use, or 20% increased Fluid Transfer | 15% less Processing Speed, or 20% less Stability |
-| Alloy Crucible | +15% Blend Speed, 15% increased Temperature Stability, 10% increased Processing Speed, 15% increased Overheat Tolerance, or 20% reduced Thermal Mass | 20% less Stability |
+| Alloy Crucible | +15% Blend Speed, 15% increased Temperature Stability, 10% increased Processing Speed, 15% increased Overheat Tolerance, or 20% reduced Thermal Mass | 20% less Temperature Stability |
 | Fluid Pump | 50% increased Fluid Capacity, or 30% increased Fluid Transfer | 30% less Fluid Transfer |
-| Battery Cell | 20% increased Energy Transfer, 30% less Idle Loss, 15% increased Energy Capacity, or 10% increased Efficiency | Doubled Idle Loss |
+| Battery Cell | 20% increased Energy Transfer, 30% less Idle Loss, or 15% increased Energy Capacity | Doubled Idle Loss |
 | Resonance Coil, Control Board, Stabilizer Matrix | +1 Coil Reach, 10% increased Catalyst Efficiency, 10% increased Calibration Precision, or 10% increased Processing Speed | 20% less Processing Speed, or 10% less Calibration Precision |
-| Bio Chamber, Fuel Box | 15% increased Fuel Efficiency, or 15% increased Fuel Duration; the Bio Chamber can also roll 10% increased Energy Generation, and the Fuel Box 15% increased Stability | 10% less Energy Generation on the Bio Chamber; 15% less Stability on the Fuel Box |
+| Bio Chamber, Fuel Box | 15% increased Fuel Efficiency, or 15% increased Fuel Duration; the Bio Chamber can also roll 10% increased Energy Generation | 10% less Energy Generation on the Bio Chamber; 15% less Fuel Efficiency on the Fuel Box |
 | Other generator parts | 10% increased Energy Generation; most also roll 15% increased Stability or 10% increased Processing Speed | 10% less Energy Generation |
-| Other parts | 15% increased Stability; most also roll 10% increased Processing Speed or 10% increased Efficiency | 15% less Stability |
-| Placed processing machine | 10% increased Processing Speed, 20% reduced Energy Use, or 15% increased Stability where the machine has it; +1 Batch Size (rare) on the Crusher, Furnace, Alloy Furnace, Melter, Metal Press, and Resonance Calibrator; 15% increased Fuel Efficiency or 10% increased Max Temperature on the Furnace | 25% increased Energy Use; 20% less Fuel Efficiency on the Furnace |
+| Other parts | 15% increased Stability, 10% increased Processing Speed, or 10% increased Efficiency, where the part's machine reads it | 15% less Stability or 15% less Processing Speed, where the part's machine reads it |
+| Placed processing machine | 10% increased Processing Speed, 20% reduced Energy Use, or 15% increased Stability on the Metal Press and Resonance Calibrator; +1 Batch Size (rare) on the Crusher, Furnace, Alloy Furnace, Melter, Metal Press, and Resonance Calibrator; 15% increased Fuel Efficiency or 10% increased Max Temperature on the Furnace | 25% increased Energy Use; 20% less Fuel Efficiency on the Furnace |
 | Placed generator | 10% increased Energy Generation, 15% increased Efficiency, and where the machine has them 15% increased Stability or 25% increased Energy Capacity | 20% less Efficiency |
 | Battery Chassis | +1 Battery Slot, 15% increased Energy Capacity, or 20% increased Energy Transfer | 15% increased Idle Loss |
 
@@ -285,11 +292,37 @@ Machines with [Machine Mastery](machine-mastery.md) and the Gear they take (Crus
 
 +1 Processing Level on a Crush Head lets it crush one level harder ore without jamming; it does not change which Gear the Crusher accepts. With a catalyst in the Affix Forge, hover Blessed or Blighted in the outcome panel to see the exact pool and odds for the item in the target slot. Corruption implicits never add yield or RP.
 
+## Mirrored items
+
+A {{ item('rngtech:mirror_catalyst') }} makes an exact copy of an item in the [Affix Forge](affix-forge.md#copying-with-a-mirror-catalyst). You keep the original. The copy goes to your inventory. It has the same rarity, affixes, RP, corruption, and everything else. The catalyst costs no RP.
+
+The Mirror Catalyst copies:
+
+- machine parts and Battery Cells,
+- machine and chassis items, with the Mastery and the Job Chips that they carry,
+- [Job Chips](work-orders.md#refining-and-corrupting-chips) that have a job.
+
+It does not copy Uniques, Tool Heads, Tool Rods, companions, or unidentified or stripped items. It can copy a Corrupted item.
+
+It does not copy the fluid in a tank. The copy of a filled tank is empty, and the original keeps its fluid.
+
+The copy is **Mirrored**. Its icon shows flipped from left to right, and its tooltip says Mirrored under its name. A Mirrored item can never be changed:
+
+- The Affix Forge, Phase Array, Tool Bench, and Refinement tabs refuse it, and nothing is used.
+- A Volatile Catalyst cannot corrupt it.
+- The Phase Array cannot use it as a Graft donor.
+- A Mirror Catalyst cannot copy it again. To make more copies, use the original.
+
+The Mirrored mark cannot be removed. A placed Mirrored machine stays Mirrored when you break it and place it again. A Mirrored Job Chip stays Mirrored when you load it into a drive bay and take it out. You can install, use, and complete Mirrored items as normal.
+
+The Mirror Catalyst is very rare. It has no recipe. Only a [Work Order](work-orders.md#rewards) of Tier IV or V can pay it.
+
 ## See also
 
 - [Machine Stats](machine-stats.md): what each stat does.
 - [Affix Forge](affix-forge.md): catalysts, lenses, and modifier crystals.
 - [Gear](gear.md): the parts you install in machines.
 - [Machine Mastery](machine-mastery.md): levelling machines up.
+- [Work Orders](work-orders.md): Job Chips and their conditions.
 
 {{ navbox() }}

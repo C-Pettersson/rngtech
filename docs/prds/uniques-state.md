@@ -2,7 +2,7 @@
 
 Source: [draft design](uniques.md).
 
-Status: **Prototype** for the 2.0 release. The PRD was accepted on 2026-10-05, and phases 2–6 landed on `feature/uniques-implementation-88f3c4` on 2026-10-10: the framework, sources, all eight launch Uniques, the UI, and documentation. They still need an in-game playtest.
+Status: **Implemented** for the 2.0 release. The PRD was accepted on 2026-10-05, and phases 2–6 landed on `feature/uniques-implementation-88f3c4` on 2026-10-10: the framework, sources, all eight launch Uniques, the UI, and documentation. They merged to `main` in #60 and are playtested.
 
 ## Scope checklist
 
@@ -15,7 +15,7 @@ Status: **Prototype** for the 2.0 release. The PRD was accepted on 2026-10-05, a
 - [x] Launch content: eight Uniques, the `ESCAPEMENT`, `REFLUX`, and `ECHO_STREAK` behaviors, textures, and language keys.
 - [x] UI: unidentified and identified tooltips, the Shift roll view, dimmed unread stats, JEI pages, and foil.
 - [x] Documentation: Rarity, Machine Parts, Battery Cells, Machine Stats, the implementation matrix, the ideas page, and quests.
-- [ ] In-game playtest of every launch Unique.
+- [x] In-game playtest of every launch Unique.
 
 ## Decisions
 
@@ -58,7 +58,7 @@ Recorded 2026-10-10 during implementation:
 - Ascendancy stats such as Heat Window apply whether or not the ascendancy is chosen, so hook gating has to happen at merge time rather than rely on the stat.
 - Battery Chassis stats did not include anything from installed cells. Non-cell stats on a cell profile, such as the Bastion's Burst lines, now merge into the chassis.
 - The Stats tab listed only ascendancy-granted stats; it now also lists non-hook Unique stats a machine has.
-- A Mastery level gain had no hook. `MachineMasteryHost.masteryLevelGained` now fires after XP raises the level.
+- A Mastery level gain had no hook. `MachineMasteryHost.masteryLevelGained` fired after XP raised the level, until the challenge tables were removed on 2026-10-26.
 - The `rngtech:challenge` loot table type needs a `LootContextParamSets` registry entry, which is private; it is added by reflection when loot types register.
 
 ## Progress log
@@ -71,6 +71,10 @@ Recorded 2026-10-10 during implementation:
 - 2026-10-10, later: balance review after the first in-game look. Fixed two Uniques whose Temperature Stability drawback hard-blocked their own recipes (Fortress Heater Element, Crying Crucible), dropped the Fortress to Sparksteel-class heat and added Heat Core Maximum Temperature to the load-time recipe-gate check, replaced the Pick-Jaw's base-ore-destroying Output Amount drawback with increased Energy Usage, and buffed the Escapement, Witch-Bottle Pump, Echo Board, and Igloo Thermostat. Unique names and tooltips now use Path of Exile's unique colour.
 
 - 2026-10-10, later: pack Uniques. `config/rngtech/uniques/*.json` loads after the built-in catalog with the same validation, skipping bad files with a logged error; ids register under `rngtech` and clashes with RNGTech items are skipped; catalog files gained an optional format `version`. Added the pack-maker guide `extras/uniques/README.md`, covering sources, challenge tables, and new Uniques. A game-test server boot confirmed a pack file registers with its own config key and a clashing id is skipped without a crash.
+
+- 2026-10-26: removed the six machine-event challenge tables, their hooks in every machine and the Forestry Companion, `masteryLevelGained`, and `ChallengeLoot.reward` and `drop`. Machines roll no loot on their own events, so nothing drops on top of a machine. The `rngtech:challenge` type, `ChallengeContext`, and the conditions stay for Work Orders.
+
+- 2026-10-28: the Crying Crucible's less Stability drawback became (40–20)% less Overheat Tolerance. The Alloy Furnace never read Stability, so the old drawback did nothing; `UniqueStatReaders` no longer lists Stability for the Alloy Furnace, so the catalog rejects it there. Crucibles identified earlier load with the new line at its midpoint.
 
 ## Verification
 

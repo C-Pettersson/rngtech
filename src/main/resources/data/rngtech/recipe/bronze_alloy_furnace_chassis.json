@@ -14,7 +14,7 @@
   ],
   "key": {
     "B": {
-      "tag": "c:circuits/basic"
+      "tag": "rngtech:circuits/basic"
     },
     "C": {
       "item": "rngtech:bronze_casing"
@@ -26,7 +26,7 @@
       "item": "rngtech:bronze_heat_core"
     },
     "I": {
-      "tag": "c:ingots/bronze"
+      "tag": "rngtech:ingots/bronze"
     },
     "R": {
       "item": "minecraft:redstone"

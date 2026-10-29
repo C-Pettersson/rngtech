@@ -3,6 +3,7 @@ package com.rngtech.client.screen;
 import com.rngtech.content.blockentity.AlgaeCultureDynamics;
 import com.rngtech.content.blockentity.AlgaePhotobioreactorBlockEntity;
 import com.rngtech.content.menu.AlgaePhotobioreactorMenu;
+import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachineStat;
 
 import net.minecraft.ChatFormatting;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePhotobioreactorMenu> {
+public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePhotobioreactorMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -39,7 +40,7 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     private static final int PROGRESS_WIDTH = 58;
     private static final int PROGRESS_HEIGHT = 8;
     private static final int STATUS_X = 98;
-    private static final int STATUS_Y = 37;
+    private static final int STATUS_Y = 38;
     private static final int STATUS_SIZE = 12;
     private static final int LIGHT_X = 114;
     private static final int LIGHT_Y = 37;
@@ -59,8 +60,6 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     private static final int AERATION_POINTER = 0xFFF2F2F2;
     private static final int AERATION_COARSE_STEP = 5;
     private static final int AERATION_NOTCH_STEP = 10;
-    private static final int TAB_WIDTH = 54;
-    private static final int TAB_SPACING = 56;
     private static final int OUTPUT_X = 138;
     private static final int OUTPUT_Y = 65;
     private static final int UREA_X = 162;
@@ -78,18 +77,31 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     private static final String[] STAT_LABEL_KEYS = {"rngtech.stat.bio_conversion"};
     private static final int[] STAT_DATA_INDICES = {AlgaePhotobioreactorMenu.bioConversionDataIndex()};
 
+    private final MachineTabs tabs;
+
     public AlgaePhotobioreactorScreen(AlgaePhotobioreactorMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 240;
         imageHeight = 186;
         inventoryLabelX = 8;
         inventoryLabelY = 90;
+        tabs = MachineTabs.builder(this)
+                .processing(AlgaePhotobioreactorMenu.TAB_PROCESSING, ModBlocks.ALGAE_PHOTOBIOREACTOR.get())
+                .gear(AlgaePhotobioreactorMenu.TAB_GEAR)
+                .stats(AlgaePhotobioreactorMenu.TAB_STATS)
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
@@ -98,7 +110,7 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == AlgaePhotobioreactorMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
@@ -110,6 +122,7 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (menu.selectedTab() != AlgaePhotobioreactorMenu.TAB_STATS) {
             guiGraphics.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, TEXT, false);
         }
@@ -123,16 +136,9 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            if (isOverTab(mouseX, mouseY, 0)) {
-                menu.selectTab(AlgaePhotobioreactorMenu.TAB_PROCESSING);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 1)) {
-                menu.selectTab(AlgaePhotobioreactorMenu.TAB_GEAR);
-                return true;
-            }
-            if (isOverTab(mouseX, mouseY, 2)) {
-                menu.selectTab(AlgaePhotobioreactorMenu.TAB_STATS);
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                menu.selectTab(tab);
                 return true;
             }
             if (menu.selectedTab() == AlgaePhotobioreactorMenu.TAB_PROCESSING && handlePurgeButtonClick(mouseX, mouseY)) {
@@ -183,31 +189,6 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
         guiGraphics.fill(x, y, x + 1, y + imageHeight, PANEL_LIGHT);
         guiGraphics.fill(x + imageWidth - 1, y, x + imageWidth, y + imageHeight, PANEL_DARK);
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
-    }
-
-    private void renderTabs(GuiGraphics guiGraphics) {
-        renderTab(
-                guiGraphics,
-                0,
-                Component.translatable("rngtech.tab.processing.short"),
-                menu.selectedTab() == AlgaePhotobioreactorMenu.TAB_PROCESSING
-        );
-        renderTab(guiGraphics, 1, Component.translatable("rngtech.tab.gear"), menu.selectedTab() == AlgaePhotobioreactorMenu.TAB_GEAR);
-        renderTab(guiGraphics, 2, Component.translatable("rngtech.tab.stats"), menu.selectedTab() == AlgaePhotobioreactorMenu.TAB_STATS);
-    }
-
-    private void renderTab(GuiGraphics guiGraphics, int index, Component label, boolean selected) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        int color = selected ? PANEL : 0xFF9A9A9A;
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 21, color);
-        guiGraphics.fill(x, y, x + TAB_WIDTH, y + 1, PANEL_LIGHT);
-        guiGraphics.fill(x, y, x + 1, y + 21, PANEL_LIGHT);
-        guiGraphics.fill(x + TAB_WIDTH - 1, y, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        if (!selected) {
-            guiGraphics.fill(x, y + 20, x + TAB_WIDTH, y + 21, PANEL_DARK);
-        }
-        guiGraphics.drawString(font, label, x + (TAB_WIDTH - font.width(label)) / 2, y + 7, selected ? TEXT : 0xFF2F2F2F, false);
     }
 
     private void renderSlotFrames(GuiGraphics guiGraphics) {
@@ -623,11 +604,5 @@ public class AlgaePhotobioreactorScreen extends AbstractContainerScreen<AlgaePho
         guiGraphics.fill(left, top, left + 18, top + 18, 0xFF373737);
         guiGraphics.fill(left + 1, top + 1, left + 17, top + 17, 0xFFE0E0E0);
         guiGraphics.fill(left + 2, top + 2, left + 16, top + 16, 0xFF8B8B8B);
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int index) {
-        int x = leftPos + 8 + index * TAB_SPACING;
-        int y = topPos - 20;
-        return mouseX >= x && mouseX < x + TAB_WIDTH && mouseY >= y && mouseY < y + 21;
     }
 }

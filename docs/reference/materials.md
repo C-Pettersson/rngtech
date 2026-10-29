@@ -1,16 +1,16 @@
 # Materials List
 
-Status: Prototype
+Status: Implemented
 
 This page defines the material families and recipe forms used by advanced RNGTech machines, machine parts, battery systems, and refinement items.
 
-The material catalog, ore generation, alloying, and survival recipe chains are implemented prototypes. Broader component-upgrade and breakthrough systems remain planned. See [Current Implementation](current-implementation.md) for the feature inventory.
+The material catalog, ore generation, alloying, and survival recipe chains are implemented. Broader component-upgrade and breakthrough systems remain planned. See [Current Implementation](current-implementation.md) for the feature inventory.
 
 [Component Stages](component-stages.md) defines how material stages work. This page names the material families and crafting inputs used by those stages.
 
 ## Code-Backed Catalog
 
-Status: Prototype
+Status: Implemented
 
 The current implementation registers texture-backed RNGTech item ids for staged material family forms that RNGTech owns, plus generic recipe forms, RNGTech-owned non-stage materials, and RNGTech-owned ore block items. Vanilla-owned forms listed in the catalog's `vanilla_form_mappings` use Minecraft item ids in tags and recipes instead of duplicate RNGTech items. The material catalog source is `src/main/resources/data/rngtech/materials/catalog.json`; ore block and worldgen profiles are sourced from `src/main/resources/data/rngtech/materials/ore_catalog.json`.
 
@@ -51,7 +51,7 @@ Large-deposit packs can disable RNGTech placement by config or by overriding `da
 
 ## Current Recipe Baseline
 
-Status: Prototype
+Status: Implemented
 
 The current code-backed crafting recipes use a small vanilla material set. Furnace dust-to-ingot recipes exist for non-alloy staged material families and are gated by material enablement, component stage, and heat requirements. Non-alloy crushed materials can smelt directly to ingots at `600` ticks and `7,200 FE` so early Crusher-to-Furnace hopper automation works. Running crushed material through the Crusher again produces dust quickly and cheaply, making the Crusher-to-Crusher-to-Furnace chain the better energy and throughput option at `260` ticks and `6,000 FE` before machine modifiers. Ore-to-ingot and crushed-to-ingot recipes are not the alloy path.
 
@@ -61,7 +61,7 @@ The current code-backed crafting recipes use a small vanilla material set. Furna
 | Flint | Flint Crush Head, Wooden Crusher Chassis | Stage 0 crusher tooling and primitive body bracing. |
 | Iron ingot or nugget | Machine Frame, Crusher, Affix Forge, Iron Crush Head, Crude Energy Connector, Iron Battery Cell, Iron Battery Chassis, Forming Hammer, generic Casing, manual Iron Plate | Main early structural material. The base Machine Frame carries Stage 0-3 bodies and the Steel Metal Press body, while most other Steel-stage bodies move to the reinforced frame sink. |
 | Copper ingot, nugget, or block | Crusher, Furnace, Copper Energy Connector, Bus Bar, Energy Coil, Affix Forge, Affix Injector, Nullifier Coil, Copper Battery Cell, Copper Battery Chassis, manual Copper Plate | Main early energy and conductivity material. |
-| Bronze ingot tag | Bronze machine parts, manual Bronze Plate, manual Bronze Gear, Crude Press bootstrap, and Basic Circuit blanks | The early bootstrap crafts `3x c:ingots/copper`, `1x c:ingots/tin`, and `1x minecraft:charcoal` into `2` Bronze Ingots. The Alloy Furnace is the full-yield option, producing `4` Bronze Ingots from the same `3:1` Copper/Tin ratio plus Charcoal flux once Bronze Alloy Furnace gear is built. `c:ingots/bronze` remains the compatibility input where recipes need an ingot tag. |
+| Bronze ingot tag | Bronze machine parts, manual Bronze Plate, manual Bronze Gear, Crude Press bootstrap, and Basic Circuit blanks | The early bootstrap crafts `3x c:ingots/copper`, `1x c:ingots/tin`, and `1x minecraft:charcoal` into `2` Bronze Ingots. The Alloy Furnace is the full-yield option, producing `4` Bronze Ingots from the same `3:1` Copper/Tin ratio plus Charcoal flux once Bronze Alloy Furnace gear is built. RNGTech recipes take `rngtech:ingots/bronze`, which holds only RNGTech Bronze; `c:ingots/bronze` exports it. |
 | Redstone | Most machine and energy recipes, including Bus Bar and Energy Coil | Current control and energy-transfer ingredient. |
 | Smooth stone and vanilla Furnace | Machine Frame, Furnace, Crusher, Crusher Machine Chassis, generic Casing, solid fuel-burning generator chassis | Current machine body and vanilla bridge. Reinforced, Advanced, and Exotic Machine Frames build upward from later structural requirements instead of replacing early recipes. |
 | Coal | Solid fuel-burning generator chassis and Coal Dust | Coal can be crushed into `rngtech:coal_dust`, which combines with a water bucket to produce Carbon Exhaust Bucket for the Algae Photobioreactor. |
@@ -70,7 +70,7 @@ The current code-backed crafting recipes use a small vanilla material set. Furna
 | Emerald | Ascension Catalyst, Ascension Matrix, Conservation Crystal, Transmutation Crystal, Expansion Crystal, and Calibrated Diamond Crystal calibration catalyst | Current rarity, value, and tuning pressure. |
 | Calibrated Diamond Crystal | Tungstensteel and Nullite Stabilizer Matrix recipes | Stage 6 logic-family calibration output made from Diamond with an Emerald catalyst; used as the T7+ crystal gate. |
 | Gold ingot, diamond, and emerald | Ascension Matrix | Current rarity-ascension ingredients. |
-| Electric circuit tiers | Shared recipe components and machine costs | Prototype tier ladder from Basic through Ultimate; blanks are crafted from mineral insulation, alloy/conductive parts, redstone logic, and calibrated logic, then pressed with the Circuit Mold. Exposed through modern `c:circuits` tags. |
+| Electric circuit tiers | Shared recipe components and machine costs | Tier ladder from Basic through Ultimate; blanks are crafted from mineral insulation, alloy/conductive parts, redstone logic, and calibrated logic, then pressed with the Circuit Mold. RNGTech recipes take `rngtech:circuits/<tier>`; the circuits are also exposed through modern `c:circuits` tags. |
 | Logs, saplings, flowers, bone meal, and charcoal | Plant Reagent and Resin | Current vanilla-accessible organic path for organic reagents, Rubber, and lubricant tag inputs. The Electric Circuit chain does not depend on these materials. |
 
 The family ids below are registered. Their advanced behavior and most non-vanilla recipes remain design targets unless code or data recipes are added for them.
@@ -99,11 +99,12 @@ Use shared tags where possible:
 |---|---|
 | Ore | `c:ores/<material>` block and item tags |
 | Raw material | `c:raw_materials/<material>` |
-| Ingot | `c:ingots/<material>` |
+| Ingot | `c:ingots/<material>`; RNGTech recipes take alloy ingots through `rngtech:ingots/<alloy>` |
 | Storage block | `c:storage_blocks/<material>` |
 | Dust | `c:dusts/<material>` |
-| Nugget | `c:nuggets/<material>` |
-| Circuit | `c:circuits/<tier>` |
+| Nugget | `c:nuggets/<material>`; RNGTech recipes take alloy nuggets through `rngtech:nuggets/<alloy>` |
+| Plate, gear, rod | `c:plates/<material>`, `c:gears/<material>`, `c:rods/<material>` for export; RNGTech recipes take `rngtech:plates/<material>`, `rngtech:gears/<material>`, and `rngtech:rods/<material>` so other mods' parts do not skip the Metal Press |
+| Circuit | `c:circuits/<tier>` for export; RNGTech recipes take `rngtech:circuits/<tier>` so other mods' circuits do not skip the circuit chain |
 | Material family | `rngtech:materials/family/<material>` |
 | Material family group | `rngtech:materials/family/<group>` |
 | Exotic-stage recipe forms | `rngtech:materials/exotic/ingots`, `/plates`, `/gears`, `/rods`, and `/casings` |
@@ -180,7 +181,7 @@ RNGTech should remain playable with vanilla ingredients until optional compatibi
 
 ### Common Modded Compatibility
 
-Advanced recipes should prefer optional `c:` tags for common modded metals instead of hard dependencies.
+Advanced recipes should prefer optional `c:` tags for common modded metals instead of hard dependencies. Items RNGTech makes in a gated machine, the alloys and every plate, gear, and rod, are the exception: recipes take them through `rngtech:` tags that hold only RNGTech's item, so other mods' versions do not skip that machine. Mined metals such as Titanium stay on `c:` tags; ore hardness is their gate.
 
 | Role | Suggested Tags |
 |---|---|

@@ -1,9 +1,11 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.PotentialReactorBlock;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.PotentialReactorPartItem;
+import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.menu.PotentialReactorMenu;
 import com.rngtech.content.recipe.PotentialReactorRecipe;
 import com.rngtech.content.recycling.RecyclingData;
@@ -101,6 +103,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
     private static final int DATA_BASE_ENERGY_GENERATION = 17;
     private static final int DATA_REPEAT_PAYOUT = 18;
     private static final int DATA_BURN_HISTORY = 19;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = DATA_BURN_HISTORY + PotentialReactorBlockEntity.BURN_MEMORY;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
 
@@ -185,6 +188,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
                 case DATA_STABILITY -> scaledStat(stats, MachineStat.STABILITY);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
                 case DATA_REPEAT_PAYOUT -> repeatPayoutPercent();
+                case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(refinementComponentStage());
                 default -> index >= DATA_BURN_HISTORY ? burnHistoryItemId(index - DATA_BURN_HISTORY) : 0;
             };
         }
@@ -195,7 +199,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
 
         @Override
         public int getCount() {
-            return DATA_BURN_HISTORY + BURN_MEMORY;
+            return DATA_PACK_GENERATION_MULTIPLIER + 1;
         }
     };
 
@@ -641,7 +645,8 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
         double efficiency = Math.max(0.1, stats.value(MachineStat.EFFICIENCY));
         double stability = Mth.clamp(stats.value(MachineStat.STABILITY), 0.25, 1.50);
         int ticks = stats.adjustedProcessingTicks(work.processingTicks());
-        return Math.max(1.0, stats.generatedEnergyTotal(work.energy(), ticks) * efficiency * stability);
+        return Math.max(1.0, RNGTechConfig.generatedEnergy(stats.generatedEnergyTotal(work.energy(), ticks) * efficiency * stability,
+                refinementComponentStage()));
     }
 
     /** How many times an energy export looked a neighbour up instead of reusing its cached capability. */

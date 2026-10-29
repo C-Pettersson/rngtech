@@ -12,7 +12,7 @@ Use this page to fit RNGTech into your modpack. It lists the energy and water nu
     - **Energy** is plain FE. At each stage, one main generator powers about one typical machine.
     - **Ore to ingots** costs about 9,000 FE per ingot at Stage 1 and about 70,000 at Stage 8.
     - **Water is finite** in RNGTech's balance. The mod still accepts infinite water, so turn it off in your pack.
-    - **Uniques:** you can move them to quests or machine challenges and add your own. See [Uniques](#uniques).
+    - **Uniques:** you can move them to quests and add your own. See [Uniques](#uniques).
     - **Ore progression:** ore hardness covers other mods' ores, and you can weaken or disable vanilla tools. See [Strict preset](#strict-preset).
     - **Settings** live in `config/rngtech-common.toml`. You change recipes with an ordinary datapack.
 
@@ -74,12 +74,30 @@ Each row crushes ore down to dust in two steps and smelts the dust, with a Crush
 
 ### Scaling energy
 
-RNGTech has no global FE multiplier. To scale the whole mod, multiply generator and machine recipes by the same factor so the stages stay in step.
+`energy.generationMultiplier` (default 1.0) multiplies the FE that every RNGTech generator makes. Fuels burn for the same time, so FE per item changes by the same factor. Use it to match another energy mod in your pack.
+
+`energy.stageGenerationMultiplier.stage1` to `stage8` (default 1.0 each) multiply the FE of the generators of one stage. They apply together with the global multiplier, so a 2.0 global multiplier and a 1.5 Stage 6 multiplier give a Stage 6 generator 3 times its FE. Use them when another mod's power is close to RNGTech's early generators but far ahead of its late ones.
+
+A generator's stage comes from the part that sets its output:
+
+| Generator | Stage |
+|---|---|
+| [Solid Fuel Burner](solid-fuel-burner.md) | Its Heat Core. An Iron Heat Core is Stage 1 and a Steel Heat Core is Stage 4. |
+| [Vacuum Collapse Generator](vacuum-collapse-generator.md) | Its Collapse Nozzle. |
+| [Cavitation Generator](cavitation-generator.md) | Its rotor. |
+| [Solar Panel](solar-panel.md) and Solar Array Controller | Each panel's own stage. |
+| Every other generator | The stage the machine shows, such as 5 for the [Syngas Combustor](syngas-combustor.md) and 6 for the [Fuel Cell](ammonia-fuel-cell.md). |
+
+Players see the result on each generator's Stats tab. The Energy Generation row shows the FE/t after both multipliers, and its hover lists them together as **Pack setting**.
+
+RNGTech has no multiplier for machine FE costs. To make the whole mod cheaper or more expensive, change the machine recipes too, so the stages stay in step.
 
 | You want to change | How |
 |---|---|
 | FE cost of a machine recipe | Override the recipe in a datapack and change `energy` (total FE per craft) or `processing_ticks`. |
-| FE output of a fuel generator | Override its recipe and change `energy`: `gas_combustion` (Syngas), `ammonia_power_cycle` (Ammonia and Hydrogen in the Fuel Cell), `vacuum_collapse`, `cavitation`, `corrosion_cell`, `potential_reactor`. |
+| FE output of all RNGTech generators | `energy.generationMultiplier`. It also changes Solid Fuel Burner FE per item, Solar Panel FE/t, and Bio Generator FE per item. |
+| FE output of one stage's generators | `energy.stageGenerationMultiplier.stage1` to `stage8`. |
+| FE output of one fuel generator | Override its recipe and change `energy`: `gas_combustion` (Syngas), `ammonia_power_cycle` (Ammonia and Hydrogen in the Fuel Cell), `vacuum_collapse`, `cavitation`, `corrosion_cell`, `potential_reactor`. |
 | Solid Fuel Burner FE per item | Each fuel gives 10 FE per burn tick (Coal: 16,000 FE). Change the burn time in NeoForge's `furnace_fuels` data map. This also changes vanilla furnaces. |
 | Other mods' fuels in the Solid Fuel Burner | Add the item to a tier tag `rngtech:solid_fuel/tier_1` to `tier_4`, plus `rngtech:solid_fuel/item_fuels` or `block_fuels`. |
 | Bio Generator fuels | Add the item to a `rngtech:bio_generator/*` tag. It gives that category's fixed FE, such as `potato_fuels` (120 FE). |
@@ -87,7 +105,7 @@ RNGTech has no global FE multiplier. To scale the whole mod, multiply generator 
 | Resonance Calibrator cost | `calibration.energyMultiplier` and `calibration.timeMultiplier`. |
 | Solar in other dimensions | `solar.dimensions.overworld`, `nether`, `end`, `other`. The Overworld is the default. |
 
-You cannot change these without code: connector caps, Battery Cell sizes, Heat Core FE/t, Solar Panel FE/t, and Bio Generator FE per category.
+You cannot change these one at a time without code: connector caps, Battery Cell sizes, Heat Core FE/t, Solar Panel FE/t, and Bio Generator FE per category.
 
 !!! warning "Recipe gotchas"
     - If `energy` holds an invalid value, such as `0` or a negative number, most recipe types fall back to their default without an error. RNGTech ignores misspelled fields. Check the value in JEI after `/reload`.
@@ -140,7 +158,7 @@ By default, Uniques drop from vanilla structures and mobs. The [Uniques](uniques
 
 - **Turn off default drops:** `uniques.loot.enabled`, or one Unique with `uniques.loot.<id>.enabled`.
 - **Give one:** `/rngtech unique give <players> <id>`, or use the item as a quest reward. Each player rolls their own copy when they identify it.
-- **Machine challenges:** RNGTech rolls a loot table on machine events, such as a Crusher jam or a finished calibration. By default the tables drop only Glyphs for the Phase Array, behind Mastery milestones, high-stability calibrations, Stage 7+ forestry heads, unstable Vacuum Collapse cycles, and high-level Crusher jams. Replace or extend them to reward players your own way. `/rngtech glyph give <players> <tier>` hands out a Glyph of tier 1 to 5.
+- **Give a Glyph:** `/rngtech glyph give <players> <tier>` gives a Glyph of tier 1 to 5. Machines do not drop loot on their own events, so quests are the way to reward machine play.
 - **Add your own Uniques:** put a JSON file in `config/rngtech/uniques/`.
 
 The [Uniques guide for pack makers](https://github.com/c-pettersson/rngtech/blob/main/extras/uniques/README.md) covers the file format and rules.
@@ -169,7 +187,10 @@ These live in `config/rngtech-common.toml`.
 | `materials.<material>` | on | Turn off to stop the material's recipes loading. Its items show as disabled. |
 | `worldgen.ores.enabled` | on | RNGTech ore generation in new chunks. |
 | `worldgen.ores.<material>.enabled` | on | One ore's generation. |
-| `worldgen.ores.vanillaToolBridgePolicy` | `EARLY_BRIDGE` | How far tools other than Modular tools reach on ore hardness. See [Tool reach](#tool-reach). |
+| `worldgen.ores.vanillaToolBridgePolicy` | `TIER_LADDER` | How far tools other than Modular tools reach on ore hardness. See [Tool reach](#tool-reach). |
+| `worldgen.ores.commonOreTagHardness` | off | Turn on to give other mods' ores their metal's hardness. See [Ore hardness](#ore-hardness). |
+| `energy.generationMultiplier` | 1.0 | Multiplies the FE of every RNGTech generator. See [Scaling energy](#scaling-energy). |
+| `energy.stageGenerationMultiplier.stage1` to `stage8` | 1.0 | Multiplies the FE of one stage's generators, together with the global multiplier. See [Scaling energy](#scaling-energy). |
 | `restrictedTools.mode` | `NORMAL` | `WEAKENED` or `USELESS` vanilla tools. See [Restricted tools](#restricted-tools). |
 | `restrictedTools.weakenedSpeedMultiplier` | 0.25 | Mining speed of restricted tools in `WEAKENED` mode. |
 | `restrictedTools.vanillaRecipesEnabled` | on | Turn off to remove the stone to netherite pickaxe, axe, and shovel recipes. |
@@ -193,7 +214,7 @@ Players move through RNGTech's stages by mining harder ores with better [Modular
 
 Each metal has an ore hardness from 1 to 8: 1 for Iron and Copper, 2 for Gold, Tin, and Zinc, and up to 8 for Naquadah. The [Ore hardness](modular-tools.md#ore-hardness) table lists which tool heads reach each level.
 
-- **Other mods' ores** of the same metal get the same hardness. The block tags `rngtech:ore_hardness/level_1` to `level_8` include each metal's common tag, such as `c:ores/tin`. This also gates Nether Gold Ore, which is in `c:ores/gold`.
+- **Other mods' ores** have no hardness by default, so other mods' pickaxes still mine them. Set `worldgen.ores.commonOreTagHardness` to on to give them their metal's hardness. The block tags `rngtech:ore_hardness/common/level_1` to `level_8` hold each metal's common tag, such as `c:ores/tin`, and count only when the setting is on.
 - **Add an ore** RNGTech doesn't know, such as Diamond Ore, by adding it to a level tag.
 - **Raise an ore** by adding it to a higher level tag. An ore in several level tags uses the highest one.
 - **Lower an ore** by overriding its level tag with `"replace": true`, leaving the ore out, then adding it to the lower tag.
@@ -209,8 +230,9 @@ Modular tools reach their head's hardness. Every other item reaches as far as `w
 |---|---:|---:|---:|---:|
 | `MODULAR_ONLY` | none | none | none | none |
 | `BOOTSTRAP_ONLY` | 1 | 1 | 1 | 1 |
-| `EARLY_BRIDGE` (default) | 1 | 2 | 2 | 2 |
+| `EARLY_BRIDGE` | 1 | 2 | 2 | 2 |
 | `VANILLA_TIER_MAPPING` | 1 | 2 | 4 | 5 |
+| `TIER_LADDER` (default) | 1 | 3 | 6 | 8 |
 
 Wooden and golden pickaxes, axes, and shovels reach no ore hardness. Only the Netherite Pickaxe counts as netherite tier, because vanilla has no block that needs one. Give another mod's tool its own reach in the `rngtech:ore_reach` item data map, at `data/rngtech/data_maps/item/ore_reach.json` in your datapack. A listed item ignores the policy:
 
@@ -244,6 +266,7 @@ For a pack where RNGTech's Modular tools are the only way to mine, put this in `
 ```toml
 [worldgen.ores]
     vanillaToolBridgePolicy = "MODULAR_ONLY"
+    commonOreTagHardness = true
 
 [restrictedTools]
     mode = "USELESS"
@@ -251,6 +274,62 @@ For a pack where RNGTech's Modular tools are the only way to mine, put this in `
 ```
 
 Then add other mods' mining tools to `rngtech:restricted_tools`, or give them a level in `rngtech:ore_reach`, and gate other mods' block-breaking machines.
+
+## Work Orders
+
+[Work Orders](work-orders.md) are jobs on Job Chips (`rngtech:job_chip`). A Dispatch Terminal lists the jobs, and machines run them. Jobs are data, so a pack can add its own, hand them out through quests, and change what they pay.
+
+- **Recipes:** `workOrders.recipesEnabled` (on) loads the Dispatch Terminal and Requisition recipes. Both recipes have the `rngtech:work_order_recipes_enabled` recipe condition. To give these items through quests or your own recipes, set the key to off.
+- **Random jobs:** `workOrders.randomOrdersEnabled` (on) lets the terminal roll jobs from the objectives. When it is off, the terminal lists only your pooled templates. With no pooled templates, the terminal lists nothing.
+- **Give a chip:** `/rngtech work_order give <players> random [tier]` rolls a job the way the terminal does. Without a tier, the tier is random. `/rngtech work_order give <players> template <template> [tier]` gives a template's job. The tier applies only if the template sets none.
+
+### Job templates
+
+A template is a fixed job in `data/<namespace>/work_orders/templates/<name>.json`. All keys except `objective` are optional. Keys you leave out roll as they would for a random job:
+
+```json
+{
+    "objective": "rngtech:furnace_items",
+    "family": "furnace",
+    "tier": 3,
+    "min_stage": 6,
+    "min_mastery_level": 40,
+    "rarity": "magic",
+    "bounty": 150,
+    "prestige": 1,
+    "name": "mypack.work_order.foundry_contract",
+    "rewards": [{"item": "rngtech:chaos_crystal", "count": 6}],
+    "reward_table": "mypack:work_orders/foundry",
+    "weight": 4
+}
+```
+
+- `objective` is the id of a loaded objective, or an inline objective. An inline objective is `{"type": "smelt", "parts": [...]}` with one to three parts. Each part is `{"filter": "any" | "stage" | "setting" | "item" | "group" | "streak" | "stat", "min": n, "item": id, "group": name, "stat": name, "count": n | {"min": a, "max": b, "step": s}}`. A stat part takes `target` in place of `count`. Inline parts need a `family`.
+- Families are `crusher`, `furnace`, `alloy_furnace`, `metal_press`, `melter`, `resonance_calibrator`, `forestry`, `component_assembler`, and `component_recycler`. Job types are `crush`, `smelt`, `alloy`, `press`, `melt`, `calibrate`, `harvest`, `assemble`, and `recycle`.
+- Without `min_stage`, the job needs the tier's stage, capped at the family's top stage. `bounty` is a percentage, 100 at base. `prestige` and `min_mastery_level` are 0 by default.
+- `rarity` (`normal`, `magic`, or `rare`) fixes how many conditions roll. The conditions themselves always roll.
+- `name` is a translation key or plain text. The chip reads "Name (Job Chip III)".
+- Fixed `rewards` are paid exactly as written. Bounty does not scale them. Without `rewards`, the reward rolls from `reward_table`. Without `reward_table`, it rolls from `rngtech:challenges/work_order`.
+- `weight` adds the template to the terminal's listings, on the same scale as objective weights. Without `weight`, the template is quest-only.
+
+The game checks each template when it loads and logs an error for any it rejects. `/rngtech work_order give` suggests the loaded templates. For a quest, use the give command, or an item reward with the components copied from a given chip.
+
+### Objectives and rewards
+
+Random jobs come from `data/rngtech/work_orders/objectives/`. Each file has a `family`, a `type`, a `filter`, a `weight`, and a goal per tier. For `any`, `stage`, and `setting` parts of recipe machines, a count is in items of work: each finished item counts as its recipe's `processing_ticks` over the machine's reference time (Crusher 120, Furnace 200, Alloy Furnace 600 per output item, Metal Press 240, Resonance Calibrator 300, Component Assembler 240, Component Recycler 144). Other parts, and the Melter and Forestry Companion, count items or mB. A goal is a count or a stat target, fixed or `min`/`max`/`step`. Item and group objectives list `options` instead. Override a file to retune it. A file that fails to load is skipped, with an error in the log.
+
+The reward table `rngtech:challenges/work_order` is a loot table with one pool and one roll, so each job pays one kind of reward. It can use:
+
+- `rngtech:set_order_count` sets an entry's count per tier (`"counts": [t1, t2, t3, t4, t5]`).
+- `rngtech:set_order_tier` sets a Glyph's tier to the job's tier, plus an optional `offset`.
+- The conditions `rngtech:order_tier` and `rngtech:order_prestige` take an inclusive `min` and `max`.
+- `rngtech:machine_family` takes a `family`, such as `melter`, and passes only for that machine's jobs.
+
+When the terminal lists the job, Bounty multiplies the rolled count. A Unique or a Mirror Catalyst always pays one.
+
+The Unique reward is three entries in `rngtech:challenges/work_order`, one per Prestige band. Each nests the table `rngtech:work_orders/unique_reward`, which picks the Unique. Change the band weights to make Uniques more or less common. Change the nested table to change which Uniques drop, or how strongly they favour the job's machine.
+
+The Mirror Catalyst has no recipe and no config key. Its only source is three entries in `rngtech:challenges/work_order`, one per Prestige band, for Tier IV and V jobs. Remove those entries to remove the Mirror Catalyst from your pack, or change their weights to change how often it drops.
 
 ## Phase Array
 
@@ -272,20 +351,45 @@ The line's own numbers live under `phaseArray.*` in `config/rngtech-common.toml`
 
 Refinement Potential is shared with the Affix Forge: a Stage 8 part rolls 22 to 32 at craft, `calibration.refinementPotentialBonus` shifts every roll, and each operation's `refinement_potential_cost` is in its recipe.
 
-Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` component, 1 to 5; a stack without it counts as Tier I, so `/give @p rngtech:glyph[rngtech:glyph_tier=3]` or a quest reward works. By default they drop from the six machine-challenge loot tables and from woken Dormant Machines; Tier V has no default source. Replace the tables to change that, or hand Glyphs out through quests.
+Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` component, 1 to 5; a stack without it counts as Tier I, so `/give @p rngtech:glyph[rngtech:glyph_tier=3]` or a quest reward works. By default they come from Work Order rewards, the only default source of Tier V, and from woken Dormant Machines. Machines roll no loot on their own events. Change the Work Order reward table to change what jobs pay, or hand Glyphs out through quests.
 
 ## Compatibility
 
-- **Other mods' metals:** RNGTech recipes use common tags such as `c:ingots/tin` and `c:ores/tin`, so other mods' tin works in them. Their ores share RNGTech's [ore hardness](#ore-hardness).
+- **Other mods' metals:** RNGTech recipes use common tags such as `c:ingots/tin` and `c:ores/tin`, so other mods' tin works in them. Their ores get RNGTech's [ore hardness](#ore-hardness) only when you turn it on.
+- **RNGTech-made items:** RNGTech puts its alloys, plates, gears, rods, and circuits in the common `c:` tags, so other mods' recipes can use them. RNGTech recipes ask for `rngtech:` tags that hold only RNGTech's items, so other mods' items do not skip RNGTech's machines. See [Shared tags](#shared-tags).
 - **AE2 and Refined Storage:** Universal Cables can link their networks.
 - **JEI and Jade** show RNGTech recipes and machine state.
 - **FTB Quests:** the repository has a ready-made quest line in [extras/ftbquests](https://github.com/c-pettersson/rngtech/tree/main/extras/ftbquests). Copy its `config/ftbquests` into your pack.
+
+### Shared tags
+
+| RNGTech items | Common tags RNGTech adds them to | RNGTech recipes ask for |
+|---|---|---|
+| Ingots, nuggets, dusts, ores, and raw metal of mined metals, such as Tin and Titanium | `c:ingots/tin`, `c:nuggets/tin`, `c:ores/tin`, and the other common tags | The same `c:` tags |
+| Bronze, Steel, Invar, Sparksteel, Arclite, Tungstensteel, Nullite, and Aethergold ingots and nuggets | `c:ingots/steel`, `c:nuggets/steel` | `rngtech:ingots/steel`, `rngtech:nuggets/steel` |
+| Plates, gears, and rods of every metal | `c:plates/steel`, `c:gears/steel`, `c:rods/steel`, plus `c:plates`, `c:gears`, and `c:rods` | `rngtech:plates/steel`, `rngtech:gears/steel`, `rngtech:rods/steel` |
+| Electric Circuits | `c:circuits/basic` to `ultimate`, plus `c:circuits` | `rngtech:circuits/basic` to `ultimate` |
+
+Each `rngtech:` tag holds only RNGTech's item. Thus another mod's steel or plates do not skip the Alloy Furnace or the Metal Press. To let RNGTech recipes take another mod's item, add that item or its common tag to the `rngtech:` tag. For example, put this in `data/rngtech/tags/item/ingots/steel.json` in a datapack:
+
+```json
+{
+  "values": ["#c:ingots/steel"]
+}
+```
+
+!!! note "AlmostUnified"
+    RNGTech has an AlmostUnified plugin. AlmostUnified still unifies the inputs of RNGTech recipes and their mined-metal outputs. The plugin keeps RNGTech's own alloys, plates, gears, and rods in RNGTech recipe outputs, so RNGTech recipes can always use what RNGTech makes. AlmostUnified hides these items in JEI and EMI, because they are not its chosen items. To show them, add them to `ignored_items` in its unification config.
+
+!!! note "Packs made for 2.0.0-alpha.3"
+    Older builds took other mods' alloys through `c:ingots/<alloy>` and `c:nuggets/<alloy>`. If your pack relies on another mod's Steel, Bronze, or Invar in RNGTech recipes, add it to `rngtech:ingots/<alloy>` as above. Older builds did not tag RNGTech plates, gears, and rods under `c:`. AlmostUnified now unifies them in other mods' recipes.
 
 ## See also
 
 - [Getting Started](getting-started.md)
 - [Stages](stages.md)
 - [Uniques](uniques.md)
+- [Work Orders](work-orders.md)
 - [Universal Cable](universal-cable.md)
 
 {{ navbox() }}

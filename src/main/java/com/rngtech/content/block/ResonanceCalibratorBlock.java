@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class ResonanceCalibratorBlock extends BaseMachineBlock {
+public class ResonanceCalibratorBlock extends WorkOrderMachineBlock {
     private final ResonanceCalibratorChassis chassis;
 
     public ResonanceCalibratorBlock(ResonanceCalibratorChassis chassis, Properties properties) {

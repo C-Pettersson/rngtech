@@ -2,13 +2,13 @@
 navigation:
   title: "Modifier lenses"
   parent: affix-forge.md
-  position: 3
+  position: 4
   icon: rngtech:affix_forge
 ---
 
 # Modifier lenses
 
-With an Affix Lens Array installed, a lens in the focus slot makes affixes from its family three times as likely to be picked. Lenses work with every catalyst except the Volatile Catalyst:
+With an Affix Lens Array installed, a lens in the focus slot makes affixes from its family three times as likely to be picked. Lenses work with every catalyst except the Volatile Catalyst and the Mirror Catalyst:
 
 - the Affix Injector, Expansion Crystal, Ascension Catalyst, and Ascension Matrix favor the lens's family when they add affixes;
 - the Affix Upgrader, Greater Affix Upgrader, and Ascension Matrix favor it when they choose the affix to upgrade;

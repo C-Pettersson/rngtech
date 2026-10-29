@@ -252,7 +252,7 @@ Frames are plain crafting ingredients: they have no stats or affixes, and a fram
 
 {{ crafting("rngtech:machine_frame", "rngtech:reinforced_machine_frame", "rngtech:advanced_machine_frame", "rngtech:exotic_machine_frame") }}
 
-The Washer Machine Chassis can be crafted from a Machine Frame, but no recipe or machine uses it, so don't spend a frame on it.
+You can no longer craft the Washer Machine Chassis. No machine uses it. Put an old Washer Machine Chassis in a crafting grid to get its Machine Frame back.
 
 ## Stage and rolls
 

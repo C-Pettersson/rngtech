@@ -1,0 +1,69 @@
+{
+    "family": "metal_press",
+    "type": "press",
+    "filter": "group",
+    "weight": 3,
+    "parts": {
+        "min": 1,
+        "max": 2
+    },
+    "options": [
+        {
+            "item": "plate",
+            "stage": 1,
+            "weight": 3
+        },
+        {
+            "item": "gear",
+            "stage": 1,
+            "weight": 3
+        },
+        {
+            "item": "casing",
+            "stage": 1,
+            "weight": 2
+        },
+        {
+            "item": "connector",
+            "stage": 1,
+            "weight": 2
+        }
+    ],
+    "tiers": [
+        {
+            "count": {
+                "min": 80,
+                "max": 120,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 96,
+                "max": 144,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 112,
+                "max": 168,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 128,
+                "max": 192,
+                "step": 8
+            }
+        },
+        {
+            "count": {
+                "min": 144,
+                "max": 216,
+                "step": 8
+            }
+        }
+    ]
+}

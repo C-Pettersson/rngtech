@@ -9,7 +9,7 @@
     "key": {
         "G": {
             "ingredient": {
-                "item": "rngtech:steel_gear"
+                "tag": "rngtech:gears/steel"
             }
         },
         "H": {

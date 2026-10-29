@@ -23,6 +23,9 @@ These named affix definitions have `CAN_ROLL` and can be selected by normal roll
 | Overclocked | Suffix | `INCREASED_PERCENT PROCESSING_SPEED` plus `INCREASED_PERCENT ENERGY_USAGE` | Powered-processing hybrid. Tier 4 caps at `+30%` speed and `+20%` energy usage. |
 | Instant Process | Suffix | `ADD INSTANT_PROCESS_CHANCE` | Chance for eligible processing to complete instantly if the machine can pay the full up-front cost. |
 | Super Output | Suffix | `ADD SUPER_OUTPUT_CHANCE` | Chance for item-output processors to add one extra copy of the base stackable output. |
+| Fluid capacity | Prefix or suffix | `ADD FLUID_CAPACITY` prefix or `INCREASED_PERCENT FLUID_CAPACITY` suffix | Fluid Pump and the fluid processors and generators. One stat sizes all of a machine's tanks and never shrinks one below its base. Fluid and Compressor Tanks keep authored capacity. |
+| Twinned | Prefix | `ADD BATCH_SIZE` | Rare (`15`) prefix on batching machines other than the Crusher, in Crusher Throughput's `dense_parallel` group. `+1` at Tier 1-3, `+2` at Tier 4-6, `+3` at Tier 7. |
+| Studious | Suffix | `INCREASED_PERCENT MASTERY_XP_GAIN` | Mastery machines and their Gear, weight `50`. Machine-wide even on a part, like the attribute suffixes. |
 | Fuel duration | Suffix | `INCREASED_PERCENT FUEL_DURATION` | Extends generator burn ticks for eligible fuel-burning generators and parts without increasing FE/t. |
 | Crush Head Pulverizing | Prefix | `INCREASED_PERCENT OUTPUT_AMOUNT` plus `DECREASED_PERCENT PROCESSING_SPEED` | Tiered Crush Head prefix using Coarse, Grinding, Pulverizing, and Micronizing display names. |
 | Crush Head Jagged | Prefix | `ADD CRUSHER_SALVAGE_CHANCE` | Tiered Crush Head prefix using Nicked, Jagged, Serrated, and Rending display names. |
@@ -69,8 +72,8 @@ Named behavioral modifiers are documented as pages once they become concrete des
 | Batch Start | Planned | Eligibility matrix only |
 | Bulk Speed | Implemented | [Bulk Speed](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#bulk-speed) |
 | Catalyst Saver | Deferred | Eligibility matrix only |
-| Energy category modifiers | Prototype | See code-backed stat modifiers above |
-| Fuel Governor | Prototype fixed behavior; rolled named modifier planned | [Fuel Governor](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#fuel-governor) |
+| Energy category modifiers | Implemented | See code-backed stat modifiers above |
+| Fuel Governor | Implemented fixed behavior; rolled named modifier planned | [Fuel Governor](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#fuel-governor) |
 | Fuel Reserve | Planned | Eligibility matrix only |
 | Graceful Progress | Planned | Eligibility matrix only |
 | Input Filter | Planned | Eligibility matrix only |

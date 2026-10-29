@@ -45,7 +45,8 @@ public class AmmoniaFuelCellMenu extends AbstractContainerMenu implements StatBr
     private static final int DATA_FLAT_ENERGY_GENERATION = 13;
     private static final int DATA_BASE_ENERGY_GENERATION = 14;
     private static final int DATA_FUEL_HYDROGEN = 15;
-    private static final int DATA_COUNT = 16;
+    private static final int DATA_PACK_GENERATION_MULTIPLIER = 16;
+    private static final int DATA_COUNT = 17;
     private static final int STAT_SCALE = 100;
     private static final int RESIDUE_SLOT = 0;
     private static final int MEMBRANE_SLOT = 1;
@@ -299,5 +300,10 @@ public class AmmoniaFuelCellMenu extends AbstractContainerMenu implements StatBr
         public boolean isActive() {
             return activeSupplier.getAsBoolean();
         }
+    }
+
+    /** The pack's config multiplier on this generator's FE, global times stage. */
+    public double packGenerationMultiplier() {
+        return GenerationMenuSupport.packMultiplier(data.get(DATA_PACK_GENERATION_MULTIPLIER));
     }
 }
