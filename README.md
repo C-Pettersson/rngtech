@@ -13,6 +13,7 @@
     <img src="https://img.shields.io/badge/Minecraft-1.21.1-62b47a" alt="Minecraft 1.21.1">
     <img src="https://img.shields.io/badge/NeoForge-21.1.228%2B-d7742f" alt="NeoForge 21.1.228+">
     <a href="https://c-pettersson.github.io/rngtech/"><img src="https://img.shields.io/badge/wiki-player%20guide-4a7bd0" alt="Player wiki"></a>
+    <a href="https://discord.gg/unTDRhD8PM"><img src="https://img.shields.io/badge/Discord-join-5865f2?logo=discord&logoColor=white" alt="Discord"></a>
     <a href="https://github.com/C-Pettersson/rngtech/actions/workflows/build.yml"><img src="https://github.com/C-Pettersson/rngtech/actions/workflows/build.yml/badge.svg?branch=main" alt="Build"></a>
 </p>
 
@@ -50,6 +51,7 @@ RNGTech is in active development. Back up your worlds before updating.
 ## Links
 
 - [Player wiki](https://c-pettersson.github.io/rngtech/)
+- [Discord](https://discord.gg/unTDRhD8PM) for questions, suggestions, and showing off builds
 - [Bug reports and support](SUPPORT.md)
 - [Contributing](CONTRIBUTING.md), including building from source
 - [Design documentation](docs/index.md)

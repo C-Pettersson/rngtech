@@ -6,4 +6,6 @@ New to the mod? Start with [Getting Started](getting-started.md), then read the 
 
 Building a modpack? See [Modpack Creators](modpack-creators.md) for the energy and water balance and the settings you can change.
 
+Have a question? Ask in the [RNGTech Discord](https://discord.gg/unTDRhD8PM).
+
 {{ gallery() }}

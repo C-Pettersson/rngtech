@@ -16,6 +16,12 @@ validation:
 hooks:
   - tools/rngwiki/hook.py
 
+extra:
+  social:
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/unTDRhD8PM
+      name: RNGTech Discord
+
 extra_css:
   - assets/wiki.css
 
