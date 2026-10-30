@@ -49,7 +49,7 @@ To publish a prepared release:
 npm run release -- patch
 ```
 
-This updates `mod_version`, runs `quickCheck`, commits the version change, creates a `vX.Y.Z` tag, and pushes it. Run the full verification above before this command. The tag workflow builds the JAR, packages the optional quest ZIP, creates a GitHub Release, and publishes to GitHub Packages. A hyphenated version becomes a GitHub prerelease.
+This updates `mod_version`, runs `quickCheck`, commits the version change, creates a `vX.Y.Z` tag, and pushes it. Run the full verification above before this command. The tag workflow builds the JAR, packages the optional quest ZIP and the pack-kits ZIP, and creates a GitHub Release with all three attached. A hyphenated version becomes a GitHub prerelease.
 
 Normal changes go through pull requests with passing CI and resolved review conversations. The repository administrator can bypass the pull-request rules for the release command's version commit. Keep that bypass limited to reviewed releases or recovery; it is not a substitute for the verification above. The separate rules against deleting or force-pushing `main` apply to administrators too.
 

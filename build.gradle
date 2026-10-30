@@ -334,9 +334,6 @@ tasks.withType(ProcessResources).configureEach {
     }
 }
 
-// GitHub Packages rejects an owner with uppercase letters (HTTP 422), and this repository's owner has them.
-def githubRepository = System.getenv('GITHUB_REPOSITORY')?.toLowerCase(Locale.ROOT)
-
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
@@ -348,16 +345,6 @@ publishing {
         maven {
             name = 'local'
             url = uri(layout.buildDirectory.dir('repo'))
-        }
-        if (githubRepository) {
-            maven {
-                name = 'GitHubPackages'
-                url = uri("https://maven.pkg.github.com/${githubRepository}")
-                credentials {
-                    username = System.getenv('GITHUB_ACTOR')
-                    password = System.getenv('GITHUB_TOKEN')
-                }
-            }
         }
     }
 }
