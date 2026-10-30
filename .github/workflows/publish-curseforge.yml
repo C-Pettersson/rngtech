@@ -39,6 +39,11 @@ on:
         required: true
         default: true
         type: boolean
+      upload_pack_kits_extra:
+        description: 'Upload extras/packs, extras/ftbquests, and extras/uniques as an additional pack-kits child file.'
+        required: true
+        default: true
+        type: boolean
       announce_discord:
         description: 'Post the release to the Discord announcement channel. Skipped when the file is marked for manual release.'
         required: true
@@ -180,6 +185,28 @@ jobs:
 
           echo "zip=$EXTRA" >> "$GITHUB_OUTPUT"
 
+      - name: Package optional pack kits extra
+        id: packkits
+        if: ${{ inputs.upload_pack_kits_extra }}
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          EXTRA="build/distributions/rngtech-pack-kits-${VERSION}.zip"
+          for DIR in extras/packs extras/ftbquests/config extras/uniques; do
+            if [[ ! -d "$DIR" ]]; then
+              echo "Expected $DIR to exist before packaging the pack kits extra." >&2
+              exit 1
+            fi
+          done
+
+          mkdir -p build/distributions
+          jar --create --no-manifest --file "$EXTRA" -C extras packs -C extras ftbquests -C extras uniques
+
+          echo "zip=$EXTRA" >> "$GITHUB_OUTPUT"
+
       - name: Upload mod jar to CurseForge
         id: main_upload
         env:
@@ -316,6 +343,69 @@ jobs:
 
           FILE_ID="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["id"])' "$RESPONSE")"
           echo "Uploaded CurseForge FTB Quests extra file id $FILE_ID."
+
+      - name: Upload pack kits extra to CurseForge
+        if: ${{ inputs.upload_pack_kits_extra }}
+        env:
+          CURSEFORGE_API_TOKEN: ${{ secrets.CURSEFORGE_API_TOKEN }}
+          PROJECT_ID: ${{ steps.curseforge.outputs.project_id }}
+          VERSION: ${{ steps.version.outputs.version }}
+          PACKKITS: ${{ steps.packkits.outputs.zip }}
+          PARENT_FILE_ID: ${{ steps.main_upload.outputs.file_id }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
+          MARK_FOR_MANUAL_RELEASE: ${{ inputs.mark_for_manual_release }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          METADATA="$RUNNER_TEMP/curseforge-packkits-metadata.json"
+          RESPONSE="$RUNNER_TEMP/curseforge-packkits-response.json"
+
+          python3 - "$METADATA" <<'PY'
+          import json
+          import os
+          import sys
+
+          output_path = sys.argv[1]
+          version = os.environ["VERSION"]
+          metadata = {
+              "changelog": (
+                  f"Optional pack-maker kits for RNGTech v{version}. "
+                  "Each folder under packs/ has a README with install steps for one modpack."
+              ),
+              "changelogType": "markdown",
+              "displayName": f"RNGTech Pack Kits v{version}",
+              "parentFileID": int(os.environ["PARENT_FILE_ID"]),
+              "releaseType": os.environ["RELEASE_TYPE"],
+              "isMarkedForManualRelease": os.environ["MARK_FOR_MANUAL_RELEASE"].lower() == "true",
+          }
+
+          with open(output_path, "w", encoding="utf-8") as handle:
+              json.dump(metadata, handle, separators=(",", ":"))
+          PY
+
+          HTTP_STATUS="$(
+            curl --silent --show-error --write-out '%{http_code}' --output "$RESPONSE" \
+              --request POST \
+              --url "${CURSEFORGE_UPLOAD_BASE_URL}/api/projects/${PROJECT_ID}/upload-file" \
+              --header "X-Api-Token: ${CURSEFORGE_API_TOKEN}" \
+              --form "metadata=<$METADATA;type=application/json" \
+              --form "file=@${PACKKITS}"
+          )"
+
+          if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -ge 300 ]]; then
+            echo "CurseForge pack kits extra upload failed with HTTP $HTTP_STATUS." >&2
+            python3 - "$RESPONSE" <<'PY' >&2
+          import pathlib
+          import sys
+
+          print(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8", errors="replace")[:4000])
+          PY
+            exit 1
+          fi
+
+          FILE_ID="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["id"])' "$RESPONSE")"
+          echo "Uploaded CurseForge pack kits extra file id $FILE_ID."
 
       - name: Announce release on Discord
         if: ${{ inputs.announce_discord && !inputs.mark_for_manual_release }}

@@ -1,0 +1,13 @@
+# RNGTech in FTB Evolution, optional: raise RNGTech's Stage 5-8 generators toward Evolution's FE scale.
+# Add these keys to config/rngtech-common.toml. Not playtested.
+# At default stats this gives about 360 FE/t from a Syngas Combustor, 1,200 FE/t from a Fuel Cell on Ammonia, and
+# about 3,000 FE/t from a Vacuum Collapse Generator, the range of Powah's Hardened, Blazing, and Niotic Furnators,
+# which cost far less to build. Fuel burns for the same time, so FE per item scales too. Stages 1-4 stay at 1.0.
+
+[energy]
+
+	[energy.stageGenerationMultiplier]
+		stage5 = 1.5
+		stage6 = 2.0
+		stage7 = 3.0
+		stage8 = 3.0
