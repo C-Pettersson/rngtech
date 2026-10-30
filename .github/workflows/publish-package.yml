@@ -87,6 +87,19 @@ jobs:
 
           echo "zip=$EXTRA" >> "$GITHUB_OUTPUT"
 
+      - name: Package optional pack kits extra
+        id: packkits
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          EXTRA="build/distributions/rngtech-pack-kits-${VERSION}.zip"
+
+          mkdir -p build/distributions
+          jar --create --no-manifest --file "$EXTRA" -C extras packs -C extras ftbquests -C extras uniques
+
+          echo "zip=$EXTRA" >> "$GITHUB_OUTPUT"
+
       - name: Upload release workflow artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -103,12 +116,21 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
+      - name: Upload pack kits workflow artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rngtech-${{ steps.version.outputs.version }}-pack-kits-extra
+          path: ${{ steps.packkits.outputs.zip }}
+          if-no-files-found: error
+          retention-days: 90
+
       - name: Create GitHub release and attach artifacts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.version.outputs.version }}
           JAR: ${{ steps.artifact.outputs.jar }}
           FTBQUESTS: ${{ steps.ftbquests.outputs.zip }}
+          PACKKITS: ${{ steps.packkits.outputs.zip }}
         shell: bash
         run: |
           RELEASE_FLAGS=()
@@ -117,12 +139,12 @@ jobs:
           fi
 
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" "$JAR" "$FTBQUESTS" --clobber
+            gh release upload "$GITHUB_REF_NAME" "$JAR" "$FTBQUESTS" "$PACKKITS" --clobber
             if [[ ${#RELEASE_FLAGS[@]} -gt 0 ]]; then
               gh release edit "$GITHUB_REF_NAME" "${RELEASE_FLAGS[@]}"
             fi
           else
-            gh release create "$GITHUB_REF_NAME" "$JAR" "$FTBQUESTS" --title "RNGTech v$VERSION" --generate-notes "${RELEASE_FLAGS[@]}"
+            gh release create "$GITHUB_REF_NAME" "$JAR" "$FTBQUESTS" "$PACKKITS" --title "RNGTech v$VERSION" --generate-notes "${RELEASE_FLAGS[@]}"
           fi
 
       - name: Publish Maven package
