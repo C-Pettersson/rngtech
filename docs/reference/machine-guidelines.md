@@ -346,6 +346,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 - The Magnet and Mining Lamp are fixed upgrades that never roll affixes.
 - Block Chew acts only on new drops from player block breaks, never on existing inventory, machine outputs, chests, or mob drops.
 - The Mining Lamp light is client-side only, so it never affects mob spawning or crop growth.
+- Trace recovery returns raw metal from the rock that metal generates in, never gems or finished items. Each metal gates on its own stage twice: the Recovery Filter stage (capped at Steel, the highest filter) and the Crush Head processing level, so late metals wait on the head. Weights follow ore frequency. Recovery stays a mining bonus: the loop audit treats it as a world source, like ore.
 
 ### Refinement
 
