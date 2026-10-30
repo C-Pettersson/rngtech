@@ -1,0 +1,27 @@
+{
+    "id": "rngtech:trial_vault_tempered_pawl",
+    "host": "disassembly_head",
+    "slot_stage": 3,
+    "base_profile": "rngtech:bronze_disassembly_head",
+    "stats": {
+        "rngtech:processing_level": {
+            "operation": "flat",
+            "value": 1,
+            "role": "signature"
+        },
+        "rngtech:energy_usage": {
+            "operation": "increased",
+            "min": 0.4,
+            "max": 0.2,
+            "role": "drawback"
+        },
+        "rngtech:processing_speed": {
+            "operation": "more",
+            "min": -0.25,
+            "max": -0.1,
+            "role": "drawback"
+        }
+    },
+    "behaviors": [],
+    "source": "rngtech:unique_source.trial_vault"
+}

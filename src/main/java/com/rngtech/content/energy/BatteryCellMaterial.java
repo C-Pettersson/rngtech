@@ -21,7 +21,9 @@ public enum BatteryCellMaterial implements StringRepresentable {
     EXOTIC(8, 10000000, 8192, 4096, 1.06, 0.00),
     UNIQUE_POTATO(0, 10000, 128, 64, 0.60, 6.00, "unique_potato_battery_cell"),
     /** A burst cell: steady output is half the Invar cell's, and its Unique lines feed the Battery Chassis. */
-    BASTION_COIN_STACK(4, 40000, 512, 128, 1.00, 0.40, "bastion_coin_stack_capacitor");
+    BASTION_COIN_STACK(4, 40000, 512, 128, 1.00, 0.40, "bastion_coin_stack_capacitor"),
+    /** A Stage 1 cell with near Lead-class storage: half the Iron cell's output, poor efficiency, and a steady leak. */
+    SHIPWRECK_SALT_ZINC(1, 24000, 128, 32, 0.90, 0.30, "shipwreck_salt_zinc_anode");
 
     public static final Codec<BatteryCellMaterial> CODEC = StringRepresentable.fromEnum(BatteryCellMaterial::values);
     public static final StreamCodec<ByteBuf, BatteryCellMaterial> STREAM_CODEC =

@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "rngtech:unique_loot_enabled",
+          "unique": "rngtech:shipwreck_salt_zinc_anode"
+        },
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.05
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:shipwreck_salt_zinc_anode",
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "rngtech:uniques/shipwreck_salt_zinc_anode"
+}

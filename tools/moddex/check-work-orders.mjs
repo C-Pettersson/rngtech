@@ -42,6 +42,7 @@ const HOST_FAMILIES = {
     servo: ["alloy_furnace", "melter", "metal_press"],
     fluid_pump: ["forestry", "melter"],
     control_board: ["resonance_calibrator"],
+    disassembly_head: ["component_recycler"],
     battery_cell: [],
 };
 

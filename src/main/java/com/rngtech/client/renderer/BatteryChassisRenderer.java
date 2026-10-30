@@ -65,6 +65,7 @@ public class BatteryChassisRenderer implements BlockEntityRenderer<BatteryChassi
     private static final float CELL_HEIGHT = 10.0F;
     private static final float POTATO_TOP = 7.5F;
     private static final float COIN_TOP = 9.0F;
+    private static final float ANODE_TOP = 8.0F;
     private static final float CELL_MAX_DIAMETER = 6.0F;
     private static final float CELL_PITCH_SHARE = 0.78F;
     private static final float WINDOW_HALF = 0.75F;
@@ -133,14 +134,18 @@ public class BatteryChassisRenderer implements BlockEntityRenderer<BatteryChassi
         return new ModelResourceLocation(RNGTech.id("block/battery_chassis/" + name), ModelResourceLocation.STANDALONE_VARIANT);
     }
 
-    /** The potato and coin-stack cells have no charge window. */
+    /** The potato, coin-stack, and salt-zinc cells have no charge window. */
     private static boolean hasWindow(String kind) {
-        return !kind.endsWith("potato") && !kind.equals(BatteryCellMaterial.BASTION_COIN_STACK.getSerializedName());
+        return !kind.endsWith("potato") && !kind.equals(BatteryCellMaterial.BASTION_COIN_STACK.getSerializedName())
+                && !kind.equals(BatteryCellMaterial.SHIPWRECK_SALT_ZINC.getSerializedName());
     }
 
     private static float cellTop(String kind) {
         if (kind.endsWith("potato")) {
             return POTATO_TOP;
+        }
+        if (kind.equals(BatteryCellMaterial.SHIPWRECK_SALT_ZINC.getSerializedName())) {
+            return ANODE_TOP;
         }
         return kind.equals(BatteryCellMaterial.BASTION_COIN_STACK.getSerializedName()) ? COIN_TOP : CELL_HEIGHT;
     }

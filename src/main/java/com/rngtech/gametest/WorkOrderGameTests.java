@@ -567,7 +567,7 @@ public final class WorkOrderGameTests {
             }
             if (!familyEntry) { catalog.add(unique); }
         }
-        check(catalog.size() == 9, "Not every Unique rolls from the whole catalog: " + catalog);
+        check(catalog.size() == 11, "Not every Unique rolls from the whole catalog: " + catalog);
         Set<String> heat = Set.of("furnace", "alloy_furnace", "metal_press", "melter");
         check(favoured.equals(Map.of(
                 "rngtech:mineshaft_worn_pick_jaw", Set.of("crusher", "melter"),
@@ -576,7 +576,8 @@ public final class WorkOrderGameTests {
                 "rngtech:crying_crucible", Set.of("alloy_furnace"),
                 "rngtech:trial_vault_escapement", Set.of("alloy_furnace", "metal_press", "melter"),
                 "rngtech:witch_bottle_reflux_pump", Set.of("melter", "forestry"),
-                "rngtech:ancient_echo_control_board", Set.of("resonance_calibrator"))),
+                "rngtech:ancient_echo_control_board", Set.of("resonance_calibrator"),
+                "rngtech:trial_vault_tempered_pawl", Set.of("component_recycler"))),
                 "A Unique is favoured on machines its part does not fit: " + favoured);
         check(!WorkOrderRewards.fixedAmount(new ItemStack(ModItems.CHAOS_CRYSTAL.get()))
                 && WorkOrderRewards.fixedAmount(new ItemStack(BuiltInRegistries.ITEM.get(RNGTech.id("crying_crucible")))),

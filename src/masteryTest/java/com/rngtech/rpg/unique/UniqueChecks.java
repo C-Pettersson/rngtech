@@ -46,6 +46,7 @@ public final class UniqueChecks {
         refinementRejectsUniques();
         potatoCellUnchanged();
         slotStageDrivesGates();
+        backlogUniquesKeepTheirShape();
         escapementSpeedsOnlyFirstCycles();
         echoStreakSurvivesOneDetour();
         packUniquesLoadFromAFolder();
@@ -53,7 +54,7 @@ public final class UniqueChecks {
     }
 
     private static void catalogLoads() {
-        require(UniqueCatalog.all().size() == 9, "the catalog holds the Potato cell and eight launch Uniques");
+        require(UniqueCatalog.all().size() == 11, "the catalog holds the Potato cell, eight launch Uniques, and two backlog Uniques");
         Set<UniqueHost> hosts = new HashSet<>();
         for (UniqueDefinition unique : UniqueCatalog.all()) {
             require(UniqueCatalog.violations(unique).isEmpty(), unique.id() + " follows the catalog rules");
@@ -62,7 +63,8 @@ public final class UniqueChecks {
         require(hosts.size() == UniqueHost.values().length, "the launch Uniques cover every supported host");
         for (UniqueStatReaders.Reader reader : List.of(UniqueStatReaders.Reader.CRUSHER, UniqueStatReaders.Reader.FURNACE,
                 UniqueStatReaders.Reader.ALLOY_FURNACE, UniqueStatReaders.Reader.METAL_PRESS, UniqueStatReaders.Reader.MELTER,
-                UniqueStatReaders.Reader.RESONANCE_CALIBRATOR, UniqueStatReaders.Reader.FORESTRY_CART, UniqueStatReaders.Reader.BATTERY_CHASSIS)) {
+                UniqueStatReaders.Reader.RESONANCE_CALIBRATOR, UniqueStatReaders.Reader.FORESTRY_CART, UniqueStatReaders.Reader.BATTERY_CHASSIS,
+                UniqueStatReaders.Reader.BATTERY_CELL, UniqueStatReaders.Reader.COMPONENT_RECYCLER)) {
             require(UniqueCatalog.all().stream().anyMatch(unique -> readsSomething(reader, unique)),
                     "a launch Unique reaches " + reader);
         }
@@ -256,6 +258,27 @@ public final class UniqueChecks {
                 "Stage 3 heads reach Processing Level 3");
         require(UniqueCatalog.get(FORTRESS).slotStage() <= 6 && UniqueCatalog.get("igloo_basement_thermostat").slotStage() <= 6,
                 "launch Heat Cores fit the Metal Press and Melter Stage 6 cap");
+    }
+
+    /** The Salt-Zinc Anode stores near Lead-class FE at Stage 1; the Tempered Pawl reaches exactly one stage past its slot. */
+    private static void backlogUniquesKeepTheirShape() {
+        UniqueDefinition anode = UniqueCatalog.get("shipwreck_salt_zinc_anode");
+        require(anode.slotStage() == 1 && anode.host() == UniqueHost.BATTERY_CELL, "the Anode is a Stage 1 Battery Cell");
+        MachineStatAccumulator cell = ComponentBaseStatCatalog.uniqueStats(anode, List.of());
+        near(cell.baseValue(MachineStat.ENERGY_CAPACITY), 30000, "a mid-rolled Anode stores 30,000 FE");
+        require(cell.baseValue(MachineStat.ENERGY_CAPACITY) > ComponentBaseStatCatalog.normalMaximum(UniqueHost.BATTERY_CELL,
+                MachineStat.ENERGY_CAPACITY, 2), "the Anode stores more than any Stage 1-2 cell");
+        require(cell.baseValue(MachineStat.ENERGY_CAPACITY) <= ComponentBaseStatCatalog.normalMaximum(UniqueHost.BATTERY_CELL,
+                MachineStat.ENERGY_CAPACITY, 3), "the Anode stays at Lead-class storage");
+        require(cell.baseValue(MachineStat.EFFICIENCY) < 1.0 && cell.baseValue(MachineStat.IDLE_LOSS) > 0.3,
+                "the Anode pays with efficiency and idle loss");
+
+        UniqueDefinition pawl = UniqueCatalog.get("trial_vault_tempered_pawl");
+        require(pawl.slotStage() == 3 && pawl.host() == UniqueHost.DISASSEMBLY_HEAD, "the Pawl is a Stage 3 Disassembly Head");
+        double level = ComponentBaseStatCatalog.uniqueStats(pawl, List.of()).baseValue(MachineStat.PROCESSING_LEVEL);
+        near(level, 4, "the Pawl takes apart Stage 4 parts");
+        near(ComponentBaseStatCatalog.normalMaximum(UniqueHost.DISASSEMBLY_HEAD, MachineStat.PROCESSING_LEVEL, 4), level,
+                "the Pawl reaches the Stage 4 head's level and no further");
     }
 
     private static void escapementSpeedsOnlyFirstCycles() {

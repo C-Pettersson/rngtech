@@ -5,11 +5,13 @@ import com.rngtech.content.block.ComponentRecyclerBlock;
 import com.rngtech.content.block.HandCrankBlock;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.DisassemblyHeadItem;
+import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.PotentialReactorPartItem;
 import com.rngtech.content.menu.ComponentRecyclerMenu;
 import com.rngtech.content.recipe.ComponentRecyclingRecipe;
 import com.rngtech.content.recycling.ComponentRecyclerChassis;
+import com.rngtech.content.recycling.DisassemblyHeadMaterial;
 import com.rngtech.content.recycling.RecyclingData;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModTags;
@@ -21,6 +23,8 @@ import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
+import com.rngtech.rpg.unique.UniqueDefinition;
+import com.rngtech.rpg.unique.UniqueItems;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
 import com.rngtech.rpg.workorder.WorkOrderConditions;
 import com.rngtech.rpg.workorder.WorkOrderFamilies;
@@ -372,7 +376,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         boolean running = getBlockState().getValue(BaseMachineBlock.ACTIVE);
         ComponentRecyclingRecipe recipe = running ? nextRecipe() : null;
         return new ComponentRecyclerVisualState(
-                head.getItem() instanceof DisassemblyHeadItem headItem ? headItem.material().getSerializedName() : "",
+                headMaterialKey(head),
                 filter.getItem() instanceof PotentialReactorPartItem part && part.filterMaterial() != null
                         ? part.filterMaterial().getSerializedName()
                         : "",
@@ -558,10 +562,20 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
         return BatteryCellItem.isBatteryCell(stack);
     }
 
+    /** A normal or Unique Disassembly Head up to the chassis stage; a Unique counts as its slot stage. */
     public boolean isDisassemblyHead(ItemStack stack) {
-        return stack.getItem() instanceof DisassemblyHeadItem head
-                && !RecyclingData.isStripped(stack)
-                && head.stage() <= chassis().stage();
+        return GearParts.is(stack, MachinePartType.DISASSEMBLY_HEAD, chassis().stage())
+                && !RecyclingData.isStripped(stack);
+    }
+
+    /** The head the renderer draws: a normal head's metal, or a Unique head's base metal. */
+    private static String headMaterialKey(ItemStack head) {
+        if (head.getItem() instanceof DisassemblyHeadItem headItem) {
+            return headItem.material().getSerializedName();
+        }
+        UniqueDefinition unique = UniqueItems.definition(head.getItem());
+        Enum<?> base = unique == null ? null : unique.host().material(unique.baseProfile());
+        return base instanceof DisassemblyHeadMaterial material ? material.getSerializedName() : "";
     }
 
     public boolean isRecoveryFilter(ItemStack stack) {

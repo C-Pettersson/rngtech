@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rngtech:item/uniques/shipwreck_salt_zinc_anode"
+  }
+}
