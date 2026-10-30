@@ -43,16 +43,19 @@ public class VacuumCollapseGeneratorBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(
+        return withBodyCues(createTickerHelper(
                 blockEntityType,
                 ModBlockEntities.VACUUM_COLLAPSE_GENERATOR.get(),
                 VacuumCollapseGeneratorBlockEntity::serverTick
-        );
+        ));
     }
 
     /** While a collapse runs, each Dimensional Stabilizer lens draws motes into the core. */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (BaseMachineBlockEntity.skipsParticle(level, pos, random)) {
+            return;
+        }
         if (!state.getValue(ACTIVE) || random.nextInt(3) != 0
                 || !(level.getBlockEntity(pos) instanceof VacuumCollapseGeneratorBlockEntity generator)
                 || generator.visualState().stabilizer().isEmpty()) {

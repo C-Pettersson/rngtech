@@ -44,12 +44,15 @@ public class PotentialReactorBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.POTENTIAL_REACTOR.get(), PotentialReactorBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.POTENTIAL_REACTOR.get(), PotentialReactorBlockEntity::serverTick));
     }
 
     /** The relief valve on the lid vents while the core reacts, more often when the reactor is less stable. */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (BaseMachineBlockEntity.skipsParticle(level, pos, random)) {
+            return;
+        }
         if (!state.getValue(ACTIVE) || !(level.getBlockEntity(pos) instanceof PotentialReactorBlockEntity reactor)) {
             return;
         }

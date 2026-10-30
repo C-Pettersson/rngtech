@@ -75,7 +75,7 @@ public class MelterBlock extends WorkOrderMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.MELTER.get(), MelterBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.MELTER.get(), MelterBlockEntity::serverTick));
     }
 
     @Override

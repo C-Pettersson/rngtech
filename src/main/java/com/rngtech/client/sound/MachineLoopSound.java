@@ -12,17 +12,19 @@ final class MachineLoopSound extends AbstractTickableSoundInstance {
     private final BlockPos pos;
     private final MachineSoundProfile profile;
     private final int stage;
+    private final float noiseFactor;
     private final float targetVolume;
     private final float targetPitch;
     private int age;
     private int fadeOutTicks = -1;
 
-    MachineLoopSound(BlockPos pos, MachineSoundProfile profile, int stage) {
+    MachineLoopSound(BlockPos pos, MachineSoundProfile profile, int stage, float noiseFactor) {
         super(profile.loopSound(), SoundSource.BLOCKS, SoundInstance.createUnseededRandom());
         this.pos = pos.immutable();
         this.profile = profile;
         this.stage = stage;
-        targetVolume = profile.loopVolume(stage);
+        this.noiseFactor = noiseFactor;
+        targetVolume = profile.loopVolume(stage) * noiseFactor;
         targetPitch = profile.pitch(stage);
         volume = 0.0F;
         pitch = targetPitch;
@@ -65,6 +67,10 @@ final class MachineLoopSound extends AbstractTickableSoundInstance {
 
     int stage() {
         return stage;
+    }
+
+    float noiseFactor() {
+        return noiseFactor;
     }
 
     boolean isStopping() {

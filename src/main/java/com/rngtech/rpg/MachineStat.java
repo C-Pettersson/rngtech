@@ -140,7 +140,13 @@ public enum MachineStat implements StringRepresentable {
     STRAIN_MERCY,
     PRIMED_CHARGE_RATE,
     /** Increased Mastery XP gain; read only as an increased bucket, so it needs no base value. */
-    MASTERY_XP_GAIN;
+    MASTERY_XP_GAIN,
+    /** Block light a Glow machine gives while it holds charge or heat. Read from the machine body's own rolls. */
+    LIGHT_LEVEL,
+    /** Reduced machine sound and particles from a Discreet body; only its decreased bucket is read, on the client. */
+    MACHINE_NOISE,
+    /** A Telemetry body's comparator gauge; the affix id names which gauge replaces the work-state signal. */
+    COMPARATOR_READOUT;
 
     public static final Codec<MachineStat> CODEC = Codec.STRING.comapFlatMap(
             name -> {

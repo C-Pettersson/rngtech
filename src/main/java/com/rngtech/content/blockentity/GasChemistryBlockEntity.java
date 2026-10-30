@@ -357,7 +357,7 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return isCombustor() ? currentVisualState().save() : currentProcessorVisualState().save();
+        return withNoiseFactor(isCombustor() ? currentVisualState().save() : currentProcessorVisualState().save());
     }
 
     @Override
@@ -367,11 +367,13 @@ public class GasChemistryBlockEntity extends BaseMachineBlockEntity
 
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        readNoiseFactor(tag);
         loadVisualState(tag);
     }
 
     @Override
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        readNoiseFactor(packet.getTag());
         loadVisualState(packet.getTag());
     }
 

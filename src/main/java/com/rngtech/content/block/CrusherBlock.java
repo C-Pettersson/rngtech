@@ -56,7 +56,7 @@ public class CrusherBlock extends WorkOrderMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.CRUSHER.get(), CrusherBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.CRUSHER.get(), CrusherBlockEntity::serverTick));
     }
 
     /** Grit of the input falls from the nip under the rolls while they crush; a jammed Crusher puffs smoke instead. */

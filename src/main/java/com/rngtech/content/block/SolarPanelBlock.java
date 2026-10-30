@@ -83,7 +83,7 @@ public class SolarPanelBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.SOLAR_PANEL.get(), SolarPanelBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.SOLAR_PANEL.get(), SolarPanelBlockEntity::serverTick));
     }
 
     @Override

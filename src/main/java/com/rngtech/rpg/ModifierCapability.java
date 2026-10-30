@@ -31,5 +31,11 @@ public enum ModifierCapability {
     HAS_MASTERY_ATTRIBUTES,
     HAS_PHASE_ARRAY,
     /** Recipe machines that work several items per cycle through Batch Size, other than the Crusher. */
-    HAS_BATCHING
+    HAS_BATCHING,
+    /** Machine bodies that light up while they hold charge or heat, which can roll Glow. */
+    HAS_WORK_LIGHT,
+    /** Machine bodies with a sound profile and no Machine Mastery, which can roll Discreet. */
+    HAS_MACHINE_NOISE,
+    /** Machine bodies with a comparator gauge to report, which can roll Telemetry. */
+    HAS_TELEMETRY
 }

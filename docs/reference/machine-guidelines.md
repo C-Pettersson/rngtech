@@ -173,6 +173,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Cables and connector modules never roll modifiers. Transfer is fixed by the endpoint item.
 - A machine or part rolls only stats and behaviors its machine reads. `RollReadChecks` in `src/masteryTest` compares every roll profile with the stats each machine declares it reads, and a part stat must also survive the part's merge rules into at least one host that reads it. A shared part such as a Heat Core may roll a stat that only some hosts read; each host's wiki page says which Gear stats apply there. When a stat stops rolling, keep its affix id's description so older items still show the line, and the Affix Forge can still remove it.
 - On fluid processors and generators, Fluid Capacity is a rollable buffer: one stat sizes every tank of the machine together (a tank that starts larger keeps its ratio) and never shrinks a tank below its authored size. It buys slack, not throughput. Storage tanks keep authored capacity, as set out under Fluid and Compressor Tanks.
+- Body cues are quality-of-life rolls on the machine block, never on Gear, and carry no downside: Glow lights the block, Discreet quiets it, and Telemetry sets its comparator gauge. A cue follows slow machine state such as buffer fill, never the craft cycle, so a light never flashes between recipes.
 
 ### Crusher
 

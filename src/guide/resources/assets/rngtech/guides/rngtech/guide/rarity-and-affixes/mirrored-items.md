@@ -2,7 +2,7 @@
 navigation:
   title: "Mirrored items"
   parent: rarity-and-affixes.md
-  position: 14
+  position: 15
   icon: rngtech:affix_injector
 ---
 

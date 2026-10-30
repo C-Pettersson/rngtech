@@ -65,7 +65,7 @@ public class MetalPressBlock extends WorkOrderMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.METAL_PRESS.get(), MetalPressBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.METAL_PRESS.get(), MetalPressBlockEntity::serverTick));
     }
 
     @Override
