@@ -2,7 +2,7 @@
 navigation:
   title: "Crying Crucible"
   parent: uniques.md
-  position: 4
+  position: 6
   icon: rngtech:fortress_heater_element
 ---
 

@@ -362,6 +362,63 @@
               "function": "rngtech:unidentified_unique"
             }
           ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:shipwreck_salt_zinc_anode",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:shipwreck_salt_zinc_anode"
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:trial_vault_tempered_pawl",
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:trial_vault_tempered_pawl"
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:trial_vault_tempered_pawl",
+          "weight": 2,
+          "conditions": [
+            {
+              "condition": "rngtech:unique_loot_enabled",
+              "unique": "rngtech:trial_vault_tempered_pawl"
+            },
+            {
+              "condition": "minecraft:any_of",
+              "terms": [
+                {
+                  "condition": "rngtech:machine_family",
+                  "family": "component_recycler"
+                }
+              ]
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified_unique"
+            }
+          ]
         }
       ]
     }

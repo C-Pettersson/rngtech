@@ -12,6 +12,8 @@ wiki:
     - rngtech:witch_bottle_reflux_pump
     - rngtech:ancient_echo_control_board
     - rngtech:bastion_coin_stack_capacitor
+    - rngtech:shipwreck_salt_zinc_anode
+    - rngtech:trial_vault_tempered_pawl
 ---
 
 # Uniques
@@ -29,9 +31,11 @@ Each Unique comes from one kind of place.
 | Unique | Gear | Counts as | Found in |
 |---|---|---:|---|
 | {{ item('rngtech:unique_potato_battery_cell') }} | Battery Cell | Stage 0 | Village chests, 5% per chest |
+| {{ item('rngtech:shipwreck_salt_zinc_anode') }} | Battery Cell | Stage 1 | Shipwreck supply chests, 5% |
 | {{ item('rngtech:igloo_basement_thermostat') }} | Heat Core | Stage 2 | Igloo basement chests, 10% |
 | {{ item('rngtech:mineshaft_worn_pick_jaw') }} | Crush Head | Stage 2 | Mineshaft minecart chests, 4% |
 | {{ item('rngtech:crying_crucible') }} | Alloy Crucible | Stage 3 | Ruined portal chests, 4% |
+| {{ item('rngtech:trial_vault_tempered_pawl') }} | Disassembly Head | Stage 3 | Trial vaults, 3% per vault |
 | {{ item('rngtech:fortress_heater_element') }} | Heat Core | Stage 4 | Nether fortress chests, 8% |
 | {{ item('rngtech:bastion_coin_stack_capacitor') }} | Battery Cell | Stage 4 | Bastion treasure chests, 10% |
 | {{ item('rngtech:witch_bottle_reflux_pump') }} | Fluid Pump | Stage 5 | Witches killed by a player, 1%, plus 0.5% per Looting level |
@@ -96,6 +100,13 @@ A Bronze-class Alloy Crucible with the same three input slots, tuned for blend r
 - **Signature:** +(20–40)% Blend Speed and +(25–50) °C Blend Heat Reduction on blend recipes. These are the Blendwright's stats, and they stack with that ascendancy.
 - **Drawbacks:** (40–20)% increased Energy Use, and (40–20)% less Overheat Tolerance. The overheat line sits lower, so recipes that can fail build failure strain sooner when you run them hot. Blend recipes cannot fail, and the safe maximum does not change.
 
+### Trial Vault Tempered Pawl
+
+A Disassembly Head for the [Component Recycler](component-recycler.md) that takes apart parts one stage above its own. Its other base stats are a Bronze Disassembly Head's. It comes from normal trial vaults, not ominous ones.
+
+- **Signature:** +1 processing level, so a Bronze Recycler with the Pawl runs Stage 4 recipes.
+- **Drawbacks:** (40–20)% increased Energy Use, and (25–10)% less Processing Speed.
+
 ### Trial Vault Escapement
 
 A stop-start Servo for small batches. Its other base stats are a Titanium Servo's.
@@ -126,6 +137,13 @@ A burst Battery Cell. It holds 40,000 FE, takes 512 FE/t, and gives a steady 128
 
 - **Signature:** (75–125)% increased Burst Transfer and (75–125)% increased Burst Duration for the [Battery Chassis](battery-chassis.md) it is in. Only a chassis that can burst uses them.
 - **Drawback:** (150–100)% increased Idle Loss.
+
+### Shipwreck Salt-Zinc Anode
+
+A Stage 1 Battery Cell that stores nearly as much as a Lead cell. Its base holds 24,000 FE, takes 128 FE/t, and gives 32 FE/t, half an Iron cell's output. Its efficiency is 90%, and its base idle loss is 0.3%/min.
+
+- **Signature:** (15–35)% increased Energy Capacity, so it holds 27,600 to 32,400 FE.
+- **Drawback:** (100–50)% increased Idle Loss.
 
 ### Voltaic Potato Battery Cell
 

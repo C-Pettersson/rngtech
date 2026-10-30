@@ -30,6 +30,7 @@ public final class UniqueStatReaders {
         FORESTRY_CART,
         RESONANCE_CALIBRATOR,
         BIO_GENERATOR,
+        COMPONENT_RECYCLER,
         /** A Battery Cell's own storage, in any machine that holds one. */
         BATTERY_CELL,
         BATTERY_CHASSIS
@@ -44,6 +45,7 @@ public final class UniqueStatReaders {
                     Reader.GAS_CHEMISTRY, Reader.COMPRESSOR_TANK),
             UniqueHost.FLUID_PUMP, List.of(Reader.MELTER, Reader.CORROSION_CELL, Reader.FORESTRY_CART, Reader.BIO_GENERATOR),
             UniqueHost.CONTROL_BOARD, List.of(Reader.RESONANCE_CALIBRATOR),
+            UniqueHost.DISASSEMBLY_HEAD, List.of(Reader.COMPONENT_RECYCLER),
             UniqueHost.BATTERY_CELL, List.of(Reader.BATTERY_CELL, Reader.BATTERY_CHASSIS)
     ));
 
@@ -93,6 +95,8 @@ public final class UniqueStatReaders {
         stats(Reader.RESONANCE_CALIBRATOR, BATCHING, MachineStat.CALIBRATION_PRECISION, MachineStat.CALIBRATION_QUALITY,
                 MachineStat.CATALYST_EFFICIENCY, MachineStat.STABILITY, MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE,
                 MachineStat.REFINEMENT_POTENTIAL_BONUS, MachineStat.STREAK_CAP, MachineStat.STREAK_FLOOR);
+        stats(Reader.COMPONENT_RECYCLER, Set.of(), MachineStat.PROCESSING_LEVEL, MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE,
+                MachineStat.INSTANT_PROCESS_CHANCE);
         stats(Reader.BATTERY_CELL, Set.of(), MachineStat.ENERGY_CAPACITY, MachineStat.ENERGY_TRANSFER, MachineStat.EFFICIENCY,
                 MachineStat.IDLE_LOSS);
         stats(Reader.BATTERY_CHASSIS, Set.of(), MachineStat.BURST_TRANSFER, MachineStat.BURST_DURATION, MachineStat.STABILITY,
@@ -124,7 +128,8 @@ public final class UniqueStatReaders {
     private static final Map<UniqueHost, Set<MachineStat>> RECIPE_GATES = new EnumMap<>(Map.of(
             UniqueHost.CRUSH_HEAD, EnumSet.of(MachineStat.PROCESSING_LEVEL),
             UniqueHost.HEAT_CORE, EnumSet.of(MachineStat.MAX_TEMPERATURE),
-            UniqueHost.ALLOY_CRUCIBLE, EnumSet.of(MachineStat.INPUT_SLOTS)
+            UniqueHost.ALLOY_CRUCIBLE, EnumSet.of(MachineStat.INPUT_SLOTS),
+            UniqueHost.DISASSEMBLY_HEAD, EnumSet.of(MachineStat.PROCESSING_LEVEL)
     ));
 
     /** Yield stats outside the Mastery declarations. */

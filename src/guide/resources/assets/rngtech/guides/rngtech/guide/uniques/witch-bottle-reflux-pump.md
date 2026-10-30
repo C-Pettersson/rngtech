@@ -2,7 +2,7 @@
 navigation:
   title: "Witch-Bottle Reflux Pump"
   parent: uniques.md
-  position: 6
+  position: 8
   icon: rngtech:fortress_heater_element
 ---
 

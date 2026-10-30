@@ -15,6 +15,8 @@ item_ids:
   - rngtech:witch_bottle_reflux_pump
   - rngtech:ancient_echo_control_board
   - rngtech:bastion_coin_stack_capacitor
+  - rngtech:shipwreck_salt_zinc_anode
+  - rngtech:trial_vault_tempered_pawl
 ---
 
 # Uniques
@@ -30,24 +32,17 @@ Every copy of a Unique has the same stat lines, but each copy rolls its own valu
 Ranges are listed worst roll to best. Flat lines with whole-number ranges, such as Jam Recovery, roll whole numbers.
 
 - [Fortress Heater Element](rngtech:uniques/fortress-heater-element.md)
-
-### Igloo Basement Thermostat
-
-A cold-running Heat Core for presses and furnaces that punish unstable heat. Its base stats, including maximum temperature, are a Bronze Heat Core's, so it is no use for hot alloys.
-
-- **Signature:** (40–80)% more Temperature Stability, (40–80)% more Overheat Tolerance, and Power Grace, which normal parts only have on Stage 6 and higher Servos.
-- **Drop Forge:** +(5–15)% Heat Window.
-- **Drawback:** (35–20)% less Heat Transfer, which slows heating and recovery, including in the Melter.
-
-### Mineshaft Worn Pick-Jaw
-
-A Stage 2 Crush Head that crushes at hardness 3, one level above its stage. Its other base stats are a Copper Crush Head's. It also works in the [Melter](rngtech:melter.md).
-
-- **Signature:** hardness 3 and +(1–2) Batch Size, so even a Stage 2 Crusher crushes in batches.
-- **Rockbreaker:** +(10–30)% Jam Recovery.
-- **Drawbacks:** +(8–3)% Jam Chance per Cycle, on every craft and not only under-level ones, and (30–15)% increased Energy Use.
-
+- [Igloo Basement Thermostat](rngtech:uniques/igloo-basement-thermostat.md)
+- [Mineshaft Worn Pick-Jaw](rngtech:uniques/mineshaft-worn-pick-jaw.md)
 - [Crying Crucible](rngtech:uniques/crying-crucible.md)
+
+### Trial Vault Tempered Pawl
+
+A Disassembly Head for the [Component Recycler](rngtech:component-recycler.md) that takes apart parts one stage above its own. Its other base stats are a Bronze Disassembly Head's. It comes from normal trial vaults, not ominous ones.
+
+- **Signature:** +1 processing level, so a Bronze Recycler with the Pawl runs Stage 4 recipes.
+- **Drawbacks:** (40–20)% increased Energy Use, and (25–10)% less Processing Speed.
+
 - [Trial Vault Escapement](rngtech:uniques/trial-vault-escapement.md)
 - [Witch-Bottle Reflux Pump](rngtech:uniques/witch-bottle-reflux-pump.md)
 - [Ancient Echo Control Board](rngtech:uniques/ancient-echo-control-board.md)
@@ -58,6 +53,13 @@ A burst Battery Cell. It holds 40,000 FE, takes 512 FE/t, and gives a steady 128
 
 - **Signature:** (75–125)% increased Burst Transfer and (75–125)% increased Burst Duration for the [Battery Chassis](rngtech:battery-chassis.md) it is in. Only a chassis that can burst uses them.
 - **Drawback:** (150–100)% increased Idle Loss.
+
+### Shipwreck Salt-Zinc Anode
+
+A Stage 1 Battery Cell that stores nearly as much as a Lead cell. Its base holds 24,000 FE, takes 128 FE/t, and gives 32 FE/t, half an Iron cell's output. Its efficiency is 90%, and its base idle loss is 0.3%/min.
+
+- **Signature:** (15–35)% increased Energy Capacity, so it holds 27,600 to 32,400 FE.
+- **Drawback:** (100–50)% increased Idle Loss.
 
 ### Voltaic Potato Battery Cell
 

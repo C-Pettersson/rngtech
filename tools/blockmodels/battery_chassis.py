@@ -133,6 +133,7 @@ CELLS = {
 }
 POTATOES = {"potato": (190, 152, 86), "unique_potato": (150, 166, 78)}
 COINS = "bastion_coin_stack"
+ANODE = "shipwreck_salt_zinc"
 
 SLATE = (46, 54, 66)
 SLATE_DARK = (30, 35, 43)
@@ -217,6 +218,8 @@ def cell_top(key):
         return 7.5
     if key == COINS:
         return 9.0
+    if key == ANODE:
+        return 8.0
     return CELL_HEIGHT
 
 
@@ -229,6 +232,8 @@ def cell_elements(key):
         return potato_elements()
     if key == COINS:
         return coin_elements()
+    if key == ANODE:
+        return anode_elements()
     return [
         *crossed(8, 8, CELL_R, CELL_F, 0.0, 1.0, "cap", faces=("north", "south", "east", "west", "down")),
         *crossed(8, 8, CELL_R, CELL_F, 1.0, 8.5, "body", faces=SIDES),
@@ -262,6 +267,14 @@ def coin_elements():
     return elements
 
 
+def anode_elements():
+    """The Shipwreck Salt-Zinc Anode: a crusted zinc slab with a copper strap bolted across the top."""
+    return [
+        box((5.5, 0.0, 6.5), (10.5, 7.0, 9.5), {"up": "salt", "*": "zinc"}),
+        box((7.25, 7.0, 6.0), (8.75, 8.0, 10.0), "electrode_copper", faces=("north", "south", "east", "west", "up")),
+    ]
+
+
 def cell_texture_keys(key):
     if key in POTATOES:
         return {
@@ -271,6 +284,12 @@ def cell_texture_keys(key):
         }
     if key == COINS:
         return {"coin_edge": TEX + "cell/coin_edge", "coin_face": TEX + "cell/coin_face"}
+    if key == ANODE:
+        return {
+            "zinc": TEX + "cell/salt_zinc",
+            "salt": TEX + "cell/salt_crust",
+            "electrode_copper": TEX + "cell/electrode_copper",
+        }
     return {
         "body": TEX + f"cell/{key}_body",
         "cap": TEX + f"cell/{key}_cap",
@@ -528,7 +547,7 @@ def write_models() -> None:
                     "parent": f"{MODEL}/{plate}{suffix}",
                     "textures": {"wire": TEX + f"wire/{metal}"},
                 })
-    for key in [*CELLS, *POTATOES, COINS]:
+    for key in [*CELLS, *POTATOES, COINS, ANODE]:
         textures = cell_texture_keys(key)
         write_json(parts / f"cell_{key}.json", {
             "textures": {"particle": next(iter(textures.values())), **textures},
@@ -816,6 +835,25 @@ def write_cell_textures() -> None:
     draw.ellipse([px(5.5), px(5.5), px(10.5) - 1, px(10.5) - 1], outline=(150, 104, 24, 255), width=2)
     draw.rectangle([px(7.25), px(7.0), px(8.75) - 1, px(9.0) - 1], fill=(184, 132, 34, 255))
     save(face, "cell/coin_face")
+
+    # Shipwreck anode: pitted zinc under a white salt crust that thickens toward the top.
+    zinc = noisy(64, (150, 160, 168), "salt_zinc", amount=8, streak=4)
+    pixels = zinc.load()
+    rand = rng("salt_zinc_crust")
+    for y in range(64):
+        for x in range(64):
+            crust = max(0.0, 0.55 - y / 64) + rand.uniform(-0.25, 0.25)
+            if crust > 0.3:
+                pixels[x, y] = (*mix(pixels[x, y], (232, 230, 220), min(1.0, crust)), 255)
+            elif rand.random() < 0.04:
+                pixels[x, y] = (*shade(pixels[x, y], -36), 255)
+    save(zinc, "cell/salt_zinc")
+    salt = noisy(64, (226, 224, 214), "salt_crust", amount=10)
+    pixels = salt.load()
+    for _ in range(90):
+        x, y = rand.randrange(64), rand.randrange(64)
+        pixels[x, y] = (*shade(pixels[x, y], rand.choice((-30, 14))), 255)
+    save(salt, "cell/salt_crust")
 
 
 def boards(name, color, width, frame=True):
