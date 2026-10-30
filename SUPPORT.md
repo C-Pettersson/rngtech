@@ -2,7 +2,7 @@
 
 Start with the [player wiki](https://c-pettersson.github.io/rngtech/) and its [Getting Started](https://c-pettersson.github.io/rngtech/getting-started/) guide, [Current Implementation](docs/reference/current-implementation.md), and JEI's recipe and Gear information. Check a feature's status before reporting missing behavior: Planned pages describe future work.
 
-Use the [issue forms](https://github.com/C-Pettersson/rngtech/issues/new/choose) for bugs, feature proposals, and questions. Search existing issues first. Include the RNGTech, Minecraft, NeoForge, and Java versions, whether you are playing on a server, and the steps that led to the problem. For integration issues, include the relevant mod names and versions.
+For quick questions, ask in `#help` on the [Discord](https://discord.gg/unTDRhD8PM). Use the [issue forms](https://github.com/C-Pettersson/rngtech/issues/new/choose) for bugs, feature proposals, and questions that need tracking. Search existing issues first. Include the RNGTech, Minecraft, NeoForge, and Java versions, whether you are playing on a server, and the steps that led to the problem. For integration issues, include the relevant mod names and versions.
 
 Share the smallest useful log excerpt or crash report. Remove usernames, player identifiers, server addresses, local paths, and tokens before posting. Use a copy of your world for reproduction steps that could change or damage it.
 
