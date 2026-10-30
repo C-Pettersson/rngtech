@@ -43,12 +43,15 @@ public class CavitationGeneratorBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.CAVITATION_GENERATOR.get(), CavitationGeneratorBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.CAVITATION_GENERATOR.get(), CavitationGeneratorBlockEntity::serverTick));
     }
 
     /** Heat haze rises off the rear fins once heat strain passes 60%. */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (BaseMachineBlockEntity.skipsParticle(level, pos, random)) {
+            return;
+        }
         if (!(level.getBlockEntity(pos) instanceof CavitationGeneratorBlockEntity generator)) {
             return;
         }

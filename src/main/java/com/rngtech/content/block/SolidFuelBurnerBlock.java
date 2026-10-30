@@ -51,12 +51,15 @@ public class SolidFuelBurnerBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.SOLID_FUEL_BURNER.get(), SolidFuelBurnerBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.SOLID_FUEL_BURNER.get(), SolidFuelBurnerBlockEntity::serverTick));
     }
 
     /** Smoke rises from the chimney while fuel burns. */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (BaseMachineBlockEntity.skipsParticle(level, pos, random)) {
+            return;
+        }
         if (!state.getValue(ACTIVE) || random.nextInt(3) != 0) {
             return;
         }

@@ -53,7 +53,7 @@ public class GasChemistryBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.GAS_CHEMISTRY.get(), GasChemistryBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.GAS_CHEMISTRY.get(), GasChemistryBlockEntity::serverTick));
     }
 
     /**
@@ -62,6 +62,9 @@ public class GasChemistryBlock extends BaseMachineBlock {
      */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (BaseMachineBlockEntity.skipsParticle(level, pos, random)) {
+            return;
+        }
         if (!state.getValue(ACTIVE)) {
             return;
         }

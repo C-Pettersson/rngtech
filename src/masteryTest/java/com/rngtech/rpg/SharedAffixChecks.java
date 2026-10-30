@@ -3,11 +3,12 @@ package com.rngtech.rpg;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** Deep Tanks, Twinned, and Studious: affixes several machine families share. */
+/** Deep Tanks, Twinned, Studious, Glow, Discreet, and Telemetry: affixes several machine families share. */
 public final class SharedAffixChecks {
     private static final List<ModifierEligibilityProfile> FLUID_MACHINES = List.of(
             ModifierEligibilityProfiles.CORROSION_CELL,
@@ -29,6 +30,35 @@ public final class SharedAffixChecks {
             ModifierEligibilityProfiles.RESONANCE_CALIBRATOR
     );
 
+    /** Every machine body with a work state and a buffer or Heat Core: the Glow and Telemetry hosts. */
+    private static final List<ModifierEligibilityProfile> LIT_MACHINES = List.of(
+            ModifierEligibilityProfiles.CRUSHER,
+            ModifierEligibilityProfiles.FURNACE,
+            ModifierEligibilityProfiles.ELECTRIC_FURNACE,
+            ModifierEligibilityProfiles.ALLOY_FURNACE,
+            ModifierEligibilityProfiles.METAL_PRESS,
+            ModifierEligibilityProfiles.MELTER,
+            ModifierEligibilityProfiles.RESONANCE_CALIBRATOR,
+            ModifierEligibilityProfiles.COMPONENT_RECYCLER,
+            ModifierEligibilityProfiles.BATTERY_ASSEMBLER,
+            ModifierEligibilityProfiles.COMPRESSOR_TANK,
+            ModifierEligibilityProfiles.COAL_GASIFIER,
+            ModifierEligibilityProfiles.STEAM_METHANE_REFORMER,
+            ModifierEligibilityProfiles.SYNGAS_COMBUSTOR,
+            ModifierEligibilityProfiles.AMMONIA_SYNTHESIZER,
+            ModifierEligibilityProfiles.AMMONIA_FUEL_CELL,
+            ModifierEligibilityProfiles.SOLID_FUEL_BURNER,
+            ModifierEligibilityProfiles.BIO_GENERATOR,
+            ModifierEligibilityProfiles.SOLAR_PANEL,
+            ModifierEligibilityProfiles.SOLAR_ARRAY_CONTROLLER,
+            ModifierEligibilityProfiles.POTENTIAL_REACTOR,
+            ModifierEligibilityProfiles.CORROSION_CELL,
+            ModifierEligibilityProfiles.VACUUM_COLLAPSE_GENERATOR,
+            ModifierEligibilityProfiles.CAVITATION_GENERATOR,
+            ModifierEligibilityProfiles.BATTERY_CHASSIS
+    );
+    private static final Set<String> HEATED = Set.of("furnace", "electric_furnace", "alloy_furnace", "metal_press", "melter");
+
     private static int checks;
 
     private SharedAffixChecks() {
@@ -40,6 +70,10 @@ public final class SharedAffixChecks {
         twinnedRollsOnBatchingMachinesOnly();
         studiousRollsWhereverAttributesDo();
         studiousScalesMasteryXp();
+        glowRollsOnMachineBodiesOnly();
+        discreetStaysOffMasteryMachines();
+        telemetrySplitsItsWeightAcrossGauges();
+        genericSpeedYieldsToNamedSpeed();
         return checks;
     }
 
@@ -93,6 +127,81 @@ public final class SharedAffixChecks {
         stats.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.MASTERY_XP_GAIN, ModifierOperation.INCREASED_PERCENT, 18));
         stats.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.MASTERY_XP_GAIN, ModifierOperation.INCREASED_PERCENT, 12));
         near(MachineMasteryHost.xpGain(stats), 1.30, "Studious rolls on the machine and its Gear add up");
+    }
+
+    private static void glowRollsOnMachineBodiesOnly() {
+        for (ModifierEligibilityProfile profile : ModifierEligibilityProfiles.allProfiles()) {
+            ModifierDefinition glow = definition(profile, "glow");
+            require((glow != null) == LIT_MACHINES.contains(profile), profile.id() + " rolls Glow only if it is a lit machine body");
+            if (glow != null) {
+                require(glow.slot() == ModifierSlot.SUFFIX && glow.modGroup().equals("light_emission"), "Glow is the light_emission suffix");
+                require(glow.rollWeight() == 70, "Glow is a filler line");
+                require(glow.tierRanges().stream().map(ModifierValueRange::min).toList().equals(List.of(4.0, 7.0, 10.0, 13.0)),
+                        "Glow lights at level 4, 7, 10, or 13");
+            }
+        }
+        for (MachinePartType partType : MachinePartType.values()) {
+            require(definition(ModifierEligibilityProfiles.forMachinePart(partType, null), "glow") == null, partType + " Gear never rolls Glow");
+        }
+    }
+
+    private static void discreetStaysOffMasteryMachines() {
+        List<String> quiet = new ArrayList<>();
+        for (ModifierEligibilityProfile profile : ModifierEligibilityProfiles.allProfiles()) {
+            ModifierDefinition discreet = definition(profile, "discreet");
+            if (discreet == null) {
+                continue;
+            }
+            quiet.add(profile.id());
+            require(!profile.hasCapability(ModifierCapability.HAS_MASTERY_ATTRIBUTES),
+                    profile.id() + " leaves silence to the Silent Operation keystone");
+            require(LIT_MACHINES.contains(profile), profile.id() + " rolls Discreet on its machine body");
+            require(discreet.slot() == ModifierSlot.PREFIX && discreet.rollWeight() == 70, "Discreet is a filler prefix");
+            require(discreet.operation() == ModifierOperation.DECREASED_PERCENT && discreet.stat() == MachineStat.MACHINE_NOISE,
+                    "Discreet reduces Machine Noise");
+        }
+        require(quiet.size() == 17, "Discreet rolls on the 17 sound-profile machines without Mastery, not " + quiet.size());
+    }
+
+    private static void telemetrySplitsItsWeightAcrossGauges() {
+        for (ModifierEligibilityProfile profile : ModifierEligibilityProfiles.allProfiles()) {
+            List<ModifierDefinition> telemetry = profile.definitions().stream()
+                    .filter(definition -> definition.modGroup().equals("comparator_readout"))
+                    .toList();
+            require(telemetry.isEmpty() != LIT_MACHINES.contains(profile), profile.id() + " rolls Telemetry only if it is a lit machine body");
+            if (telemetry.isEmpty()) {
+                continue;
+            }
+            List<TelemetryReadout> readouts = ModifierEligibilityProfiles.telemetryReadouts(profile.id());
+            require(telemetry.stream().map(definition -> TelemetryReadout.byAffixId(definition.id())).toList().equals(readouts),
+                    profile.id() + " rolls one Telemetry line per gauge it reports");
+            require(telemetry.stream().mapToInt(ModifierDefinition::rollWeight).sum() == 60, profile.id() + " splits a Telemetry weight of 60");
+            require(telemetry.stream().allMatch(definition -> definition.slot() == ModifierSlot.SUFFIX && !definition.isTiered()),
+                    "Telemetry is an untiered suffix");
+            require(readouts.contains(TelemetryReadout.HEAT) == HEATED.contains(profile.id()),
+                    profile.id() + " reports heat only with a Heat Core");
+            require(readouts.contains(TelemetryReadout.ENERGY) == !profile.id().equals("furnace"),
+                    profile.id() + " reports its buffer unless it burns fuel");
+        }
+    }
+
+    private static void genericSpeedYieldsToNamedSpeed() {
+        int diluted = 0;
+        for (ModifierEligibilityProfile profile : ModifierEligibilityProfiles.allProfiles()) {
+            ModifierDefinition generic = definition(profile, "processing_speed");
+            if (generic == null) {
+                continue;
+            }
+            boolean named = profile.definitions().stream().anyMatch(definition -> definition.slot() == ModifierSlot.SUFFIX
+                    && definition.modGroup().equals("processing_speed")
+                    && !definition.id().equals("processing_speed")
+                    && !definition.id().equals("overclocked"));
+            require(generic.rollWeight() == (named ? 75 : 100), profile.id() + " rolls generic speed at " + (named ? 75 : 100));
+            if (named) {
+                diluted++;
+            }
+        }
+        require(diluted > 10, "generic speed yields on the processors with a named speed");
     }
 
     private static boolean rolls(ModifierEligibilityProfile profile, ModifierSlot slot, String group) {

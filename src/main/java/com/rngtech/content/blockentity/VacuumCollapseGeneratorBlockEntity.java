@@ -262,7 +262,7 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return currentVisualState().save();
+        return withNoiseFactor(currentVisualState().save());
     }
 
     @Override
@@ -272,11 +272,13 @@ public class VacuumCollapseGeneratorBlockEntity extends BaseMachineBlockEntity i
 
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        readNoiseFactor(tag);
         visualState = VacuumCollapseVisualState.load(tag);
     }
 
     @Override
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        readNoiseFactor(packet.getTag());
         visualState = VacuumCollapseVisualState.load(packet.getTag());
     }
 

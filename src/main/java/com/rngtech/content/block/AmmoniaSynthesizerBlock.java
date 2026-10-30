@@ -43,12 +43,15 @@ public class AmmoniaSynthesizerBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.AMMONIA_SYNTHESIZER.get(), AmmoniaSynthesizerBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.AMMONIA_SYNTHESIZER.get(), AmmoniaSynthesizerBlockEntity::serverTick));
     }
 
     /** Frost vapour drifts down off the condenser while the Synthesizer runs. */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (BaseMachineBlockEntity.skipsParticle(level, pos, random)) {
+            return;
+        }
         if (!state.getValue(ACTIVE) || random.nextInt(3) != 0) {
             return;
         }

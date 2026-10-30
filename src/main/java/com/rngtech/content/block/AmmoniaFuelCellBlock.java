@@ -43,12 +43,15 @@ public class AmmoniaFuelCellBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.AMMONIA_FUEL_CELL.get(), AmmoniaFuelCellBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.AMMONIA_FUEL_CELL.get(), AmmoniaFuelCellBlockEntity::serverTick));
     }
 
     /** Nitrogen and water vapour leave the vent stack above the residue trap while the cell runs. */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (BaseMachineBlockEntity.skipsParticle(level, pos, random)) {
+            return;
+        }
         if (!state.getValue(ACTIVE) || random.nextInt(3) != 0) {
             return;
         }

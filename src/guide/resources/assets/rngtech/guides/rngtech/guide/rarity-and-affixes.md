@@ -61,6 +61,7 @@ A fixed trait of the Copper, Bronze, and Steel Fuel Boxes in a [Solid Fuel Burne
 
 A suffix that halves the failure strain a heat machine takes when its power drops mid-cycle. It can roll on electric Furnaces, Alloy Furnaces, Heat Cores, Alloy Crucibles, and Servos, and Stage 6 and higher Servos have it built in. See [Furnace](rngtech:furnace.md) for how failure strain works.
 
+- [Glow, Discreet, and Telemetry](rngtech:rarity-and-affixes/glow-discreet-and-telemetry.md)
 - [Other named affixes](rngtech:rarity-and-affixes/other-named-affixes.md)
 
 ## Refinement Potential

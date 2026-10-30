@@ -65,6 +65,7 @@ Initial v1 family weights are static Java metadata:
 | Family | Roll weight |
 |---|---:|
 | Ordinary rollable affix | `100` |
+| Generic processing speed on a profile that also rolls a named speed | `75` |
 | Processing-specific speed names such as Crushing or Smelting | `75` |
 | Instant Process and Super Output | `35` |
 | Overclocked | `25` |
@@ -79,6 +80,9 @@ Initial v1 family weights are static Java metadata:
 | Control, Drive, and Reserve attribute suffixes | `50` each |
 | Studious (Mastery XP gain) suffix | `50` |
 | Twinned (Batch Size) prefix | `15` |
+| Glow (Light Level) suffix | `70` |
+| Discreet (Machine Noise) prefix | `70` |
+| Telemetry (comparator gauge) suffix | `60` in total, split evenly across the gauges the machine reports |
 
 Old saved modifiers that only have stat, operation, value, and slot still decode. They receive a default group derived from operation and stat so legacy stat-only data remains valid and still participates in duplicate checks.
 
@@ -98,6 +102,8 @@ Current slot rule of thumb:
 | Control, Drive, and Reserve attribute points | Suffix on Mastery machines and their Gear |
 | Studious Mastery XP gain | Suffix on Mastery machines and their Gear |
 | Twinned Batch Size | Prefix on batching recipe machines other than the Crusher |
+| Glow and Telemetry | Suffix on machine bodies only, never Gear |
+| Discreet | Prefix on machine bodies without Machine Mastery |
 | Fluid capacity | Flat prefix and percent suffix on the Fluid Pump and fluid-handling machines |
 | Output amount | Suffix |
 | Heat insulation | Implicit when authored onto a concrete item or part identity; not randomly rolled |
@@ -216,6 +222,16 @@ The choice is the attribute choice in time: a direct stat now, or a faster climb
 Status: Implemented
 
 Twinned is a rare `ADD BATCH_SIZE` prefix (roll weight `15`) for the recipe machines that batch: the Furnace, electric Furnace, Alloy Furnace, Melter, Metal Press, and Resonance Calibrator, through the `HAS_BATCHING` capability. It shares the `dense_parallel` group with Crusher Throughput, which the Crusher keeps instead. Its tiers follow the input-slot shape: `+1` at Tier 1-3, `+2` at Tier 4-6, and `+3` at Tier 7. Batch Overhead still applies to every extra item, so a larger batch trades cycle time for items per cycle.
+
+## Glow, Discreet, and Telemetry
+
+Status: Implemented
+
+Three quality-of-life lines roll on machine bodies only, never on Gear, and carry no downside. The shared `BaseMachineBlockEntity` reads them from the body's own rolls, so they need no host-specific stat code.
+
+- **Glow** (`light_emission` suffix, weight `70`) gives light level `4`, `7`, `10`, or `13` by tier through a `glow` block state on `BaseMachineBlock`. It rolls on the 24 machine bodies with a work state and an FE buffer or a Heat Core, which leaves out the Fluid Tank, the Phase Array parts, and Dormant Machines. The light comes on at `10%` buffer fill and goes off below `5%`, and each change holds for at least `5` seconds, so the light never follows the craft cycle. The fuel Furnace has no buffer and reads its hottest lane against its Max Temperature instead. A real block light lights a machine hall and blocks mob spawns, and a dark machine shows that it is out of power.
+- **Discreet** (`sound_dampening` prefix, weight `70`) is `DECREASED_PERCENT MACHINE_NOISE` at `25`, `45`, `65`, or `85%`. It scales the loop and cue volume and skips the same share of ambient particles. It rolls on the 17 machines with a sound profile and no Machine Mastery, where the Silent Operation keystone owns silence. Hosts add the factor to their update tag, because most of them sync only their visual state.
+- **Telemetry** (`comparator_readout` suffix) is untiered. Each variant replaces the work-state comparator signal with one gauge: FE buffer fill, craft progress, output fill (the items the bottom face exposes, read like a chest), or temperature from ambient to Max Temperature. A machine rolls only the gauges it has; `TELEMETRY_READOUTS` lists them per profile, and the weight of `60` is split across them. The body-cue tick updates comparators within a second when the gauge moves.
 
 ## Code-Backed Modifier Ranges
 
@@ -346,7 +362,7 @@ Vein Miner is a rare Pick Head-only prefix. It rolls as one compound affix with 
 | 6 | `26` | `6-8` |
 | 7 | `40` | `4-6` |
 
-Processing profiles also expose named processing-speed affixes whose display name is specific to the work being done, such as Crushing, Smelting, Reacting, Recycling, Pressing, Melting, Alloying, Calibrating, Serving, Screening, and Disassembling. These use the `PROCESSING_SPEED` stat, live in the shared `processing_speed` modifier group, and currently roll fixed values by tier:
+Processing profiles also expose named processing-speed affixes whose display name is specific to the work being done, such as Crushing, Smelting, Reacting, Recycling, Pressing, Melting, Alloying, Calibrating, Serving, Screening, and Disassembling. These use the `PROCESSING_SPEED` stat, live in the shared `processing_speed` modifier group, and currently roll fixed values by tier. Where a named speed rolls, generic processing speed drops from weight `100` to `75`, so the shared group lands on fewer Rares:
 
 | Tier | Processing-specific speed |
 |---:|---:|

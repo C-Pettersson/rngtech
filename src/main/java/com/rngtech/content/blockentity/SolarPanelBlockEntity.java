@@ -15,6 +15,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -297,6 +301,27 @@ public class SolarPanelBlockEntity extends BaseMachineBlockEntity implements Mac
         generationCarry = tag.getDouble("GenerationCarry");
         lastControlledTick = tag.getLong("LastControlledTick");
         clampInternalEnergy();
+    }
+
+    /** Panels sync only the Discreet noise factor; everything else they show comes from the block state. */
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return withNoiseFactor(new CompoundTag());
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        readNoiseFactor(tag);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        readNoiseFactor(packet.getTag());
     }
 
     private boolean generateFromSunlight() {
