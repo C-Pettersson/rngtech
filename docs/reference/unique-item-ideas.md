@@ -2,7 +2,7 @@
 
 Status: Planned
 
-This page collects candidate Unique Gear and Battery Cells. The Voltaic Potato Battery Cell and the eight launch Uniques are implemented; see the [Current Implementation Matrix](current-implementation.md). The [Unique Items PRD](../prds/uniques.md) defines the catalog, sources, and launch set. Backlog entries are not current gameplay until a later task promotes them.
+This page collects candidate Unique Gear and Battery Cells. The Voltaic Potato Battery Cell, the eight launch Uniques, and two backlog Uniques are implemented; see the [Current Implementation Matrix](current-implementation.md). The [Unique Items PRD](../prds/uniques.md) defines the catalog, sources, and launch set. Backlog entries are not current gameplay until a later task promotes them.
 
 A strong Unique comes from one exact place in the world, solves one odd build problem, and carries one real drawback. It is a sidegrade or a build-around piece, not a higher stage.
 
@@ -34,6 +34,19 @@ These eight are implemented and specified, with their ranges, in the [Unique Ite
 | Ancient Echo Control Board | Control Board | 6 | Ancient city chest | Nullite-class Calibration Precision, `ECHO_STREAK` | Less Processing Speed, no Refinement Potential Bonus |
 | Bastion Coin-Stack Capacitor | Battery Cell | 4 | Bastion treasure chest | Doubled Burst Transfer and Duration in burst-capable chassis | High Idle Loss, weak steady output |
 
+## Shipped from the Backlog
+
+Status: Implemented
+
+Their shipped values live in the catalog under `data/rngtech/uniques/`.
+
+| Unique | Host | Slot stage | Source | Signature | Drawback |
+|---|---|---:|---|---|---|
+| Shipwreck Salt-Zinc Anode | Battery Cell | 1 | Shipwreck supply chest | Near Lead-class capacity (a `SHIPWRECK_SALT_ZINC` cell material plus increased Energy Capacity) | High Idle Loss, 90% Efficiency, half an Iron cell's output |
+| Trial Vault Tempered Pawl | Disassembly Head | 3 | Trial chambers normal vault | +1 Processing Level, so Stage 4 recipes on a Bronze Recycler | More Energy Usage, less Processing Speed |
+
+The Pawl added `DISASSEMBLY_HEAD` as a Unique host with a Component Recycler stat reader and a Processing Level gate. The backlog entry asked for Stage 5 reach, which the one-stage-past rule forbids at slot stage 3, so it ships with Stage 4 reach.
+
 ## Backlog
 
 Status: Planned
@@ -43,14 +56,12 @@ Redesigned 2026-10-04 against current stats and Gear slots. Each entry lists wha
 | Unique | Host | Slot stage | Source | Signature | Drawback | Needs |
 |---|---|---:|---|---|---|---|
 | Blaze Cage Igniter | Fuel Box | 3 | Nether fortress chest | Burns blaze rods and blaze powder at very high Fuel Efficiency and Energy Generation | Rejects every other fuel, one fuel slot | A per-box fuel whitelist in `SolidFuelBurnerFuelRules`. A check that no recipe turns FE into blaze fuel. |
-| Shipwreck Salt-Zinc Anode | Battery Cell | 1 | Shipwreck supply chest | Lead-class capacity at Stage 1 | High Idle Loss, low Efficiency, low output rate | A `BatteryCellMaterial` entry only. |
 | End City Phase-Latched Cell | Battery Cell | 7 | End city treasure | Exotic-class capacity and input transfer | Output rate stays low unless the host has `BURST_RELEASE` | A new `PHASE_LATCH` behavior in Battery Chassis output. |
 | Jungle Tripwire Governor | Servo | 4 | Jungle temple chest | `POWER_GRACE` and high Overheat Tolerance two stages early | Less Processing Speed, and it disables the host's `BULK_SPEED` | A behavior that suppresses `BULK_SPEED`. |
 | Buried Anchor Coil | Resonance Coil | 4 | Buried treasure chest | More Calibration Quality on Structural and Storage patterns, Coil Reach hook (Mass Tuner) | Less Calibration Quality on Conductive and Kinetic patterns | A `PATTERN_AFFINITY` behavior keyed to Calibration Pattern family. |
 | Trail-Sherd Calibration Shim | Stabilizer Matrix | 2 | Trail ruins rare archaeology | High Catalyst Efficiency and Calibration Quality on Stage 4 or lower outputs | Less Calibration Quality on Stage 5+ outputs | An output-stage-aware matrix behavior. The old "failed upgrade recovery" was dropped because upgrade outcomes do not exist. |
 | Stronghold Marginalia Board | Control Board | 6 | Stronghold library chest | Refinement Potential Bonus on Stage 6+ outputs | Low Stability and Calibration Precision on lower outputs | A review of the Refinement Potential economy before any Unique raises RP. |
 | Prismarine Quench Lining | Containment Lining | 3 | Elder guardian drop | Very high Potential Reactor Stability | Less Energy Generation | An entity loot modifier. "Residue safety" was dropped, because `RESIDUE_SCREEN` belongs to Recovery Filters. |
-| Trial Vault Tempered Pawl | Disassembly Head | 3 | Trial chambers normal vault | Stage 5 Processing Level reach on the Component Recycler | More Energy Usage, less Processing Speed | Nothing new. The old `OUTPUT_AMOUNT` drawback was dropped, because the recycler does not read it. |
 | Dungeon Ash Filter | Recovery Filter | 1 | Dungeon chest | Strong residue recovery from low-stage salvage | Slower reactor processing | Loop-audit and recycling-return coverage, because residue is yield. |
 | Mansion Heartwood Splitter | Axe or Treefeller head | 5 | Woodland mansion chest | Very high Tree Fell Limit for Timber Baron carts | Low Durability, high FE Usage | Unique support in `ToolBaseStatCatalog` and the Tool Bench. |
 

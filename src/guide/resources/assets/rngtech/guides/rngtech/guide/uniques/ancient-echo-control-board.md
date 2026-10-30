@@ -2,7 +2,7 @@
 navigation:
   title: "Ancient Echo Control Board"
   parent: uniques.md
-  position: 7
+  position: 9
   icon: rngtech:fortress_heater_element
 ---
 

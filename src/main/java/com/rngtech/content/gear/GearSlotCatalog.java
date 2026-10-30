@@ -1091,10 +1091,10 @@ public final class GearSlotCatalog {
     }
 
     private static List<ItemStack> disassemblyHeads(Predicate<DisassemblyHeadMaterial> filter) {
-        return Arrays.stream(DisassemblyHeadMaterial.values())
+        return withUniques(Arrays.stream(DisassemblyHeadMaterial.values())
                 .filter(filter)
                 .map(material -> item(ModItems.disassemblyHead(material).get()))
-                .toList();
+                .toList(), UniqueHost.DISASSEMBLY_HEAD, filter);
     }
 
     private static List<ItemStack> energyConnectors(Predicate<EnergyConnectorTier> filter) {

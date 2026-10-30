@@ -2,7 +2,7 @@
 navigation:
   title: "Trial Vault Escapement"
   parent: uniques.md
-  position: 5
+  position: 7
   icon: rngtech:fortress_heater_element
 ---
 

@@ -7,6 +7,7 @@ import com.rngtech.content.machine.AlloyCrucibleMaterial;
 import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.FluidPumpMaterial;
 import com.rngtech.content.machine.ServoMaterial;
+import com.rngtech.content.recycling.DisassemblyHeadMaterial;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineType;
 
@@ -23,6 +24,8 @@ public enum UniqueHost {
     SERVO(MachinePartType.SERVO, MachineType.METAL_PRESS, ServoMaterial.values(), ServoMaterial::stage),
     FLUID_PUMP(MachinePartType.FLUID_PUMP, MachineType.MELTER, FluidPumpMaterial.values(), FluidPumpMaterial::stage),
     CONTROL_BOARD(MachinePartType.CONTROL_BOARD, MachineType.RESONANCE_CALIBRATOR, CalibrationGearMaterial.values(), CalibrationGearMaterial::stage),
+    DISASSEMBLY_HEAD(MachinePartType.DISASSEMBLY_HEAD, MachineType.COMPONENT_RECYCLER, DisassemblyHeadMaterial.values(),
+            DisassemblyHeadMaterial::stage),
     BATTERY_CELL(null, MachineType.BATTERY_CELL, normalCells(), BatteryCellMaterial::stage);
 
     private final MachinePartType partType;

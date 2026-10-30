@@ -9,6 +9,8 @@
     "rngtech:trial_vault_escapement",
     "rngtech:witch_bottle_reflux_pump",
     "rngtech:ancient_echo_control_board",
-    "rngtech:bastion_coin_stack_capacitor"
+    "rngtech:bastion_coin_stack_capacitor",
+    "rngtech:shipwreck_salt_zinc_anode",
+    "rngtech:trial_vault_tempered_pawl"
   ]
 }

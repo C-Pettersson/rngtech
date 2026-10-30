@@ -406,6 +406,7 @@ public final class ComponentBaseStatCatalog {
             case SERVO -> servo((ServoMaterial) material);
             case FLUID_PUMP -> fluidPump((FluidPumpMaterial) material);
             case CONTROL_BOARD -> controlBoard((CalibrationGearMaterial) material);
+            case DISASSEMBLY_HEAD -> disassemblyHead((DisassemblyHeadMaterial) material);
             case BATTERY_CELL -> batteryCell((BatteryCellMaterial) material);
         };
     }

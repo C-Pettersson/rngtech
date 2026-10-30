@@ -1,0 +1,21 @@
+{
+    "id": "rngtech:shipwreck_salt_zinc_anode",
+    "host": "battery_cell",
+    "slot_stage": 1,
+    "stats": {
+        "rngtech:energy_capacity": {
+            "operation": "increased",
+            "min": 0.15,
+            "max": 0.35,
+            "role": "signature"
+        },
+        "rngtech:idle_loss": {
+            "operation": "increased",
+            "min": 1.0,
+            "max": 0.5,
+            "role": "drawback"
+        }
+    },
+    "behaviors": [],
+    "source": "rngtech:unique_source.shipwreck_supply"
+}

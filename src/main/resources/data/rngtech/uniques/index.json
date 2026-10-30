@@ -9,6 +9,8 @@
         "trial_vault_escapement.json",
         "witch_bottle_reflux_pump.json",
         "ancient_echo_control_board.json",
-        "bastion_coin_stack_capacitor.json"
+        "bastion_coin_stack_capacitor.json",
+        "shipwreck_salt_zinc_anode.json",
+        "trial_vault_tempered_pawl.json"
     ]
 }

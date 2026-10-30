@@ -12,6 +12,7 @@
     "rngtech:arclite_battery_cell",
     "rngtech:nullite_battery_cell",
     "rngtech:aethergold_battery_cell",
-    "rngtech:exotic_battery_cell"
+    "rngtech:exotic_battery_cell",
+    "rngtech:shipwreck_salt_zinc_anode"
   ]
 }
