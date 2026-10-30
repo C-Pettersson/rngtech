@@ -56,6 +56,7 @@ RNGTech is in active development. Back up your worlds before updating.
 - [Contributing](CONTRIBUTING.md), including building from source
 - [Design documentation](docs/index.md)
 - [Security reporting](SECURITY.md)
+- [Support development on Ko-fi](https://ko-fi.com/vauxite_dev)
 
 ## License
 
