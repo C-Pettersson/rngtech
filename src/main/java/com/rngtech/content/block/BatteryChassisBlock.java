@@ -49,7 +49,7 @@ public class BatteryChassisBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.BATTERY_CHASSIS.get(), BatteryChassisBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.BATTERY_CHASSIS.get(), BatteryChassisBlockEntity::serverTick));
     }
 
     @Override

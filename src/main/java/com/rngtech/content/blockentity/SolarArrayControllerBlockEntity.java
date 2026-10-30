@@ -397,7 +397,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = saveWithoutMetadata(registries);
         tag.putLong(PANEL_MAP_TAG, panelMap);
-        return tag;
+        return withNoiseFactor(tag);
     }
 
     /** Controllers saved as solid cubes stored no light inside their block; recheck it once so the open model is lit. */

@@ -50,11 +50,11 @@ public class ResonanceCalibratorBlock extends WorkOrderMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(
+        return withBodyCues(createTickerHelper(
                 blockEntityType,
                 ModBlockEntities.RESONANCE_CALIBRATOR.get(),
                 ResonanceCalibratorBlockEntity::serverTick
-        );
+        ));
     }
 
     @Override

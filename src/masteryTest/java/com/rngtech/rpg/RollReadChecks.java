@@ -140,6 +140,20 @@ public final class RollReadChecks {
         for (String graced : List.of("electric_furnace", "alloy_furnace", "metal_press")) {
             BEHAVIOR_READS.computeIfAbsent(graced, id -> EnumSet.noneOf(MachineBehavior.class)).add(MachineBehavior.POWER_GRACE);
         }
+        // Glow, Telemetry, and Discreet: the shared machine block entity reads the body's own rolls.
+        for (String lit : List.of("crusher", "furnace", "electric_furnace", "alloy_furnace", "metal_press", "melter",
+                "resonance_calibrator", "battery_assembler", "component_recycler", "compressor_tank", "coal_gasifier",
+                "steam_methane_reformer", "syngas_combustor", "ammonia_synthesizer", "ammonia_fuel_cell", "solid_fuel_burner",
+                "bio_generator", "solar_panel", "solar_array_controller", "potential_reactor", "corrosion_cell",
+                "vacuum_collapse_generator", "cavitation_generator", "battery_chassis")) {
+            READS.get(lit).addAll(List.of(MachineStat.LIGHT_LEVEL, MachineStat.COMPARATOR_READOUT));
+        }
+        for (String quiet : List.of("battery_assembler", "component_recycler", "compressor_tank", "coal_gasifier",
+                "steam_methane_reformer", "syngas_combustor", "ammonia_synthesizer", "ammonia_fuel_cell", "solid_fuel_burner",
+                "bio_generator", "solar_panel", "solar_array_controller", "potential_reactor", "corrosion_cell",
+                "vacuum_collapse_generator", "cavitation_generator", "battery_chassis")) {
+            READS.get(quiet).add(MachineStat.MACHINE_NOISE);
+        }
     }
 
     private RollReadChecks() {

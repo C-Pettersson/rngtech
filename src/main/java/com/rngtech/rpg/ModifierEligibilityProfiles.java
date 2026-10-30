@@ -30,6 +30,12 @@ public final class ModifierEligibilityProfiles {
     private static final int TOOL_VEIN_MINER_WEIGHT = 18;
     private static final int TWINNED_WEIGHT = 15;
     private static final int MINERS_COMPANION_FILTER_SLOTS_WEIGHT = 60;
+    private static final int GLOW_WEIGHT = 70;
+    private static final int DISCREET_WEIGHT = 70;
+    /** Telemetry's weight in total, split evenly across the gauges a machine can report. */
+    private static final int TELEMETRY_WEIGHT = 60;
+    /** Generic Processing Speed beside a named speed, so the shared group lands on fewer Rares. */
+    private static final int GENERIC_SPEED_BESIDE_NAMED_WEIGHT = 75;
 
     private static final List<ModifierValueRange> PERCENT_TIER_RANGES = List.of(
             new ModifierValueRange(2, 5, true),
@@ -515,6 +521,102 @@ public final class ModifierEligibilityProfiles {
             ModifierOperation.ADD,
             INPUT_SLOTS_ADD_RANGES
     ).withRollWeight(TWINNED_WEIGHT);
+    /** Lights the machine while it holds charge or heat. Machine bodies only; Gear never rolls it. */
+    private static final ModifierDefinition GLOW = ModifierDefinition.rollable(
+            "glow",
+            "light_emission",
+            ModifierSlot.SUFFIX,
+            MachineStat.LIGHT_LEVEL,
+            ModifierOperation.ADD,
+            List.of(
+                    ModifierValueRange.fixed(4),
+                    ModifierValueRange.fixed(7),
+                    ModifierValueRange.fixed(10),
+                    ModifierValueRange.fixed(13)
+            )
+    ).withRollWeight(GLOW_WEIGHT);
+    /** Quiets the machine's sound and ambient particles. Mastery machines leave silence to the Silent Operation keystone. */
+    private static final ModifierDefinition DISCREET = ModifierDefinition.rollable(
+            "discreet",
+            "sound_dampening",
+            ModifierSlot.PREFIX,
+            MachineStat.MACHINE_NOISE,
+            ModifierOperation.DECREASED_PERCENT,
+            List.of(
+                    ModifierValueRange.fixed(25),
+                    ModifierValueRange.fixed(45),
+                    ModifierValueRange.fixed(65),
+                    ModifierValueRange.fixed(85)
+            )
+    ).withRollWeight(DISCREET_WEIGHT);
+    private static final ModifierDefinition TELEMETRY_ENERGY = ModifierDefinition.rollableUntiered(
+            "telemetry_energy",
+            "comparator_readout",
+            ModifierSlot.SUFFIX,
+            MachineStat.COMPARATOR_READOUT,
+            ModifierOperation.ADD,
+            ModifierValueRange.fixed(1)
+    );
+    private static final ModifierDefinition TELEMETRY_PROGRESS = ModifierDefinition.rollableUntiered(
+            "telemetry_progress",
+            "comparator_readout",
+            ModifierSlot.SUFFIX,
+            MachineStat.COMPARATOR_READOUT,
+            ModifierOperation.ADD,
+            ModifierValueRange.fixed(1)
+    );
+    private static final ModifierDefinition TELEMETRY_OUTPUT = ModifierDefinition.rollableUntiered(
+            "telemetry_output",
+            "comparator_readout",
+            ModifierSlot.SUFFIX,
+            MachineStat.COMPARATOR_READOUT,
+            ModifierOperation.ADD,
+            ModifierValueRange.fixed(1)
+    );
+    private static final ModifierDefinition TELEMETRY_HEAT = ModifierDefinition.rollableUntiered(
+            "telemetry_heat",
+            "comparator_readout",
+            ModifierSlot.SUFFIX,
+            MachineStat.COMPARATOR_READOUT,
+            ModifierOperation.ADD,
+            ModifierValueRange.fixed(1)
+    );
+    private static final Map<TelemetryReadout, ModifierDefinition> TELEMETRY = Map.of(
+            TelemetryReadout.ENERGY, TELEMETRY_ENERGY,
+            TelemetryReadout.PROGRESS, TELEMETRY_PROGRESS,
+            TelemetryReadout.OUTPUT, TELEMETRY_OUTPUT,
+            TelemetryReadout.HEAT, TELEMETRY_HEAT
+    );
+    /** The gauges each Telemetry host can report, by profile id. Heat needs a machine with a Heat Core. */
+    private static final Map<String, List<TelemetryReadout>> TELEMETRY_READOUTS = Map.ofEntries(
+            Map.entry("crusher", List.of(TelemetryReadout.ENERGY, TelemetryReadout.PROGRESS, TelemetryReadout.OUTPUT)),
+            Map.entry("furnace", List.of(TelemetryReadout.PROGRESS, TelemetryReadout.OUTPUT, TelemetryReadout.HEAT)),
+            Map.entry("electric_furnace", List.of(
+                    TelemetryReadout.ENERGY, TelemetryReadout.PROGRESS, TelemetryReadout.OUTPUT, TelemetryReadout.HEAT)),
+            Map.entry("alloy_furnace", List.of(
+                    TelemetryReadout.ENERGY, TelemetryReadout.PROGRESS, TelemetryReadout.OUTPUT, TelemetryReadout.HEAT)),
+            Map.entry("metal_press", List.of(
+                    TelemetryReadout.ENERGY, TelemetryReadout.PROGRESS, TelemetryReadout.OUTPUT, TelemetryReadout.HEAT)),
+            Map.entry("melter", List.of(TelemetryReadout.ENERGY, TelemetryReadout.PROGRESS, TelemetryReadout.HEAT)),
+            Map.entry("resonance_calibrator", List.of(TelemetryReadout.ENERGY, TelemetryReadout.PROGRESS, TelemetryReadout.OUTPUT)),
+            Map.entry("component_recycler", List.of(TelemetryReadout.ENERGY, TelemetryReadout.PROGRESS, TelemetryReadout.OUTPUT)),
+            Map.entry("battery_assembler", List.of(TelemetryReadout.ENERGY, TelemetryReadout.PROGRESS, TelemetryReadout.OUTPUT)),
+            Map.entry("coal_gasifier", List.of(TelemetryReadout.ENERGY, TelemetryReadout.PROGRESS, TelemetryReadout.OUTPUT)),
+            Map.entry("steam_methane_reformer", List.of(TelemetryReadout.ENERGY, TelemetryReadout.PROGRESS)),
+            Map.entry("ammonia_synthesizer", List.of(TelemetryReadout.ENERGY, TelemetryReadout.PROGRESS)),
+            Map.entry("compressor_tank", List.of(TelemetryReadout.ENERGY)),
+            Map.entry("solid_fuel_burner", List.of(TelemetryReadout.ENERGY)),
+            Map.entry("bio_generator", List.of(TelemetryReadout.ENERGY)),
+            Map.entry("solar_panel", List.of(TelemetryReadout.ENERGY)),
+            Map.entry("solar_array_controller", List.of(TelemetryReadout.ENERGY)),
+            Map.entry("potential_reactor", List.of(TelemetryReadout.ENERGY)),
+            Map.entry("corrosion_cell", List.of(TelemetryReadout.ENERGY)),
+            Map.entry("vacuum_collapse_generator", List.of(TelemetryReadout.ENERGY)),
+            Map.entry("syngas_combustor", List.of(TelemetryReadout.ENERGY)),
+            Map.entry("cavitation_generator", List.of(TelemetryReadout.ENERGY)),
+            Map.entry("ammonia_fuel_cell", List.of(TelemetryReadout.ENERGY)),
+            Map.entry("battery_chassis", List.of(TelemetryReadout.ENERGY))
+    );
     private static final ModifierDefinition FUEL_EFFICIENCY = percent(ModifierSlot.PREFIX, MachineStat.FUEL_EFFICIENCY);
     private static final ModifierDefinition STABILITY = percent(ModifierSlot.SUFFIX, MachineStat.STABILITY);
     private static final ModifierDefinition TEMPERATURE_STABILITY =
@@ -1540,6 +1642,10 @@ public final class ModifierEligibilityProfiles {
     ).withRollWeight(60);
 
     private static final Set<String> DESCRIBED_AFFIX_IDS = Set.of(
+            TELEMETRY_ENERGY.id(),
+            TELEMETRY_PROGRESS.id(),
+            TELEMETRY_OUTPUT.id(),
+            TELEMETRY_HEAT.id(),
             CRUSHER_SALVAGE.id(),
             CRUSH_HEAD_JAGGED.id(),
             CRUSH_HEAD_SCUFFED.id(),
@@ -1613,6 +1719,8 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CRUSHER = profile(
             "crusher",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
@@ -1648,6 +1756,8 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile FURNACE = profile(
             "furnace",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_BATCHING,
                     ModifierCapability.HAS_INPUT_SLOT,
@@ -1676,6 +1786,8 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile ELECTRIC_FURNACE = profile(
             "electric_furnace",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_BATCHING,
                     ModifierCapability.HAS_FE_STORAGE,
@@ -1707,6 +1819,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile SOLID_FUEL_BURNER = profile(
             "solid_fuel_burner",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_OUTPUT,
                     ModifierCapability.HAS_FE_GENERATION,
                     ModifierCapability.HAS_FUEL_SLOT,
@@ -1726,6 +1841,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile BIO_GENERATOR = profile(
             "bio_generator",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_OUTPUT,
                     ModifierCapability.HAS_FE_GENERATION,
@@ -1743,6 +1861,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile SOLAR_PANEL = profile(
             "solar_panel",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_OUTPUT,
                     ModifierCapability.HAS_FE_GENERATION,
@@ -1753,6 +1874,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile SOLAR_ARRAY_CONTROLLER = profile(
             "solar_array_controller",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_OUTPUT,
                     ModifierCapability.HAS_FE_GENERATION,
@@ -1765,6 +1889,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile POTENTIAL_REACTOR = profile(
             "potential_reactor",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_OUTPUT,
                     ModifierCapability.HAS_FE_GENERATION,
@@ -1785,6 +1912,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CORROSION_CELL = profile(
             "corrosion_cell",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_OUTPUT,
                     ModifierCapability.HAS_FE_GENERATION,
@@ -1811,6 +1941,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile VACUUM_COLLAPSE_GENERATOR = profile(
             "vacuum_collapse_generator",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_OUTPUT,
                     ModifierCapability.HAS_FE_GENERATION,
@@ -1832,6 +1965,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile COMPONENT_RECYCLER = profile(
             "component_recycler",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_INPUT_SLOT,
@@ -1852,6 +1988,8 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile METAL_PRESS = profile(
             "metal_press",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_BATCHING,
                     ModifierCapability.HAS_FE_STORAGE,
@@ -1883,6 +2021,8 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile MELTER = profile(
             "melter",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_BATCHING,
                     ModifierCapability.HAS_FE_STORAGE,
@@ -1912,6 +2052,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile BATTERY_ASSEMBLER = profile(
             "battery_assembler",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_INPUT_SLOT,
@@ -1936,6 +2079,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile COAL_GASIFIER = profile(
             "coal_gasifier",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_INPUT_SLOT,
@@ -1961,6 +2107,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile SYNGAS_COMBUSTOR = profile(
             "syngas_combustor",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_OUTPUT,
                     ModifierCapability.HAS_FE_GENERATION,
@@ -1983,6 +2132,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile STEAM_METHANE_REFORMER = profile(
             "steam_methane_reformer",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_PROCESSING,
@@ -2006,6 +2158,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CAVITATION_GENERATOR = profile(
             "cavitation_generator",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_OUTPUT,
                     ModifierCapability.HAS_FE_GENERATION,
@@ -2034,6 +2189,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile AMMONIA_SYNTHESIZER = profile(
             "ammonia_synthesizer",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_INPUT_SLOT,
@@ -2057,6 +2215,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile AMMONIA_FUEL_CELL = profile(
             "ammonia_fuel_cell",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_OUTPUT,
                     ModifierCapability.HAS_FE_GENERATION,
@@ -2098,6 +2259,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile COMPRESSOR_TANK = profile(
             "compressor_tank",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_FLUID_STORAGE,
@@ -2126,6 +2290,8 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile ALLOY_FURNACE = profile(
             "alloy_furnace",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_BATCHING,
                     ModifierCapability.HAS_FE_STORAGE,
@@ -2157,6 +2323,8 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile RESONANCE_CALIBRATOR = profile(
             "resonance_calibrator",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
                     ModifierCapability.HAS_BATCHING,
                     ModifierCapability.HAS_FE_STORAGE,
@@ -2317,6 +2485,9 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile BATTERY_CHASSIS = profile(
             "battery_chassis",
             Set.of(
+                    ModifierCapability.HAS_WORK_LIGHT,
+                    ModifierCapability.HAS_MACHINE_NOISE,
+                    ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_FE_STORAGE,
                     ModifierCapability.HAS_FE_INPUT,
                     ModifierCapability.HAS_FE_OUTPUT,
@@ -2965,9 +3136,36 @@ public final class ModifierEligibilityProfiles {
             definitions = new ArrayList<>(definitions);
             definitions.add(TWINNED);
         }
+        if (capabilities.contains(ModifierCapability.HAS_WORK_LIGHT)) {
+            definitions = new ArrayList<>(definitions);
+            definitions.add(GLOW);
+        }
+        if (capabilities.contains(ModifierCapability.HAS_MACHINE_NOISE)) {
+            definitions = new ArrayList<>(definitions);
+            definitions.add(DISCREET);
+        }
+        if (capabilities.contains(ModifierCapability.HAS_TELEMETRY)) {
+            definitions = new ArrayList<>(definitions);
+            definitions.addAll(telemetryAffixes(id));
+        }
         ModifierEligibilityProfile profile = new ModifierEligibilityProfile(id, capabilities, definitions, rollableBehaviors);
         validateProfile(profile);
         return profile;
+    }
+
+    /** One Telemetry line per gauge the machine can report, sharing {@link #TELEMETRY_WEIGHT} evenly. */
+    private static List<ModifierDefinition> telemetryAffixes(String profileId) {
+        List<TelemetryReadout> readouts = TELEMETRY_READOUTS.get(profileId);
+        if (readouts == null) {
+            throw new IllegalStateException("Telemetry host " + profileId + " lists no readouts");
+        }
+        int weight = TELEMETRY_WEIGHT / readouts.size();
+        return readouts.stream().map(readout -> TELEMETRY.get(readout).withRollWeight(weight)).toList();
+    }
+
+    /** The gauges a Telemetry host can report, empty for machines that cannot roll Telemetry. */
+    public static List<TelemetryReadout> telemetryReadouts(String profileId) {
+        return TELEMETRY_READOUTS.getOrDefault(profileId, List.of());
     }
 
     public static String behaviorModGroup(MachineBehavior behavior) {
@@ -3062,7 +3260,7 @@ public final class ModifierEligibilityProfiles {
             List<ModifierDefinition> extras,
             MachineStat... stats
     ) {
-        LinkedHashSet<ModifierDefinition> definitions = new LinkedHashSet<>(affixes(extras, stats));
+        LinkedHashSet<ModifierDefinition> definitions = new LinkedHashSet<>(besideNamedSpeed(affixes(extras, stats)));
         definitions.add(processingSpecific(actionId));
         definitions.add(INSTANT_PROCESS);
         if (itemOutput) {
@@ -3134,9 +3332,15 @@ public final class ModifierEligibilityProfiles {
             List<ModifierDefinition> extras,
             MachineStat... stats
     ) {
-        LinkedHashSet<ModifierDefinition> definitions = new LinkedHashSet<>(affixes(extras, stats));
+        LinkedHashSet<ModifierDefinition> definitions = new LinkedHashSet<>(besideNamedSpeed(affixes(extras, stats)));
         definitions.add(processingSpecific(actionId));
         return List.copyOf(definitions);
+    }
+
+    private static List<ModifierDefinition> besideNamedSpeed(List<ModifierDefinition> definitions) {
+        return definitions.stream()
+                .map(definition -> definition == PROCESSING_SPEED ? PROCESSING_SPEED.withRollWeight(GENERIC_SPEED_BESIDE_NAMED_WEIGHT) : definition)
+                .toList();
     }
 
     private static List<ModifierDefinition> poweredProcessingAffixes(
@@ -3292,6 +3496,9 @@ public final class ModifierEligibilityProfiles {
         put(definitions, ModifierCapability.HAS_FLUID_STORAGE, FLUID_CAPACITY_ADD, FLUID_CAPACITY);
         put(definitions, ModifierCapability.HAS_MASTERY_ATTRIBUTES, MASTERY_CONTROL, MASTERY_DRIVE, MASTERY_RESERVE, MASTERY_XP);
         put(definitions, ModifierCapability.HAS_BATCHING, TWINNED);
+        put(definitions, ModifierCapability.HAS_WORK_LIGHT, GLOW);
+        put(definitions, ModifierCapability.HAS_MACHINE_NOISE, DISCREET);
+        put(definitions, ModifierCapability.HAS_TELEMETRY, TELEMETRY_ENERGY, TELEMETRY_PROGRESS, TELEMETRY_OUTPUT, TELEMETRY_HEAT);
         put(definitions, ModifierCapability.HAS_FLUID_INPUT, FLUID_TRANSFER);
         put(definitions, ModifierCapability.HAS_FLUID_OUTPUT, FLUID_TRANSFER);
         put(

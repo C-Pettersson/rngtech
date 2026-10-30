@@ -58,11 +58,11 @@ public class ComponentRecyclerBlock extends WorkOrderMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(
+        return withBodyCues(createTickerHelper(
                 blockEntityType,
                 ModBlockEntities.COMPONENT_RECYCLER.get(),
                 ComponentRecyclerBlockEntity::serverTick
-        );
+        ));
     }
 
     /**
@@ -71,6 +71,9 @@ public class ComponentRecyclerBlock extends WorkOrderMachineBlock {
      */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (BaseMachineBlockEntity.skipsParticle(level, pos, random)) {
+            return;
+        }
         if (!state.getValue(ACTIVE) || !(level.getBlockEntity(pos) instanceof ComponentRecyclerBlockEntity recycler)) {
             return;
         }

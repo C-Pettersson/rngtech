@@ -295,7 +295,7 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return currentVisualState().save();
+        return withNoiseFactor(currentVisualState().save());
     }
 
     @Override
@@ -305,11 +305,13 @@ public class CorrosionCellBlockEntity extends BaseMachineBlockEntity
 
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        readNoiseFactor(tag);
         visualState = CorrosionVisualState.load(tag);
     }
 
     @Override
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        readNoiseFactor(packet.getTag());
         visualState = CorrosionVisualState.load(packet.getTag());
     }
 

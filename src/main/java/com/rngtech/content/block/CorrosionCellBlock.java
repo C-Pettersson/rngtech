@@ -43,12 +43,15 @@ public class CorrosionCellBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.CORROSION_CELL.get(), CorrosionCellBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.CORROSION_CELL.get(), CorrosionCellBlockEntity::serverTick));
     }
 
     /** Hydrogen from the dissolving fuel vents as a faint mist from the stack, more of it at higher current. */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (BaseMachineBlockEntity.skipsParticle(level, pos, random)) {
+            return;
+        }
         if (!(level.getBlockEntity(pos) instanceof CorrosionCellBlockEntity cell)) {
             return;
         }

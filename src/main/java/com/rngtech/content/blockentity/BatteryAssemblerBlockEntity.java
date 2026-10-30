@@ -336,7 +336,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return currentVisualState().save(registries);
+        return withNoiseFactor(currentVisualState().save(registries));
     }
 
     @Override
@@ -346,11 +346,13 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
 
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        readNoiseFactor(tag);
         visualState = BatteryAssemblerVisualState.load(tag, registries);
     }
 
     @Override
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        readNoiseFactor(packet.getTag());
         visualState = BatteryAssemblerVisualState.load(packet.getTag(), registries);
     }
 

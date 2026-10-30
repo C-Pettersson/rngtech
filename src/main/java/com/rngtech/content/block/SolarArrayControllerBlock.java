@@ -41,7 +41,7 @@ public class SolarArrayControllerBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.SOLAR_ARRAY_CONTROLLER.get(), SolarArrayControllerBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.SOLAR_ARRAY_CONTROLLER.get(), SolarArrayControllerBlockEntity::serverTick));
     }
 
     @Override

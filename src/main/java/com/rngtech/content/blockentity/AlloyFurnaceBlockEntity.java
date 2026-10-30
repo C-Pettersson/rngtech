@@ -1055,6 +1055,11 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
     }
 
     @Override
+    protected double heatFraction() {
+        return HeatEngine.heatFraction(heat.exactTemperature(), effectiveStats().intValue(MachineStat.MAX_TEMPERATURE));
+    }
+
+    @Override
     public boolean mutesMachineSound() {
         return MegaPassiveTree.has(machineProgression(), "MUTE_MACHINE_SOUND");
     }

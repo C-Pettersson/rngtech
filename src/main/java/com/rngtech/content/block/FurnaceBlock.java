@@ -56,7 +56,7 @@ public class FurnaceBlock extends WorkOrderMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.FURNACE.get(), FurnaceBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.FURNACE.get(), FurnaceBlockEntity::serverTick));
     }
 
     /** Smoke rises from the Stage 0 Furnace's chimney while it burns fuel. */

@@ -41,7 +41,7 @@ public class BatteryAssemblerBlock extends WorkOrderMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.BATTERY_ASSEMBLER.get(), BatteryAssemblerBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.BATTERY_ASSEMBLER.get(), BatteryAssemblerBlockEntity::serverTick));
     }
 
     @Override

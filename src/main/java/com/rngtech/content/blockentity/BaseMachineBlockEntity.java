@@ -3,6 +3,7 @@ package com.rngtech.content.blockentity;
 import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.block.AmmoniaFuelCellBlock;
 import com.rngtech.content.block.AmmoniaSynthesizerBlock;
+import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.BatteryAssemblerBlock;
 import com.rngtech.content.block.BatteryChassisBlock;
 import com.rngtech.content.block.BioGeneratorBlock;
@@ -25,10 +26,15 @@ import com.rngtech.content.block.WorkOrderMachineBlock;
 import com.rngtech.content.item.RefinementConsumableItem;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineImplicitCatalog;
+import com.rngtech.rpg.MachineModifier;
+import com.rngtech.rpg.MachineModifierEffect;
+import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
+import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.PhaseArrayRules;
+import com.rngtech.rpg.TelemetryReadout;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
@@ -42,6 +48,8 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -63,6 +71,12 @@ import java.util.function.Supplier;
 public abstract class BaseMachineBlockEntity extends BlockEntity implements RefinableMachine {
     private static final long REMOVED_GEAR_CHECK_INTERVAL = 20L;
     private static final double REMOVED_GEAR_PLAYER_RANGE = 16.0D;
+    private static final int BODY_CUE_INTERVAL = 20;
+    private static final double GLOW_ON_FILL = 0.10D;
+    private static final double GLOW_OFF_FILL = 0.05D;
+    private static final long GLOW_HOLD_TICKS = 100L;
+    private static final String TELEMETRY_GROUP = "comparator_readout";
+    private static final String NOISE_FACTOR_TAG = "NoiseFactor";
 
     private final IItemHandler topItemHandler;
     private final IItemHandler sideItemHandler;
@@ -95,6 +109,9 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
     private MachineTraits effectiveTraits;
     private MachineTraits effectiveTraitsStored;
     private Block effectiveTraitsBlock;
+    private long glowChangedAt = -GLOW_HOLD_TICKS;
+    private int lastTelemetrySignal = -1;
+    private float syncedNoiseFactor = 1.0F;
 
     protected BaseMachineBlockEntity(
             BlockEntityType<?> blockEntityType,
@@ -157,6 +174,9 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
                 .build()
         );
         setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
     }
 
     /**
@@ -374,6 +394,166 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         return false;
     }
 
+    /** How loud this machine's sound and ambient particles are: 1, or less on a Discreet body. Clients read the synced value. */
+    public final float noiseFactor() {
+        return level != null && level.isClientSide ? syncedNoiseFactor : bodyNoiseFactor();
+    }
+
+    /** Whether a Discreet machine skips this ambient particle, so its particles thin out with its sound. */
+    public static boolean skipsParticle(Level level, BlockPos pos, RandomSource random) {
+        return level.getBlockEntity(pos) instanceof BaseMachineBlockEntity machine && random.nextFloat() >= machine.noiseFactor();
+    }
+
+    /** Adds the Discreet noise factor to an update tag, for hosts that sync only their visual state. */
+    protected final CompoundTag withNoiseFactor(CompoundTag tag) {
+        float factor = bodyNoiseFactor();
+        if (factor < 1.0F) {
+            tag.putFloat(NOISE_FACTOR_TAG, factor);
+        }
+        return tag;
+    }
+
+    protected final void readNoiseFactor(CompoundTag tag) {
+        syncedNoiseFactor = tag.contains(NOISE_FACTOR_TAG) ? tag.getFloat(NOISE_FACTOR_TAG) : 1.0F;
+    }
+
+    private float bodyNoiseFactor() {
+        return (float) Mth.clamp(1.0D - bodyEffect(MachineStat.MACHINE_NOISE, ModifierOperation.DECREASED_PERCENT) / 100.0D, 0.0D, 1.0D);
+    }
+
+    /**
+     * Every second, lights or darkens a Glow body and tells comparators when a Telemetry gauge moved. The light comes on
+     * at 10% fill and goes off below 5%, and holds each change for 5 seconds, so it never flashes between recipes.
+     */
+    public final void tickBodyCues(Level level, BlockPos pos) {
+        if (Math.floorMod(level.getGameTime() + pos.hashCode(), BODY_CUE_INTERVAL) != 0) {
+            return;
+        }
+        BlockState state = level.getBlockState(pos);
+        if (state.hasProperty(BaseMachineBlock.GLOW)) {
+            updateGlow(level, pos, state);
+        }
+        int signal = telemetrySignal();
+        if (signal != lastTelemetrySignal) {
+            lastTelemetrySignal = signal;
+            level.updateNeighbourForOutputSignal(pos, state.getBlock());
+        }
+    }
+
+    private void updateGlow(Level level, BlockPos pos, BlockState state) {
+        int target = glowIndex(bodyEffect(MachineStat.LIGHT_LEVEL, ModifierOperation.ADD));
+        int current = state.getValue(BaseMachineBlock.GLOW);
+        if (target == 0 && current == 0) {
+            return;
+        }
+        boolean lit = current > 0;
+        boolean wantLit = target > 0 && glowFill() >= (lit ? GLOW_OFF_FILL : GLOW_ON_FILL);
+        int next = wantLit ? target : 0;
+        if (next == current) {
+            return;
+        }
+        long time = level.getGameTime();
+        if (target > 0 && lit != wantLit) {
+            if (time - glowChangedAt < GLOW_HOLD_TICKS) {
+                return;
+            }
+            glowChangedAt = time;
+        }
+        level.setBlock(pos, state.setValue(BaseMachineBlock.GLOW, next), Block.UPDATE_CLIENTS);
+    }
+
+    private static int glowIndex(double lightLevel) {
+        if (lightLevel <= 0.0D) {
+            return 0;
+        }
+        int index = 1;
+        for (int candidate = 2; candidate < BaseMachineBlock.GLOW_LIGHT_LEVELS.length; candidate++) {
+            if (lightLevel >= BaseMachineBlock.GLOW_LIGHT_LEVELS[candidate]) {
+                index = candidate;
+            }
+        }
+        return index;
+    }
+
+    /** How full the FE buffer is, or for a machine without one, how hot it runs against its Max Temperature. */
+    private double glowFill() {
+        double energy = energyFill();
+        return energy >= 0.0D ? energy : heatFraction();
+    }
+
+    private double energyFill() {
+        if (this instanceof MachineInfoProvider provider) {
+            MachineInfoSnapshot info = provider.machineInfo();
+            if (info.energyCapacity() > 0L) {
+                return Math.max(0L, info.energy()) / (double) info.energyCapacity();
+            }
+        }
+        return -1.0D;
+    }
+
+    /** The machine's temperature against its Max Temperature, or -1 for a machine without heat. */
+    protected double heatFraction() {
+        return -1.0D;
+    }
+
+    /** The comparator signal of a Telemetry body's gauge, or -1 when the body has no Telemetry. */
+    public int telemetrySignal() {
+        TelemetryReadout readout = telemetryReadout();
+        if (readout == null) {
+            return -1;
+        }
+        double fill = switch (readout) {
+            case ENERGY -> energyFill();
+            case PROGRESS -> progressFill();
+            case OUTPUT -> {
+                IItemHandler output = getItemHandler(Direction.DOWN);
+                yield output == null ? 0.0D : ItemHandlerHelper.calcRedstoneFromInventory(output) / 15.0D;
+            }
+            case HEAT -> heatFraction();
+        };
+        return fillSignal(fill);
+    }
+
+    private double progressFill() {
+        if (this instanceof MachineInfoProvider provider) {
+            MachineInfoSnapshot info = provider.machineInfo();
+            if (info.progressMax() > 0 && info.progress() > 0) {
+                return info.progress() / (double) info.progressMax();
+            }
+        }
+        return 0.0D;
+    }
+
+    /** Scales a fill to a comparator signal the way vanilla containers do: empty is 0, any fill at least 1, full 15. */
+    public static int fillSignal(double fill) {
+        if (!(fill > 0.0D)) {
+            return 0;
+        }
+        return Math.min(15, 1 + (int) Math.floor(Math.min(1.0D, fill) * 14.0D));
+    }
+
+    private TelemetryReadout telemetryReadout() {
+        for (MachineModifier modifier : effectiveTraits().activeModifiers()) {
+            if (TELEMETRY_GROUP.equals(modifier.modGroup())) {
+                return TelemetryReadout.byAffixId(modifier.affixId());
+            }
+        }
+        return null;
+    }
+
+    /** The summed value of {@code stat} with {@code operation} across the machine body's own rolls. */
+    private double bodyEffect(MachineStat stat, ModifierOperation operation) {
+        double total = 0.0D;
+        for (MachineModifier modifier : effectiveTraits().activeModifiers()) {
+            for (MachineModifierEffect effect : modifier.effects()) {
+                if (effect.stat() == stat && effect.operation() == operation) {
+                    total += effect.value();
+                }
+            }
+        }
+        return total;
+    }
+
     @Override
     public ItemStackHandler getRefinementInventory() {
         return refinementInventory;
@@ -521,6 +701,7 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         statsCache.invalidate();
+        readNoiseFactor(tag);
         refinementInventory.deserializeNBT(registries, tag.getCompound("RefinementInventory"));
         removedGear.clear();
         ListTag removed = tag.getList("RemovedGear", Tag.TAG_COMPOUND);
