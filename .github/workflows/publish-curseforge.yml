@@ -39,6 +39,11 @@ on:
         required: true
         default: true
         type: boolean
+      announce_discord:
+        description: 'Post the release to the Discord announcement channel. Skipped when the file is marked for manual release.'
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: read
@@ -53,6 +58,7 @@ jobs:
     timeout-minutes: 30
     env:
       CURSEFORGE_UPLOAD_BASE_URL: https://minecraft.curseforge.com
+      CURSEFORGE_PROJECT_URL: https://www.curseforge.com/minecraft/mc-mods/rngtech
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -310,3 +316,76 @@ jobs:
 
           FILE_ID="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["id"])' "$RESPONSE")"
           echo "Uploaded CurseForge FTB Quests extra file id $FILE_ID."
+
+      - name: Announce release on Discord
+        if: ${{ inputs.announce_discord && !inputs.mark_for_manual_release }}
+        env:
+          DISCORD_RELEASE_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+          VERSION: ${{ steps.version.outputs.version }}
+          FILE_ID: ${{ steps.main_upload.outputs.file_id }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
+          GAME_VERSION_NAMES: ${{ inputs.game_version_names }}
+          CHANGELOG: ${{ inputs.changelog }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${DISCORD_RELEASE_WEBHOOK:-}" ]]; then
+            echo "::notice::Repository secret DISCORD_RELEASE_WEBHOOK is not set; skipping the Discord announcement."
+            exit 0
+          fi
+
+          PAYLOAD="$RUNNER_TEMP/discord-payload.json"
+          RESPONSE="$RUNNER_TEMP/discord-response.json"
+
+          python3 - "$PAYLOAD" <<'PY'
+          import json
+          import os
+          import sys
+
+          output_path = sys.argv[1]
+          version = os.environ["VERSION"]
+          release_type = os.environ["RELEASE_TYPE"]
+
+          changelog = os.environ.get("CHANGELOG", "").strip()
+          if not changelog:
+              changelog = f"RNGTech v{version} is out."
+          if len(changelog) > 4000:
+              changelog = changelog[:3997].rstrip() + "..."
+
+          colors = {"alpha": 0xE67E22, "beta": 0x3498DB, "release": 0x2ECC71}
+          payload = {
+              "allowed_mentions": {"parse": []},
+              "embeds": [
+                  {
+                      "title": f"RNGTech v{version}",
+                      "url": f"{os.environ['CURSEFORGE_PROJECT_URL']}/files/{os.environ['FILE_ID']}",
+                      "description": changelog,
+                      "color": colors.get(release_type, 0x5865F2),
+                      "fields": [
+                          {"name": "Release type", "value": release_type.capitalize(), "inline": True},
+                          {"name": "Game versions", "value": os.environ["GAME_VERSION_NAMES"], "inline": True},
+                      ],
+                  }
+              ],
+          }
+
+          with open(output_path, "w", encoding="utf-8") as handle:
+              json.dump(payload, handle, separators=(",", ":"))
+          PY
+
+          HTTP_STATUS="$(
+            curl --silent --show-error --write-out '%{http_code}' --output "$RESPONSE" \
+              --request POST \
+              --url "$DISCORD_RELEASE_WEBHOOK" \
+              --header 'Content-Type: application/json' \
+              --data "@$PAYLOAD"
+          )"
+
+          if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -ge 300 ]]; then
+            echo "::warning::Discord announcement failed with HTTP $HTTP_STATUS. The CurseForge upload succeeded; post the announcement by hand."
+            head -c 2000 "$RESPONSE" >&2 || true
+            exit 0
+          fi
+
+          echo "Posted the Discord announcement."
