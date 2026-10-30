@@ -2,7 +2,7 @@
 navigation:
   title: "Corruption implicits"
   parent: rarity-and-affixes.md
-  position: 13
+  position: 14
   icon: rngtech:affix_injector
 ---
 

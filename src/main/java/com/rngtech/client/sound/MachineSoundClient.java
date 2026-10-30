@@ -131,18 +131,19 @@ public final class MachineSoundClient {
         }
 
         activePositions.add(key);
+        float noiseFactor = machine.noiseFactor();
         MachineLoopSound current = ACTIVE_LOOPS.get(key);
-        if (current != null && (current.profile() != profile || current.isStopping())) {
+        if (current != null && (current.profile() != profile || current.isStopping() || current.noiseFactor() != noiseFactor)) {
             current.stopNow();
             ACTIVE_LOOPS.remove(key);
             current = null;
         }
 
         if (current == null) {
-            MachineLoopSound sound = new MachineLoopSound(key, profile, machine.refinementComponentStage());
+            MachineLoopSound sound = new MachineLoopSound(key, profile, machine.refinementComponentStage(), noiseFactor);
             ACTIVE_LOOPS.put(key, sound);
             minecraft.getSoundManager().play(sound);
-            playCue(minecraft, profile.startSound(), key, profile, machine.refinementComponentStage(), tick);
+            playCue(minecraft, profile.startSound(), key, profile, machine.refinementComponentStage(), noiseFactor, tick);
         }
     }
 
@@ -160,7 +161,7 @@ public final class MachineSoundClient {
                 MachineLoopSound sound = entry.getValue();
                 if (!sound.isStopping()) {
                     sound.beginStopping();
-                    playCue(minecraft, sound.profile().stopSound(), entry.getKey(), sound.profile(), sound.stage(), tick);
+                    playCue(minecraft, sound.profile().stopSound(), entry.getKey(), sound.profile(), sound.stage(), sound.noiseFactor(), tick);
                 }
             }
         }
@@ -172,6 +173,7 @@ public final class MachineSoundClient {
             BlockPos pos,
             MachineSoundProfile profile,
             int stage,
+            float noiseFactor,
             int tick
     ) {
         Integer cooldownUntil = CUE_COOLDOWNS.get(pos);
@@ -182,7 +184,7 @@ public final class MachineSoundClient {
         minecraft.getSoundManager().play(new SimpleSoundInstance(
                 sound,
                 SoundSource.BLOCKS,
-                profile.cueVolume(stage),
+                profile.cueVolume(stage) * noiseFactor,
                 profile.pitch(stage),
                 SoundInstance.createUnseededRandom(),
                 pos

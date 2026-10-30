@@ -328,7 +328,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return currentVisualState().save(registries);
+        return withNoiseFactor(currentVisualState().save(registries));
     }
 
     @Override
@@ -338,11 +338,13 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        readNoiseFactor(tag);
         visualState = ComponentRecyclerVisualState.load(tag, registries);
     }
 
     @Override
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        readNoiseFactor(packet.getTag());
         visualState = ComponentRecyclerVisualState.load(packet.getTag(), registries);
     }
 

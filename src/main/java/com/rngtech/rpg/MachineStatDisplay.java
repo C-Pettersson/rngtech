@@ -78,6 +78,7 @@ public final class MachineStatDisplay {
             case FLUID_TRANSFER -> formatNumber(value) + " mB/t";
             case COMPRESSION_RATIO -> formatNumber(value) + ":1";
             case MAX_TEMPERATURE -> formatNumber(Math.round(value)) + " heat";
+            case LIGHT_LEVEL -> "level " + formatNumber(value);
             case BURST_DURATION, ORE_BURST_DURATION, ORE_BURST_COOLDOWN -> formatUnit(value, "tick", "ticks");
             case DURABILITY -> formatNumber(value) + " durability";
             case SELF_REPAIR -> formatNumber(value) + " durability";
@@ -178,6 +179,9 @@ public final class MachineStatDisplay {
     }
 
     public static MutableComponent effectText(MachineModifierEffect effect) {
+        if (effect.stat() == MachineStat.COMPARATOR_READOUT) {
+            return Component.translatable(effect.stat().translationKey());
+        }
         double amount = switch (effect.operation()) {
             case MORE -> (effect.value() - 1.0) * 100.0;
             case LESS -> (1.0 - effect.value()) * 100.0;
@@ -188,6 +192,9 @@ public final class MachineStatDisplay {
     }
 
     public static String effectValue(MachineModifierEffect effect) {
+        if (effect.stat() == MachineStat.COMPARATOR_READOUT) {
+            return "on";
+        }
         return switch (effect.operation()) {
             case ADD -> formatAdditiveEffectValue(effect.stat(), effect.value());
             case INCREASED_PERCENT -> formatSignedPercentPoints(effect.value());

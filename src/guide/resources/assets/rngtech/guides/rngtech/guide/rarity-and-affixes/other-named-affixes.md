@@ -2,7 +2,7 @@
 navigation:
   title: "Other named affixes"
   parent: rarity-and-affixes.md
-  position: 9
+  position: 10
   icon: rngtech:affix_injector
 ---
 

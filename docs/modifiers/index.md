@@ -26,6 +26,9 @@ These named affix definitions have `CAN_ROLL` and can be selected by normal roll
 | Fluid capacity | Prefix or suffix | `ADD FLUID_CAPACITY` prefix or `INCREASED_PERCENT FLUID_CAPACITY` suffix | Fluid Pump and the fluid processors and generators. One stat sizes all of a machine's tanks and never shrinks one below its base. Fluid and Compressor Tanks keep authored capacity. |
 | Twinned | Prefix | `ADD BATCH_SIZE` | Rare (`15`) prefix on batching machines other than the Crusher, in Crusher Throughput's `dense_parallel` group. `+1` at Tier 1-3, `+2` at Tier 4-6, `+3` at Tier 7. |
 | Studious | Suffix | `INCREASED_PERCENT MASTERY_XP_GAIN` | Mastery machines and their Gear, weight `50`. Machine-wide even on a part, like the attribute suffixes. |
+| Glow | Suffix | `ADD LIGHT_LEVEL` | Machine bodies only, weight `70`. Light level `4`, `7`, `10`, or `13` while the buffer holds at least `10%` (or the fuel Furnace runs hot), with hysteresis and a `5`-second hold. |
+| Discreet | Prefix | `DECREASED_PERCENT MACHINE_NOISE` | Machine bodies without Mastery that have a sound profile, weight `70`. `25-85%` quieter sound and fewer ambient particles. |
+| Telemetry | Suffix | Untiered `COMPARATOR_READOUT` | Machine bodies only. One variant per gauge the machine has (buffer, progress, output, heat), sharing a weight of `60`. Replaces the work-state comparator signal. |
 | Fuel duration | Suffix | `INCREASED_PERCENT FUEL_DURATION` | Extends generator burn ticks for eligible fuel-burning generators and parts without increasing FE/t. |
 | Crush Head Pulverizing | Prefix | `INCREASED_PERCENT OUTPUT_AMOUNT` plus `DECREASED_PERCENT PROCESSING_SPEED` | Tiered Crush Head prefix using Coarse, Grinding, Pulverizing, and Micronizing display names. |
 | Crush Head Jagged | Prefix | `ADD CRUSHER_SALVAGE_CHANCE` | Tiered Crush Head prefix using Nicked, Jagged, Serrated, and Rending display names. |

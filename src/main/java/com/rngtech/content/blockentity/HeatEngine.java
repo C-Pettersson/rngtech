@@ -172,6 +172,14 @@ public final class HeatEngine {
     }
 
     /** HU that raise the chamber 1 °C. */
+    /** How far {@code temperature} sits from ambient toward {@code maxTemperature}, from 0, or -1 without a heat ceiling. */
+    public static double heatFraction(double temperature, int maxTemperature) {
+        if (maxTemperature <= AMBIENT) {
+            return -1.0;
+        }
+        return Math.max(0.0, (temperature - AMBIENT) / (maxTemperature - AMBIENT));
+    }
+
     public static double heatCapacity(MachineStatAccumulator stats) {
         return HEAT_CAPACITY * Math.max(0.25, stats.value(MachineStat.THERMAL_MASS));
     }

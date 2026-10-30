@@ -4,7 +4,7 @@ Status: Planned
 
 Proposed affixes that several machine families can share, to widen pools where a Rare almost always rolls the same lines. They come from a pool study of `main` at 672b9577 (2026-10-28). Roll mechanics, weights, and tier tables are defined in [Affix Generation](../systems/affix-generation.md); capability flags in [Modifier Eligibility](../reference/modifier-eligibility.md).
 
-Three lines from the study have shipped: Fluid Capacity on fluid processors and generators (Deep Tanks), Twinned, and Studious. See [Affix Generation](../systems/affix-generation.md#studious) and the [Rarity and Affixes](https://c-pettersson.github.io/rngtech/rarity-and-affixes/) wiki page.
+Six lines from the study have shipped: Fluid Capacity on fluid processors and generators (Deep Tanks), Twinned, Studious, Glow, Discreet, and Telemetry. The cheapest dilution knob shipped with them: generic processing speed rolls at weight `75` wherever a named speed exists. See [Affix Generation](../systems/affix-generation.md#glow-discreet-and-telemetry) and the [Rarity and Affixes](https://c-pettersson.github.io/rngtech/rarity-and-affixes/) wiki page.
 
 ## Why the pools need widening
 
@@ -30,41 +30,7 @@ Shared lines alone cannot fix a part with one prefix: three additions still leav
 
 Weak, visible, mildly useful in one niche, in the spirit of Path of Exile's Light Radius.
 
-### Glow
-
-| Field | Value |
-|---|---|
-| Slot and group | Suffix, `light_emission` |
-| Rolls on | Every block machine with a working state, except the Fluid Tank. Not Gear. |
-| Tiers | Light level 4, 7, 10, 13 |
-| Weight | `70` |
-| Hook | New. No machine emits light today. Use NeoForge's position-aware `getLightEmission(state, level, pos)` reading a cached flag from the block entity, and call `checkBlock(pos)` only when that flag flips; or a `lit` blockstate where a model has a lamp. |
-
-The machine is lit while its FE buffer holds at least 10% of capacity. Heat machines without a buffer (fuel Furnace, Solid Fuel Burner) use temperature at or above 10% of their maximum. The light never follows the craft cycle, so it does not blink between recipes. To avoid flashing, use hysteresis (on at 10%, off below 5%) and hold each change for at least 5 seconds, which also keeps light-engine updates rare. A real block light lights a machine hall and blocks spawns like a lit vanilla Furnace, and a dark machine shows it is out of power.
-
-### Discreet
-
-| Field | Value |
-|---|---|
-| Slot and group | Prefix, `sound_dampening` |
-| Rolls on | Chassis without Machine Mastery that have a sound profile: generators, Coal Gasifier, Steam Methane Reformer, Ammonia Synthesizer, Component Recycler, Component Assembler, Compressor Tank. |
-| Tiers | 25%, 45%, 65%, 85% reduced loop and cue volume, and the same reduction to ambient particles |
-| Weight | `70` |
-| Hook | Partial. `MachineSoundClient` already asks `mutesMachineSound()`; widen it to a volume factor applied to `MachineLoopSound`'s target volume, and let `animateTick` skip particles by the same factor. |
-
-Stays off Mastery machines, where the Silent Operation keystone owns silence.
-
-### Telemetry
-
-| Field | Value |
-|---|---|
-| Slot and group | Suffix, `comparator_readout` |
-| Rolls on | Every chassis on `BaseMachineBlock` |
-| Variants | Untiered, one of: FE buffer fill, craft progress, output fill, or temperature against maximum (heat machines) |
-| Weight | `60` in total, split across the variants the machine can use |
-| Hook | Partial. `BaseMachineBlock.getAnalogOutputSignal` already reads `MachineInfoProvider.machineInfo()` and maps the work state to 15/8/4/1. Add the readout to the snapshot and scale it to 0-15. |
-
-The tooltip says it replaces the work-state signal. It lets redstone builds start a backup generator on a low buffer without any autocrafting.
+Glow, Discreet, and Telemetry from this tier have shipped.
 
 ### Hearth
 
@@ -110,7 +76,7 @@ It matters once, at corruption, and stays well under the Stabilization Crystal, 
 | Weight | `75` |
 | Hook | New. Each generator computes generation on its own; add one shared helper that applies the bonus from buffer fill. |
 
-It works against Reserve Bank and increased Energy Capacity, so a player picks a hungry small-buffer generator or a deep one. Together with Discreet it drops each shared generator prefix from 75% to about 54% of Rares.
+It works against Reserve Bank and increased Energy Capacity, so a player picks a hungry small-buffer generator or a deep one. Together with the shipped Discreet prefix it drops each shared generator prefix from 75% to about 54% of Rares.
 
 ### Backlog
 
@@ -156,7 +122,7 @@ Path of Exile's "Allocates" anoint. Notables carry no penalties, so it adds none
 | Fluid Capacity on Fluid and Compressor Tanks | Storage capacity is authored identity ([Machine Guidelines](../reference/machine-guidelines.md#fluid-and-compressor-tanks)). |
 | Reduced stage requirement on Gear | Skips the stage gate. Corruption already bars `UPGRADE_LIMIT` from 2.0 pools for this reason. |
 | Idle drain | Machines draw no FE while idle, so a reduction has nothing to reduce, and adding drain is a hidden cost. |
-| Spawn-suppression radius | Glow already blocks spawns where it lights, and shows why. |
+| Spawn-suppression radius | The shipped Glow line already blocks spawns where it lights, and shows why. |
 | Redstone on/off as an affix | Basic control behind a roll reads as a tax. Better as a default. |
 | Silence on Mastery machines | The Silent Operation keystone owns it. |
 

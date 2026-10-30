@@ -50,7 +50,7 @@ public class AlloyFurnaceBlock extends WorkOrderMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.ALLOY_FURNACE.get(), AlloyFurnaceBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.ALLOY_FURNACE.get(), AlloyFurnaceBlockEntity::serverTick));
     }
 
     @Override

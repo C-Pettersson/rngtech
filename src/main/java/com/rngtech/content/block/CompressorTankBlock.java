@@ -49,7 +49,7 @@ public class CompressorTankBlock extends BaseMachineBlock {
         if (level.isClientSide) {
             return null;
         }
-        return createTickerHelper(blockEntityType, ModBlockEntities.COMPRESSOR_TANK.get(), CompressorTankBlockEntity::serverTick);
+        return withBodyCues(createTickerHelper(blockEntityType, ModBlockEntities.COMPRESSOR_TANK.get(), CompressorTankBlockEntity::serverTick));
     }
 
     @Override

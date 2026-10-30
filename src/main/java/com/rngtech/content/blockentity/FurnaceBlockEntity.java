@@ -1213,6 +1213,15 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     @Override
+    protected double heatFraction() {
+        double hottest = HeatEngine.AMBIENT;
+        for (HeatLane lane : heat) {
+            hottest = Math.max(hottest, lane.exactTemperature());
+        }
+        return HeatEngine.heatFraction(hottest, effectiveStats().intValue(MachineStat.MAX_TEMPERATURE));
+    }
+
+    @Override
     public boolean mutesMachineSound() {
         return FurnacePassiveTree.mutesMachineSound(machineProgression());
     }
