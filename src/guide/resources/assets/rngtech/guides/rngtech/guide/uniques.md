@@ -56,7 +56,7 @@ A burst Battery Cell. It holds 40,000 FE, takes 512 FE/t, and gives a steady 128
 
 ### Shipwreck Salt-Zinc Anode
 
-A Stage 1 Battery Cell that stores nearly as much as a Lead cell. Its base holds 24,000 FE, takes 128 FE/t, and gives 32 FE/t, half an Iron cell's output. Its efficiency is 90%, and its base idle loss is 0.3%/min.
+A Stage 1 Battery Cell that stores far more than an Iron cell. Its base holds 24,000 FE, takes 128 FE/t, and gives 32 FE/t, half an Iron cell's output. Its efficiency is 90%, and its base idle loss is 0.3%/min.
 
 - **Signature:** (15–35)% increased Energy Capacity, so it holds 27,600 to 32,400 FE.
 - **Drawback:** (100–50)% increased Idle Loss.
