@@ -35,6 +35,7 @@ import com.rngtech.rpg.refinement.RefinementTargets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -63,6 +64,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -624,6 +626,9 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     private static final int IDLE_PARTICLE_INTERVAL = 6;
     /** The ring's centre height in a Coil, from the model. */
     private static final double BEAM_HEIGHT = 8.75 / 16.0;
+    /** The screen's slip colours: red for a slip that cost the operation, amber for one past the Coils it needs. */
+    private static final DustParticleOptions FAILED_SLIP = new DustParticleOptions(new Vector3f(0.82F, 0.28F, 0.23F), 1.2F);
+    private static final DustParticleOptions HARMLESS_SLIP = new DustParticleOptions(new Vector3f(0.89F, 0.64F, 0.23F), 1.2F);
 
     /** A formed line carries a faint drift of motes from the Emitter toward the Cradle. */
     private void idleBeam(ServerLevel server) {
@@ -641,7 +646,10 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
                 toward.getStepX() * 0.03, 0.0, toward.getStepZ() * 0.03, 1.0);
     }
 
-    /** While a pulse runs, the beam reaches from the Emitter to the last lit Coil and sparks where it slips. */
+    /**
+     * While a pulse runs, the beam reaches from the Emitter to the last lit Coil and sparks where it slips: red where the
+     * slip cost the operation, amber where it came past the Coils the operation needs and did no harm.
+     */
     private void pulseBeam(ServerLevel server, PhasePulseSequence.Frame frame) {
         if (line.emitter() == null) {
             return;
@@ -668,8 +676,13 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         }
         if (frame.flashing() > 0) {
             BlockPos slipped = line.coilsFromEmitter().get(frame.flashing() - 1);
-            server.sendParticles(ParticleTypes.ELECTRIC_SPARK, slipped.getX() + 0.5, slipped.getY() + BEAM_HEIGHT, slipped.getZ() + 0.5,
-                    6, 0.3, 0.3, 0.3, 0.1);
+            boolean harmless = harmlessSlip(frame.flashing());
+            server.sendParticles(harmless ? HARMLESS_SLIP : FAILED_SLIP, slipped.getX() + 0.5, slipped.getY() + BEAM_HEIGHT,
+                    slipped.getZ() + 0.5, 6, 0.3, 0.3, 0.3, 0.0);
+            if (!harmless) {
+                server.sendParticles(ParticleTypes.ELECTRIC_SPARK, slipped.getX() + 0.5, slipped.getY() + BEAM_HEIGHT,
+                        slipped.getZ() + 0.5, 6, 0.3, 0.3, 0.3, 0.1);
+            }
         }
     }
 
@@ -691,7 +704,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         }
         int engaging = PhasePulseSequence.engagingOn(pulse, pulseTick);
         if (engaging > 0) {
-            playEngage(engaging, engaging == pulse.slippedPosition());
+            playEngage(engaging, engaging == pulse.slippedPosition(), harmlessSlip(engaging));
         }
         lightLine(frame);
         if (level instanceof ServerLevel server) {
@@ -722,8 +735,15 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         }
     }
 
-    private void playEngage(int position, boolean slips) {
-        if (slips) {
+    /** A slip past the Coils the operation needs still counts as Success. */
+    private boolean harmlessSlip(int position) {
+        return pulseRecipe != null && position > pulseRecipe.coils();
+    }
+
+    private void playEngage(int position, boolean slips, boolean harmless) {
+        if (slips && harmless) {
+            level.playSound(null, worldPosition, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 0.8F, 0.8F);
+        } else if (slips) {
             level.playSound(null, worldPosition, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 0.9F, 1.5F);
         } else {
             level.playSound(null, worldPosition, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 0.8F,

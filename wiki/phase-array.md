@@ -98,7 +98,7 @@ Opening every position takes one Glyph of each tier. The Tier V is also what one
 2. Pick an operation from the row of marks. Operations that work on one affix or one empty slot ask you to click it in the list under the marks; Imprint then lists the affixes it can add, and Graft lists the donor's affixes.
 3. Hover the mark for the FE, the Glyph, the RP, and the odds of every outcome for this item on this line. The chamber's hover shows the item's Strain and the Fracture chance it adds.
 4. Click **Charge**. The line fills from FE on any side of the Cradle, the Emitter, or a Coil, and from the Battery Cells in the Cradle's sockets, up to the line's Charge Rate. A dip in supply pauses the charge; it never fails. The charge stays if you close the screen or switch operations, and a costlier operation asks for more.
-5. Click **Fire**. The Coils engage from the Emitter inward, one every 0.4 seconds with a tone that climbs the line. The first Coil that slips stops the pulse: it flashes, the lit Coils go dark one by one, and the outcome applies.
+5. Click **Fire**. The Coils engage from the Emitter inward, one every 0.4 seconds with a tone that climbs the line. The first Coil that slips stops the pulse: it flashes and throws red sparks, the lit Coils go dark one by one, and the outcome applies.
 
 The item hangs in the Cradle's bore while it sits in the chamber and is locked while the pulse runs. When the pulse ends it moves to the **output** slot; take it out before the next one. The result line under the conduit names the outcome and what it did until the next item goes in.
 
@@ -114,7 +114,7 @@ Each Coil holds the pulse with its own **Hold Chance**, 92% before affixes. With
 | Miss | The pulse slips earlier | Nothing changes. Only the FE and the Glyph are spent. |
 | Fracture | Rolled before the Coils engage, 1% per point of Strain above the line's Tolerance | One random affix drops a tier. A Tier 1 affix is removed. |
 
-The pulse always runs the whole usable line, so a nine-Coil line fires a three-Coil operation past the three it needs. A slip past `R` does no harm: it still counts as Success and shows amber, not red, on the line. Holding every Coil is what buys the Overhold roll.
+The pulse always runs the whole usable line, so a nine-Coil line fires a three-Coil operation past the three it needs. A slip past `R` does no harm: it still counts as Success. It shows amber, not red, on the screen and on the Coil, with a softer sound. Holding every Coil is what buys the Overhold roll.
 
 RP is spent on Success, Overhold, and Partial, never on a Miss or a Fracture. A Glyph is spent on every outcome unless the line's Glyph Salvage returns it on a Miss.
 
