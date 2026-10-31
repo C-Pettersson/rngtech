@@ -1,0 +1,14 @@
+{
+    "type": "rngtech:miners_companion_recovery",
+    "group": "rngtech:trace_recovery/nether",
+    "input": {
+        "tag": "rngtech:trace_recovery/nether"
+    },
+    "result": {
+        "id": "minecraft:quartz",
+        "count": 1
+    },
+    "weight": 8,
+    "min_filter_stage": 1,
+    "min_processing_level": 1
+}

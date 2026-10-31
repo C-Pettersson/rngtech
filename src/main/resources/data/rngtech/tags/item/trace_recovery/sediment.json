@@ -1,0 +1,9 @@
+{
+    "values": [
+        "minecraft:gravel",
+        "minecraft:sand",
+        "minecraft:red_sand",
+        "#c:gravels",
+        "#c:sands"
+    ]
+}

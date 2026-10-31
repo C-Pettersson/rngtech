@@ -63,10 +63,6 @@ Future work on machines that already ship. Design intent for their current behav
 - Big Saw Gantry, Forestry Drones, and a station refinement profile are covered by the [Tree Farm Automation requirements](prds/tree-farm-automation.md).
 - Not covered there: access control for cart owners (owner data is attribution-only), an external item capability for cart cargo, canopy shaping, and support for arbitrary modded tree shapes.
 
-### Miner's Companion
-
-- Default Miner's Companion recovery recipes. The recovery system ships, but only datapacks add recipes.
-
 ### Machine Parts
 
 - Part upgrades, upgrade outcomes (fracture, strain, breakthrough), and Refinement Potential carry-over are covered by [Crafting and Upgrades](systems/crafting.md).

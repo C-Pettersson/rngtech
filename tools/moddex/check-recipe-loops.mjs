@@ -34,6 +34,8 @@ const FE_CONSUMERS = new Set([
 const PASSIVE = new Set(["rngtech:algae_growth", "rngtech:desiccant_absorption", "rngtech:wooden_dehumidifier_conversion"]);
 /** Code-defined recipes: their item conversions are listed in specialReactions(), or they transform no items. */
 const SPECIAL = new Set(["rngtech:carbon_exhaust_bucket", "rngtech:identify_traits", "rngtech:phase_array"]);
+/** Chance rolls on drops a player's own block breaks destroy; like ore, they are a world source and convert no stored items. */
+const MINING_ROLLS = new Set(["rngtech:miners_companion_recovery"]);
 const INPUT_KEYS = [
     "ingredient", "ingredients", "primary_ingredient", "secondary_ingredient", "catalyst", "stabilizer", "plate", "electrolyte",
     "carbon_input", "dry_input", "fluid_input", "water_input", "gas_input", "nitrogen_input", "hydrogen_input", "ammonia_input"
@@ -195,7 +197,7 @@ async function worldSourceFailures(bounds, reactions, tags) {
 async function recipeReactions(recipe, tags, bounds) {
     const { id, json } = recipe;
     const type = json.type;
-    if (SPECIAL.has(type)) {
+    if (SPECIAL.has(type) || MINING_ROLLS.has(type)) {
         return [];
     }
     if (!SHAPED.has(type) && !SHAPELESS.has(type) && !FE_PRODUCERS.has(type) && !FE_CONSUMERS.has(type) && !PASSIVE.has(type)) {
