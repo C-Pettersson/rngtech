@@ -106,7 +106,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                 connector.getInventory(),
                 UniversalConnectorBlockEntity.SLOT_ENERGY_CONNECTOR,
                 30,
-                60,
+                40,
                 () -> selectedTab == TAB_ENERGY
         ));
         for (int moduleIndex = 0; moduleIndex < FLUID_MODULE_COUNT; moduleIndex++) {
@@ -114,7 +114,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                     connector.getInventory(),
                     UniversalConnectorBlockEntity.fluidConnectorSlot(moduleIndex),
                     30,
-                    60 + moduleIndex * 32,
+                    40 + moduleIndex * 32,
                     () -> selectedTab == TAB_FLUID
             ));
         }
@@ -123,7 +123,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                     connector.getInventory(),
                     UniversalConnectorBlockEntity.itemConnectorSlot(moduleIndex),
                     30,
-                    60 + moduleIndex * 32,
+                    40 + moduleIndex * 32,
                     () -> selectedTab == TAB_ITEM
             ));
         }
@@ -131,7 +131,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                 connector.getInventory(),
                 UniversalConnectorBlockEntity.SLOT_RESERVED_CONNECTOR,
                 30,
-                60,
+                40,
                 () -> selectedTab == TAB_BRIDGE
         ));
         for (int moduleIndex = 0; moduleIndex < FLUID_MODULE_COUNT; moduleIndex++) {
@@ -144,7 +144,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                         moduleIndex,
                         filterIndex,
                         252 + filterIndex * 18,
-                        60 + moduleIndex * 32,
+                        40 + moduleIndex * 32,
                         () -> selectedTab == TAB_FLUID
                 ));
             }
@@ -159,7 +159,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                         moduleIndex,
                         filterIndex,
                         252 + filterIndex * 18,
-                        60 + moduleIndex * 32,
+                        40 + moduleIndex * 32,
                         () -> selectedTab == TAB_ITEM
                 ));
             }
@@ -567,7 +567,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                         playerInventory,
                         column + row * 9 + 9,
                         35 + column * 18,
-                        156 + row * 18,
+                        136 + row * 18,
                         () -> selectedTab != TAB_NETWORK
                 ));
             }
@@ -578,7 +578,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                     playerInventory,
                     column,
                     35 + column * 18,
-                    214,
+                    194,
                     () -> selectedTab != TAB_NETWORK
             ));
         }
