@@ -44,36 +44,36 @@
     "tiers": [
         {
             "count": {
-                "min": 20,
-                "max": 28,
+                "min": 32,
+                "max": 48,
                 "step": 4
             }
         },
         {
             "count": {
-                "min": 28,
-                "max": 40,
+                "min": 48,
+                "max": 68,
                 "step": 4
             }
         },
         {
             "count": {
-                "min": 36,
-                "max": 56,
+                "min": 96,
+                "max": 148,
                 "step": 4
             }
         },
         {
             "count": {
-                "min": 44,
-                "max": 64,
+                "min": 116,
+                "max": 168,
                 "step": 4
             }
         },
         {
             "count": {
-                "min": 44,
-                "max": 64,
+                "min": 116,
+                "max": 168,
                 "step": 4
             }
         }
