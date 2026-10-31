@@ -22,8 +22,10 @@ public final class MachineNameGenerator {
     );
 
     public static Component generatedName(MachineTraits traits, Component baseName) {
-        MachineModifier prefix = firstModifier(traits, ModifierSlot.PREFIX);
-        MachineModifier suffix = firstModifier(traits, ModifierSlot.SUFFIX);
+        return generatedName(firstModifier(traits, ModifierSlot.PREFIX), firstModifier(traits, ModifierSlot.SUFFIX), baseName);
+    }
+
+    public static Component generatedName(MachineModifier prefix, MachineModifier suffix, Component baseName) {
         if (prefix == null && suffix == null) {
             return baseName;
         }
@@ -53,7 +55,7 @@ public final class MachineNameGenerator {
         return modifier.slot().isAffix();
     }
 
-    private static MachineModifier firstModifier(MachineTraits traits, ModifierSlot slot) {
+    public static MachineModifier firstModifier(MachineTraits traits, ModifierSlot slot) {
         for (MachineModifier modifier : traits.modifiers()) {
             if (modifier.slot() == slot) {
                 return modifier;
