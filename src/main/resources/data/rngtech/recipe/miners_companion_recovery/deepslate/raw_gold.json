@@ -1,0 +1,14 @@
+{
+    "type": "rngtech:miners_companion_recovery",
+    "group": "rngtech:trace_recovery/deepslate",
+    "input": {
+        "tag": "rngtech:trace_recovery/deepslate"
+    },
+    "result": {
+        "id": "minecraft:raw_gold",
+        "count": 1
+    },
+    "weight": 4,
+    "min_filter_stage": 3,
+    "min_processing_level": 3
+}

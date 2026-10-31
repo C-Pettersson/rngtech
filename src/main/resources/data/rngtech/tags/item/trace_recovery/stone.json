@@ -1,0 +1,12 @@
+{
+    "values": [
+        "minecraft:cobblestone",
+        "minecraft:mossy_cobblestone",
+        "minecraft:stone",
+        "minecraft:andesite",
+        "minecraft:diorite",
+        "minecraft:granite",
+        "#c:cobblestones/normal",
+        "#c:cobblestones/mossy"
+    ]
+}

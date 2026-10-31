@@ -1,0 +1,8 @@
+{
+    "values": [
+        "minecraft:cobbled_deepslate",
+        "minecraft:deepslate",
+        "minecraft:tuff",
+        "#c:cobblestones/deepslate"
+    ]
+}

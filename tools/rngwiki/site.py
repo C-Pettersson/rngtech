@@ -57,6 +57,8 @@ _COLUMN_LABELS = {
     "glyph_tier": "Glyph",
     "base_fe": "Base FE",
     "refinement_potential_cost": "RP",
+    "min_filter_stage": "Filter stage",
+    "min_processing_level": "Head level",
 }
 _GLYPH_NUMERALS = ["None", "I", "II", "III", "IV", "V"]
 _TEMPLATE_START = re.compile(r"\{\{\s*([a-z_]+)\s*\(")
