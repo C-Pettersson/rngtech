@@ -8,8 +8,13 @@ import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -34,6 +39,31 @@ public class BatteryChassisBlock extends BaseMachineBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new BatteryChassisBlockEntity(pos, state);
+    }
+
+    /** A dye colours the casing band of a metal chassis; the Wooden crate has no band. */
+    @Override
+    protected ItemInteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hitResult
+    ) {
+        if (!(stack.getItem() instanceof DyeItem dye)
+                || material == BatteryChassisMaterial.WOODEN
+                || !(level.getBlockEntity(pos) instanceof BatteryChassisBlockEntity chassis)
+                || chassis.color() == dye.getDyeColor()) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (!level.isClientSide) {
+            chassis.setColor(dye.getDyeColor());
+            level.playSound(null, pos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
+            stack.consume(1, player);
+        }
+        return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override

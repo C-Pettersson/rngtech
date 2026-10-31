@@ -61,7 +61,7 @@ public class CableItem extends BlockItem implements PlacementPreview.Source {
         tooltipComponents.add(Component.translatable("rngtech.tooltip.cable.dye").withStyle(ChatFormatting.DARK_GRAY));
     }
 
-    /** A water cauldron washes the dye out of a whole stack of cable for one water level. */
+    /** A water cauldron washes the dye out of a whole stack of cable, or of Battery Chassis, for one water level. */
     public static ItemInteractionResult washInCauldron(
             BlockState state,
             Level level,

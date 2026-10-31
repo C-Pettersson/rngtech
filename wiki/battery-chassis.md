@@ -57,7 +57,7 @@ Each stage has its own recipe built around a Machine Frame. You do not need the 
 
 ### Breaking
 
-Mine a placed chassis with a pickaxe. It drops itself and keeps its rolled traits. Installed cells drop as separate items and keep their own FE, rarity, and affixes, but lose any bonus capacity the chassis was giving them.
+Mine a placed chassis with a pickaxe. It drops itself and keeps its rolled traits and its dye color. Installed cells drop as separate items and keep their own FE, rarity, and affixes, but lose any bonus capacity the chassis was giving them.
 
 ## Usage
 
@@ -104,6 +104,16 @@ The Copper and Gold chassis, and every chassis from Sparksteel up, can burst. A 
 - Two chassis placed directly next to each other do not burst while they even out their charge. Banks that even out over a [Universal Cable](universal-cable.md) can burst.
 
 Hover the Burst row on the Process tab to see the burst output and the ticks left in the window. An attached connector still caps the burst.
+
+### Dyeing
+
+Dye lets you tell banks apart. It changes only the color of the band under the lid. It does not change stats or how the chassis connects.
+
+- Right-click a placed metal chassis with a dye to color its band. This uses one dye.
+- Right-click with a different dye to change the color.
+- To remove the dye, mine the chassis and use it on a water cauldron. This washes the whole stack and uses one level of water.
+
+The chassis keeps its color when you mine it. The item tooltip shows the color. The Wooden chassis has no band and does not take dye.
 
 ### Gear
 

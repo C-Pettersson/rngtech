@@ -4,7 +4,9 @@ import com.rngtech.content.energy.BatteryChassisMaterial;
 import com.rngtech.rpg.MachineType;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -38,5 +40,12 @@ public class BatteryChassisBlockItem extends MachineBlockItem {
                 "rngtech.tooltip.battery_chassis.slots",
                 material.slots()
         ).withStyle(ChatFormatting.GRAY));
+        DyeColor color = stack.get(DataComponents.BASE_COLOR);
+        if (color != null) {
+            tooltipComponents.add(Component.translatable(
+                    "rngtech.tooltip.battery_chassis.color",
+                    Component.translatable("color.minecraft." + color.getName())
+            ).withStyle(ChatFormatting.GRAY));
+        }
     }
 }

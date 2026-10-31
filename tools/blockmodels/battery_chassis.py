@@ -11,7 +11,7 @@ top and a redstone lamp that lights while FE flows, in the materials of its reci
 
 The housings are static block models. The cells are standalone part models in a canonical 6x6
 footprint, 10 pixels tall; BatteryChassisRenderer scales them into the layout, draws the sockets,
-straps, charge windows, meter, lamps, and the port plates on wired sides. Its constants and its
+straps, charge windows, meter, lamps, a dyed band, and the port plates on wired sides. Its constants and its
 layout match this file. Item models bake a full set of matching cells. Run from the repository root:
 
     python tools/blockmodels/battery_chassis.py
@@ -691,6 +691,11 @@ def write_rack_textures() -> None:
             if y % 2 == 0:
                 pixels[x, y] = (*shade(TEAL_DARK, 6), 255)
     save(band, "band")
+    # Grey copy the renderer tints with a dyed chassis's colour; the brightest texel turns white.
+    top = max(g for _, g, _, _ in band.getdata())
+    dyed = Image.new("RGBA", band.size)
+    dyed.putdata([(v, v, v, a) for _, g, _, a in band.getdata() for v in [min(255, round(g * 255 / top))]])
+    save(dyed, "band_dyed")
 
     # Lid sides, six texels tall: seams and a dark lamp lens in the middle (x 6.5 to 9.5).
     lid = noisy(64, SLATE, "lid_side", amount=4)

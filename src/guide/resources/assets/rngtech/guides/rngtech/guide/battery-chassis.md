@@ -55,6 +55,7 @@ Each side, top and bottom included, shows what it touches. A side facing a cable
 - [Storing power](rngtech:battery-chassis/storing-power.md)
 - [Stages](rngtech:battery-chassis/stages.md)
 - [Burst](rngtech:battery-chassis/burst.md)
+- [Dyeing](rngtech:battery-chassis/dyeing.md)
 
 ### Gear
 
@@ -84,4 +85,4 @@ The Battery Chassis screen has four tabs:
 
 ### Breaking
 
-Mine a placed chassis with a pickaxe. It drops itself and keeps its rolled traits. Installed cells drop as separate items and keep their own FE, rarity, and affixes, but lose any bonus capacity the chassis was giving them.
+Mine a placed chassis with a pickaxe. It drops itself and keeps its rolled traits and its dye color. Installed cells drop as separate items and keep their own FE, rarity, and affixes, but lose any bonus capacity the chassis was giving them.
