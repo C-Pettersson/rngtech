@@ -63,17 +63,18 @@ public final class WorkOrderFamilies {
      * and so are job sizes for families whose jobs are sized by time. The Crusher and Furnace come from the processing
      * balance simulation (the 75th percentile build at Mastery level 1), raised where a stage's sample metal ran slower
      * than the stage below; the Crusher's Tier V stays at its Tier IV speed, so a Stage 8 job is not a huge mining trip.
-     * The others are the bare chassis's best throughput at or below the stage, times the good-to-bare ratio of a similar
-     * machine: about 1.5 for heated machines, from the Furnace, and 4 for the rest, from the Crusher.
+     * The others are measured in {@code WorkOrderTimingGameTests}: the best chassis at or below the stage, with matching
+     * plain Gear and a Battery Cell, times the good-to-bare ratio of a similar machine: about 1.5 for heated machines, from
+     * the Furnace, and 4 for the rest, from the Crusher. That test fails when a row drifts more than 15% from its build.
      */
     private static final Map<String, int[]> JOB_SPEED = Map.of(
             "crusher", new int[] {450, 690, 690, 990, 990},
             "furnace", new int[] {160, 350, 430, 430, 490},
-            "alloy_furnace", new int[] {165, 165, 183, 183, 183},
-            "metal_press", new int[] {150, 150, 150, 150, 150},
-            "resonance_calibrator", new int[] {460, 460, 510, 660, 660},
+            "alloy_furnace", new int[] {278, 278, 483, 483, 483},
+            "metal_press", new int[] {198, 198, 198, 198, 198},
+            "resonance_calibrator", new int[] {460, 460, 510, 796, 796},
             COMPONENT_ASSEMBLER, new int[] {400, 400, 400, 400, 400},
-            COMPONENT_RECYCLER, new int[] {420, 480, 528, 528, 580});
+            COMPONENT_RECYCLER, new int[] {468, 596, 716, 716, 864});
 
     /**
      * Families whose jobs are sized by the materials the work eats, such as catalysts, cell materials, or parts to
