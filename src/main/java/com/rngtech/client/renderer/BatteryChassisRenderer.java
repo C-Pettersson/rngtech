@@ -52,6 +52,7 @@ public class BatteryChassisRenderer implements BlockEntityRenderer<BatteryChassi
     private static final ResourceLocation SOCKET = RNGTech.id("block/battery_chassis/socket");
     private static final ResourceLocation CRATE_BAR = RNGTech.id("block/battery_chassis/crate/bar");
     private static final ResourceLocation CRATE_LAMP = RNGTech.id("block/battery_chassis/crate/lamp_on");
+    private static final ResourceLocation DYED_BAND = RNGTech.id("block/battery_chassis/band_dyed");
     /** Interior the cells are laid out in, as x0, x1, z0, z1. */
     private static final float[] RACK_INTERIOR = {2.0F, 14.0F, 2.0F, 14.0F};
     private static final float[] CRATE_INTERIOR = {2.0F, 14.0F, 2.0F, 14.0F};
@@ -93,6 +94,9 @@ public class BatteryChassisRenderer implements BlockEntityRenderer<BatteryChassi
     private static final float LAMP_X1 = 9.5F;
     private static final float LAMP_Y0 = 14.875F;
     private static final float LAMP_Y1 = 15.625F;
+    // Casing band under the lid, as drawn by the block model.
+    private static final float BAND_Y0 = 14.0F;
+    private static final float BAND_Y1 = 14.5F;
     private static final float SURFACE = 0.02F;
     private static final int LED_EMPTY = 0xFF5A3C;
     private static final int LED_LOW = 0xFFB040;
@@ -261,6 +265,9 @@ public class BatteryChassisRenderer implements BlockEntityRenderer<BatteryChassi
             renderStraps(cutout, pose, wire, layout, cells, packedLight, packedOverlay);
             renderMeter(cutout, pose, state, time, packedOverlay);
             renderLamps(cutout, pose, state.flow(), time, packedOverlay);
+            if (blockEntity.color() != null) {
+                renderBand(cutout, pose, blockEntity.color().getTextureDiffuseColor(), packedLight, packedOverlay);
+            }
         }
         poseStack.popPose();
     }
@@ -474,6 +481,29 @@ public class BatteryChassisRenderer implements BlockEntityRenderer<BatteryChassi
         quad(consumer, pose, new Vector3f(1.0F, 0.0F, 0.0F), color, light, overlay,
                 new float[] {far, LAMP_Y0, LAMP_X0, u0, v1}, new float[] {far, LAMP_Y0, LAMP_X1, u1, v1},
                 new float[] {far, LAMP_Y1, LAMP_X1, u1, v0}, new float[] {far, LAMP_Y1, LAMP_X0, u0, v0});
+    }
+
+    /** A dyed band just outside the model's own, using the same rows of the band texture. */
+    private static void renderBand(VertexConsumer consumer, PoseStack.Pose pose, int color, int light, int overlay) {
+        TextureAtlasSprite sprite = sprite(DYED_BAND);
+        float u0 = sprite.getU0();
+        float u1 = sprite.getU1();
+        float v0 = sprite.getV(1.0F - BAND_Y1 / 16.0F);
+        float v1 = sprite.getV(1.0F - BAND_Y0 / 16.0F);
+        float near = -SURFACE;
+        float far = 16.0F + SURFACE;
+        quad(consumer, pose, new Vector3f(0.0F, 0.0F, -1.0F), color, light, overlay,
+                new float[] {near, BAND_Y0, near, u0, v1}, new float[] {far, BAND_Y0, near, u1, v1},
+                new float[] {far, BAND_Y1, near, u1, v0}, new float[] {near, BAND_Y1, near, u0, v0});
+        quad(consumer, pose, new Vector3f(0.0F, 0.0F, 1.0F), color, light, overlay,
+                new float[] {near, BAND_Y0, far, u0, v1}, new float[] {far, BAND_Y0, far, u1, v1},
+                new float[] {far, BAND_Y1, far, u1, v0}, new float[] {near, BAND_Y1, far, u0, v0});
+        quad(consumer, pose, new Vector3f(-1.0F, 0.0F, 0.0F), color, light, overlay,
+                new float[] {near, BAND_Y0, near, u0, v1}, new float[] {near, BAND_Y0, far, u1, v1},
+                new float[] {near, BAND_Y1, far, u1, v0}, new float[] {near, BAND_Y1, near, u0, v0});
+        quad(consumer, pose, new Vector3f(1.0F, 0.0F, 0.0F), color, light, overlay,
+                new float[] {far, BAND_Y0, near, u0, v1}, new float[] {far, BAND_Y0, far, u1, v1},
+                new float[] {far, BAND_Y1, far, u1, v0}, new float[] {far, BAND_Y1, near, u0, v0});
     }
 
     /** A box whose faces show {@code span} model pixels per full sprite, cropped to the face size. */

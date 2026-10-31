@@ -11,6 +11,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -19,7 +21,11 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUtils;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -61,7 +67,19 @@ public class CableItem extends BlockItem implements PlacementPreview.Source {
         tooltipComponents.add(Component.translatable("rngtech.tooltip.cable.dye").withStyle(ChatFormatting.DARK_GRAY));
     }
 
-    /** A water cauldron washes the dye out of a whole stack of cable for one water level. */
+    /** Whether the stack is a plain Water Bottle, which washes the dye off a placed Cable or Battery Chassis. */
+    public static boolean isWaterBottle(ItemStack stack) {
+        PotionContents contents = stack.get(DataComponents.POTION_CONTENTS);
+        return stack.is(Items.POTION) && contents != null && contents.is(Potions.WATER);
+    }
+
+    /** Spends the Water Bottle that washed a placed block, leaving an empty Glass Bottle in the hand. */
+    public static void emptyWaterBottle(ItemStack stack, Level level, BlockPos pos, Player player, InteractionHand hand) {
+        level.playSound(null, pos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 1.0F, 1.0F);
+        player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(Items.GLASS_BOTTLE)));
+    }
+
+    /** A water cauldron washes the dye out of a whole stack of cable, or of Battery Chassis, for one water level. */
     public static ItemInteractionResult washInCauldron(
             BlockState state,
             Level level,
