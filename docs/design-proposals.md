@@ -41,11 +41,6 @@ Future work on machines that already ship. Design intent for their current behav
 - Rename or migrate the block to staged Energy Recycler chassis once a save-safe migration plan exists. Until then `rngtech:potential_reactor` stays registered as the Energy Recycler path.
 - An enchant-style machine slot for special salvage behavior, such as preserving part materials or extracting affix residue.
 
-### Solid Fuel Burner and Fuel Governor
-
-- Rolled Fuel Governor modifiers: a fuel-control suffix and an automation-focused enchant-style effect. Today Fuel Governor, Quick Feed, Fuel Reserve, and Block Feed are fixed Fuel Box behaviors only.
-- Generator identity modifiers for burner chassis.
-
 ### Dormant Machines
 
 - Whether the End Relay or Nether Smeltworks should carry a Seal I tier with an ascendancy already chosen. The default keeps Seals as the only ascendancy source.

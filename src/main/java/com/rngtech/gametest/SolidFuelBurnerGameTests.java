@@ -78,11 +78,14 @@ public final class SolidFuelBurnerGameTests {
         });
     }
 
-    /** With a full cell, a Fuel Governor banks the fire: no flames, and the current fuel item keeps its burn. */
+    /**
+     * With a full cell, a Fuel Governor banks the fire: no flames, and the current fuel item keeps its burn. The parts
+     * carry no Quick Feed, which would ease the banked fire's stoke and revalue its burn.
+     */
     @GameTest(template = MachineTestSupport.EMPTY)
     public static void governedBurnerBanksItsFire(GameTestHelper helper) {
-        SolidFuelBurnerBlockEntity burner = burner(helper, new BlockPos(2, 1, 2), SolidFuelBurnerChassis.COPPER,
-                HeatCoreMaterial.IRON, FuelBoxMaterial.COPPER, new ItemStack(Items.COAL, 8));
+        SolidFuelBurnerBlockEntity burner = burner(helper, new BlockPos(2, 1, 2), SolidFuelBurnerChassis.ALLOY,
+                HeatCoreMaterial.IRON, FuelBoxMaterial.BRONZE, new ItemStack(Items.COAL, 8));
         float[] banked = new float[1];
         helper.startSequence()
                 .thenExecuteAfter(5, () -> {
@@ -249,6 +252,55 @@ public final class SolidFuelBurnerGameTests {
         });
     }
 
+    /**
+     * Quick Feed holds the set stoke up to a half-full cell, then eases toward the minimum at a full cell. The gauge stays
+     * the ceiling, the fire and FE/t follow the running stoke, and a Copper Fuel Box brings Quick Feed to any chassis.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void quickFeedEasesTheFireAsTheCellFills(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity copper = burner(helper, new BlockPos(1, 1, 2), SolidFuelBurnerChassis.COPPER,
+                HeatCoreMaterial.IRON, FuelBoxMaterial.IRON, new ItemStack(Items.COAL, 8));
+        SolidFuelBurnerBlockEntity steel = burner(helper, new BlockPos(3, 1, 2), SolidFuelBurnerChassis.STEEL,
+                HeatCoreMaterial.IRON, FuelBoxMaterial.IRON, new ItemStack(Items.COAL, 8));
+        fillCell(copper, 0.4);
+        copper.followDemand();
+        check(copper.runningStoke() == SolidFuelBurnerStoke.RATED_STOKE, "Below half full, Quick Feed should keep the set stoke, ran at " + copper.runningStoke());
+        fillCell(copper, 0.8);
+        copper.followDemand();
+        check(copper.stoke() == SolidFuelBurnerStoke.RATED_STOKE, "Quick Feed should leave the gauge alone, was " + copper.stoke());
+        check(copper.runningStoke() == 55, "At 80% full, Quick Feed should run at 55%, ran at " + copper.runningStoke());
+        check(copper.currentVisualState().stoke() == 55, "The draught slots should show the running stoke");
+        fillCell(copper, 1.0);
+        copper.followDemand();
+        check(copper.runningStoke() == SolidFuelBurnerStoke.MIN_STOKE, "A full cell should bank the fire to the minimum, ran at " + copper.runningStoke());
+        fillCell(copper, 0.6);
+        copper.setStoke(40);
+        check(copper.runningStoke() == 40, "The gauge should cap Quick Feed at 40%, ran at " + copper.runningStoke());
+
+        fillCell(steel, 0.8);
+        steel.followDemand();
+        check(steel.runningStoke() == SolidFuelBurnerStoke.RATED_STOKE, "A burner without Quick Feed should run at its set stoke, ran at " + steel.runningStoke());
+        steel.getGearInventory().setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX, new ItemStack(ModItems.fuelBox(FuelBoxMaterial.COPPER).get()));
+        steel.followDemand();
+        check(steel.runningStoke() == 55, "A Copper Fuel Box should bring Quick Feed, ran at " + steel.runningStoke());
+        steel.getGearInventory().setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX, new ItemStack(ModItems.fuelBox(FuelBoxMaterial.IRON).get()));
+
+        copper.setStoke(SolidFuelBurnerStoke.RATED_STOKE);
+        fillCell(copper, 0.8);
+        helper.runAfterDelay(SolidFuelBurnerBlockEntity.QUICK_FEED_INTERVAL + 1, () -> {
+            int running = copper.runningStoke();
+            check(running < 60 && running > SolidFuelBurnerStoke.MIN_STOKE, "A ticking Copper burner should ease its fire, ran at " + running);
+            MachineInfoSnapshot info = copper.machineInfo();
+            Inventory inventory = helper.makeMockPlayer(GameType.SURVIVAL).getInventory();
+            SolidFuelBurnerMenu menu = new SolidFuelBurnerMenu(0, inventory, copper, copper.getMenuData());
+            check(menu.runningStoke() == running && menu.stoke() == SolidFuelBurnerStoke.RATED_STOKE, "The gauge should show both stokes");
+            check(info.energyRate() == SolidFuelBurnerStoke.generation(menu.ratedGeneration(), running),
+                    "FE/t should follow the running stoke " + running + ", was " + info.energyRate());
+            check(steel.runningStoke() == SolidFuelBurnerStoke.RATED_STOKE, "The Iron Fuel Box should end Quick Feed, ran at " + steel.runningStoke());
+            helper.succeed();
+        });
+    }
+
     /** Stoke clamps to its range, syncs to the world view, and survives a save. */
     @GameTest(template = MachineTestSupport.EMPTY)
     public static void stokeClampsAndSaves(GameTestHelper helper) {
@@ -267,6 +319,12 @@ public final class SolidFuelBurnerGameTests {
         copy.loadWithComponents(saved, helper.getLevel().registryAccess());
         check(copy.stoke() == 60, "Stoke should survive a save, was " + copy.stoke());
         helper.succeed();
+    }
+
+    private static void fillCell(SolidFuelBurnerBlockEntity burner, double fill) {
+        ItemStack cell = burner.getGearInventory().getStackInSlot(SolidFuelBurnerBlockEntity.SLOT_BATTERY_CELL);
+        int capacity = BatteryCellItem.energyCapacity(cell);
+        BatteryCellItem.setEnergy(cell, (int) Math.round(capacity * fill), capacity);
     }
 
     private static void tick(GameTestHelper helper, SolidFuelBurnerBlockEntity burner) {

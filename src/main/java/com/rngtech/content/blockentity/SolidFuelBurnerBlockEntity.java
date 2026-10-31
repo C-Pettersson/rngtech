@@ -98,9 +98,11 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     private static final int DATA_STOKE = 20;
     private static final int DATA_RATED_GENERATION = 21;
     private static final int DATA_PACK_GENERATION_MULTIPLIER = 22;
-    private static final int DATA_COUNT = 23;
+    private static final int DATA_RUNNING_STOKE = 23;
+    private static final int DATA_COUNT = 24;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
+    public static final int QUICK_FEED_INTERVAL = 20;
     /** The fire's full height: a Steel Heat Core's base output. */
     private static final float VISUAL_RATE_REFERENCE = HeatCoreMaterial.STEEL.energyGeneration();
     private static final int COAL_TINT = 0x2E2E32;
@@ -187,6 +189,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
                 case DATA_STOKE -> stoke;
                 case DATA_RATED_GENERATION -> ratedGeneration(stats);
                 case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(generatorStage());
+                case DATA_RUNNING_STOKE -> runningStoke;
                 default -> 0;
             };
         }
@@ -210,6 +213,8 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     private int energyOutputThisTick;
     private int lastEnergyOutput;
     private int stoke = SolidFuelBurnerStoke.RATED_STOKE;
+    /** The stoke the fire burns at: the set stoke, or less while Quick Feed eases it for a filling cell. */
+    private int runningStoke = SolidFuelBurnerStoke.RATED_STOKE;
     private SolidFuelBurnerVisualState visualState = SolidFuelBurnerVisualState.IDLE;
     private SolidFuelBurnerVisualState.Key lastSyncedVisual;
     private final SolidFuelBurnerVisualState.Animation animation = new SolidFuelBurnerVisualState.Animation();
@@ -225,6 +230,9 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, SolidFuelBurnerBlockEntity burner) {
         burner.beginEnergyTelemetryTick();
+        if (level.getGameTime() % QUICK_FEED_INTERVAL == 0) {
+            burner.followDemand();
+        }
         boolean generated = burner.tickFuel();
         boolean exported = burner.exportEnergy(level, pos);
         BaseMachineBlock.setActive(level, pos, state, generated);
@@ -259,22 +267,44 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         return stoke;
     }
 
-    /**
-     * Sets how hard the fire is driven. The fuel item already burning keeps the share it has left: its remaining FE is
-     * revalued at the new stoke's fuel economy and its burn ticks at the new FE/t, so changing stoke mid-item neither
-     * gains nor loses fuel against burning the whole item at each setting in turn.
-     */
+    public int runningStoke() {
+        return runningStoke;
+    }
+
+    /** Sets the stoke gauge: the fire's stoke, or its ceiling with Quick Feed. */
     public void setStoke(int stoke) {
         int clamped = SolidFuelBurnerStoke.clamp(stoke);
         if (clamped == this.stoke) {
             return;
         }
-        double economy = SolidFuelBurnerStoke.fuelEconomy(this.stoke);
         this.stoke = clamped;
+        followDemand();
+        setChanged();
+    }
+
+    /** Quick Feed eases the fire as the cell fills; without it the fire runs at the set stoke. */
+    public void followDemand() {
+        int target = hasBehavior(MachineBehavior.QUICK_FEED) && energyCapacity() > 0
+                ? SolidFuelBurnerStoke.quickFeed(stoke, energyStored() / (double) energyCapacity())
+                : stoke;
+        setRunningStoke(target);
+    }
+
+    /**
+     * The fuel item already burning keeps the share it has left: its remaining FE is revalued at the new stoke's fuel
+     * economy and its burn ticks at the new FE/t, so changing stoke mid-item neither gains nor loses fuel against burning
+     * the whole item at each setting in turn.
+     */
+    private void setRunningStoke(int target) {
+        if (target == runningStoke) {
+            return;
+        }
+        double economy = SolidFuelBurnerStoke.fuelEconomy(runningStoke);
+        runningStoke = target;
         int generation = effectiveGeneration(effectiveStats());
         if (hasBurnTime() && generation > 0) {
             double share = totalBurnTime > 0 ? burnTime / (double) totalBurnTime : 1.0;
-            remainingFuelEnergy *= SolidFuelBurnerStoke.fuelEconomy(clamped) / economy;
+            remainingFuelEnergy *= SolidFuelBurnerStoke.fuelEconomy(target) / economy;
             burnTime = Math.max(1, Mth.ceil(remainingFuelEnergy / generation));
             totalBurnTime = Math.max(burnTime, (int) Math.round(burnTime / Math.max(share, 1.0E-6)));
         }
@@ -332,7 +362,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
                 fuelTint(fuel0),
                 fuelTint(fuel1),
                 cellStack().isEmpty() || energyCapacity() <= 0 ? -1.0F : energyStored() / (float) energyCapacity(),
-                stoke
+                runningStoke
         );
     }
 
@@ -501,6 +531,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         tag.putDouble("GenerationCarry", generationCarry);
         tag.putDouble("HeatWasteCarry", heatWasteCarry);
         tag.putInt("Stoke", stoke);
+        tag.putInt("RunningStoke", runningStoke);
     }
 
     @Override
@@ -515,6 +546,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         heatWasteCarry = tag.getDouble("HeatWasteCarry");
         // Burners saved before stoke existed ran at the rated stoke.
         stoke = tag.contains("Stoke") ? SolidFuelBurnerStoke.clamp(tag.getInt("Stoke")) : SolidFuelBurnerStoke.RATED_STOKE;
+        runningStoke = tag.contains("RunningStoke") ? SolidFuelBurnerStoke.clamp(tag.getInt("RunningStoke")) : stoke;
     }
 
     private boolean tickFuel() {
@@ -600,7 +632,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
 
         int generation = effectiveGeneration(stats);
         double fuelEnergy = RNGTechConfig.generatedEnergy(effectiveFuelDurationTicks(fuelBurnTime, stats) * (double) FUEL_ENERGY_PER_BURN_TICK
-                * SolidFuelBurnerStoke.fuelEconomy(stoke), generatorStage());
+                * SolidFuelBurnerStoke.fuelEconomy(runningStoke), generatorStage());
         int effectiveFuelBurnTime = generation <= 0 ? 0 : Math.max(1, Mth.ceil(fuelEnergy / generation));
         burnTime = effectiveFuelBurnTime;
         totalBurnTime = effectiveFuelBurnTime;
@@ -774,9 +806,9 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         return cellStack().isEmpty() ? 0 : energyStored();
     }
 
-    /** FE/t at the current stoke. */
+    /** FE/t at the running stoke. */
     private int effectiveGeneration(MachineStatAccumulator stats) {
-        return SolidFuelBurnerStoke.generation(ratedGeneration(stats), stoke);
+        return SolidFuelBurnerStoke.generation(ratedGeneration(stats), runningStoke);
     }
 
     /** FE/t at the rated stoke: the most this burner can make with its Heat Core and stats. */

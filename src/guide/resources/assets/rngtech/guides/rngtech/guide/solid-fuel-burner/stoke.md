@@ -19,4 +19,15 @@ Turning the stoke down lowers FE/t in proportion, but the slower burn gets more 
 | 50% | ×0.50 | ×1.13 |
 | 25% | ×0.25 | ×1.20 |
 
-Run at full stoke when you need the power, and turn it down to stretch your fuel when demand is low or your fuel supply is slow. Changing the stoke while an item burns is fair both ways: the part of the item already burned keeps its value, and the rest is worth what the new stoke gives. Hover the gauge to see the FE/t and the FE per fuel item at the current setting.
+Run at full stoke when you need the power, and turn it down to stretch your fuel when demand is low or your fuel supply is slow. Changing the stoke while an item burns is fair both ways: the part of the item already burned keeps its value, and the rest is worth what the new stoke gives. Hover the gauge to see the FE/t and the FE per fuel item at the stoke the fire burns at.
+
+A burner with [Quick Feed](rngtech:solid-fuel-burner/gear.md) sets its own stoke. While the Battery Cell is half full or less, the fire burns at the stoke you set. Above half full, the stoke goes down steadily, to 25% when the cell is full. Your setting is the highest stoke that Quick Feed uses. The burner checks the cell once each second. The gauge bar fills to the stoke the fire burns at, and the pointer shows your setting.
+
+| Battery Cell fill | Stoke with Quick Feed (set to 100%) |
+|---|---:|
+| 50% or less | 100% |
+| 60% | 85% |
+| 80% | 55% |
+| 100% | 25% |
+
+Under a steady load, the fire settles where its FE/t meets the demand. When demand is low, each fuel item gives more FE.

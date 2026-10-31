@@ -35,6 +35,6 @@ The Heat Core's and Fuel Box's fuel efficiency multiply together.
 What the behaviors do:
 
 - **Fuel Governor**: when the Battery Cell is full, the burner pauses instead of burning fuel for nothing. The current fuel item stops burning and loses no burn time to heat leakage, the burner keeps exporting FE, and it picks up where it left off once the cell has room. An Iron Fuel Box has no governor, so it keeps burning and wastes fuel while the cell is full. See [Fuel Governor](rngtech:rarity-and-affixes.md#fuel-governor).
-- **Quick Feed**: an identity trait on the Copper burner, Copper Heat Core, and Copper Fuel Box. It does not change how the burner runs.
+- **Quick Feed**: the burner turns its stoke down as the Battery Cell fills past half, so each fuel item gives more FE while you do not need the power. See [Stoke](rngtech:solid-fuel-burner/stoke.md). Comes from the Copper burner, Copper Heat Core, and Copper Fuel Box. Any one of them is enough.
 - **Fuel Reserve**: the burner leaves the last fuel item in its slot untouched, so an automated feed line never runs completely dry. Comes from the Alloy burner and Bronze Fuel Box.
 - **Block Feed**: lets the burner accept compact block fuels such as Blocks of Coal.

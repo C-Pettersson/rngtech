@@ -13,6 +13,8 @@ public final class SolidFuelBurnerStoke {
     public static final int MAX_STOKE = 100;
     public static final int RATED_STOKE = MAX_STOKE;
     public static final double MAX_FUEL_BONUS = 0.20;
+    /** Quick Feed holds the set stoke up to this cell fill, then eases toward the minimum at a full cell. */
+    public static final double QUICK_FEED_EASE_START = 0.5;
 
     private SolidFuelBurnerStoke() {
     }
@@ -27,6 +29,19 @@ public final class SolidFuelBurnerStoke {
             return 0;
         }
         return Math.max(1, (int) Math.round(rated * clamp(stoke) / (double) MAX_STOKE));
+    }
+
+    /**
+     * Quick Feed's running stoke: the set stoke while the cell is at most half full, then a straight slide to the minimum
+     * at a full cell. The set stoke stays the ceiling, so the fire never runs harder than the gauge.
+     */
+    public static int quickFeed(int setStoke, double cellFill) {
+        double fill = Mth.clamp(cellFill, 0.0, 1.0);
+        if (fill <= QUICK_FEED_EASE_START) {
+            return clamp(setStoke);
+        }
+        double eased = MAX_STOKE - (MAX_STOKE - MIN_STOKE) * (fill - QUICK_FEED_EASE_START) / (1.0 - QUICK_FEED_EASE_START);
+        return clamp(Math.min(setStoke, (int) Math.round(eased)));
     }
 
     /** FE per fuel item against rated stoke: 1.0 at 100%, rising linearly to 1.2 at the minimum. */
