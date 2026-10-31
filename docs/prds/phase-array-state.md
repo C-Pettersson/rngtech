@@ -96,5 +96,6 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 - Formation differs from the first PRD text: it is automatic, not a right-click, so it matches the Dehumidifier. The PRD now says so.
 - The model's players are simple: they always Resonate the lowest affix, and they stop at 25% Fracture. A player who Reforges a worn item, or Grafts between bodies, is not modelled.
 - The line is horizontal only, decided on 2026-10-31.
+- The Cradle screen was relaid on 2026-10-31 after the alpha.5 in-game check: the item area reads like a furnace (the line runs into the target, the Glyph under it as fuel, the charge conduit as the arrow to a large output slot, the button under the conduit), the cells moved beside the inventory, and the operation marks, list, and seats share edges.
 - Tier V Glyphs come from Work Orders only. No interim source is added here, by decision on 2026-10-21.
 - The Affix Forge 3D models branch's Exotic Affix Forge model should wait for the form decision.

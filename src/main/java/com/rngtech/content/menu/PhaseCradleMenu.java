@@ -29,22 +29,27 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 public class PhaseCradleMenu extends AbstractContainerMenu {
     public static final int WIDTH = 256;
     public static final int HEIGHT = 262;
-    public static final int TARGET_X = 226;
-    public static final int TARGET_Y = 24;
+    /**
+     * The item area reads like a furnace: the line runs into the target, the Glyph sits under it like fuel, the donor
+     * beside the Glyph, and the charge conduit points from them to the large output slot.
+     */
+    public static final int TARGET_X = 150;
+    public static final int TARGET_Y = 18;
+    public static final int GLYPH_X = 150;
+    public static final int GLYPH_Y = 54;
+    public static final int DONOR_X = 126;
+    public static final int DONOR_Y = 54;
     public static final int OUTPUT_X = 226;
-    public static final int OUTPUT_Y = 50;
-    public static final int GLYPH_X = 204;
-    public static final int GLYPH_Y = 50;
-    public static final int DONOR_X = 182;
-    public static final int DONOR_Y = 50;
-    public static final int CELL_X = 12;
-    public static final int CELL_Y = 40;
-    public static final int CELL_SPACING = 19;
+    public static final int OUTPUT_Y = 35;
+    /** The nine cell sockets, a 3 by 3 grid beside the player's inventory, sharing the right column's edge. */
+    public static final int CELL_X = 194;
+    public static final int CELL_Y = 180;
+    public static final int CELL_SPACING = 18;
     /** The five Glyph seats, a column under the output slot, seat I at the top. */
-    public static final int SEAT_X = 226;
-    public static final int SEAT_Y = 72;
+    public static final int SEAT_X = 230;
+    public static final int SEAT_Y = 76;
     public static final int SEAT_SPACING = 18;
-    public static final int INVENTORY_X = 48;
+    public static final int INVENTORY_X = 8;
     public static final int INVENTORY_Y = 180;
     public static final int HOTBAR_Y = 238;
 

@@ -57,33 +57,39 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
     private static final int ROW_HOVER = 0xFF303840;
     private static final int LIT_BRIGHT = 0xFFD8FBFF;
 
-    private static final int LINE_Y = 20;
-    private static final int EMITTER_X = 76;
-    private static final int NODE_X = 92;
-    private static final int NODE_SPACING = 12;
+    private static final int LINE_Y = 21;
+    private static final int EMITTER_X = 8;
+    private static final int NODE_X = 22;
+    private static final int NODE_SPACING = 14;
     private static final int NODE_SIZE = 8;
-    private static final int CONDUIT_X = 76;
-    private static final int CONDUIT_Y = 42;
-    private static final int CONDUIT_WIDTH = 140;
+    /** The charge conduit is the furnace arrow, from the target and Glyph to the output; its head sits past its end. */
+    private static final int CONDUIT_X = 176;
+    private static final int CONDUIT_Y = 40;
+    private static final int CONDUIT_WIDTH = 36;
     private static final int CONDUIT_HEIGHT = 7;
-    private static final int STATUS_X = 12;
-    private static final int STATUS_Y = 18;
-    private static final int RESULT_X = 76;
-    private static final int RESULT_Y = 54;
-    /** The result line stops short of the donor, Glyph, and output slots; its hover carries the full text. */
-    private static final int RESULT_WIDTH = PhaseCradleMenu.DONOR_X - RESULT_X - 4;
-    private static final int OPERATION_X = 76;
-    private static final int OPERATION_Y = 70;
+    private static final int ARROW_LENGTH = 6;
+    /** The output slot's socket is larger than the others, centered on the slot. */
+    private static final int OUTPUT_SOCKET = 26;
+    private static final int STATUS_X = 222;
+    private static final int STATUS_Y = 6;
+    private static final int RESULT_X = 8;
+    private static final int RESULT_Y = 44;
+    private static final int READOUT_Y = RESULT_Y + 12;
+    /** The result line stops short of the donor slot; its hover carries the full text. */
+    private static final int RESULT_WIDTH = PhaseCradleMenu.DONOR_X - 1 - RESULT_X - 4;
+    private static final int OPERATION_X = 8;
+    private static final int OPERATION_Y = 78;
     private static final int OPERATION_SIZE = 12;
-    private static final int OPERATION_SPACING = 14;
-    private static final int LIST_X = 76;
-    private static final int LIST_Y = 86;
-    private static final int LIST_WIDTH = 140;
+    private static final int OPERATION_SPACING = 23;
+    private static final int LIST_X = 8;
+    private static final int LIST_Y = 94;
+    private static final int LIST_WIDTH = 196;
     private static final int ROW_HEIGHT = 12;
-    private static final int LIST_ROWS = 6;
-    private static final int BUTTON_X = 76;
-    private static final int BUTTON_Y = 160;
-    private static final int BUTTON_WIDTH = 140;
+    private static final int LIST_ROWS = 5;
+    /** The Charge and Fire button sits under the conduit, between the Glyph and the output. */
+    private static final int BUTTON_X = 176;
+    private static final int BUTTON_Y = 54;
+    private static final int BUTTON_WIDTH = 42;
     private static final int BUTTON_HEIGHT = 14;
     private static final int STRAIN_MARKS = 12;
 
@@ -129,6 +135,13 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
                 drawSocket(graphics, left + slot.x - 1, top + slot.y - 1, 0);
             } else if (slot.index >= PhaseCradleBlockEntity.SLOT_COUNT) {
                 drawSocket(graphics, left + slot.x - 1, top + slot.y - 1, cellRing(slot.getItem()));
+            } else if (slot.index == PhaseCradleBlockEntity.SLOT_OUTPUT) {
+                int inset = (OUTPUT_SOCKET - 16) / 2;
+                drawSocket(graphics, left + slot.x - inset, top + slot.y - inset, OUTPUT_SOCKET, TRACE);
+            } else if (slot.index == PhaseCradleBlockEntity.SLOT_DONOR && menu.action() != PhaseArrayAction.GRAFT) {
+                // Only Graft uses a donor, so its socket sits dimmed under any other operation.
+                drawSocket(graphics, left + slot.x - 1, top + slot.y - 1, 0);
+                graphics.fill(left + slot.x, top + slot.y, left + slot.x + 16, top + slot.y + 16, 0x66000000);
             } else {
                 drawSocket(graphics, left + slot.x - 1, top + slot.y - 1, slot.index == PhaseCradleBlockEntity.SLOT_TARGET ? LIT_DEEP : TRACE);
             }
@@ -148,6 +161,28 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         drawButton(graphics, left + BUTTON_X, top + BUTTON_Y, mouseX, mouseY);
     }
 
+    /**
+     * The Glyph slot draws its count two pixels up and left of the vanilla spot, so the number and its shadow stay inside
+     * the slot instead of crossing the tablet's frame and the slot's lower edge. While the player carries a stack,
+     * vanilla drawing keeps its drag previews.
+     */
+    @Override
+    protected void renderSlot(GuiGraphics graphics, Slot slot) {
+        ItemStack stack = slot.getItem();
+        if (slot.index != PhaseCradleBlockEntity.SLOT_GLYPH || stack.getCount() <= 1 || !menu.getCarried().isEmpty()) {
+            super.renderSlot(graphics, slot);
+            return;
+        }
+        graphics.pose().pushPose();
+        graphics.pose().translate(0.0F, 0.0F, 100.0F);
+        graphics.renderItem(stack, slot.x, slot.y, slot.x + slot.y * imageWidth);
+        graphics.renderItemDecorations(font, stack, slot.x, slot.y, "");
+        String count = String.valueOf(stack.getCount());
+        graphics.pose().translate(0.0F, 0.0F, 200.0F);
+        graphics.drawString(font, count, slot.x + 15 - font.width(count), slot.y + 7, 0xFFFFFFFF, true);
+        graphics.pose().popPose();
+    }
+
     @Override
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         graphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
@@ -162,10 +197,21 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         if (result != null) {
             drawClipped(graphics, result, RESULT_X, RESULT_Y, RESULT_WIDTH, resultColor());
         }
+        if (!menu.targetStack().isEmpty()) {
+            Component readout = Component.translatable("rngtech.phase_cradle.screen.readout", menu.strain(),
+                    RefinementTargets.storedTraits(menu.targetStack()).refinementPotential());
+            drawClipped(graphics, readout, RESULT_X, READOUT_Y, RESULT_WIDTH, DIM);
+        }
+        graphics.drawString(font, Component.translatable("rngtech.phase_cradle.screen.cells_label"), PhaseCradleMenu.CELL_X,
+                inventoryLabelY, TEXT, false);
+        // Each numeral is centered in the gap between the affix list and its seat.
+        int gapLeft = LIST_X + LIST_WIDTH + 1;
+        int gapRight = PhaseCradleMenu.SEAT_X - 1;
         for (int seat = 0; seat < PhaseCradleBlockEntity.GLYPH_SEATS; seat++) {
             boolean seated = !menu.getSlot(PhaseCradleMenu.SEAT_SLOT_START + seat).getItem().isEmpty();
-            graphics.drawString(font, GlyphItem.numeral(seat + 1), PhaseCradleMenu.SEAT_X + 20, PhaseCradleMenu.SEAT_Y + seat * PhaseCradleMenu.SEAT_SPACING + 5,
-                    seated ? LIT : DIM, false);
+            String numeral = GlyphItem.numeral(seat + 1);
+            int x = gapLeft + (gapRight - gapLeft - font.width(numeral) + 1) / 2;
+            graphics.drawString(font, numeral, x, PhaseCradleMenu.SEAT_Y + seat * PhaseCradleMenu.SEAT_SPACING + 5, seated ? LIT : DIM, false);
         }
         Component label = buttonLabel();
         int width = font.width(label);
@@ -294,17 +340,24 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
             }
         }
         graphics.fill(x + 1, y + 1, x + CONDUIT_WIDTH - 1, y + 2, 0x33FFFFFF);
+        int head = fraction >= 1.0 ? LIT : TRACE;
+        for (int step = 0; step < ARROW_LENGTH; step++) {
+            graphics.fill(x + CONDUIT_WIDTH + step, y - 3 + step, x + CONDUIT_WIDTH + step + 1, y + CONDUIT_HEIGHT + 3 - step, head);
+        }
     }
 
     private void drawSocket(GuiGraphics graphics, int x, int y, int ring) {
-        graphics.fill(x, y, x + 18, y + 18, BEZEL_DARK);
-        graphics.fill(x + 1, y + 1, x + 17, y + 17, BEZEL_LIGHT);
-        graphics.fill(x + 1, y + 1, x + 17, y + 17, SOCKET);
+        drawSocket(graphics, x, y, 18, ring);
+    }
+
+    private void drawSocket(GuiGraphics graphics, int x, int y, int size, int ring) {
+        graphics.fill(x, y, x + size, y + size, BEZEL_DARK);
+        graphics.fill(x + 1, y + 1, x + size - 1, y + size - 1, SOCKET);
         if (ring != 0) {
-            graphics.fill(x, y, x + 18, y + 1, ring);
-            graphics.fill(x, y + 17, x + 18, y + 18, ring);
-            graphics.fill(x, y, x + 1, y + 18, ring);
-            graphics.fill(x + 17, y, x + 18, y + 18, ring);
+            graphics.fill(x, y, x + size, y + 1, ring);
+            graphics.fill(x, y + size - 1, x + size, y + size, ring);
+            graphics.fill(x, y, x + 1, y + size, ring);
+            graphics.fill(x + size - 1, y, x + size, y + size, ring);
         }
     }
 
