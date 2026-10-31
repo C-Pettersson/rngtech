@@ -89,7 +89,7 @@ public final class ConnectorLinkStatusGameTests {
 
     private static void install(UniversalConnectorAccess connector) {
         connector.getInventory().setStackInSlot(
-                UniversalConnectorBlockEntity.SLOT_ENERGY_CONNECTOR,
+                UniversalConnectorBlockEntity.energyConnectorSlot(0),
                 new ItemStack(ModItems.energyConnector(EnergyConnectorTier.COPPER).get())
         );
         connector.getInventory().setStackInSlot(

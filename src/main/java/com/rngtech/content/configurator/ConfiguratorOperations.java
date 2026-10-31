@@ -191,7 +191,7 @@ public final class ConfiguratorOperations {
 
     private static List<ModuleChange> moduleChanges(UniversalConnectorAccess access, ConfiguratorPreset preset) {
         List<ModuleChange> changes = new ArrayList<>();
-        addModuleChange(changes, access, UniversalConnectorBlockEntity.SLOT_ENERGY_CONNECTOR, preset.energy());
+        addModuleChange(changes, access, UniversalConnectorBlockEntity.energyConnectorSlot(0), preset.energy());
         for (int index = 0; index < UniversalConnectorBlockEntity.FLUID_MODULE_SLOT_COUNT; index++) {
             addModuleChange(
                     changes,
@@ -437,12 +437,12 @@ public final class ConfiguratorOperations {
             if (universalAccess != null) {
                 ItemStackHandler inventory = universalAccess.getInventory();
                 return ConnectorSetting.of(
-                        universalAccess.menuData().get(UniversalConnectorBlockEntity.dataChannelIndex()),
-                        universalAccess.menuData().get(UniversalConnectorBlockEntity.dataModeIndex()),
-                        universalAccess.menuData().get(UniversalConnectorBlockEntity.dataDistributionIndex()),
-                        direction(universalAccess.menuData().get(UniversalConnectorBlockEntity.dataAttachAsIndex())),
+                        universalAccess.menuData().get(UniversalConnectorBlockEntity.dataEnergyChannelIndex(0)),
+                        universalAccess.menuData().get(UniversalConnectorBlockEntity.dataEnergyModeIndex(0)),
+                        universalAccess.menuData().get(UniversalConnectorBlockEntity.dataEnergyDistributionIndex(0)),
+                        direction(universalAccess.menuData().get(UniversalConnectorBlockEntity.dataEnergyAttachAsIndex(0))),
                         universalAccess.defaultAttachAs(),
-                        inventory.getStackInSlot(UniversalConnectorBlockEntity.SLOT_ENERGY_CONNECTOR)
+                        inventory.getStackInSlot(UniversalConnectorBlockEntity.energyConnectorSlot(0))
                 );
             }
             CableBlockEntity.ConnectorData connector = cable.connector(cableSide);
@@ -502,10 +502,10 @@ public final class ConfiguratorOperations {
             CableConnectorMode mode = cableMode(setting.modeOrdinal());
             EnergyDistributionMode distributionMode = energyDistributionMode(setting.distributionOrdinal());
             if (universalAccess != null) {
-                changed |= universalAccess.setChannel(setting.channel());
-                changed |= universalAccess.setAttachAs(attachAs == null ? universalAccess.defaultAttachAs() : attachAs);
-                changed |= universalAccess.setMode(mode);
-                changed |= universalAccess.setEnergyDistributionMode(distributionMode);
+                changed |= universalAccess.setEnergyChannel(0, setting.channel());
+                changed |= universalAccess.setEnergyAttachAs(0, attachAs == null ? universalAccess.defaultAttachAs() : attachAs);
+                changed |= universalAccess.setEnergyMode(0, mode);
+                changed |= universalAccess.setEnergyDistributionMode(0, distributionMode);
             } else {
                 changed |= cable.setChannel(cableSide, setting.channel());
                 changed |= cable.setAttachAs(cableSide, attachAs == null ? cableSide.getOpposite() : attachAs);

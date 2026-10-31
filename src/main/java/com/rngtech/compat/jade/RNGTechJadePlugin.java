@@ -566,16 +566,24 @@ public final class RNGTechJadePlugin implements IWailaPlugin {
                 return null;
             }
             ContainerData data = access.menuData();
-            boolean hasEnergy = data.get(UniversalConnectorBlockEntity.dataHasConnectorIndex()) != 0;
+            int cap = 0;
+            int lastInput = 0;
+            int lastOutput = 0;
+            for (int module = 0; module < UniversalConnectorBlockEntity.ENERGY_MODULE_SLOT_COUNT; module++) {
+                cap += data.get(UniversalConnectorBlockEntity.dataEnergyTransferRateIndex(module));
+                lastInput += data.get(UniversalConnectorBlockEntity.dataEnergyLastInputIndex(module));
+                lastOutput += data.get(UniversalConnectorBlockEntity.dataEnergyLastOutputIndex(module));
+            }
+            boolean hasEnergy = cap > 0;
             int bridgeType = data.get(UniversalConnectorBlockEntity.dataBridgeTypeIndex());
             if (!hasEnergy && bridgeType == 0) {
                 return null;
             }
             CompoundTag tag = new CompoundTag();
             tag.putBoolean("has_energy", hasEnergy);
-            tag.putInt("cap", data.get(UniversalConnectorBlockEntity.dataTransferRateIndex()));
-            tag.putInt("last_input", data.get(UniversalConnectorBlockEntity.dataLastEnergyInputIndex()));
-            tag.putInt("last_output", data.get(UniversalConnectorBlockEntity.dataLastEnergyOutputIndex()));
+            tag.putInt("cap", cap);
+            tag.putInt("last_input", lastInput);
+            tag.putInt("last_output", lastOutput);
             tag.putInt("bridge_type", bridgeType);
             tag.putInt("bridge_channel", data.get(UniversalConnectorBlockEntity.dataBridgeChannelIndex()));
             return tag;
