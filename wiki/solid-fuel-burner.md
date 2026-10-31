@@ -31,7 +31,7 @@ The **Solid Fuel Burner** is RNGTech's first real generator. It burns coal, char
 
 Each burner you craft rolls its own [rarity and affixes](rarity-and-affixes.md). Burners do not have Machine Mastery.
 
-You can read a burner from the outside. Facing its front, the hopper on the right is the installed Fuel Box, split into two bins when it has two fuel slots, and shows the fuel waiting in each. The current fuel item burns on the grate behind the front grille. The Heat Core sits on top as a row of fins in the core's material. The flames stand taller at a higher FE/t, from a stronger Heat Core or a higher stoke, and the draught slots in the ash-pit door below the grille open and close with the stoke. A burner paused by its Fuel Governor keeps a dull, banked fire with no flames. The meter on the left side shows how full the Battery Cell is, and smoke rises from the chimney while fuel burns. Each chassis has its own casing: cast iron for Crude, copper for Copper, bronze for Alloy, and blued steel for Steel.
+You can read a burner from the outside. Facing its front, the hopper on the right is the installed Fuel Box, split into two bins when it has two fuel slots, and shows the fuel waiting in each. The current fuel item burns on the grate behind the front grille. The Heat Core sits on top as a row of fins in the core's material. The flames stand taller at a higher FE/t, from a stronger Heat Core or a higher stoke, and the draught slots in the ash-pit door below the grille open and close with the stoke the fire burns at. A burner paused by its Fuel Governor keeps a dull, banked fire with no flames. The meter on the left side shows how full the Battery Cell is, and smoke rises from the chimney while fuel burns. Each chassis has its own casing: cast iron for Crude, copper for Copper, bronze for Alloy, and blued steel for Steel.
 
 ## Obtaining
 
@@ -70,7 +70,18 @@ Turning the stoke down lowers FE/t in proportion, but the slower burn gets more 
 | 50% | ×0.50 | ×1.13 |
 | 25% | ×0.25 | ×1.20 |
 
-Run at full stoke when you need the power, and turn it down to stretch your fuel when demand is low or your fuel supply is slow. Changing the stoke while an item burns is fair both ways: the part of the item already burned keeps its value, and the rest is worth what the new stoke gives. Hover the gauge to see the FE/t and the FE per fuel item at the current setting.
+Run at full stoke when you need the power, and turn it down to stretch your fuel when demand is low or your fuel supply is slow. Changing the stoke while an item burns is fair both ways: the part of the item already burned keeps its value, and the rest is worth what the new stoke gives. Hover the gauge to see the FE/t and the FE per fuel item at the stoke the fire burns at.
+
+A burner with [Quick Feed](#gear) sets its own stoke. While the Battery Cell is half full or less, the fire burns at the stoke you set. Above half full, the stoke goes down steadily, to 25% when the cell is full. Your setting is the highest stoke that Quick Feed uses. The burner checks the cell once each second. The gauge bar fills to the stoke the fire burns at, and the pointer shows your setting.
+
+| Battery Cell fill | Stoke with Quick Feed (set to 100%) |
+|---|---:|
+| 50% or less | 100% |
+| 60% | 85% |
+| 80% | 55% |
+| 100% | 25% |
+
+Under a steady load, the fire settles where its FE/t meets the demand. When demand is low, each fuel item gives more FE.
 
 ### Fuel
 
@@ -102,7 +113,7 @@ With JEI installed, click the fuel line on the Process tab to open the Solid Fue
 | Stage | Burner | Notes |
 |---:|---|---|
 | 1 | {{ item('rngtech:crude_solid_fuel_burner') }} | Accepts Stage 1 Gear. Lowest stability. |
-| 2 | {{ item('rngtech:copper_solid_fuel_burner') }} | Accepts Gear up to Stage 2. |
+| 2 | {{ item('rngtech:copper_solid_fuel_burner') }} | Accepts Gear up to Stage 2. Has Quick Feed. |
 | 3 | {{ item('rngtech:alloy_solid_fuel_burner') }} | Accepts Gear up to Stage 3. Has Fuel Reserve. |
 | 4 | {{ item('rngtech:steel_solid_fuel_burner') }} | Accepts Gear up to Stage 4. Highest stability. |
 
@@ -137,7 +148,7 @@ The Heat Core's and Fuel Box's fuel efficiency multiply together.
 What the behaviors do:
 
 - **Fuel Governor**: when the Battery Cell is full, the burner pauses instead of burning fuel for nothing. The current fuel item stops burning and loses no burn time to heat leakage, the burner keeps exporting FE, and it picks up where it left off once the cell has room. An Iron Fuel Box has no governor, so it keeps burning and wastes fuel while the cell is full. See [Fuel Governor](rarity-and-affixes.md#fuel-governor).
-- **Quick Feed**: an identity trait on the Copper burner, Copper Heat Core, and Copper Fuel Box. It does not change how the burner runs.
+- **Quick Feed**: the burner turns its stoke down as the Battery Cell fills past half, so each fuel item gives more FE while you do not need the power. See [Stoke](#stoke). Comes from the Copper burner, Copper Heat Core, and Copper Fuel Box. Any one of them is enough.
 - **Fuel Reserve**: the burner leaves the last fuel item in its slot untouched, so an automated feed line never runs completely dry. Comes from the Alloy burner and Bronze Fuel Box.
 - **Block Feed**: lets the burner accept compact block fuels such as Blocks of Coal.
 

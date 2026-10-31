@@ -133,5 +133,5 @@ Found during the study; not shared affixes, but they decide how wide a pool real
 - About 60 named `runtime()` affixes (flag `NON_TARGETABLE`) have mechanic-style group names, but nothing reads their id or group; their only effect is the generic stat, and their `.extra` tooltip lines describe behavior that does not exist. Implementing those names (Check Valve, Vapor-Lock Breaker, Cinder Return, Exhaust Port, Pressure Curtain) is the cheapest source of per-family niche lines. Otherwise merge same-stat siblings into one group.
 - Exact duplicates that stack: High Head and Fluid Transfer, Leak Quencher and Idle Loss, Low Drag and Processing Speed (outside the `processing_speed` group), Charge Backplane and Energy Transfer.
 - Heat Soak is reduced `COOLING_RATE`, which `HeatEngine` reads only for active overheat shedding, so it may slow overheat recovery instead of keeping heat in.
-- The `QUICK_FEED` and `THERMAL_BUFFER` implicit behaviors are granted but never read.
+- The `THERMAL_BUFFER` implicit behavior is granted but never read. `QUICK_FEED` was the same until it became the Copper burner's load-following stoke.
 - The Forestry Companion has no prefixes, and the Miner's Companion's Rare equals its Magic.

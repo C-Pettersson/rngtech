@@ -13,6 +13,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -254,7 +255,7 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
         renderStokeGauge(guiGraphics);
     }
 
-    /** Stoke from a banked fire to rated, with the rated FE/t at the right end. The pointer marks the selected stoke. */
+    /** Stoke from a banked fire to rated. The bar fills to the running stoke; the pointer marks the set stoke. */
     private void renderStokeGauge(GuiGraphics guiGraphics) {
         int left = leftPos + STOKE_X;
         int top = topPos + STOKE_Y;
@@ -264,7 +265,8 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
         guiGraphics.fill(left, top, left + STOKE_WIDTH, top + STOKE_HEIGHT, 0xFF5F5F5F);
         guiGraphics.fill(left + 1, top + 1, right, bottom, STOKE_TRACK);
         int pointer = Math.min(left + 1 + stokeOffset(menu.stoke(), inner), right - 1);
-        guiGraphics.fill(left + 1, top + 3, Math.max(left + 1, pointer), bottom - 2, FUEL);
+        int running = Math.min(left + 1 + stokeOffset(menu.runningStoke(), inner), pointer);
+        guiGraphics.fill(left + 1, top + 3, Math.max(left + 1, running), bottom - 2, FUEL);
         for (int notch = SolidFuelBurnerStoke.MIN_STOKE; notch <= SolidFuelBurnerStoke.MAX_STOKE; notch += STOKE_NOTCH_STEP) {
             int x = Math.min(left + 1 + stokeOffset(notch, inner), right - 1);
             guiGraphics.fill(x, top + 1, x + 1, top + 2, PANEL_DARK);
@@ -282,17 +284,21 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
 
     private List<Component> stokeTooltip() {
         int stoke = menu.stoke();
+        int running = menu.runningStoke();
         int rated = menu.ratedGeneration();
-        return List.of(
-                Component.translatable("rngtech.burner.tooltip.stoke", stoke),
-                Component.translatable(
-                        "rngtech.burner.tooltip.stoke_effects",
-                        CompactValueText.energyRate(SolidFuelBurnerStoke.generation(rated, stoke)),
-                        CompactValueText.energyRate(rated),
-                        String.format(Locale.ROOT, "%.2f", SolidFuelBurnerStoke.fuelEconomy(stoke))
-                ).withStyle(ChatFormatting.GRAY),
-                Component.translatable("rngtech.burner.tooltip.stoke_hint").withStyle(ChatFormatting.DARK_GRAY)
-        );
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable("rngtech.burner.tooltip.stoke", stoke));
+        if (running < stoke) {
+            lines.add(Component.translatable("rngtech.burner.tooltip.stoke_quick_feed", running));
+        }
+        lines.add(Component.translatable(
+                "rngtech.burner.tooltip.stoke_effects",
+                CompactValueText.energyRate(SolidFuelBurnerStoke.generation(rated, running)),
+                CompactValueText.energyRate(rated),
+                String.format(Locale.ROOT, "%.2f", SolidFuelBurnerStoke.fuelEconomy(running))
+        ).withStyle(ChatFormatting.GRAY));
+        lines.add(Component.translatable("rngtech.burner.tooltip.stoke_hint").withStyle(ChatFormatting.DARK_GRAY));
+        return lines;
     }
 
     private void renderGear(GuiGraphics guiGraphics) {

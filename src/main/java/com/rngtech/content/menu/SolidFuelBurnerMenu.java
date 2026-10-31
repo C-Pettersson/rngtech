@@ -52,7 +52,8 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
     private static final int DATA_STOKE = 20;
     private static final int DATA_RATED_GENERATION = 21;
     private static final int DATA_PACK_GENERATION_MULTIPLIER = 22;
-    private static final int DATA_COUNT = 23;
+    private static final int DATA_RUNNING_STOKE = 23;
+    private static final int DATA_COUNT = 24;
     private static final int BUTTON_STOKE_BASE = 8000;
     private static final int STAT_SCALE = 100;
     private static final int FUEL_SLOT_START = 0;
@@ -176,6 +177,11 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
 
     public int stoke() {
         return data.get(DATA_STOKE);
+    }
+
+    /** The stoke the fire burns at; below the set stoke while Quick Feed eases it. */
+    public int runningStoke() {
+        return data.get(DATA_RUNNING_STOKE);
     }
 
     /** FE/t at the rated stoke, the most this burner can make. */

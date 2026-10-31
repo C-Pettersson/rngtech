@@ -14,6 +14,7 @@ For processing machines:
 - Recipe hardness pressure should use `PROCESSING_LEVEL`. For Crushers, the installed Crush Head supplies the active level and recipes declare `required_processing_level`; under-level work is allowed but takes longer, costs more total FE, and can jam instead of hard-blocking the recipe.
 - If a machine family has staged chassis, the placed chassis should be the machine body. Do not model it as a separate item-only ingredient unless the machine itself is not staged.
 - Chassis stage may gate installed Gear stage, but chassis material should also change base stats or fixed behavior identity so same-stage choices can matter.
+- Fixed behaviors are material identity. Never offer the same behavior as a rolled affix, not even only where the material lacks it: rolls change degree, and a behavior anything can roll stops being a reason to choose its material. A fixed behavior that does nothing gets implemented as identity, not turned into a roll. Rolled behavior affixes are for behaviors no material owns, such as Balance Mode, Bulk Speed, and Output Guard.
 - Processing speed should increase throughput, not silently make each craft cheaper.
 - Reduced energy usage and output amount are the main ways to cheaper effective processing-machine production.
 - Config keys may tune baselines, but renaming a key is appropriate when an old local config would preserve an obsolete balance target.
@@ -263,6 +264,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Logs burn for a quarter of their vanilla burn time on purpose.
 - Chassis accept lower-stage Gear so mixed setups can trade speed, efficiency, fuel queue size, and behavior.
 - Fuel Governor pauses only when the buffer cannot hold more generated FE. It never blocks export, and it never changes fuel cost, duration, or generation while there is room.
+- Quick Feed is the Copper identity: load following. It holds the set stoke up to a half-full cell, then eases it linearly to 25% at a full cell, rechecked once a second. The gauge stays the ceiling, and the eased stoke is ordinary stoke, so it revalues the burning item like a manual change and never leaves the stoke's FE/t and `1.20x` bounds. It is QoL with no downside: under steady load the fire settles where FE/t meets demand, and the draught slots and the gauge bar show the running stoke.
 
 ### Syngas Combustor
 
