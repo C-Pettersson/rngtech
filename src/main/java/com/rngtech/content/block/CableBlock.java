@@ -228,6 +228,10 @@ public class CableBlock extends Block implements EntityBlock {
             return dyeCable(stack, dye.getDyeColor(), level, pos, player);
         }
 
+        if (CableItem.isWaterBottle(stack)) {
+            return washCable(stack, level, pos, player, hand);
+        }
+
         if (stack.getItem() instanceof CableItem) {
             // Holding Cable means "build", so place it instead of opening a connector menu on this block.
             // Only the Wrench turns a disabled link back on.
@@ -246,6 +250,18 @@ public class CableBlock extends Block implements EntityBlock {
             refreshCableLinks(level, pos);
             level.playSound(null, pos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
             stack.consume(1, player);
+        }
+        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    private static ItemInteractionResult washCable(ItemStack stack, Level level, BlockPos pos, Player player, InteractionHand hand) {
+        if (!(level.getBlockEntity(pos) instanceof CableBlockEntity cable) || cable.color() == null) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (!level.isClientSide) {
+            cable.setColor(null);
+            refreshCableLinks(level, pos);
+            CableItem.emptyWaterBottle(stack, level, pos, player, hand);
         }
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }

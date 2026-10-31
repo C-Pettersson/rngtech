@@ -3,6 +3,7 @@ package com.rngtech.content.block;
 import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.BatteryChassisBlockEntity;
 import com.rngtech.content.energy.BatteryChassisMaterial;
+import com.rngtech.content.item.CableItem;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
@@ -41,7 +42,7 @@ public class BatteryChassisBlock extends BaseMachineBlock {
         return new BatteryChassisBlockEntity(pos, state);
     }
 
-    /** A dye colours the casing band of a metal chassis; the Wooden crate has no band. */
+    /** A dye colours the casing band of a metal chassis and a Water Bottle washes it off; the Wooden crate has no band. */
     @Override
     protected ItemInteractionResult useItemOn(
             ItemStack stack,
@@ -52,18 +53,25 @@ public class BatteryChassisBlock extends BaseMachineBlock {
             InteractionHand hand,
             BlockHitResult hitResult
     ) {
-        if (!(stack.getItem() instanceof DyeItem dye)
-                || material == BatteryChassisMaterial.WOODEN
-                || !(level.getBlockEntity(pos) instanceof BatteryChassisBlockEntity chassis)
-                || chassis.color() == dye.getDyeColor()) {
+        if (material == BatteryChassisMaterial.WOODEN || !(level.getBlockEntity(pos) instanceof BatteryChassisBlockEntity chassis)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        if (!level.isClientSide) {
-            chassis.setColor(dye.getDyeColor());
-            level.playSound(null, pos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
-            stack.consume(1, player);
+        if (stack.getItem() instanceof DyeItem dye && chassis.color() != dye.getDyeColor()) {
+            if (!level.isClientSide) {
+                chassis.setColor(dye.getDyeColor());
+                level.playSound(null, pos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
+                stack.consume(1, player);
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
-        return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        if (CableItem.isWaterBottle(stack) && chassis.color() != null) {
+            if (!level.isClientSide) {
+                chassis.setColor(null);
+                CableItem.emptyWaterBottle(stack, level, pos, player, hand);
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override

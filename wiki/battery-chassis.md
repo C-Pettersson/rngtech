@@ -45,7 +45,7 @@ Each chassis you craft rolls its own [rarity and affixes](rarity-and-affixes.md)
 
 You can read a chassis from the outside. Each active cell slot is a socket on the floor of the rack, and every installed cell stands in its socket, so you can see which cells are in and which slots are empty. The window on each cell fills up with that cell's charge. The lights on the corner posts show the whole bank's charge, the bottom two warning orange and red. While the bank charges, the light above the charge blinks and the lamps on the lid glow green; while it discharges, the top light pulses and the lamps glow amber. Teal lamps mean FE passes through in about equal amounts, and dark lamps mean nothing is moving. The bus rails under the lid and the straps over the cells are in the chassis's metal.
 
-Each side, top and bottom included, shows what it touches. A side facing a cable connector or a [Universal Connector](universal-cable.md) shows a connector port. A side against another FE block, such as a machine or another chassis, is closed with a solid, smooth contact wall. A side with nothing attached stays open, or plain on the lid and base. The {{ item('rngtech:wooden_battery_chassis') }} is a plain plank crate instead: its cells sit in the crate, wired to a copper bar, and its redstone lamp glows while FE flows in or out. Slow leakage alone does not light it.
+Each side, top and bottom included, shows what it touches. A side facing a cable connector or a [Universal Connector](universal-cable.md) shows a connector port. A side against another FE block, such as a machine or a chassis it links to, is closed with a solid, smooth contact wall. A side with nothing attached stays open, or plain on the lid and base. The {{ item('rngtech:wooden_battery_chassis') }} is a plain plank crate instead: its cells sit in the crate, wired to a copper bar, and its redstone lamp glows while FE flows in or out. Slow leakage alone does not light it.
 
 ## Obtaining
 
@@ -71,7 +71,7 @@ Put Battery Cells in the chassis, then connect it to generators and machines dir
 - **Efficiency** below 1.0 wastes FE: the chassis stores less than it accepts and draws more from its cells than it delivers. The Wooden, Copper, Gold, and Arclite chassis start below 1.0, and Efficiency affixes can raise it. Efficiency above 1.0 gives no bonus.
 - **Global Modifier Strength** sets how strongly the chassis's Capacity and Energy Transfer affixes act on each cell. It starts at 1.5 on the Wooden chassis and falls to 0.7 on the Exotic chassis. For example, 50% increased Energy Transfer on an Iron chassis, which has 1.3 strength, raises each cell's rates by 65%. Charged Storage always doubles capacity.
 
-Two Battery Chassis placed directly next to each other slowly even out their fill levels. Banks on the same cable network with connectors on Both also even out their charge and then stop, instead of draining each other, so daisy-chained banks pass charge along. See [storage balancing](universal-cable.md#energy).
+Two Battery Chassis placed directly next to each other slowly even out their fill levels, unless they are dyed different colors (see [Dyeing](#dyeing)). Banks on the same cable network with connectors on Both also even out their charge and then stop, instead of draining each other, so daisy-chained banks pass charge along. See [storage balancing](universal-cable.md#energy).
 
 ### Stages
 
@@ -107,11 +107,14 @@ Hover the Burst row on the Process tab to see the burst output and the ticks lef
 
 ### Dyeing
 
-Dye lets you tell banks apart. It changes only the color of the band under the lid. It does not change stats or how the chassis connects.
+Dye lets you tell banks apart and keep them separate. It colors the band under the lid. It does not change stats.
+
+Two chassis that touch share FE only if their colors link. A dyed chassis links only to chassis of the same color and to undyed chassis. An undyed chassis links to every color. Chassis that do not link show no contact wall between them. Cables and machines connect to a chassis of any color.
 
 - Right-click a placed metal chassis with a dye to color its band. This uses one dye.
 - Right-click with a different dye to change the color.
-- To remove the dye, mine the chassis and use it on a water cauldron. This washes the whole stack and uses one level of water.
+- To remove the dye from a placed chassis, right-click it with a Water Bottle. You get an empty Glass Bottle back.
+- To remove the dye from chassis items, use them on a water cauldron. This washes the whole stack and uses one level of water.
 
 The chassis keeps its color when you mine it. The item tooltip shows the color. The Wooden chassis has no band and does not take dye.
 

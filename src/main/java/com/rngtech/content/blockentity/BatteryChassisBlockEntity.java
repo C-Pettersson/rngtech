@@ -4,6 +4,7 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.BatteryChassisBlock;
 import com.rngtech.content.block.CableBlock;
 import com.rngtech.content.block.UniversalConnectorBlock;
+import com.rngtech.content.cable.CableGraph;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.menu.BatteryChassisMenu;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -237,7 +238,10 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         return visualState;
     }
 
-    /** The dye on the casing band, or null for the plain band. Only looks; it changes no stat. */
+    /**
+     * The dye on the casing band, or null for the plain band. It changes no stat, but touching chassis of two different
+     * colours do not share FE, as with dyed cables.
+     */
     public DyeColor color() {
         return color;
     }
@@ -249,6 +253,11 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         this.color = color;
         setChanged();
         syncInventoryToClient();
+    }
+
+    /** Whether this chassis shares FE with a touching chassis: undyed links to any colour, dyed only to its own. */
+    public boolean linksTo(BatteryChassisBlockEntity other) {
+        return CableGraph.colorsLink(color, other.color);
     }
 
     /** What the chassis shows right now, built on the server. */
@@ -309,7 +318,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         return sides;
     }
 
-    /** Other sides with an FE neighbour, such as a machine or another chassis, read from the export caches. */
+    /** Other sides with an FE neighbour, such as a machine or a linked chassis, read from the export caches. */
     private int contactSides() {
         if (level == null || level.isClientSide) {
             return 0;
@@ -318,7 +327,9 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         int sides = 0;
         for (Direction direction : DIRECTIONS) {
             int bit = 1 << direction.get3DDataValue();
-            if ((connectors & bit) == 0 && exportTargets.get(level, worldPosition, direction) != null) {
+            if ((connectors & bit) == 0
+                    && !(level.getBlockEntity(worldPosition.relative(direction)) instanceof BatteryChassisBlockEntity other && !linksTo(other))
+                    && exportTargets.get(level, worldPosition, direction) != null) {
                 sides |= bit;
             }
         }
@@ -1331,6 +1342,9 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             BlockPos targetPos = pos.relative(direction);
             BlockEntity blockEntity = level.getBlockEntity(targetPos);
             if (blockEntity instanceof BatteryChassisBlockEntity targetChassis) {
+                if (!linksTo(targetChassis)) {
+                    continue;
+                }
                 int delivered = equalizeWithAdjacentChassis(targetChassis, direction, remainingOutput, context);
                 remainingOutput -= delivered;
                 exported |= delivered > 0;

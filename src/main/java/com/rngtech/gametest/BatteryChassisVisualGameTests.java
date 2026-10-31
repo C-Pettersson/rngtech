@@ -26,6 +26,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
@@ -161,6 +163,52 @@ public final class BatteryChassisVisualGameTests {
         placed.applyComponentsFromItemStack(drops.getFirst());
         check(placed.color() == DyeColor.RED, "Placing the red chassis should keep the colour: " + placed.color());
         helper.succeed();
+    }
+
+    /** A Water Bottle washes the dye off a placed chassis and leaves a Glass Bottle; on an undyed chassis it passes. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void waterBottleWashesTheBandOff(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        BatteryChassisBlockEntity chassis = chassis(helper, pos, BatteryChassisMaterial.IRON);
+        chassis.setColor(DyeColor.RED);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, PotionContents.createItemStack(Items.POTION, Potions.WATER));
+        check(useHeldItem(helper, pos, player).consumesAction(), "A Water Bottle should wash a red chassis");
+        check(chassis.color() == null, "The chassis should be undyed: " + chassis.color());
+        check(player.getMainHandItem().is(Items.GLASS_BOTTLE), "Washing should leave a Glass Bottle: " + player.getMainHandItem());
+
+        player.setItemInHand(InteractionHand.MAIN_HAND, PotionContents.createItemStack(Items.POTION, Potions.WATER));
+        check(useHeldItem(helper, pos, player) == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                && player.getMainHandItem().is(Items.POTION), "Washing an undyed chassis should pass and keep the bottle");
+        helper.succeed();
+    }
+
+    /** Touching chassis dyed two colours neither share FE nor show a contact plate; undyeing one links them again. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 2 * FLOW_TICKS + 40)
+    public static void differentColoursDoNotShareCharge(GameTestHelper helper) {
+        BatteryChassisBlockEntity full = chassis(helper, new BlockPos(1, 1, 2), BatteryChassisMaterial.IRON);
+        BatteryChassisBlockEntity empty = chassis(helper, new BlockPos(2, 1, 2), BatteryChassisMaterial.IRON);
+        full.getInventory().setStackInSlot(0, cell(BatteryCellMaterial.IRON, 1.0));
+        empty.getInventory().setStackInSlot(0, cell(BatteryCellMaterial.IRON, 0.0));
+        full.setColor(DyeColor.RED);
+        empty.setColor(DyeColor.BLUE);
+        helper.startSequence()
+                .thenExecuteAfter(FLOW_TICKS, () -> {
+                    BatteryChassisVisualState source = full.currentVisualState();
+                    BatteryChassisVisualState sink = empty.currentVisualState();
+                    check(sink.charge() <= 0.0F && sink.flow() == BatteryChassisVisualState.Flow.IDLE,
+                            "A blue chassis took FE from a red one: " + sink);
+                    check(source.plate(Direction.EAST) == BatteryChassisVisualState.Plate.NONE
+                            && sink.plate(Direction.WEST) == BatteryChassisVisualState.Plate.NONE,
+                            "Unlinked chassis should not show contact plates: " + source + ", " + sink);
+                    empty.setColor(null);
+                })
+                .thenExecuteAfter(FLOW_TICKS, () -> {
+                    BatteryChassisVisualState sink = empty.currentVisualState();
+                    check(sink.charge() > 0.0F && sink.plate(Direction.WEST) == BatteryChassisVisualState.Plate.CONTACT,
+                            "An undyed chassis should link to the red one: " + sink);
+                })
+                .thenSucceed();
     }
 
     /** The Wooden crate has no band, so a dye passes through to the default interaction. */

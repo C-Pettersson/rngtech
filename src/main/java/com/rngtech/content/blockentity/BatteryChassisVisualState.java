@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @param cells      one entry per active slot, in slot order; an empty slot has an empty kind
  * @param connectors sides a cable or Universal Connector faces, which show a connector port
- * @param contacts   other sides with an FE neighbour, such as a machine or another chassis, which show a smooth plate
+ * @param contacts   other sides with an FE neighbour, such as a machine or a linked chassis, which show a smooth plate
  */
 public record BatteryChassisVisualState(List<Cell> cells, float charge, Flow flow, int connectors, int contacts) {
     public static final BatteryChassisVisualState EMPTY = new BatteryChassisVisualState(List.of(), -1.0F, Flow.IDLE, 0, 0);
