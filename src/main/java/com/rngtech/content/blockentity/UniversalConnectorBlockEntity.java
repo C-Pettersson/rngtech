@@ -37,13 +37,17 @@ import java.util.Map;
 public class UniversalConnectorBlockEntity extends BlockEntity
         implements MenuProvider, UniversalConnectorAccess, UniversalConnectorDataOwner {
     private static final Direction[] DIRECTIONS = Direction.values();
-    public static final int SLOT_ENERGY_CONNECTOR = 0;
+    public static final int ENERGY_MODULE_SLOT_COUNT = 3;
     public static final int SLOT_FLUID_CONNECTOR_START = 1;
     public static final int FLUID_MODULE_SLOT_COUNT = 3;
     public static final int SLOT_ITEM_CONNECTOR_START = SLOT_FLUID_CONNECTOR_START + FLUID_MODULE_SLOT_COUNT;
     public static final int ITEM_MODULE_SLOT_COUNT = 3;
     public static final int SLOT_RESERVED_CONNECTOR = SLOT_ITEM_CONNECTOR_START + ITEM_MODULE_SLOT_COUNT;
-    public static final int SLOT_COUNT = SLOT_RESERVED_CONNECTOR + 1;
+    /** The first Energy row keeps slot 0 from before rows existed; the others follow the Bridge slot. */
+    private static final int SLOT_EXTRA_ENERGY_CONNECTOR_START = SLOT_RESERVED_CONNECTOR + 1;
+    public static final int SLOT_COUNT = SLOT_EXTRA_ENERGY_CONNECTOR_START + ENERGY_MODULE_SLOT_COUNT - 1;
+    /** Connector slots before the Energy rows, which is also where old saves kept their filters. */
+    public static final int LEGACY_SLOT_COUNT = SLOT_RESERVED_CONNECTOR + 1;
     public static final int FILTER_SLOTS_PER_MODULE = 2;
     public static final int SLOT_FLUID_FILTER_START = 0;
     public static final int FLUID_FILTER_SLOT_COUNT = FLUID_MODULE_SLOT_COUNT * FILTER_SLOTS_PER_MODULE;
@@ -53,18 +57,20 @@ public class UniversalConnectorBlockEntity extends BlockEntity
     public static final int MAX_CHANNEL = 15;
 
 
-    private static final int DATA_CHANNEL = 0;
-    private static final int DATA_ATTACH_AS = 1;
-    private static final int DATA_MODE = 2;
-    private static final int DATA_TRANSFER_RATE = 3;
-    private static final int DATA_DISTRIBUTION = 4;
-    private static final int DATA_HAS_CONNECTOR = 5;
-    private static final int DATA_LAST_ENERGY_INPUT = 6;
-    private static final int DATA_LAST_ENERGY_OUTPUT = 7;
-    private static final int DATA_BRIDGE_CHANNEL = 8;
-    private static final int DATA_BRIDGE_TYPE = 9;
-    private static final int DATA_BRIDGE_MOD_LOADED = 10;
-    private static final int DATA_BRIDGE_ENDPOINT_COUNT = 11;
+    private static final int DATA_ENERGY_MODULE_STRIDE = 8;
+    private static final int DATA_ENERGY_CHANNEL_OFFSET = 0;
+    private static final int DATA_ENERGY_ATTACH_AS_OFFSET = 1;
+    private static final int DATA_ENERGY_MODE_OFFSET = 2;
+    private static final int DATA_ENERGY_TRANSFER_RATE_OFFSET = 3;
+    private static final int DATA_ENERGY_DISTRIBUTION_OFFSET = 4;
+    private static final int DATA_ENERGY_LAST_INPUT_OFFSET = 5;
+    private static final int DATA_ENERGY_LAST_OUTPUT_OFFSET = 6;
+    private static final int DATA_ENERGY_TARGET_ACCESS_OFFSET = 7;
+    private static final int DATA_ENERGY_MODULE_BASE = 0;
+    private static final int DATA_BRIDGE_CHANNEL = DATA_ENERGY_MODULE_BASE + ENERGY_MODULE_SLOT_COUNT * DATA_ENERGY_MODULE_STRIDE;
+    private static final int DATA_BRIDGE_TYPE = DATA_BRIDGE_CHANNEL + 1;
+    private static final int DATA_BRIDGE_MOD_LOADED = DATA_BRIDGE_TYPE + 1;
+    private static final int DATA_BRIDGE_ENDPOINT_COUNT = DATA_BRIDGE_MOD_LOADED + 1;
     private static final int DATA_MODULE_STRIDE = 5;
     private static final int DATA_MODULE_CHANNEL_OFFSET = 0;
     private static final int DATA_MODULE_ATTACH_AS_OFFSET = 1;
@@ -100,8 +106,7 @@ public class UniversalConnectorBlockEntity extends BlockEntity
     private static final int DATA_NETWORK_ENERGY_OUTPUT_5M = DATA_NETWORK_ENERGY_INPUT_5M + 1;
     private static final int DATA_NETWORK_ENERGY_INPUT_15M = DATA_NETWORK_ENERGY_OUTPUT_5M + 1;
     private static final int DATA_NETWORK_ENERGY_OUTPUT_15M = DATA_NETWORK_ENERGY_INPUT_15M + 1;
-    private static final int DATA_ENERGY_TARGET_ACCESS = DATA_NETWORK_ENERGY_OUTPUT_15M + 1;
-    private static final int DATA_NETWORK_ENERGY_INPUT_CAP = DATA_ENERGY_TARGET_ACCESS + 1;
+    private static final int DATA_NETWORK_ENERGY_INPUT_CAP = DATA_NETWORK_ENERGY_OUTPUT_15M + 1;
     private static final int DATA_NETWORK_ENERGY_OUTPUT_CAP = DATA_NETWORK_ENERGY_INPUT_CAP + 1;
     private static final int DATA_NETWORK_ENERGY_CHANNEL_CAP = DATA_NETWORK_ENERGY_OUTPUT_CAP + 1;
     private static final int DATA_COUNT = DATA_NETWORK_ENERGY_CHANNEL_CAP + 1;
@@ -204,6 +209,11 @@ public class UniversalConnectorBlockEntity extends BlockEntity
     }
 
     @Override
+    public LinkStatus energyLinkStatus(int moduleIndex) {
+        return primaryConnector().energyLinkStatus(moduleIndex);
+    }
+
+    @Override
     public LinkStatus fluidLinkStatus(int moduleIndex) {
         return primaryConnector().fluidLinkStatus(moduleIndex);
     }
@@ -231,13 +241,14 @@ public class UniversalConnectorBlockEntity extends BlockEntity
         }
     }
 
-    public boolean incrementChannel(int amount) {
-        return primaryConnector().incrementChannel(amount);
+    @Override
+    public boolean incrementEnergyChannel(int moduleIndex, int amount) {
+        return primaryConnector().incrementEnergyChannel(moduleIndex, amount);
     }
 
     @Override
-    public boolean setChannel(int channel) {
-        return primaryConnector().setChannel(channel);
+    public boolean setEnergyChannel(int moduleIndex, int channel) {
+        return primaryConnector().setEnergyChannel(moduleIndex, channel);
     }
 
     @Override
@@ -251,28 +262,33 @@ public class UniversalConnectorBlockEntity extends BlockEntity
     }
 
     @Override
-    public boolean setAttachAs(Direction attachAs) {
-        return primaryConnector().setAttachAs(attachAs);
+    public boolean cycleEnergyAttachAs(int moduleIndex) {
+        return primaryConnector().cycleEnergyAttachAs(moduleIndex);
     }
 
     @Override
-    public boolean cycleMode() {
-        return primaryConnector().cycleMode();
+    public boolean setEnergyAttachAs(int moduleIndex, Direction attachAs) {
+        return primaryConnector().setEnergyAttachAs(moduleIndex, attachAs);
     }
 
     @Override
-    public boolean setMode(CableConnectorMode mode) {
-        return primaryConnector().setMode(mode);
+    public boolean cycleEnergyMode(int moduleIndex) {
+        return primaryConnector().cycleEnergyMode(moduleIndex);
     }
 
     @Override
-    public boolean cycleEnergyDistributionMode() {
-        return primaryConnector().cycleEnergyDistributionMode();
+    public boolean setEnergyMode(int moduleIndex, CableConnectorMode mode) {
+        return primaryConnector().setEnergyMode(moduleIndex, mode);
     }
 
     @Override
-    public boolean setEnergyDistributionMode(EnergyDistributionMode distributionMode) {
-        return primaryConnector().setEnergyDistributionMode(distributionMode);
+    public boolean cycleEnergyDistributionMode(int moduleIndex) {
+        return primaryConnector().cycleEnergyDistributionMode(moduleIndex);
+    }
+
+    @Override
+    public boolean setEnergyDistributionMode(int moduleIndex, EnergyDistributionMode distributionMode) {
+        return primaryConnector().setEnergyDistributionMode(moduleIndex, distributionMode);
     }
 
     public boolean incrementFluidChannel(int moduleIndex, int amount) {
@@ -451,6 +467,16 @@ public class UniversalConnectorBlockEntity extends BlockEntity
         invalidateNetworkCache();
     }
 
+    public static int energyConnectorSlot(int moduleIndex) {
+        return moduleIndex == 0 ? 0 : SLOT_EXTRA_ENERGY_CONNECTOR_START + moduleIndex - 1;
+    }
+
+    public static boolean isEnergyConnectorSlot(int slot) {
+        return slot == 0
+                || slot >= SLOT_EXTRA_ENERGY_CONNECTOR_START
+                && slot < SLOT_EXTRA_ENERGY_CONNECTOR_START + ENERGY_MODULE_SLOT_COUNT - 1;
+    }
+
     public static int fluidConnectorSlot(int moduleIndex) {
         return SLOT_FLUID_CONNECTOR_START + moduleIndex;
     }
@@ -489,36 +515,54 @@ public class UniversalConnectorBlockEntity extends BlockEntity
                 : Direction.NORTH;
     }
 
-    public static int dataChannelIndex() {
-        return DATA_CHANNEL;
+    public static int dataEnergyChannelIndex(int moduleIndex) {
+        return energyDataIndex(moduleIndex, DATA_ENERGY_CHANNEL_OFFSET);
     }
 
-    public static int dataAttachAsIndex() {
-        return DATA_ATTACH_AS;
+    public static int dataEnergyAttachAsIndex(int moduleIndex) {
+        return energyDataIndex(moduleIndex, DATA_ENERGY_ATTACH_AS_OFFSET);
     }
 
-    public static int dataModeIndex() {
-        return DATA_MODE;
+    public static int dataEnergyModeIndex(int moduleIndex) {
+        return energyDataIndex(moduleIndex, DATA_ENERGY_MODE_OFFSET);
     }
 
-    public static int dataDistributionIndex() {
-        return DATA_DISTRIBUTION;
+    public static int dataEnergyDistributionIndex(int moduleIndex) {
+        return energyDataIndex(moduleIndex, DATA_ENERGY_DISTRIBUTION_OFFSET);
     }
 
-    public static int dataTransferRateIndex() {
-        return DATA_TRANSFER_RATE;
+    public static int dataEnergyTransferRateIndex(int moduleIndex) {
+        return energyDataIndex(moduleIndex, DATA_ENERGY_TRANSFER_RATE_OFFSET);
     }
 
-    public static int dataHasConnectorIndex() {
-        return DATA_HAS_CONNECTOR;
+    public static int dataEnergyLastInputIndex(int moduleIndex) {
+        return energyDataIndex(moduleIndex, DATA_ENERGY_LAST_INPUT_OFFSET);
     }
 
-    public static int dataLastEnergyInputIndex() {
-        return DATA_LAST_ENERGY_INPUT;
+    public static int dataEnergyLastOutputIndex(int moduleIndex) {
+        return energyDataIndex(moduleIndex, DATA_ENERGY_LAST_OUTPUT_OFFSET);
     }
 
-    public static int dataLastEnergyOutputIndex() {
-        return DATA_LAST_ENERGY_OUTPUT;
+    public static int dataEnergyTargetAccessIndex(int moduleIndex) {
+        return energyDataIndex(moduleIndex, DATA_ENERGY_TARGET_ACCESS_OFFSET);
+    }
+
+    public static boolean isEnergyModuleDataIndex(int index) {
+        return index >= DATA_ENERGY_MODULE_BASE && index < DATA_BRIDGE_CHANNEL;
+    }
+
+    /** The Energy row a module data index belongs to; see {@link #isEnergyModuleDataIndex}. */
+    public static int energyDataModule(int index) {
+        return (index - DATA_ENERGY_MODULE_BASE) / DATA_ENERGY_MODULE_STRIDE;
+    }
+
+    /** Which field of its row a module data index holds, matching the {@code dataEnergy*Index} order. */
+    public static int energyDataField(int index) {
+        return (index - DATA_ENERGY_MODULE_BASE) % DATA_ENERGY_MODULE_STRIDE;
+    }
+
+    private static int energyDataIndex(int moduleIndex, int offset) {
+        return DATA_ENERGY_MODULE_BASE + moduleIndex * DATA_ENERGY_MODULE_STRIDE + offset;
     }
 
     public static int dataBridgeChannelIndex() {
@@ -539,10 +583,6 @@ public class UniversalConnectorBlockEntity extends BlockEntity
 
     public static int dataCount() {
         return DATA_COUNT;
-    }
-
-    public static int dataEnergyTargetAccessIndex() {
-        return DATA_ENERGY_TARGET_ACCESS;
     }
 
     public static int dataNetworkEnergyInputCapIndex() {

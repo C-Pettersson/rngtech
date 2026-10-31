@@ -39,15 +39,15 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
     public static final int TAB_ITEM = 2;
     public static final int TAB_BRIDGE = 3;
     public static final int TAB_NETWORK = 4;
-    public static final int BUTTON_CHANNEL_DOWN = 0;
-    public static final int BUTTON_CHANNEL_UP = 1;
-    public static final int BUTTON_MODE = 2;
-    public static final int BUTTON_DISTRIBUTION = 3;
     public static final int BUTTON_CLEAR_NETWORK_CACHE = 4;
     public static final int BUTTON_BRIDGE_CHANNEL_DOWN = 5;
     public static final int BUTTON_BRIDGE_CHANNEL_UP = 6;
-    public static final int BUTTON_ATTACH_AS_BASE = 10;
     public static final int BUTTON_TAB_BASE = 100;
+    public static final int BUTTON_ENERGY_CHANNEL_DOWN_BASE = 400;
+    public static final int BUTTON_ENERGY_CHANNEL_UP_BASE = 410;
+    public static final int BUTTON_ENERGY_ATTACH_BASE = 420;
+    public static final int BUTTON_ENERGY_MODE_BASE = 430;
+    public static final int BUTTON_ENERGY_DISTRIBUTION_BASE = 440;
     public static final int BUTTON_FLUID_CHANNEL_DOWN_BASE = 300;
     public static final int BUTTON_FLUID_CHANNEL_UP_BASE = 310;
     public static final int BUTTON_FLUID_ATTACH_BASE = 320;
@@ -56,10 +56,10 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
     public static final int BUTTON_ITEM_CHANNEL_UP_BASE = 210;
     public static final int BUTTON_ITEM_ATTACH_BASE = 220;
     public static final int BUTTON_ITEM_MODE_BASE = 230;
+    public static final int ENERGY_MODULE_COUNT = UniversalConnectorBlockEntity.ENERGY_MODULE_SLOT_COUNT;
     public static final int FLUID_MODULE_COUNT = UniversalConnectorBlockEntity.FLUID_MODULE_SLOT_COUNT;
     public static final int ITEM_MODULE_COUNT = UniversalConnectorBlockEntity.ITEM_MODULE_SLOT_COUNT;
     private static final int DATA_COUNT = UniversalConnectorBlockEntity.dataCount();
-    private static final int ENERGY_CONNECTOR_SLOT = UniversalConnectorBlockEntity.SLOT_ENERGY_CONNECTOR;
     private static final int FLUID_CONNECTOR_SLOT_START = UniversalConnectorBlockEntity.SLOT_FLUID_CONNECTOR_START;
     private static final int FLUID_CONNECTOR_SLOT_END = FLUID_CONNECTOR_SLOT_START + FLUID_MODULE_COUNT;
     private static final int ITEM_CONNECTOR_SLOT_START = UniversalConnectorBlockEntity.SLOT_ITEM_CONNECTOR_START;
@@ -102,19 +102,13 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         this.data = data;
         this.connector = connector;
 
-        addSlot(new TabbedSlot(
-                connector.getInventory(),
-                UniversalConnectorBlockEntity.SLOT_ENERGY_CONNECTOR,
-                30,
-                60,
-                () -> selectedTab == TAB_ENERGY
-        ));
+        addEnergySlot(connector, 0);
         for (int moduleIndex = 0; moduleIndex < FLUID_MODULE_COUNT; moduleIndex++) {
             addSlot(new TabbedSlot(
                     connector.getInventory(),
                     UniversalConnectorBlockEntity.fluidConnectorSlot(moduleIndex),
                     30,
-                    60 + moduleIndex * 32,
+                    40 + moduleIndex * 32,
                     () -> selectedTab == TAB_FLUID
             ));
         }
@@ -123,7 +117,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                     connector.getInventory(),
                     UniversalConnectorBlockEntity.itemConnectorSlot(moduleIndex),
                     30,
-                    60 + moduleIndex * 32,
+                    40 + moduleIndex * 32,
                     () -> selectedTab == TAB_ITEM
             ));
         }
@@ -131,9 +125,12 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                 connector.getInventory(),
                 UniversalConnectorBlockEntity.SLOT_RESERVED_CONNECTOR,
                 30,
-                60,
+                40,
                 () -> selectedTab == TAB_BRIDGE
         ));
+        for (int moduleIndex = 1; moduleIndex < ENERGY_MODULE_COUNT; moduleIndex++) {
+            addEnergySlot(connector, moduleIndex);
+        }
         for (int moduleIndex = 0; moduleIndex < FLUID_MODULE_COUNT; moduleIndex++) {
             for (int filterIndex = 0; filterIndex < UniversalConnectorBlockEntity.FILTER_SLOTS_PER_MODULE; filterIndex++) {
                 addSlot(new GhostFilterSlot(
@@ -144,7 +141,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                         moduleIndex,
                         filterIndex,
                         252 + filterIndex * 18,
-                        60 + moduleIndex * 32,
+                        40 + moduleIndex * 32,
                         () -> selectedTab == TAB_FLUID
                 ));
             }
@@ -159,7 +156,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                         moduleIndex,
                         filterIndex,
                         252 + filterIndex * 18,
-                        60 + moduleIndex * 32,
+                        40 + moduleIndex * 32,
                         () -> selectedTab == TAB_ITEM
                 ));
             }
@@ -182,42 +179,52 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         return selectedTab;
     }
 
-    public int channel() {
-        return data.get(UniversalConnectorBlockEntity.dataChannelIndex());
+    public int energyChannel(int moduleIndex) {
+        return data.get(UniversalConnectorBlockEntity.dataEnergyChannelIndex(moduleIndex));
     }
 
-    public Direction attachAs() {
-        int ordinal = data.get(UniversalConnectorBlockEntity.dataAttachAsIndex());
+    public Direction energyAttachAs(int moduleIndex) {
+        int ordinal = data.get(UniversalConnectorBlockEntity.dataEnergyAttachAsIndex(moduleIndex));
         Direction[] values = Direction.values();
         return ordinal >= 0 && ordinal < values.length ? values[ordinal] : Direction.NORTH;
     }
 
-    public int modeOrdinal() {
-        return data.get(UniversalConnectorBlockEntity.dataModeIndex());
+    public int energyModeOrdinal(int moduleIndex) {
+        return data.get(UniversalConnectorBlockEntity.dataEnergyModeIndex(moduleIndex));
     }
 
-    public int distributionOrdinal() {
-        return data.get(UniversalConnectorBlockEntity.dataDistributionIndex());
+    public int energyDistributionOrdinal(int moduleIndex) {
+        return data.get(UniversalConnectorBlockEntity.dataEnergyDistributionIndex(moduleIndex));
     }
 
-    public int transferRate() {
-        return data.get(UniversalConnectorBlockEntity.dataTransferRateIndex());
+    public int energyTransferRate(int moduleIndex) {
+        return data.get(UniversalConnectorBlockEntity.dataEnergyTransferRateIndex(moduleIndex));
     }
 
-    public boolean hasConnector() {
-        return data.get(UniversalConnectorBlockEntity.dataHasConnectorIndex()) != 0;
+    public boolean hasEnergyConnector(int moduleIndex) {
+        return energyTransferRate(moduleIndex) > 0;
     }
 
-    public boolean targetHasEnergyAccess() {
-        return data.get(UniversalConnectorBlockEntity.dataEnergyTargetAccessIndex()) != 0;
+    public boolean targetHasEnergyAccess(int moduleIndex) {
+        return data.get(UniversalConnectorBlockEntity.dataEnergyTargetAccessIndex(moduleIndex)) != 0;
     }
 
-    public int lastEnergyInput() {
-        return data.get(UniversalConnectorBlockEntity.dataLastEnergyInputIndex());
+    public int lastEnergyInput(int moduleIndex) {
+        return data.get(UniversalConnectorBlockEntity.dataEnergyLastInputIndex(moduleIndex));
     }
 
-    public int lastEnergyOutput() {
-        return data.get(UniversalConnectorBlockEntity.dataLastEnergyOutputIndex());
+    public int lastEnergyOutput(int moduleIndex) {
+        return data.get(UniversalConnectorBlockEntity.dataEnergyLastOutputIndex(moduleIndex));
+    }
+
+    /** The channel the Network tab's energy row reads: the first Energy row with a connector, else the first row. */
+    public int networkEnergyChannel() {
+        for (int moduleIndex = 0; moduleIndex < ENERGY_MODULE_COUNT; moduleIndex++) {
+            if (hasEnergyConnector(moduleIndex)) {
+                return energyChannel(moduleIndex);
+            }
+        }
+        return energyChannel(0);
     }
 
     public int bridgeChannel() {
@@ -418,6 +425,26 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         if (player.level().isClientSide) {
             return isKnownButton(id);
         }
+        int energyChannelDown = id - BUTTON_ENERGY_CHANNEL_DOWN_BASE;
+        if (isEnergyModuleIndex(energyChannelDown)) {
+            return connector.incrementEnergyChannel(energyChannelDown, -1);
+        }
+        int energyChannelUp = id - BUTTON_ENERGY_CHANNEL_UP_BASE;
+        if (isEnergyModuleIndex(energyChannelUp)) {
+            return connector.incrementEnergyChannel(energyChannelUp, 1);
+        }
+        int energyAttach = id - BUTTON_ENERGY_ATTACH_BASE;
+        if (isEnergyModuleIndex(energyAttach)) {
+            return connector.cycleEnergyAttachAs(energyAttach);
+        }
+        int energyMode = id - BUTTON_ENERGY_MODE_BASE;
+        if (isEnergyModuleIndex(energyMode)) {
+            return connector.cycleEnergyMode(energyMode);
+        }
+        int energyDistribution = id - BUTTON_ENERGY_DISTRIBUTION_BASE;
+        if (isEnergyModuleIndex(energyDistribution)) {
+            return connector.cycleEnergyDistributionMode(energyDistribution);
+        }
         int fluidChannelDown = id - BUTTON_FLUID_CHANNEL_DOWN_BASE;
         if (isFluidModuleIndex(fluidChannelDown)) {
             return connector.incrementFluidChannel(fluidChannelDown, -1);
@@ -450,31 +477,14 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         if (isItemModuleIndex(itemMode)) {
             return connector.cycleItemMode(itemMode);
         }
-        if (id == BUTTON_CHANNEL_DOWN) {
-            return connector.incrementChannel(-1);
-        }
-        if (id == BUTTON_CHANNEL_UP) {
-            return connector.incrementChannel(1);
-        }
         if (id == BUTTON_BRIDGE_CHANNEL_DOWN) {
             return connector.incrementBridgeChannel(-1);
         }
         if (id == BUTTON_BRIDGE_CHANNEL_UP) {
             return connector.incrementBridgeChannel(1);
         }
-        if (id == BUTTON_MODE) {
-            return connector.cycleMode();
-        }
-        if (id == BUTTON_DISTRIBUTION) {
-            return connector.cycleEnergyDistributionMode();
-        }
         if (id == BUTTON_CLEAR_NETWORK_CACHE) {
             return connector.clearNetworkCache();
-        }
-        int attachAs = id - BUTTON_ATTACH_AS_BASE;
-        Direction[] values = Direction.values();
-        if (attachAs >= 0 && attachAs < values.length) {
-            return connector.setAttachAs(values[attachAs]);
         }
         return false;
     }
@@ -527,7 +537,8 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         } else if (index < PLAYER_INVENTORY_START) {
             return ItemStack.EMPTY;
         } else if (stack.getItem() instanceof EnergyConnectorItem) {
-            if (!moveItemStackTo(stack, ENERGY_CONNECTOR_SLOT, ENERGY_CONNECTOR_SLOT + 1, false)) {
+            if (!moveItemStackTo(stack, 0, 1, false)
+                    && !moveItemStackTo(stack, BRIDGE_CONNECTOR_SLOT + 1, FILTER_MENU_SLOT_START, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (stack.getItem() instanceof FluidConnectorItem) {
@@ -560,6 +571,17 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         return moved;
     }
 
+    /** Menu slot numbers match the connector inventory, so the Energy rows are added where their slots sit. */
+    private void addEnergySlot(UniversalConnectorAccess connector, int moduleIndex) {
+        addSlot(new TabbedSlot(
+                connector.getInventory(),
+                UniversalConnectorBlockEntity.energyConnectorSlot(moduleIndex),
+                30,
+                40 + moduleIndex * 32,
+                () -> selectedTab == TAB_ENERGY
+        ));
+    }
+
     private void addPlayerInventory(Inventory playerInventory) {
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 9; column++) {
@@ -567,7 +589,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                         playerInventory,
                         column + row * 9 + 9,
                         35 + column * 18,
-                        156 + row * 18,
+                        136 + row * 18,
                         () -> selectedTab != TAB_NETWORK
                 ));
             }
@@ -578,7 +600,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                     playerInventory,
                     column,
                     35 + column * 18,
-                    214,
+                    194,
                     () -> selectedTab != TAB_NETWORK
             ));
         }
@@ -589,13 +611,16 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         if (tab >= TAB_ENERGY && tab <= TAB_NETWORK) {
             return true;
         }
-        if (id == BUTTON_CHANNEL_DOWN
-                || id == BUTTON_CHANNEL_UP
-                || id == BUTTON_MODE
-                || id == BUTTON_DISTRIBUTION
-                || id == BUTTON_CLEAR_NETWORK_CACHE
+        if (id == BUTTON_CLEAR_NETWORK_CACHE
                 || id == BUTTON_BRIDGE_CHANNEL_DOWN
                 || id == BUTTON_BRIDGE_CHANNEL_UP) {
+            return true;
+        }
+        if (isEnergyModuleIndex(id - BUTTON_ENERGY_CHANNEL_DOWN_BASE)
+                || isEnergyModuleIndex(id - BUTTON_ENERGY_CHANNEL_UP_BASE)
+                || isEnergyModuleIndex(id - BUTTON_ENERGY_ATTACH_BASE)
+                || isEnergyModuleIndex(id - BUTTON_ENERGY_MODE_BASE)
+                || isEnergyModuleIndex(id - BUTTON_ENERGY_DISTRIBUTION_BASE)) {
             return true;
         }
         if (isFluidModuleIndex(id - BUTTON_FLUID_CHANNEL_DOWN_BASE)
@@ -610,8 +635,11 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                 || isItemModuleIndex(id - BUTTON_ITEM_MODE_BASE)) {
             return true;
         }
-        int attachAs = id - BUTTON_ATTACH_AS_BASE;
-        return attachAs >= 0 && attachAs < Direction.values().length;
+        return false;
+    }
+
+    private static boolean isEnergyModuleIndex(int moduleIndex) {
+        return moduleIndex >= 0 && moduleIndex < ENERGY_MODULE_COUNT;
     }
 
     private static boolean isFluidModuleIndex(int moduleIndex) {
@@ -762,7 +790,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         private final ItemStackHandler inventory = new ItemStackHandler(UniversalConnectorBlockEntity.SLOT_COUNT) {
             @Override
             public boolean isItemValid(int slot, ItemStack stack) {
-                if (slot == UniversalConnectorBlockEntity.SLOT_ENERGY_CONNECTOR) {
+                if (UniversalConnectorBlockEntity.isEnergyConnectorSlot(slot)) {
                     return stack.getItem() instanceof EnergyConnectorItem;
                 }
                 if (UniversalConnectorBlockEntity.isFluidConnectorSlot(slot)) {
@@ -856,12 +884,12 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         }
 
         @Override
-        public boolean incrementChannel(int amount) {
+        public boolean incrementEnergyChannel(int moduleIndex, int amount) {
             return false;
         }
 
         @Override
-        public boolean setChannel(int channel) {
+        public boolean setEnergyChannel(int moduleIndex, int channel) {
             return false;
         }
 
@@ -876,27 +904,32 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         }
 
         @Override
-        public boolean setAttachAs(Direction attachAs) {
+        public boolean cycleEnergyAttachAs(int moduleIndex) {
             return false;
         }
 
         @Override
-        public boolean cycleMode() {
+        public boolean setEnergyAttachAs(int moduleIndex, Direction attachAs) {
             return false;
         }
 
         @Override
-        public boolean setMode(CableConnectorMode mode) {
+        public boolean cycleEnergyMode(int moduleIndex) {
             return false;
         }
 
         @Override
-        public boolean cycleEnergyDistributionMode() {
+        public boolean setEnergyMode(int moduleIndex, CableConnectorMode mode) {
             return false;
         }
 
         @Override
-        public boolean setEnergyDistributionMode(EnergyDistributionMode distributionMode) {
+        public boolean cycleEnergyDistributionMode(int moduleIndex) {
+            return false;
+        }
+
+        @Override
+        public boolean setEnergyDistributionMode(int moduleIndex, EnergyDistributionMode distributionMode) {
             return false;
         }
 

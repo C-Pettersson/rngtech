@@ -5,18 +5,23 @@ import com.rngtech.content.cable.EnergyDistributionMode;
 import com.rngtech.content.cable.FluidConnectorMode;
 import com.rngtech.content.cable.ItemConnectorMode;
 import com.rngtech.content.cable.NetworkBridgeType;
+import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.menu.UniversalConnectorMenu;
+import com.rngtech.content.registry.ModItems;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Items;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalConnectorMenu> {
+public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalConnectorMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
     private static final int PANEL_LIGHT = 0xFFE9E9E9;
@@ -28,23 +33,13 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     private static final int SELECTED = 0xFF6C7658;
     private static final int SELECTED_LIGHT = 0xFFA5B17E;
     private static final int DISABLED = 0xFF777777;
-    private static final int TAB_X = 8;
-    private static final int TAB_Y = 20;
-    private static final int TAB_WIDTH = 56;
-    private static final int TAB_HEIGHT = 18;
-    private static final int ENERGY_MODE_X = 74;
-    private static final int ENERGY_MODE_WIDTH = 44;
-    private static final int ENERGY_CHANNEL_DOWN_X = 126;
-    private static final int ENERGY_CHANNEL_UP_X = 168;
-    private static final int ENERGY_CHANNEL_VALUE_X = 147;
-    private static final int ENERGY_DISTRIBUTION_X = 196;
-    private static final int ENERGY_DISTRIBUTION_WIDTH = 52;
-    private static final int ENERGY_ATTACH_X = 252;
-    private static final int ENERGY_ATTACH_WIDTH = 48;
-    private static final int ENERGY_ROW_Y = 59;
+    private static final int WARNING = 0xFFA14D4D;
+    private static final int WARNING_DARK = 0xFF5A2626;
+    private static final int WARNING_LIGHT = 0xFFD08A8A;
+    private static final int LABEL_Y = 28;
     private static final int SMALL_BUTTON = 18;
     private static final int ITEM_SLOT_X = 29;
-    private static final int ITEM_SLOT_Y = 59;
+    private static final int ITEM_SLOT_Y = 39;
     private static final int ITEM_ROW_GAP = 32;
     private static final int ITEM_MODE_X = 74;
     private static final int ITEM_MODE_WIDTH = 34;
@@ -54,36 +49,38 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     private static final int ITEM_ATTACH_X = 192;
     private static final int ITEM_ATTACH_WIDTH = 48;
     private static final int ITEM_FILTER_X = 252;
+    private static final int ENERGY_DISTRIBUTION_X = ITEM_FILTER_X;
+    private static final int ENERGY_DISTRIBUTION_WIDTH = 52;
     private static final int FILTER_SLOT_COUNT = 2;
     private static final int FILTER_SLOT_GAP = 18;
     private static final int BRIDGE_CHANNEL_DOWN_X = 126;
     private static final int BRIDGE_CHANNEL_UP_X = 168;
     private static final int BRIDGE_CHANNEL_VALUE_X = 147;
-    private static final int BRIDGE_ROW_Y = 59;
+    private static final int BRIDGE_ROW_Y = 39;
     private static final int BRIDGE_STATUS_X = 196;
-    private static final int BRIDGE_STATUS_Y = 52;
+    private static final int BRIDGE_STATUS_Y = 32;
     private static final int BRIDGE_STATUS_WIDTH = 106;
     private static final int BRIDGE_STATUS_HEIGHT = 66;
     private static final int DEBUG_CARD_X = 16;
-    private static final int DEBUG_CARD_Y = 51;
+    private static final int DEBUG_CARD_Y = 31;
     private static final int DEBUG_CARD_WIDTH = 58;
     private static final int DEBUG_CARD_HEIGHT = 28;
     private static final int DEBUG_CARD_GAP = 8;
     private static final int DEBUG_ROW_X = 16;
-    private static final int DEBUG_ROW_Y = 87;
+    private static final int DEBUG_ROW_Y = 67;
     private static final int DEBUG_ROW_WIDTH = 286;
     private static final int DEBUG_ROW_HEIGHT = 17;
     private static final int DEBUG_ROW_GAP = 5;
     private static final int DEBUG_CACHE_X = 16;
-    private static final int DEBUG_CACHE_Y = 176;
+    private static final int DEBUG_CACHE_Y = 156;
     private static final int DEBUG_CACHE_WIDTH = 138;
     private static final int DEBUG_CACHE_HEIGHT = 18;
     private static final int DEBUG_BUTTON_X = 164;
-    private static final int DEBUG_BUTTON_Y = 176;
+    private static final int DEBUG_BUTTON_Y = 156;
     private static final int DEBUG_BUTTON_WIDTH = 138;
     private static final int DEBUG_BUTTON_HEIGHT = 18;
     private static final int NETWORK_ENERGY_ROW_X = 16;
-    private static final int NETWORK_ENERGY_ROW_Y = 199;
+    private static final int NETWORK_ENERGY_ROW_Y = 179;
     private static final int NETWORK_ENERGY_ROW_WIDTH = 286;
     private static final int NETWORK_ENERGY_ROW_HEIGHT = 28;
     private static final int NETWORK_ENERGY_WINDOW_BUTTON_WIDTH = 34;
@@ -102,37 +99,42 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
 
     private static final String[] NETWORK_ENERGY_WINDOW_LABELS = {"1m", "5m", "15m"};
 
-    private static final String[] TAB_KEYS = {
-            "rngtech.universal_connector.tab.energy",
-            "rngtech.universal_connector.tab.fluid",
-            "rngtech.universal_connector.tab.item",
-            "rngtech.universal_connector.tab.bridge",
-            "rngtech.universal_connector.tab.network"
-    };
-
+    private final MachineTabs tabs;
     private int networkEnergyWindowIndex;
 
     public UniversalConnectorScreen(UniversalConnectorMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         imageWidth = 318;
-        imageHeight = 236;
+        imageHeight = 216;
         inventoryLabelX = 35;
-        inventoryLabelY = 144;
+        inventoryLabelY = 124;
+        tabs = MachineTabs.builder(this)
+                .tab(UniversalConnectorMenu.TAB_ENERGY, "rngtech.universal_connector.tab.energy", ModItems.batteryCell(BatteryCellMaterial.COPPER).get())
+                .tab(UniversalConnectorMenu.TAB_FLUID, "rngtech.universal_connector.tab.fluid", Items.WATER_BUCKET)
+                .tab(UniversalConnectorMenu.TAB_ITEM, "rngtech.universal_connector.tab.item", Items.CHEST)
+                .tab(UniversalConnectorMenu.TAB_BRIDGE, "rngtech.universal_connector.tab.bridge", ModItems.AE2_NETWORK_CONNECTOR.get())
+                .tab(UniversalConnectorMenu.TAB_NETWORK, "rngtech.universal_connector.tab.network", ModItems.CABLE.get())
+                .build();
+    }
+
+    @Override
+    public MachineTabs machineTabs() {
+        return tabs;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        tabs.renderTooltip(guiGraphics, mouseX, mouseY);
         renderControlTooltip(guiGraphics, mouseX, mouseY);
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
-        renderTabs(guiGraphics);
+        tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
         if (isEnergyTab()) {
-            renderSlotFrame(guiGraphics, ITEM_SLOT_X, ITEM_SLOT_Y, false);
             renderEnergyControls(guiGraphics);
         } else if (isModuleTab()) {
             renderModuleControls(guiGraphics);
@@ -149,11 +151,7 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         guiGraphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
-        for (int tab = UniversalConnectorMenu.TAB_ENERGY; tab <= UniversalConnectorMenu.TAB_NETWORK; tab++) {
-            int x = TAB_X + tab * (TAB_WIDTH + 2);
-            int color = menu.selectedTab() == tab ? TEXT : 0xFF505050;
-            drawCentered(guiGraphics, Component.translatable(TAB_KEYS[tab]), x, TAB_Y + 5, TAB_WIDTH, color);
-        }
+        tabs.renderSelectedLabel(guiGraphics, menu.selectedTab(), titleLabelX, titleLabelY, TEXT_MUTED);
         if (isEnergyTab()) {
             drawEnergyLabels(guiGraphics);
         } else if (isModuleTab()) {
@@ -171,33 +169,35 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            for (int tab = UniversalConnectorMenu.TAB_ENERGY; tab <= UniversalConnectorMenu.TAB_NETWORK; tab++) {
-                if (isOverTab(mouseX, mouseY, tab)) {
-                    sendButton(UniversalConnectorMenu.BUTTON_TAB_BASE + tab);
-                    return true;
-                }
+            int tab = tabs.tabAt(mouseX, mouseY);
+            if (tab >= 0) {
+                sendButton(UniversalConnectorMenu.BUTTON_TAB_BASE + tab);
+                return true;
             }
 
             if (isEnergyTab()) {
-                if (inBounds(mouseX, mouseY, ENERGY_CHANNEL_DOWN_X, ENERGY_ROW_Y, SMALL_BUTTON, SMALL_BUTTON)) {
-                    sendButton(UniversalConnectorMenu.BUTTON_CHANNEL_DOWN);
-                    return true;
-                }
-                if (inBounds(mouseX, mouseY, ENERGY_CHANNEL_UP_X, ENERGY_ROW_Y, SMALL_BUTTON, SMALL_BUTTON)) {
-                    sendButton(UniversalConnectorMenu.BUTTON_CHANNEL_UP);
-                    return true;
-                }
-                if (inBounds(mouseX, mouseY, ENERGY_MODE_X, ENERGY_ROW_Y, ENERGY_MODE_WIDTH, SMALL_BUTTON)) {
-                    sendButton(UniversalConnectorMenu.BUTTON_MODE);
-                    return true;
-                }
-                if (inBounds(mouseX, mouseY, ENERGY_DISTRIBUTION_X, ENERGY_ROW_Y, ENERGY_DISTRIBUTION_WIDTH, SMALL_BUTTON)) {
-                    sendButton(UniversalConnectorMenu.BUTTON_DISTRIBUTION);
-                    return true;
-                }
-                if (inBounds(mouseX, mouseY, ENERGY_ATTACH_X, ENERGY_ROW_Y, ENERGY_ATTACH_WIDTH, SMALL_BUTTON)) {
-                    sendButton(UniversalConnectorMenu.BUTTON_ATTACH_AS_BASE + nextDirection(menu.attachAs()).ordinal());
-                    return true;
+                for (int moduleIndex = 0; moduleIndex < UniversalConnectorMenu.ENERGY_MODULE_COUNT; moduleIndex++) {
+                    int rowY = ITEM_SLOT_Y + moduleIndex * ITEM_ROW_GAP;
+                    if (inBounds(mouseX, mouseY, ITEM_CHANNEL_DOWN_X, rowY, SMALL_BUTTON, SMALL_BUTTON)) {
+                        sendButton(UniversalConnectorMenu.BUTTON_ENERGY_CHANNEL_DOWN_BASE + moduleIndex);
+                        return true;
+                    }
+                    if (inBounds(mouseX, mouseY, ITEM_CHANNEL_UP_X, rowY, SMALL_BUTTON, SMALL_BUTTON)) {
+                        sendButton(UniversalConnectorMenu.BUTTON_ENERGY_CHANNEL_UP_BASE + moduleIndex);
+                        return true;
+                    }
+                    if (inBounds(mouseX, mouseY, ITEM_MODE_X, rowY, ITEM_MODE_WIDTH, SMALL_BUTTON)) {
+                        sendButton(UniversalConnectorMenu.BUTTON_ENERGY_MODE_BASE + moduleIndex);
+                        return true;
+                    }
+                    if (inBounds(mouseX, mouseY, ITEM_ATTACH_X, rowY, ITEM_ATTACH_WIDTH, SMALL_BUTTON)) {
+                        sendButton(UniversalConnectorMenu.BUTTON_ENERGY_ATTACH_BASE + moduleIndex);
+                        return true;
+                    }
+                    if (inBounds(mouseX, mouseY, ENERGY_DISTRIBUTION_X, rowY, ENERGY_DISTRIBUTION_WIDTH, SMALL_BUTTON)) {
+                        sendButton(UniversalConnectorMenu.BUTTON_ENERGY_DISTRIBUTION_BASE + moduleIndex);
+                        return true;
+                    }
                 }
             } else if (isModuleTab()) {
                 for (int moduleIndex = 0; moduleIndex < moduleCount(); moduleIndex++) {
@@ -259,22 +259,20 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
         guiGraphics.fill(x, y + imageHeight - 1, x + imageWidth, y + imageHeight, PANEL_DARK);
     }
 
-    private void renderTabs(GuiGraphics guiGraphics) {
-        for (int tab = UniversalConnectorMenu.TAB_ENERGY; tab <= UniversalConnectorMenu.TAB_NETWORK; tab++) {
-            int x = leftPos + TAB_X + tab * (TAB_WIDTH + 2);
-            int y = topPos + TAB_Y;
-            boolean selected = menu.selectedTab() == tab;
-            guiGraphics.fill(x, y, x + TAB_WIDTH, y + TAB_HEIGHT, selected ? PANEL_LIGHT : PANEL_DARK);
-            guiGraphics.fill(x + 1, y + 1, x + TAB_WIDTH - 1, y + TAB_HEIGHT - 1, selected ? PANEL : 0xFF9A9A9A);
-        }
-    }
-
     private void renderEnergyControls(GuiGraphics guiGraphics) {
-        renderButton(guiGraphics, ENERGY_MODE_X, ENERGY_ROW_Y, ENERGY_MODE_WIDTH, SMALL_BUTTON, false);
-        renderButton(guiGraphics, ENERGY_CHANNEL_DOWN_X, ENERGY_ROW_Y, SMALL_BUTTON, SMALL_BUTTON, false);
-        renderButton(guiGraphics, ENERGY_CHANNEL_UP_X, ENERGY_ROW_Y, SMALL_BUTTON, SMALL_BUTTON, false);
-        renderButton(guiGraphics, ENERGY_DISTRIBUTION_X, ENERGY_ROW_Y, ENERGY_DISTRIBUTION_WIDTH, SMALL_BUTTON, false);
-        renderButton(guiGraphics, ENERGY_ATTACH_X, ENERGY_ROW_Y, ENERGY_ATTACH_WIDTH, SMALL_BUTTON, false);
+        for (int moduleIndex = 0; moduleIndex < UniversalConnectorMenu.ENERGY_MODULE_COUNT; moduleIndex++) {
+            int rowY = ITEM_SLOT_Y + moduleIndex * ITEM_ROW_GAP;
+            renderSlotFrame(guiGraphics, ITEM_SLOT_X, rowY, false);
+            renderButton(guiGraphics, ITEM_MODE_X, rowY, ITEM_MODE_WIDTH, SMALL_BUTTON, false);
+            renderButton(guiGraphics, ITEM_CHANNEL_DOWN_X, rowY, SMALL_BUTTON, SMALL_BUTTON, false);
+            renderButton(guiGraphics, ITEM_CHANNEL_UP_X, rowY, SMALL_BUTTON, SMALL_BUTTON, false);
+            if (energyRowLacksAccess(moduleIndex)) {
+                renderButton(guiGraphics, ITEM_ATTACH_X, rowY, ITEM_ATTACH_WIDTH, SMALL_BUTTON, WARNING_DARK, WARNING, WARNING_LIGHT);
+            } else {
+                renderButton(guiGraphics, ITEM_ATTACH_X, rowY, ITEM_ATTACH_WIDTH, SMALL_BUTTON, false);
+            }
+            renderButton(guiGraphics, ENERGY_DISTRIBUTION_X, rowY, ENERGY_DISTRIBUTION_WIDTH, SMALL_BUTTON, false);
+        }
     }
 
     private void renderModuleControls(GuiGraphics guiGraphics) {
@@ -325,60 +323,50 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     }
 
     private void drawEnergyLabels(GuiGraphics guiGraphics) {
-        String transfer = menu.hasConnector()
-                ? Component.translatable("rngtech.cable_connector.transfer", menu.transferRate()).getString()
-                : Component.translatable("rngtech.universal_connector.no_module").getString();
-        String live = Component.translatable(
-                "rngtech.universal_connector.energy_live",
-                menu.lastEnergyInput(),
-                menu.lastEnergyOutput()
-        ).getString();
         drawSlotLabel(guiGraphics, Component.translatable("rngtech.universal_connector.module"));
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.mode"), ENERGY_MODE_X, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), ENERGY_CHANNEL_DOWN_X, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.distribution.short"), ENERGY_DISTRIBUTION_X, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.attach"), ENERGY_ATTACH_X, 48, TEXT_MUTED, false);
-        drawCentered(guiGraphics, modeName(), ENERGY_MODE_X, ENERGY_ROW_Y + 5, ENERGY_MODE_WIDTH, 0xFFFFFFFF);
-        drawCentered(guiGraphics, Component.literal("-"), ENERGY_CHANNEL_DOWN_X, ENERGY_ROW_Y + 5, SMALL_BUTTON, 0xFFFFFFFF);
-        drawCentered(guiGraphics, Component.literal("+"), ENERGY_CHANNEL_UP_X, ENERGY_ROW_Y + 5, SMALL_BUTTON, 0xFFFFFFFF);
-        drawCentered(
-                guiGraphics,
-                Component.literal(Integer.toString(menu.channel())),
-                ENERGY_CHANNEL_VALUE_X,
-                ENERGY_ROW_Y + 5,
-                18,
-                TEXT
-        );
-        drawCentered(
-                guiGraphics,
-                distributionName(),
-                ENERGY_DISTRIBUTION_X,
-                ENERGY_ROW_Y + 5,
-                ENERGY_DISTRIBUTION_WIDTH,
-                0xFFFFFFFF
-        );
-        drawCentered(
-                guiGraphics,
-                directionName(menu.attachAs()),
-                ENERGY_ATTACH_X,
-                ENERGY_ROW_Y + 5,
-                ENERGY_ATTACH_WIDTH,
-                0xFFFFFFFF
-        );
-        guiGraphics.drawString(font, font.plainSubstrByWidth(transfer, 170), 76, 84, TEXT_MUTED, false);
-        guiGraphics.drawString(font, font.plainSubstrByWidth(live, 190), 76, 96, TEXT_MUTED, false);
-        if (menu.hasConnector() && !menu.targetHasEnergyAccess()) {
-            String warning = Component.translatable("rngtech.cable_connector.no_energy_access").getString();
-            guiGraphics.drawString(font, font.plainSubstrByWidth(warning, 226), 76, 110, COLOR_NEGATIVE, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.mode"), ITEM_MODE_X, LABEL_Y, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), ITEM_CHANNEL_DOWN_X, LABEL_Y, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.attach"), ITEM_ATTACH_X, LABEL_Y, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.distribution.short"), ENERGY_DISTRIBUTION_X, LABEL_Y, TEXT_MUTED, false);
+
+        for (int moduleIndex = 0; moduleIndex < UniversalConnectorMenu.ENERGY_MODULE_COUNT; moduleIndex++) {
+            int rowY = ITEM_SLOT_Y + moduleIndex * ITEM_ROW_GAP;
+            drawCentered(guiGraphics, energyModeName(moduleIndex), ITEM_MODE_X, rowY + 5, ITEM_MODE_WIDTH, 0xFFFFFFFF);
+            drawCentered(guiGraphics, Component.literal("-"), ITEM_CHANNEL_DOWN_X, rowY + 5, SMALL_BUTTON, 0xFFFFFFFF);
+            drawCentered(guiGraphics, Component.literal("+"), ITEM_CHANNEL_UP_X, rowY + 5, SMALL_BUTTON, 0xFFFFFFFF);
+            drawCentered(
+                    guiGraphics,
+                    Component.literal(Integer.toString(menu.energyChannel(moduleIndex))),
+                    ITEM_CHANNEL_VALUE_X,
+                    rowY + 5,
+                    18,
+                    TEXT
+            );
+            drawCentered(
+                    guiGraphics,
+                    directionName(menu.energyAttachAs(moduleIndex)),
+                    ITEM_ATTACH_X,
+                    rowY + 5,
+                    ITEM_ATTACH_WIDTH,
+                    0xFFFFFFFF
+            );
+            drawCentered(
+                    guiGraphics,
+                    energyDistributionName(moduleIndex),
+                    ENERGY_DISTRIBUTION_X,
+                    rowY + 5,
+                    ENERGY_DISTRIBUTION_WIDTH,
+                    0xFFFFFFFF
+            );
         }
     }
 
     private void drawModuleLabels(GuiGraphics guiGraphics) {
         drawSlotLabel(guiGraphics, Component.translatable(moduleLabelKey()));
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.mode"), ITEM_MODE_X, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), ITEM_CHANNEL_DOWN_X, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.attach"), ITEM_ATTACH_X, 48, TEXT_MUTED, false);
-        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.filter"), ITEM_FILTER_X, 48, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.mode"), ITEM_MODE_X, LABEL_Y, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), ITEM_CHANNEL_DOWN_X, LABEL_Y, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.attach"), ITEM_ATTACH_X, LABEL_Y, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.universal_connector.filter"), ITEM_FILTER_X, LABEL_Y, TEXT_MUTED, false);
 
         for (int moduleIndex = 0; moduleIndex < moduleCount(); moduleIndex++) {
             int rowY = ITEM_SLOT_Y + moduleIndex * ITEM_ROW_GAP;
@@ -407,7 +395,7 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     private void drawBridgeLabels(GuiGraphics guiGraphics) {
         NetworkBridgeType bridgeType = menu.bridgeType();
         drawSlotLabel(guiGraphics, Component.translatable("rngtech.universal_connector.bridge_module"));
-        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), BRIDGE_CHANNEL_DOWN_X, 48, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.cable_connector.channel"), BRIDGE_CHANNEL_DOWN_X, LABEL_Y, TEXT_MUTED, false);
         drawCentered(guiGraphics, Component.literal("-"), BRIDGE_CHANNEL_DOWN_X, BRIDGE_ROW_Y + 5, SMALL_BUTTON, 0xFFFFFFFF);
         drawCentered(guiGraphics, Component.literal("+"), BRIDGE_CHANNEL_UP_X, BRIDGE_ROW_Y + 5, SMALL_BUTTON, 0xFFFFFFFF);
         drawCentered(
@@ -522,11 +510,15 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     }
 
     private void renderButton(GuiGraphics guiGraphics, int x, int y, int width, int height, boolean selected) {
+        renderButton(guiGraphics, x, y, width, height, BUTTON_DARK, selected ? SELECTED : BUTTON, selected ? SELECTED_LIGHT : BUTTON_LIGHT);
+    }
+
+    private void renderButton(GuiGraphics guiGraphics, int x, int y, int width, int height, int dark, int face, int light) {
         int left = leftPos + x;
         int top = topPos + y;
-        guiGraphics.fill(left, top, left + width, top + height, BUTTON_DARK);
-        guiGraphics.fill(left + 1, top + 1, left + width - 1, top + height - 1, selected ? SELECTED : BUTTON);
-        guiGraphics.fill(left + 1, top + 1, left + width - 1, top + 2, selected ? SELECTED_LIGHT : BUTTON_LIGHT);
+        guiGraphics.fill(left, top, left + width, top + height, dark);
+        guiGraphics.fill(left + 1, top + 1, left + width - 1, top + height - 1, face);
+        guiGraphics.fill(left + 1, top + 1, left + width - 1, top + 2, light);
     }
 
     private void renderMetricCard(GuiGraphics guiGraphics, int x, int y, int accent) {
@@ -581,11 +573,11 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     private void renderPlayerInventoryFrames(GuiGraphics guiGraphics) {
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 9; column++) {
-                renderSlotFrame(guiGraphics, 34 + column * 18, 155 + row * 18, false);
+                renderSlotFrame(guiGraphics, 34 + column * 18, 135 + row * 18, false);
             }
         }
         for (int column = 0; column < 9; column++) {
-            renderSlotFrame(guiGraphics, 34 + column * 18, 213, false);
+            renderSlotFrame(guiGraphics, 34 + column * 18, 193, false);
         }
     }
 
@@ -600,10 +592,6 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
         int left = leftPos + x;
         int top = topPos + y;
         return mouseX >= left && mouseX < left + width && mouseY >= top && mouseY < top + height;
-    }
-
-    private boolean isOverTab(double mouseX, double mouseY, int tab) {
-        return inBounds(mouseX, mouseY, TAB_X + tab * (TAB_WIDTH + 2), TAB_Y, TAB_WIDTH, TAB_HEIGHT);
     }
 
     private boolean isEnergyTab() {
@@ -639,7 +627,7 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
     }
 
     private void drawSlotLabel(GuiGraphics guiGraphics, Component text) {
-        guiGraphics.drawString(font, text, ITEM_SLOT_X + 9 - font.width(text) / 2, 48, TEXT_MUTED, false);
+        guiGraphics.drawString(font, text, ITEM_SLOT_X + 9 - font.width(text) / 2, LABEL_Y, TEXT_MUTED, false);
     }
 
     private void drawCenteredClipped(GuiGraphics guiGraphics, Component text, int x, int y, int width, int color) {
@@ -698,7 +686,7 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
         int output = selectedNetworkEnergyOutput();
         drawClipped(
                 guiGraphics,
-                Component.translatable("rngtech.universal_connector.network_energy.title", menu.channel()),
+                Component.translatable("rngtech.universal_connector.network_energy.title", menu.networkEnergyChannel()),
                 NETWORK_ENERGY_ROW_X + 15,
                 NETWORK_ENERGY_ROW_Y + 4,
                 154,
@@ -825,24 +813,28 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
         return COLOR_BRIDGE;
     }
 
-    private Component modeName() {
-        return Component.translatable(connectorMode().translationKey());
-    }
-
-    private CableConnectorMode connectorMode() {
+    private CableConnectorMode energyMode(int moduleIndex) {
         CableConnectorMode[] values = CableConnectorMode.values();
-        int ordinal = menu.modeOrdinal();
+        int ordinal = menu.energyModeOrdinal(moduleIndex);
         return ordinal >= 0 && ordinal < values.length ? values[ordinal] : CableConnectorMode.BOTH;
     }
 
-    private EnergyDistributionMode distributionMode() {
+    private Component energyModeName(int moduleIndex) {
+        return Component.translatable(energyMode(moduleIndex).translationKey());
+    }
+
+    private EnergyDistributionMode energyDistributionMode(int moduleIndex) {
         EnergyDistributionMode[] values = EnergyDistributionMode.values();
-        int ordinal = menu.distributionOrdinal();
+        int ordinal = menu.energyDistributionOrdinal(moduleIndex);
         return ordinal >= 0 && ordinal < values.length ? values[ordinal] : EnergyDistributionMode.ROUND_ROBIN;
     }
 
-    private Component distributionName() {
-        return Component.translatable(distributionMode().translationKey());
+    private Component energyDistributionName(int moduleIndex) {
+        return Component.translatable(energyDistributionMode(moduleIndex).translationKey());
+    }
+
+    private boolean energyRowLacksAccess(int moduleIndex) {
+        return menu.hasEnergyConnector(moduleIndex) && !menu.targetHasEnergyAccess(moduleIndex);
     }
 
     private void renderControlTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
@@ -860,30 +852,49 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
             }
             return;
         }
-        if (isEnergyTab() && inBounds(mouseX, mouseY, ENERGY_MODE_X, ENERGY_ROW_Y, ENERGY_MODE_WIDTH, SMALL_BUTTON)) {
-            CableConnectorMode connectorMode = connectorMode();
-            guiGraphics.renderComponentTooltip(
-                    font,
-                    List.of(
-                            Component.translatable(connectorMode.translationKey()),
-                            Component.translatable(connectorMode.descriptionKey())
-                    ),
-                    mouseX,
-                    mouseY
-            );
-            return;
+        if (isEnergyTab()) {
+            List<Component> tooltip = energyTooltip(mouseX, mouseY);
+            if (!tooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, tooltip, mouseX, mouseY);
+            }
         }
-        if (!isEnergyTab()
-                || !inBounds(mouseX, mouseY, ENERGY_DISTRIBUTION_X, ENERGY_ROW_Y, ENERGY_DISTRIBUTION_WIDTH, SMALL_BUTTON)) {
-            return;
+    }
+
+    /** The mode and Dist buttons explain their setting; the rest of a row, past its slot, shows what the row moves. */
+    private List<Component> energyTooltip(int mouseX, int mouseY) {
+        for (int moduleIndex = 0; moduleIndex < UniversalConnectorMenu.ENERGY_MODULE_COUNT; moduleIndex++) {
+            int rowY = ITEM_SLOT_Y + moduleIndex * ITEM_ROW_GAP;
+            if (inBounds(mouseX, mouseY, ITEM_MODE_X, rowY, ITEM_MODE_WIDTH, SMALL_BUTTON)) {
+                CableConnectorMode mode = energyMode(moduleIndex);
+                return List.of(Component.translatable(mode.translationKey()), Component.translatable(mode.descriptionKey()));
+            }
+            if (inBounds(mouseX, mouseY, ENERGY_DISTRIBUTION_X, rowY, ENERGY_DISTRIBUTION_WIDTH, SMALL_BUTTON)) {
+                EnergyDistributionMode mode = energyDistributionMode(moduleIndex);
+                return List.of(Component.translatable(mode.translationKey()), Component.translatable(mode.descriptionKey()));
+            }
+            int rowStart = ITEM_SLOT_X + 18;
+            if (inBounds(mouseX, mouseY, rowStart, rowY, ENERGY_DISTRIBUTION_X + ENERGY_DISTRIBUTION_WIDTH - rowStart, SMALL_BUTTON)) {
+                return energyRowTooltip(moduleIndex);
+            }
         }
-        EnergyDistributionMode mode = distributionMode();
-        guiGraphics.renderComponentTooltip(
-                font,
-                List.of(Component.translatable(mode.translationKey()), Component.translatable(mode.descriptionKey())),
-                mouseX,
-                mouseY
-        );
+        return List.of();
+    }
+
+    private List<Component> energyRowTooltip(int moduleIndex) {
+        if (!menu.hasEnergyConnector(moduleIndex)) {
+            return List.of(Component.translatable("rngtech.universal_connector.no_module"));
+        }
+        List<Component> tooltip = new ArrayList<>(3);
+        tooltip.add(Component.translatable("rngtech.cable_connector.transfer", menu.energyTransferRate(moduleIndex)));
+        tooltip.add(Component.translatable(
+                "rngtech.universal_connector.energy_live",
+                menu.lastEnergyInput(moduleIndex),
+                menu.lastEnergyOutput(moduleIndex)
+        ));
+        if (!menu.targetHasEnergyAccess(moduleIndex)) {
+            tooltip.add(Component.translatable("rngtech.cable_connector.no_energy_access").withStyle(ChatFormatting.RED));
+        }
+        return tooltip;
     }
 
     private List<Component> bridgeTooltip(int mouseX, int mouseY) {
@@ -1066,7 +1077,7 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
         return List.of(
                 Component.translatable(
                         "rngtech.universal_connector.network_energy.tooltip",
-                        menu.channel(),
+                        menu.networkEnergyChannel(),
                         networkEnergyWindowLabel()
                 ),
                 Component.translatable(
@@ -1160,12 +1171,6 @@ public class UniversalConnectorScreen extends AbstractContainerScreen<UniversalC
 
     private static Component directionName(Direction direction) {
         return Component.translatable("rngtech.direction." + direction.getSerializedName());
-    }
-
-    private static Direction nextDirection(Direction direction) {
-        Direction[] values = Direction.values();
-        int ordinal = direction == null ? 0 : direction.ordinal() + 1;
-        return values[Math.floorMod(ordinal, values.length)];
     }
 
     private static Component moduleAttachName(Direction direction) {

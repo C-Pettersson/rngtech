@@ -191,7 +191,7 @@ Tab order must not change per machine. Tab availability may change, but the play
 
 ### Tab rail
 
-Every tabbed machine screen builds its tabs with `MachineTabs` instead of drawing its own. Each tab is a 16 px item icon and its full name, stacked down the panel's left edge, so adding a tab costs one row instead of a wider strip. When the screen has no room left of the panel for the names, the tabs collapse to an icon rail with the name on hover and the open tab's name at the right of the title row. When even the rail does not fit, such as the expanded Mastery tree or a panel wider than the screen, the icon tabs move above the panel. The tab rectangles are reported to JEI as exclusion areas.
+Every tabbed machine screen, and the Universal Connector screen, builds its tabs with `MachineTabs` instead of drawing its own. Each tab is a 16 px item icon and its full name, stacked down the panel's left edge, so adding a tab costs one row instead of a wider strip. When the screen has no room left of the panel for the names, the tabs collapse to an icon rail with the name on hover and the open tab's name at the right of the title row. When even the rail does not fit, such as the expanded Mastery tree or a panel wider than the screen, the icon tabs move above the panel. The tab rectangles are reported to JEI as exclusion areas.
 
 ## Component Grammar
 
