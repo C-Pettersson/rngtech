@@ -260,7 +260,7 @@ public final class UniqueChecks {
                 "launch Heat Cores fit the Metal Press and Melter Stage 6 cap");
     }
 
-    /** The Salt-Zinc Anode stores near Lead-class FE at Stage 1; the Tempered Pawl reaches exactly one stage past its slot. */
+    /** The Salt-Zinc Anode outstores every Stage 1-2 cell but no Stage 3 cell; the Tempered Pawl reaches exactly one stage past its slot. */
     private static void backlogUniquesKeepTheirShape() {
         UniqueDefinition anode = UniqueCatalog.get("shipwreck_salt_zinc_anode");
         require(anode.slotStage() == 1 && anode.host() == UniqueHost.BATTERY_CELL, "the Anode is a Stage 1 Battery Cell");
@@ -269,7 +269,7 @@ public final class UniqueChecks {
         require(cell.baseValue(MachineStat.ENERGY_CAPACITY) > ComponentBaseStatCatalog.normalMaximum(UniqueHost.BATTERY_CELL,
                 MachineStat.ENERGY_CAPACITY, 2), "the Anode stores more than any Stage 1-2 cell");
         require(cell.baseValue(MachineStat.ENERGY_CAPACITY) <= ComponentBaseStatCatalog.normalMaximum(UniqueHost.BATTERY_CELL,
-                MachineStat.ENERGY_CAPACITY, 3), "the Anode stays at Lead-class storage");
+                MachineStat.ENERGY_CAPACITY, 3), "the Anode stores no more than a Stage 3 cell");
         require(cell.baseValue(MachineStat.EFFICIENCY) < 1.0 && cell.baseValue(MachineStat.IDLE_LOSS) > 0.3,
                 "the Anode pays with efficiency and idle loss");
 

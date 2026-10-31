@@ -74,6 +74,7 @@ nav:
       - Work Orders State: prds/work-orders-state.md
       - Phase Array: prds/phase-array.md
       - Phase Array State: prds/phase-array-state.md
+      - Energy Storage Ladder: prds/energy-storage.md
   - Reference:
       - Releasing: releasing.md
       - Tick Benchmark: reference/benchmarking.md

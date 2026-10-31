@@ -22,6 +22,7 @@ import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.Rarity;
 import com.rngtech.rpg.refinement.PhaseArrayAction;
 import com.rngtech.rpg.refinement.PhaseStrain;
+import com.rngtech.rpg.refinement.RefinementSelection;
 import com.rngtech.rpg.refinement.RefinementTargets;
 
 import com.google.gson.JsonObject;
@@ -315,6 +316,33 @@ public final class PhaseArrayGameTests {
         PhaseArrayRecipe retuned = ModRecipes.PHASE_ARRAY_SERIALIZER.get().codec().codec().parse(JsonOps.INSTANCE, json).getOrThrow();
         check(retuned.baseFe() == 3_000_000L && retuned.refinementPotentialCost() == 0 && retuned.glyphTier() == 0,
                 "A recipe with a changed cost parses, with defaults for what it leaves out");
+        helper.succeed();
+    }
+
+    /**
+     * The chosen affix survives the item leaving the target slot: put back, the same affix is selected again, found by
+     * its id. An item without that affix comes in with nothing selected.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT)
+    public static void selectionSurvivesTheOutputTrip(GameTestHelper helper) {
+        PhaseCradleBlockEntity cradle = cradle(helper);
+        ItemStack target = new ItemStack(ModItems.PHASE_COIL.get());
+        MachineTraits traits = cheapTraits(4);
+        RefinementTargets.setTraits(target, traits);
+        ItemStackHandler items = cradle.getItems();
+        items.setStackInSlot(PhaseCradleBlockEntity.SLOT_TARGET, target.copy());
+        cradle.setAction(PhaseArrayAction.RESONATE);
+        cradle.setSelection(RefinementSelection.existingModifier(2));
+        items.setStackInSlot(PhaseCradleBlockEntity.SLOT_TARGET, ItemStack.EMPTY);
+        check(cradle.selection().kind() == RefinementSelection.Kind.NONE, "An empty chamber should show no selection");
+        items.setStackInSlot(PhaseCradleBlockEntity.SLOT_TARGET, target.copy());
+        check(cradle.selection().kind() == RefinementSelection.Kind.EXISTING_MODIFIER && cradle.selection().affixIndex() == 2,
+                "The same affix should be selected again, got " + cradle.selection());
+        ItemStack other = new ItemStack(ModItems.PHASE_COIL.get());
+        RefinementTargets.setTraits(other, cheapTraits(1));
+        items.setStackInSlot(PhaseCradleBlockEntity.SLOT_TARGET, ItemStack.EMPTY);
+        items.setStackInSlot(PhaseCradleBlockEntity.SLOT_TARGET, other);
+        check(cradle.selection().kind() == RefinementSelection.Kind.NONE, "An item without the affix should come in unselected, got " + cradle.selection());
         helper.succeed();
     }
 
