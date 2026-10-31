@@ -185,7 +185,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         @Override
         protected void onContentsChanged(int slot) {
             if (slot == SLOT_TARGET) {
-                selection = RefinementSelection.none();
+                selection = restoredSelection();
                 definitionIndex = 0;
                 if (level != null && !level.isClientSide) {
                     level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
@@ -311,6 +311,12 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     private int inputThisTick;
     private PhaseArrayAction action = PhaseArrayAction.REFORGE;
     private RefinementSelection selection = RefinementSelection.none();
+    /**
+     * The player's last selection, restored when an item comes back to the target slot, so a run of Resonates on one
+     * affix survives taking the item out of the output. A chosen affix is kept by its id, not its position.
+     */
+    private RefinementSelection rememberedSelection = RefinementSelection.none();
+    private String rememberedAffix = "";
     private int definitionIndex;
     private int donorAffixIndex;
     private PhasePulse.Outcome lastOutcome;
@@ -1070,7 +1076,35 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     public void setSelection(RefinementSelection wanted) {
         selection = wanted == null ? RefinementSelection.none() : wanted;
         definitionIndex = 0;
+        rememberSelection();
         setChanged();
+    }
+
+    private void rememberSelection() {
+        rememberedSelection = selection;
+        MachineModifier affix = selection.kind() == RefinementSelection.Kind.EXISTING_MODIFIER ? selectedAffix() : null;
+        rememberedAffix = affix == null ? "" : affix.affixId();
+    }
+
+    /** The remembered selection for the item now in the target slot: its affix by id, or the same empty slot. */
+    private RefinementSelection restoredSelection() {
+        if (targetStack().isEmpty()) {
+            return RefinementSelection.none();
+        }
+        return switch (rememberedSelection.kind()) {
+            case EXISTING_MODIFIER -> {
+                List<MachineModifier> affixes = RefinementTargets.storedTraits(targetStack()).modifiers().stream()
+                        .filter(modifier -> modifier.slot().isAffix()).toList();
+                for (int index = 0; index < affixes.size(); index++) {
+                    if (affixes.get(index).affixId().equals(rememberedAffix)) {
+                        yield RefinementSelection.existingModifier(index);
+                    }
+                }
+                yield RefinementSelection.none();
+            }
+            case EMPTY_SLOT -> rememberedSelection;
+            case NONE -> RefinementSelection.none();
+        };
     }
 
     public void setDefinitionIndex(int index) {
@@ -1489,6 +1523,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
         charging = tag.getBoolean("Charging");
         action = actionByName(tag.getString("Action"));
         selection = selectionFromTag(tag);
+        rememberSelection();
         definitionIndex = Math.max(0, tag.getInt("DefinitionIndex"));
         donorAffixIndex = Math.max(0, tag.getInt("DonorAffixIndex"));
         int outcome = tag.contains("LastOutcome") ? tag.getInt("LastOutcome") : NO_OUTCOME;
