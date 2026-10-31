@@ -114,6 +114,8 @@
   "rngtech.phase_cradle.screen.coil.absent": "Position %s: no Coil",
   "rngtech.phase_cradle.screen.emitter": "Phase Emitter",
   "rngtech.phase_cradle.screen.chamber": "Target",
+  "rngtech.phase_cradle.screen.readout": "Strain %s, %s RP",
+  "rngtech.phase_cradle.screen.cells_label": "Cells",
   "rngtech.phase_cradle.screen.strain": "Strain %s (Tolerance %s): %s Fracture",
   "rngtech.phase_cradle.screen.charge": "Charge %s, %s/t in, line %s/t",
   "rngtech.phase_cradle.screen.cells": "Battery Cells drain into the charge while it charges",
