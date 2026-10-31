@@ -148,6 +148,28 @@ public class PhaseCradleScreen extends AbstractContainerScreen<PhaseCradleMenu> 
         drawButton(graphics, left + BUTTON_X, top + BUTTON_Y, mouseX, mouseY);
     }
 
+    /**
+     * The Glyph slot draws its count two pixels up and left of the vanilla spot, so the number and its shadow stay inside
+     * the slot instead of crossing the tablet's frame and the slot's lower edge. While the player carries a stack,
+     * vanilla drawing keeps its drag previews.
+     */
+    @Override
+    protected void renderSlot(GuiGraphics graphics, Slot slot) {
+        ItemStack stack = slot.getItem();
+        if (slot.index != PhaseCradleBlockEntity.SLOT_GLYPH || stack.getCount() <= 1 || !menu.getCarried().isEmpty()) {
+            super.renderSlot(graphics, slot);
+            return;
+        }
+        graphics.pose().pushPose();
+        graphics.pose().translate(0.0F, 0.0F, 100.0F);
+        graphics.renderItem(stack, slot.x, slot.y, slot.x + slot.y * imageWidth);
+        graphics.renderItemDecorations(font, stack, slot.x, slot.y, "");
+        String count = String.valueOf(stack.getCount());
+        graphics.pose().translate(0.0F, 0.0F, 200.0F);
+        graphics.drawString(font, count, slot.x + 15 - font.width(count), slot.y + 7, 0xFFFFFFFF, true);
+        graphics.pose().popPose();
+    }
+
     @Override
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         graphics.drawString(font, title, titleLabelX, titleLabelY, TEXT, false);
