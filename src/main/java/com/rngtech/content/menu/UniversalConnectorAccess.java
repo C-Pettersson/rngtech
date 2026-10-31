@@ -15,8 +15,13 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public interface UniversalConnectorAccess {
-    /** Why the energy connector is idle, or {@link LinkStatus#OK}. Only computed on the server. */
+    /** The first Energy row's problem, or {@link LinkStatus#OK}. Only computed on the server. */
     default LinkStatus energyLinkStatus() {
+        return LinkStatus.OK;
+    }
+
+    /** Why this Energy row is idle, or {@link LinkStatus#OK}. Only computed on the server. */
+    default LinkStatus energyLinkStatus(int moduleIndex) {
         return LinkStatus.OK;
     }
 
@@ -42,23 +47,25 @@ public interface UniversalConnectorAccess {
 
     boolean isMenuAvailable(Player player);
 
-    boolean incrementChannel(int amount);
+    boolean incrementEnergyChannel(int moduleIndex, int amount);
 
-    boolean setChannel(int channel);
+    boolean setEnergyChannel(int moduleIndex, int channel);
 
     boolean incrementBridgeChannel(int amount);
 
     boolean setBridgeChannel(int channel);
 
-    boolean setAttachAs(Direction attachAs);
+    boolean cycleEnergyAttachAs(int moduleIndex);
 
-    boolean cycleMode();
+    boolean setEnergyAttachAs(int moduleIndex, Direction attachAs);
 
-    boolean setMode(CableConnectorMode mode);
+    boolean cycleEnergyMode(int moduleIndex);
 
-    boolean cycleEnergyDistributionMode();
+    boolean setEnergyMode(int moduleIndex, CableConnectorMode mode);
 
-    boolean setEnergyDistributionMode(EnergyDistributionMode distributionMode);
+    boolean cycleEnergyDistributionMode(int moduleIndex);
+
+    boolean setEnergyDistributionMode(int moduleIndex, EnergyDistributionMode distributionMode);
 
     boolean clearNetworkCache();
 

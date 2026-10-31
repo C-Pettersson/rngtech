@@ -79,7 +79,9 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
      */
     private static final Map<Level, LevelNetworkCache> NETWORK_CACHES = new WeakHashMap<>();
     private static final Comparator<EnergyEndpoint> ENERGY_ENDPOINT_ORDER =
-            Comparator.comparing(EnergyEndpoint::connectorPos).thenComparing(EnergyEndpoint::connectorFace);
+            Comparator.comparing(EnergyEndpoint::connectorPos)
+                    .thenComparing(EnergyEndpoint::connectorFace)
+                    .thenComparingInt(EnergyEndpoint::module);
 
     private final IEnergyStorage[] sidedEnergyStorages = new IEnergyStorage[DIRECTIONS.length];
     private final List<ConnectorTargetCache<IEnergyStorage>> directEnergyTargets = new ArrayList<>(DIRECTIONS.length);
@@ -1419,7 +1421,8 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                     direction,
                     EnergyEndpointType.DIRECT,
                     connector.mode(),
-                    isBatteryChassis(targetState)
+                    isBatteryChassis(targetState),
+                    0
             ));
         }
     }
@@ -1509,15 +1512,18 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
             Direction face,
             boolean targetIsBatteryChassis
     ) {
-        int channel = connector.networkEnergyChannel();
-        if (isValidChannel(channel)) {
-            energyEndpoints[channel].add(new EnergyEndpoint(
-                    cable,
-                    face,
-                    EnergyEndpointType.CABLE_UNIVERSAL,
-                    connector.mode(),
-                    targetIsBatteryChassis
-            ));
+        for (int module = 0; module < UniversalConnectorBlockEntity.ENERGY_MODULE_SLOT_COUNT; module++) {
+            int channel = connector.networkEnergyChannel(module);
+            if (isValidChannel(channel)) {
+                energyEndpoints[channel].add(new EnergyEndpoint(
+                        cable,
+                        face,
+                        EnergyEndpointType.CABLE_UNIVERSAL,
+                        connector.energyMode(module),
+                        targetIsBatteryChassis,
+                        module
+                ));
+            }
         }
     }
 
@@ -2296,15 +2302,17 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
     }
 
     /**
-     * One energy connector on the network, in any mode. It keeps the cable that holds it, so moving FE needs no block
-     * entity lookup; the snapshot is rebuilt whenever that cable or its connectors change.
+     * One energy connector on the network, in any mode: a direct connector, or one Energy row of a Universal Connector.
+     * It keeps the cable that holds it, so moving FE needs no block entity lookup; the snapshot is rebuilt whenever
+     * that cable or its connectors change.
      */
     private record EnergyEndpoint(
             CableBlockEntity cable,
             Direction connectorFace,
             EnergyEndpointType type,
             CableConnectorMode mode,
-            boolean targetIsBatteryChassis
+            boolean targetIsBatteryChassis,
+            int module
     ) {
         private BlockPos connectorPos() {
             return cable.getBlockPos();
@@ -2326,7 +2334,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
         private IEnergyStorage target() {
             return switch (type) {
                 case DIRECT -> directConnector() == null ? null : cable.directTargetEnergy(connectorFace);
-                case CABLE_UNIVERSAL -> universalConnector() == null ? null : universalConnector().targetEnergyStorage();
+                case CABLE_UNIVERSAL -> universalConnector() == null ? null : universalConnector().targetEnergyStorage(module);
             };
         }
 
@@ -2335,21 +2343,21 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 case DIRECT -> directConnector() == null ? EnergyDistributionMode.ROUND_ROBIN : directConnector().distributionMode();
                 case CABLE_UNIVERSAL -> universalConnector() == null
                         ? EnergyDistributionMode.ROUND_ROBIN
-                        : universalConnector().energyDistributionMode();
+                        : universalConnector().energyDistributionMode(module);
             };
         }
 
         private int inputBudget(long gameTime) {
             return switch (type) {
                 case DIRECT -> directConnector() == null ? 0 : cable.directEnergyInputBudget(connectorFace, gameTime);
-                case CABLE_UNIVERSAL -> universalConnector() == null ? 0 : universalConnector().networkEnergyInputBudget();
+                case CABLE_UNIVERSAL -> universalConnector() == null ? 0 : universalConnector().networkEnergyInputBudget(module);
             };
         }
 
         private int outputBudget(long gameTime) {
             return switch (type) {
                 case DIRECT -> directConnector() == null ? 0 : cable.directEnergyOutputBudget(connectorFace, gameTime);
-                case CABLE_UNIVERSAL -> universalConnector() == null ? 0 : universalConnector().networkEnergyOutputBudget();
+                case CABLE_UNIVERSAL -> universalConnector() == null ? 0 : universalConnector().networkEnergyOutputBudget(module);
             };
         }
 
@@ -2361,7 +2369,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 case DIRECT -> cable.directEnergyInput[connectorFace.ordinal()].add(gameTime, amount);
                 case CABLE_UNIVERSAL -> {
                     if (universalConnector() != null) {
-                        universalConnector().recordNetworkEnergyInput(amount);
+                        universalConnector().recordNetworkEnergyInput(module, amount);
                     }
                 }
             }
@@ -2375,7 +2383,7 @@ public class CableBlockEntity extends BlockEntity implements UniversalConnectorD
                 case DIRECT -> cable.directEnergyOutput[connectorFace.ordinal()].add(gameTime, amount);
                 case CABLE_UNIVERSAL -> {
                     if (universalConnector() != null) {
-                        universalConnector().recordNetworkEnergyOutput(amount);
+                        universalConnector().recordNetworkEnergyOutput(module, amount);
                     }
                 }
             }

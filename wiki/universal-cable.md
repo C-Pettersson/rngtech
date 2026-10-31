@@ -108,16 +108,16 @@ A dyed Cable keeps its color when you mine it. The color shows on the cable's gl
 | Setting | What it does |
 |---|---|
 | Channel | 0–15. Connectors only exchange with the same channel. Energy, Fluid, Item, and Bridge channels are separate. |
-| Mode | Energy: Input takes FE from the machine into the cable, Output sends FE from the cable into the machine, and Both does both. Hover a mode button for its description. Fluid and Item rows: IN pulls from the machine into the cable, OUT pushes from the cable into the machine. |
+| Mode | Energy rows: In takes FE from the machine into the cable, Out sends FE from the cable into the machine, and Both does both. Hover a mode button for its description. Fluid and Item rows: In pulls from the machine into the cable, Out pushes from the cable into the machine. |
 | Attach As | Which side of the machine the connector acts as. For example, a connector under a machine can insert as if it were on top. Set a Fluid or Item row to None to switch it off. |
-| Distribution | Energy only. How this connector splits the FE it gives each tick: Round Robin rotates between outputs, Even splits it evenly and then sends leftovers to outputs that can still take more, First Available fills outputs in order. |
+| Distribution | Energy rows only. How this row splits the FE it gives each tick: Round Robin rotates between outputs, Even splits it evenly and then sends leftovers to outputs that can still take more, First Available fills outputs in order. |
 | Filters | Fluid and Item rows each have two ghost filter slots. Filters are copies and are never used up. |
 
-A new connector starts on channel 0, with Energy mode Both, Distribution Round Robin, and every Fluid and Item row set to IN. Attach As starts as the machine face the connector actually touches. Each Fluid and Item row has its own mode, channel, and Attach, and several rows can share a channel and side.
+A new connector starts on channel 0. Every Energy row starts on Both with Distribution Round Robin, and every Fluid and Item row starts on In. Attach As starts as the machine face the connector actually touches. Each Energy, Fluid, and Item row has its own mode, channel, and Attach, and several rows can share a channel and side.
 
 ### Energy
 
-The Energy tab has one Energy Connector slot. The connector pulls FE from machines that output it, carries it through the cable, and delivers it to Output connectors on the same channel. The installed connector's tier is the cap on how much FE that endpoint moves.
+The Energy tab has three rows. Each row has an Energy Connector slot and its own mode, channel, Attach, and Distribution. A row pulls FE from machines that output it, carries it through the cable, and delivers it to Out rows on the same channel. The installed connector's tier is the cap on how much FE that row moves. Rows add up: three rows on the same machine side move three times the FE of one row.
 
 | Connector | Stage | Transfer |
 |---|---:|---:|
@@ -131,32 +131,32 @@ The Energy tab has one Energy Connector slot. The connector pulls FE from machin
 
 The tier is a per-tick cap in both directions. A connector takes at most its tier in FE/t from its machine, and delivers at most its tier in FE/t into its machine, however many generators feed the network. Most machines do not limit how fast they take or give FE, so the connector tier is usually what sets the rate.
 
-**Sharing the load.** Each tick, every energy channel moves its FE in one step, after all machines have run. Every Input or Both connector offers what its machine can give, every Output or Both connector asks for what its machine can take, and then the FE is shared out in this order:
+**Sharing the load.** Each tick, every energy channel moves its FE in one step, after all machines have run. Every In or Both row offers what its machine can give, every Out or Both row asks for what its machine can take, and then the FE is shared out in this order:
 
 1. Generators feed machines. When generators offer more than the machines need, each generator gives the same share of what it offers, so they share the load instead of one doing all the work.
 2. Spare FE from generators charges storage blocks.
 3. Storage blocks cover what the machines still need.
 4. Storage blocks even out with each other (see below).
 
-Each connector's Distribution setting decides how its own share is split between the receiving connectors. The result does not depend on the order you placed things in. Machines that push FE into a connector on their own deliver it right away, by the same rules.
+Each row's Distribution setting decides how its own share is split between the receiving rows. The result does not depend on the order you placed things in. Machines that push FE into a connector on their own deliver it right away, by the same rules.
 
-**Storage balancing.** A storage block is any block that can both take and give FE at that moment, such as a [Battery Chassis](battery-chassis.md). Between two storage blocks whose connectors are both on Both, FE flows only from the fuller block to the emptier one, by fill percentage, and stops once they are equally full. Gaps under 1% move nothing, so idle banks do not trade FE back and forth and lose it to charge and discharge losses. Daisy-chained banks still pass charge along: a generator charges the first bank, and the first bank shares with the next. Generators still charge banks, and banks still feed machines. A completely full bank passes its overflow on freely, and a completely empty bank takes FE freely. To fill one bank from another regardless of fill, set the source bank's connector to Input or the destination bank's connector to Output.
+**Storage balancing.** A storage block is any block that can both take and give FE at that moment, such as a [Battery Chassis](battery-chassis.md). Between two storage blocks whose connectors are both on Both, FE flows only from the fuller block to the emptier one, by fill percentage, and stops once they are equally full. Gaps under 1% move nothing, so idle banks do not trade FE back and forth and lose it to charge and discharge losses. Daisy-chained banks still pass charge along: a generator charges the first bank, and the first bank shares with the next. Generators still charge banks, and banks still feed machines. A completely full bank passes its overflow on freely, and a completely empty bank takes FE freely. To fill one bank from another regardless of fill, set the source bank's row to In or the destination bank's row to Out.
 
-**No FE on this side.** You can put a connector on any face, but many machines take or give FE only on some sides. If the machine has no FE on the connector's Attach As side, the Energy tab and the Wrench hologram show a red warning: `No FE on this side of the target. Change Attach As or move the connector.`
+**No FE on this side.** You can put a connector on any face, but many machines take or give FE only on some sides. If the machine has no FE on a row's Attach As side, the row's Attach button turns red. Hover the row to read the warning. The Wrench hologram shows the same warning as a red line: `No FE on this side of the target. Change Attach As or move the connector.`
 
 **Machine readouts.** A machine's Jade tooltip and info panel count only connectors that actually move FE for it: the mode must match the direction, and the Attach As side must be one where the machine has FE. When those connectors carry less than the machine needs, it shows **Attached connector limits input energy**, or **Attached connector limits output energy** on a generator.
 
 ### Fluids
 
-The Fluid tab has three rows, each with a Fluid Connector slot, its own mode, channel, and Attach setting, and two filter slots. An IN row drains a shipment from the machine, waits, and repeats. An OUT row fills its machine from shipments arriving on its channel, up to its tier's shipment size. To filter a row, put a filled bucket or other fluid container in a filter slot.
+The Fluid tab has three rows, each with a Fluid Connector slot, its own mode, channel, and Attach setting, and two filter slots. An In row drains a shipment from the machine, waits, and repeats. An Out row fills its machine from shipments arriving on its channel, up to its tier's shipment size. To filter a row, put a filled bucket or other fluid container in a filter slot.
 
-Each shipment can **jam**: the row pauses for a few seconds without losing any fluid. Several IN rows on the same machine side and channel run in parallel, so stacking rows raises throughput.
+Each shipment can **jam**: the row pauses for a few seconds without losing any fluid. Several In rows on the same machine side and channel run in parallel, so stacking rows raises throughput.
 
-An IN row that finds nothing it can send, because its machine is empty, no OUT row on its channel can take the shipment, or its filter matches nothing, waits before it looks again. It waits its tier's time between shipments, but never more than one second, and it looks again at once when cables, connectors, or their settings change. Item rows work the same way.
+An In row that finds nothing it can send, because its machine is empty, no Out row on its channel can take the shipment, or its filter matches nothing, waits before it looks again. It waits its tier's time between shipments, but never more than one second, and it looks again at once when cables, connectors, or their settings change. Item rows work the same way.
 
-A connector with an IN row also accepts fluid or items that its machine pushes out on its own, and sends them to that row's channel. Pushed shipments follow the same size, wait, jam, and filter rules.
+A connector with an In row also accepts fluid or items that its machine pushes out on its own, and sends them to that row's channel. Pushed shipments follow the same size, wait, jam, and filter rules.
 
-**Splitting shipments.** Each fluid or item shipment is split evenly between every connector with an OUT row on its channel that can take it, however far away each one is. If a machine is full or its filter rejects the shipment, its share goes to the others. When a shipment does not divide evenly, the extra goes to a different machine each time, so a Basic Item Connector feeding three Furnaces sends one item to each in turn.
+**Splitting shipments.** Each fluid or item shipment is split evenly between every connector with an Out row on its channel that can take it, however far away each one is. If a machine is full or its filter rejects the shipment, its share goes to the others. When a shipment does not divide evenly, the extra goes to a different machine each time, so a Basic Item Connector feeding three Furnaces sends one item to each in turn.
 
 | Connector | Stage | Shipment | Every | Jam chance, pause |
 |---|---:|---:|---:|---:|
@@ -195,7 +195,7 @@ The {{ item('rngtech:wrench') }} manages links and shows connector settings.
 - Right-click the cable arm that leads to another Cable to switch that link off. To switch it back on, right-click the side of the cable core facing the other Cable. Disabled links stay off after reloads, and only the Wrench turns them back on. Cables dyed different colors cannot be linked.
 - Right-click a connector on a cable face to open its screen.
 - Hold the Wrench while looking at a Universal Connector, standalone or on a cable, to see a hologram of its settings. Direct Energy Connectors left on a cable face from older worlds show no hologram.
-- The hologram has Summary, Energy, Item, and Fluid pages. The Summary page also shows the bridge, such as `Bridge: AE2, channel 3`. Shift + right-click cycles the pages, and so does the **Cycle Wrench View** key. That key has no default binding; set it under Controls.
+- The hologram has Summary, Energy, Item, and Fluid pages. The Energy page shows the first Energy row that has a connector. The Summary page also shows the bridge, such as `Bridge: AE2, channel 3`. Shift + right-click cycles the pages, and so does the **Cycle Wrench View** key. That key has no default binding; set it under Controls.
 - The Energy, Item, and Fluid pages add a red line under a connector or module that cannot move anything: no other connector on its channel, nothing on the channel that can receive from or supply its mode (for example two inputs on one channel), or a module with no Attach side. Working connectors show no warning.
 
 ### Configurator
@@ -205,6 +205,7 @@ The {{ item('rngtech:configurator') }} copies connector settings and pastes them
 Right-click a connector to open the Configurator menu:
 
 - **Copy All**, **Copy Energy**, **Copy Fluid**, or **Copy Item** stores those settings on the Configurator. A partial copy replaces only that part of the stored preset.
+- Energy settings copy from and paste onto the first Energy row only.
 - **Paste** applies the stored channels, modes, Distribution, Attach As, and ghost filters. It never changes installed modules unless module paste is on.
 
 An Attach setting left on its starting side is stored as **Default**, so a preset pastes correctly onto connectors facing other directions.
@@ -212,7 +213,7 @@ An Attach setting left on its starting side is stored as **Default**, so a prese
 To edit the stored preset, hold the Configurator and press the **Open Configurator Preset** key. It has no default binding; set it under Controls. The preset screen can:
 
 - Pick a category (All, Energy, Fluid, or Item), then set its channel, cycle its mode, or set its Attach to Default, None, or a fixed side, for every row at once.
-- **Flip** every mode in the preset: Input and Output swap, and so do IN and OUT.
+- **Flip** every mode in the preset: In and Out swap.
 - **Reset** the selected category, or **Reset All**.
 - Turn **module paste** on (Mod On). Paste then also installs the matching modules from your inventory and hands back any modules it replaces. If a module is missing or you have no room for the replaced ones, nothing changes at all.
 - Turn the **Gear helper** on (Gear On). Right-click a machine to fill its empty Gear slots from your inventory, with the same rules as placing Gear by hand. It does not let pipes or hoppers reach Gear slots.
@@ -223,11 +224,11 @@ The Configurator can also copy Machine Mastery builds. See [Machine Mastery](mac
 
 A Universal Connector's screen has five tabs:
 
-- **Energy**: the Energy Connector slot with mode, channel, Distribution, and Attach settings, plus FE in and out last tick and the red warning when the machine has no FE on the Attach As side.
+- **Energy**: three Energy Connector rows with mode, channel, Attach, and Distribution each. A red Attach button means the machine has no FE on that side. Hover a row to see its transfer cap, the FE it moved in and out last tick, and the warning.
 - **Fluid**: three Fluid Connector rows with mode, channel, Attach, and two filter slots each.
 - **Item**: three Item Connector rows with mode, channel, Attach, and two filter slots each.
 - **Bridge**: the network connector slot, bridge channel, and link status.
-- **Network**: a read-only overview of the whole cable network: cables, connectors, modules, and channels. The FE meter shows power actually delivered on this connector's energy channel, as In and Out averaged over 1, 5, or 15 minutes, plus Max: the most the channel can move with its current connectors. It does not count demand that went unmet. Averages cover only the time measured so far, so a new network shows its real rate at once, and the history is kept when the network is rebuilt, extended, or merged. Hover In or Out for the live rate. **Clear network cache** forces a rebuild.
+- **Network**: a read-only overview of the whole cable network: cables, connectors, modules, and channels. The FE meter shows power actually delivered on the channel of the first Energy row that has a connector, as In and Out averaged over 1, 5, or 15 minutes, plus Max: the most the channel can move with its current connectors. It does not count demand that went unmet. Averages cover only the time measured so far, so a new network shows its real rate at once, and the history is kept when the network is rebuilt, extended, or merged. Hover In or Out for the live rate. **Clear network cache** forces a rebuild.
 
 ## Data values
 
