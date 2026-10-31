@@ -42,7 +42,7 @@ Their shipped values live in the catalog under `data/rngtech/uniques/`.
 
 | Unique | Host | Slot stage | Source | Signature | Drawback |
 |---|---|---:|---|---|---|
-| Shipwreck Salt-Zinc Anode | Battery Cell | 1 | Shipwreck supply chest | Near Lead-class capacity (a `SHIPWRECK_SALT_ZINC` cell material plus increased Energy Capacity) | High Idle Loss, 90% Efficiency, half an Iron cell's output |
+| Shipwreck Salt-Zinc Anode | Battery Cell | 1 | Shipwreck supply chest | Well above Iron-class capacity (a `SHIPWRECK_SALT_ZINC` cell material plus increased Energy Capacity) | High Idle Loss, 90% Efficiency, half an Iron cell's output |
 | Trial Vault Tempered Pawl | Disassembly Head | 3 | Trial chambers normal vault | +1 Processing Level, so Stage 4 recipes on a Bronze Recycler | More Energy Usage, less Processing Speed |
 
 The Pawl added `DISASSEMBLY_HEAD` as a Unique host with a Component Recycler stat reader and a Processing Level gate. The backlog entry asked for Stage 5 reach, which the one-stage-past rule forbids at slot stage 3, so it ships with Stage 4 reach.
