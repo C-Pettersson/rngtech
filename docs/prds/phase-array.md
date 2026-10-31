@@ -405,12 +405,12 @@ Resolved 2026-10-21:
 - Glyphs are seated in the Cradle, one seat per tier, like the Affix Forge's installed upgrades, after locking them into Coils one by one proved hard to read in playtest (resolved 2026-10-22). A seated Glyph can be taken back out.
 - Drained Battery Cells leave through the Cradle's bottom face, as Structure says; the Non-Goal rules out automating the pulse, not emptying the sockets. Nothing enters by automation.
 
-## Open Questions
+Resolved 2026-10-31, the former open questions:
 
-- Whether the pulse always runs from the Emitter to the Cradle, or whether the player can choose which Coils take part, which would let a strong Coil sit where it matters.
-- Whether the Fracture check should run before the sequence, as drafted, or replace the first slip, so a fracture is something the player watches happen.
-- Whether the line may also be built vertically, as a column under or above the Cradle.
-- Whether the challenge table chances are high enough that a player building a line sees Glyphs arrive at a usable rate, or whether `mastery_level` should pay at every ten levels.
-- Whether the RP costs should be fixed, as drafted, or rolled in a narrow range like the Affix Forge's.
-- Whether a Graft donor must be the same part type as the target, or only share the affix's eligibility.
-- Whether the time targets should assume one line charging from supply, or a line plus full Battery Chassis, which changes the `base` values by about four times.
+- The pulse always runs from the Emitter to the Cradle across every usable Coil, and the player does not choose which Coils take part. A slip past the Coils the operation needs still counts as Success, so it shows amber, not red: on the Cradle screen, in its particles, and with a softer sound than a failing slip.
+- The Fracture check runs before the sequence, as drafted. The Fracture odds stay a function of Strain alone.
+- The line is horizontal only.
+- RP costs are fixed recipe fields, as drafted and tuned in the 2026-10-22 playtest.
+- A Graft donor only has to carry an affix the target can roll, so it may be a different part type.
+- The `base` FE values assume one line charging from supply at the 20 kFE/t reference, as playtested.
+- The question about challenge table Glyph rates no longer applies: those tables were removed on 2026-10-26.

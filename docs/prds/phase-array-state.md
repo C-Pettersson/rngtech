@@ -2,7 +2,7 @@
 
 Source: [draft design](phase-array.md).
 
-Status: **Implemented**. The PRD was accepted on 2026-10-21 and every delivery phase merged to `main` in #205. The Exotic Affix Forge is replaced. The in-game playtest is done; the open questions below stay open.
+Status: **Implemented**. The PRD was accepted on 2026-10-21 and every delivery phase merged to `main` in #205. The Exotic Affix Forge is replaced. The in-game playtest is done, and the open questions were resolved on 2026-10-31.
 
 ## Scope checklist
 
@@ -92,9 +92,9 @@ Recorded 2026-10-21 from the code on `main` at `c7757d96` and the open branches:
 
 - The PRD's numbers are the `prd` scenario of `tools/balance/phase-array-scenarios.json`. The model has no Second Hold, Strain Tolerance, or part affixes in play; they are zero at base and only exist once parts roll.
 - The sequence uses vanilla sounds (amethyst chime, beacon deactivate, respawn anchor charge, glass break) and vanilla particles. Custom sounds are open.
-- The pulse crosses every usable Coil, so a long line running a short operation watches all its positions; slips past the operation's count still succeed and a full hold rolls Overhold. This is the PRD's ladder, and it was questioned in playtest.
+- The pulse crosses every usable Coil, so a long line running a short operation watches all its positions; slips past the operation's count still succeed and a full hold rolls Overhold. This is the PRD's ladder. It was questioned in playtest and kept on 2026-10-31, with a harmless slip shown amber in the world as well as on the screen.
 - Formation differs from the first PRD text: it is automatic, not a right-click, so it matches the Dehumidifier. The PRD now says so.
 - The model's players are simple: they always Resonate the lowest affix, and they stop at 25% Fracture. A player who Reforges a worn item, or Grafts between bodies, is not modelled.
-- The line is drafted horizontal only. A vertical line is an open question.
+- The line is horizontal only, decided on 2026-10-31.
 - Tier V Glyphs come from Work Orders only. No interim source is added here, by decision on 2026-10-21.
 - The Affix Forge 3D models branch's Exotic Affix Forge model should wait for the form decision.
