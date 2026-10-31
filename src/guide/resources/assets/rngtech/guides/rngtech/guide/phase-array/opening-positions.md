@@ -8,7 +8,7 @@ navigation:
 
 # Opening positions
 
-The Cradle has five Glyph seats, one per tier, in a column beside the chamber. A Glyph of that tier or higher in a seat opens every position of its tier, and positions open from the Emitter inward: the first closed one ends the usable line. Take a Glyph out and its positions close again. Each position asks for a seat:
+The Cradle has five Glyph seats, one per tier, in a column under the output slot. A Glyph of that tier or higher in a seat opens every position of its tier, and positions open from the Emitter inward: the first closed one ends the usable line. Take a Glyph out and its positions close again. Each position asks for a seat:
 
 | Position | Seat it needs | Operations it opens |
 |---:|---:|---|

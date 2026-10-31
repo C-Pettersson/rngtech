@@ -76,7 +76,7 @@ Each Coil has a **position**, counted from the Emitter: position 1 is the Coil n
 
 ### Opening positions {#positions}
 
-The Cradle has five Glyph seats, one per tier, in a column beside the chamber. A Glyph of that tier or higher in a seat opens every position of its tier, and positions open from the Emitter inward: the first closed one ends the usable line. Take a Glyph out and its positions close again. Each position asks for a seat:
+The Cradle has five Glyph seats, one per tier, in a column under the output slot. A Glyph of that tier or higher in a seat opens every position of its tier, and positions open from the Emitter inward: the first closed one ends the usable line. Take a Glyph out and its positions close again. Each position asks for a seat:
 
 | Position | Seat it needs | Operations it opens |
 |---:|---:|---|
@@ -98,9 +98,9 @@ Opening every position takes one Glyph of each tier. The Tier V is also what one
 2. Pick an operation from the row of marks. Operations that work on one affix or one empty slot ask you to click it in the list under the marks; Imprint then lists the affixes it can add, and Graft lists the donor's affixes.
 3. Hover the mark for the FE, the Glyph, the RP, and the odds of every outcome for this item on this line. The chamber's hover shows the item's Strain and the Fracture chance it adds.
 4. Click **Charge**. The line fills from FE on any side of the Cradle, the Emitter, or a Coil, and from the Battery Cells in the Cradle's sockets, up to the line's Charge Rate. A dip in supply pauses the charge; it never fails. The charge stays if you close the screen or switch operations, and a costlier operation asks for more.
-5. Click **Fire**. The Coils engage from the Emitter inward, one every 0.4 seconds with a tone that climbs the line. The first Coil that slips stops the pulse: it flashes and throws red sparks, the lit Coils go dark one by one, and the outcome applies.
+5. Click **Fire**. The Coils engage from the Emitter inward, one every 0.4 seconds with a tone that climbs the line. The first Coil that slips stops the pulse. It flashes red or amber, the lit Coils go dark one by one, and the outcome applies. [Reading a slip](#reading-a-slip) tells you what the colour means.
 
-The item hangs in the Cradle's bore while it sits in the chamber and is locked while the pulse runs. When the pulse ends it moves to the **output** slot; take it out before the next one. The result line under the conduit names the outcome and what it did until the next item goes in.
+The item hangs in the Cradle's bore while it sits in the chamber and is locked while the pulse runs. When the pulse ends it moves to the **output** slot; take it out before the next one. The readout under the line names the outcome and what it did until the next item goes in. The Cradle remembers the affix you selected. Put the item back in the chamber and the same affix is selected again, so you can Resonate one affix many times in a row.
 
 ### Outcomes
 
@@ -114,7 +114,19 @@ Each Coil holds the pulse with its own **Hold Chance**, 92% before affixes. With
 | Miss | The pulse slips earlier | Nothing changes. Only the FE and the Glyph are spent. |
 | Fracture | Rolled before the Coils engage, 1% per point of Strain above the line's Tolerance | One random affix drops a tier. A Tier 1 affix is removed. |
 
-The pulse always runs the whole usable line, so a nine-Coil line fires a three-Coil operation past the three it needs. A slip past `R` does no harm: it still counts as Success. It shows amber, not red, on the screen and on the Coil, with a softer sound. Holding every Coil is what buys the Overhold roll.
+The pulse always runs the whole usable line, so a nine-Coil line fires a three-Coil operation past the three it needs. A slip past `R` does no harm: it still counts as Success. Only a line where every Coil holds rolls for Overhold.
+
+#### Reading a slip
+
+The colour of a slip tells you if it cost you the operation. The line on the screen keeps the colours until the next item goes in.
+
+| You see | Where the slip is | Result |
+|---|---|---|
+| Every node green, no slip | No Coil slipped | Success, and an Overhold roll if the line is longer than `R` |
+| Amber node, amber dust on the Coil, a soft chime | After the first `R` Coils | Success. The slip only cost the Overhold roll. |
+| Red node, red dust and sparks on the Coil, a falling tone | Inside the first `R` Coils | Partial or Miss |
+
+For example, Reforge needs 3 Coils. On a 7-Coil line, a slip at Coil 5 shows amber and the Reforge succeeds. A slip at Coil 3 shows red, and you get only the Partial result.
 
 RP is spent on Success, Overhold, and Partial, never on a Miss or a Fracture. A Glyph is spent on every outcome unless the line's Glyph Salvage returns it on a Miss.
 
@@ -193,16 +205,20 @@ Nothing else moves by automation: the target, the Glyph, the donor, and the outp
 
 ## Screen
 
-The Cradle has one screen, read from the top down:
+The Cradle has one screen. Its item area at the top right reads like a furnace: the item goes in, the Glyph is the fuel, and the result comes out at the end of the arrow.
 
-- **The line** runs across the top: the Emitter's node at the left, one node per position, and the target's chamber at the right. A lit node is a usable position; a dim node with an amber edge is closed, and its hover names the seat it waits on. After a pulse the held nodes turn green and the slipped one red, or amber when the slip did no harm, until the next item goes in.
-- **The conduit** under the line fills with the charge. Hover it for FE held and needed, the rate FE is arriving, and the time to full.
-- **The cell sockets** sit on the left, nine of them, each ring dimming as its cell empties.
-- **The chamber** holds the target slot with its affixes listed under it; the Glyph, donor, and output slots sit beside it. Marks around the chamber show the item's Strain.
-- **The Glyph seats** run down the right edge under the output slot, numbered I to V; a numeral lights while its seat holds a Glyph.
-- **The operation marks** run in a row above the list. A dim mark cannot run, and its hover says why: the missing position, Glyph, selection, or RP.
-- **The one button** under the list reads Charge, Stop, Fire, or Pulse, whichever the line is ready for.
-- **Three lights** at the top left show blocked, waiting for input, and live.
+- **The line** runs across the top from the Emitter at the left, one node per position, into the chamber. A lit node is a usable position. A dim node with an amber edge is closed, and its hover names the seat it waits on. After a pulse, the held nodes turn green and the slipped one turns red or amber. See [Reading a slip](#reading-a-slip).
+- **The chamber** at the end of the line holds the target item. Marks around it show the item's Strain.
+- **The Glyph slot** sits under the chamber, where a furnace keeps its fuel. **The donor slot** sits beside it. The donor slot is dim unless the operation is Graft.
+- **The conduit** is the arrow from the chamber to the output. It fills with the charge, and its head lights when the charge is full. Hover it for the FE held and needed, the rate FE arrives, and the time to full.
+- **The button** under the conduit reads Charge, Stop, Fire, or Pulse, whichever the line is ready for.
+- **The output slot** is the large slot at the end of the arrow. The item goes there when the pulse ends.
+- **The readout** under the line names the last outcome. With an item in the chamber, it also shows the item's Strain and RP.
+- **The operation marks** run in a row above the list. A dim mark cannot run, and its hover tells you why: the missing position, Glyph, selection, or RP.
+- **The list** shows what the chosen operation can act on: the item's affixes, its empty slots, the affixes it can take, or the donor's affixes.
+- **The Glyph seats** run down the right side under the output slot, numbered I to V. A numeral lights while its seat holds a Glyph.
+- **The cell sockets** sit beside your inventory, nine of them. Each ring dims as its cell empties.
+- **Three lights** at the top right show blocked, waiting for input, and live.
 
 Hover anything for its exact values, and an empty slot for what goes in it. In the world, Jade on the Cradle names the chosen operation and, with no line, the first block it lacks. With JEI installed, the operations are listed under the Phase Array category.
 
