@@ -343,7 +343,7 @@ final class BenchmarkScene {
         if (level.getBlockEntity(placement.cable()) instanceof CableBlockEntity cable
                 && cable.installUniversalConnector(placement.face())) {
             cable.universalConnector(placement.face()).getInventory().setStackInSlot(
-                    UniversalConnectorBlockEntity.SLOT_ENERGY_CONNECTOR,
+                    UniversalConnectorBlockEntity.energyConnectorSlot(0),
                     new ItemStack(ModItems.energyConnector(placement.tier()).get())
             );
             BlockState state = level.getBlockState(placement.cable());

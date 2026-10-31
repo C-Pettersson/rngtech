@@ -10,9 +10,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Sums the energy connectors that actually move FE for a machine: Universal Connectors and direct cable connectors
- * facing it, in a mode that matches the requested direction, attached as a side where the machine exposes FE.
+ * Sums the energy connectors that actually move FE for a machine: Universal Connector Energy rows and direct cable
+ * connectors facing it, in a mode that matches the requested direction, attached as a side where the machine exposes FE.
  */
 public final class AdjacentEnergyConnector {
     private static final Direction[] DIRECTIONS = Direction.values();
@@ -51,60 +54,62 @@ public final class AdjacentEnergyConnector {
         int lastInput = 0;
         int lastOutput = 0;
         for (Direction direction : DIRECTIONS) {
-            Connector connector = connector(level, targetPos.relative(direction), direction.getOpposite());
-            if (connector == null || connector.transferRate() <= 0) {
-                continue;
-            }
-            if ((source && !connector.mode().acceptsNetworkInput()) || (!source && !connector.mode().sendsNetworkOutput())) {
-                continue;
-            }
-            if (level.getCapability(Capabilities.EnergyStorage.BLOCK, targetPos, connector.attachAs()) == null) {
-                continue;
-            }
+            for (Connector connector : connectors(level, targetPos.relative(direction), direction.getOpposite())) {
+                if (connector.transferRate() <= 0) {
+                    continue;
+                }
+                if ((source && !connector.mode().acceptsNetworkInput()) || (!source && !connector.mode().sendsNetworkOutput())) {
+                    continue;
+                }
+                if (level.getCapability(Capabilities.EnergyStorage.BLOCK, targetPos, connector.attachAs()) == null) {
+                    continue;
+                }
 
-            transferRate += connector.transferRate();
-            lastInput += connector.lastInput();
-            lastOutput += connector.lastOutput();
+                transferRate += connector.transferRate();
+                lastInput += connector.lastInput();
+                lastOutput += connector.lastOutput();
+            }
         }
         return transferRate <= 0 ? Info.NONE : new Info(transferRate, lastInput, lastOutput);
     }
 
-    private static Connector connector(Level level, BlockPos pos, Direction face) {
+    private static List<Connector> connectors(Level level, BlockPos pos, Direction face) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof CableBlockEntity cable) {
             CableBlockEntity.ConnectorData direct = cable.connector(face);
             if (direct != null) {
-                return new Connector(
+                return List.of(new Connector(
                         direct.mode(),
                         direct.attachAs(),
                         direct.transferRate(),
                         cable.lastDirectEnergyInput(face),
                         cable.lastDirectEnergyOutput(face)
-                );
+                ));
             }
-            return universalConnector(cable.universalConnectorAccess(face));
+            return universalConnectors(cable.universalConnectorAccess(face));
         }
         if (blockEntity instanceof UniversalConnectorBlockEntity connector && connector.targetDirection() == face) {
-            return universalConnector(connector.universalConnectorAccess(face));
+            return universalConnectors(connector.universalConnectorAccess(face));
         }
-        return null;
+        return List.of();
     }
 
-    private static Connector universalConnector(UniversalConnectorAccess access) {
+    private static List<Connector> universalConnectors(UniversalConnectorAccess access) {
         if (access == null) {
-            return null;
+            return List.of();
         }
         ContainerData data = access.menuData();
-        if (data.get(UniversalConnectorBlockEntity.dataHasConnectorIndex()) == 0) {
-            return null;
+        List<Connector> connectors = new ArrayList<>(UniversalConnectorBlockEntity.ENERGY_MODULE_SLOT_COUNT);
+        for (int module = 0; module < UniversalConnectorBlockEntity.ENERGY_MODULE_SLOT_COUNT; module++) {
+            connectors.add(new Connector(
+                    connectorMode(data.get(UniversalConnectorBlockEntity.dataEnergyModeIndex(module))),
+                    direction(data.get(UniversalConnectorBlockEntity.dataEnergyAttachAsIndex(module))),
+                    data.get(UniversalConnectorBlockEntity.dataEnergyTransferRateIndex(module)),
+                    data.get(UniversalConnectorBlockEntity.dataEnergyLastInputIndex(module)),
+                    data.get(UniversalConnectorBlockEntity.dataEnergyLastOutputIndex(module))
+            ));
         }
-        return new Connector(
-                connectorMode(data.get(UniversalConnectorBlockEntity.dataModeIndex())),
-                direction(data.get(UniversalConnectorBlockEntity.dataAttachAsIndex())),
-                data.get(UniversalConnectorBlockEntity.dataTransferRateIndex()),
-                data.get(UniversalConnectorBlockEntity.dataLastEnergyInputIndex()),
-                data.get(UniversalConnectorBlockEntity.dataLastEnergyOutputIndex())
-        );
+        return connectors;
     }
 
     private static CableConnectorMode connectorMode(int ordinal) {

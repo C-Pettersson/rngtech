@@ -57,19 +57,20 @@ public record ConnectorOverlaySnapshot(
             itemModules.add(itemModule(access, inventory, data, moduleIndex));
         }
 
+        int energy = shownEnergyModule(inventory);
         return new ConnectorOverlaySnapshot(
                 cableSide,
                 mountedFace.ordinal(),
-                itemKey(inventory.getStackInSlot(UniversalConnectorBlockEntity.SLOT_ENERGY_CONNECTOR)),
-                data.get(UniversalConnectorBlockEntity.dataModeIndex()),
-                data.get(UniversalConnectorBlockEntity.dataDistributionIndex()),
-                data.get(UniversalConnectorBlockEntity.dataChannelIndex()),
-                data.get(UniversalConnectorBlockEntity.dataAttachAsIndex()),
-                data.get(UniversalConnectorBlockEntity.dataTransferRateIndex()),
-                data.get(UniversalConnectorBlockEntity.dataLastEnergyInputIndex()),
-                data.get(UniversalConnectorBlockEntity.dataLastEnergyOutputIndex()),
-                data.get(UniversalConnectorBlockEntity.dataEnergyTargetAccessIndex()) != 0,
-                access.energyLinkStatus().ordinal(),
+                itemKey(inventory.getStackInSlot(UniversalConnectorBlockEntity.energyConnectorSlot(energy))),
+                data.get(UniversalConnectorBlockEntity.dataEnergyModeIndex(energy)),
+                data.get(UniversalConnectorBlockEntity.dataEnergyDistributionIndex(energy)),
+                data.get(UniversalConnectorBlockEntity.dataEnergyChannelIndex(energy)),
+                data.get(UniversalConnectorBlockEntity.dataEnergyAttachAsIndex(energy)),
+                data.get(UniversalConnectorBlockEntity.dataEnergyTransferRateIndex(energy)),
+                data.get(UniversalConnectorBlockEntity.dataEnergyLastInputIndex(energy)),
+                data.get(UniversalConnectorBlockEntity.dataEnergyLastOutputIndex(energy)),
+                data.get(UniversalConnectorBlockEntity.dataEnergyTargetAccessIndex(energy)) != 0,
+                access.energyLinkStatus(energy).ordinal(),
                 data.get(UniversalConnectorBlockEntity.dataBridgeTypeIndex()),
                 data.get(UniversalConnectorBlockEntity.dataBridgeChannelIndex()),
                 data.get(UniversalConnectorBlockEntity.dataBridgeModLoadedIndex()) != 0,
@@ -77,6 +78,16 @@ public record ConnectorOverlaySnapshot(
                 fluidModules,
                 itemModules
         );
+    }
+
+    /** The Energy row the hologram describes: the first one with a connector in it, else the first row. */
+    private static int shownEnergyModule(ItemStackHandler inventory) {
+        for (int module = 0; module < UniversalConnectorBlockEntity.ENERGY_MODULE_SLOT_COUNT; module++) {
+            if (!inventory.getStackInSlot(UniversalConnectorBlockEntity.energyConnectorSlot(module)).isEmpty()) {
+                return module;
+            }
+        }
+        return 0;
     }
 
     public LinkStatus energyLinkStatus() {
