@@ -3,13 +3,19 @@ package com.rngtech.content.block;
 import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.BatteryChassisBlockEntity;
 import com.rngtech.content.energy.BatteryChassisMaterial;
+import com.rngtech.content.item.CableItem;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -34,6 +40,38 @@ public class BatteryChassisBlock extends BaseMachineBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new BatteryChassisBlockEntity(pos, state);
+    }
+
+    /** A dye colours the casing band of a metal chassis and a Water Bottle washes it off; the Wooden crate has no band. */
+    @Override
+    protected ItemInteractionResult useItemOn(
+            ItemStack stack,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hitResult
+    ) {
+        if (material == BatteryChassisMaterial.WOODEN || !(level.getBlockEntity(pos) instanceof BatteryChassisBlockEntity chassis)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (stack.getItem() instanceof DyeItem dye && chassis.color() != dye.getDyeColor()) {
+            if (!level.isClientSide) {
+                chassis.setColor(dye.getDyeColor());
+                level.playSound(null, pos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
+                stack.consume(1, player);
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
+        if (CableItem.isWaterBottle(stack) && chassis.color() != null) {
+            if (!level.isClientSide) {
+                chassis.setColor(null);
+                CableItem.emptyWaterBottle(stack, level, pos, player, hand);
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override

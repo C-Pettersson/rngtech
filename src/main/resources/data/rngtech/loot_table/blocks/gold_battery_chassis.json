@@ -16,7 +16,8 @@
               "function": "minecraft:copy_components",
               "include": [
                 "rngtech:machine_traits",
-                "rngtech:mirrored"
+                "rngtech:mirrored",
+                "minecraft:base_color"
               ],
               "source": "block_entity"
             }

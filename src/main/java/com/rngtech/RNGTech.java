@@ -111,6 +111,7 @@ public final class RNGTech {
     private void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             CauldronInteraction.WATER.map().put(ModItems.CABLE.get(), CableItem::washInCauldron);
+            ModItems.BATTERY_CHASSIS.values().forEach(item -> CauldronInteraction.WATER.map().put(item.get(), CableItem::washInCauldron));
             UreaItem.registerDispenserBehavior();
         });
         LOGGER.info("RNGTech loaded");

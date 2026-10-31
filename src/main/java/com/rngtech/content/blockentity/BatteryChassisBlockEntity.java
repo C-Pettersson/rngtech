@@ -4,6 +4,7 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.BatteryChassisBlock;
 import com.rngtech.content.block.CableBlock;
 import com.rngtech.content.block.UniversalConnectorBlock;
+import com.rngtech.content.cable.CableGraph;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.menu.BatteryChassisMenu;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -22,7 +23,10 @@ import com.rngtech.rpg.ModifierEligibilityProfiles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -36,6 +40,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -105,6 +110,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
     private double flowOut;
     private BatteryChassisVisualState visualState = BatteryChassisVisualState.EMPTY;
     private BatteryChassisVisualState.Key lastSyncedVisual;
+    private DyeColor color;
 
     private final ContainerData menuData = new ContainerData() {
         @Override
@@ -232,6 +238,28 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         return visualState;
     }
 
+    /**
+     * The dye on the casing band, or null for the plain band. It changes no stat, but touching chassis of two different
+     * colours do not share FE, as with dyed cables.
+     */
+    public DyeColor color() {
+        return color;
+    }
+
+    public void setColor(DyeColor color) {
+        if (this.color == color) {
+            return;
+        }
+        this.color = color;
+        setChanged();
+        syncInventoryToClient();
+    }
+
+    /** Whether this chassis shares FE with a touching chassis: undyed links to any colour, dyed only to its own. */
+    public boolean linksTo(BatteryChassisBlockEntity other) {
+        return CableGraph.colorsLink(color, other.color);
+    }
+
     /** What the chassis shows right now, built on the server. */
     public BatteryChassisVisualState currentVisualState() {
         RuntimeContext context = runtimeContext();
@@ -290,7 +318,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         return sides;
     }
 
-    /** Other sides with an FE neighbour, such as a machine or another chassis, read from the export caches. */
+    /** Other sides with an FE neighbour, such as a machine or a linked chassis, read from the export caches. */
     private int contactSides() {
         if (level == null || level.isClientSide) {
             return 0;
@@ -299,7 +327,9 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         int sides = 0;
         for (Direction direction : DIRECTIONS) {
             int bit = 1 << direction.get3DDataValue();
-            if ((connectors & bit) == 0 && exportTargets.get(level, worldPosition, direction) != null) {
+            if ((connectors & bit) == 0
+                    && !(level.getBlockEntity(worldPosition.relative(direction)) instanceof BatteryChassisBlockEntity other && !linksTo(other))
+                    && exportTargets.get(level, worldPosition, direction) != null) {
                 sides |= bit;
             }
         }
@@ -518,6 +548,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         tag.putInt("BurstTicksRemaining", burstTicksRemaining);
         tag.putInt("EnergizedTicks", energizedTicks);
         tag.putDouble("IdleLossCarry", idleLossCarry);
+        putColor(tag);
     }
 
     @Override
@@ -528,6 +559,38 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         burstTicksRemaining = tag.getInt("BurstTicksRemaining");
         energizedTicks = Math.max(0, tag.getInt("EnergizedTicks"));
         idleLossCarry = tag.getDouble("IdleLossCarry");
+        color = readColor(tag);
+    }
+
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        if (color != null) {
+            components.set(DataComponents.BASE_COLOR, color);
+        }
+    }
+
+    @Override
+    protected void applyImplicitComponents(BlockEntity.DataComponentInput componentInput) {
+        super.applyImplicitComponents(componentInput);
+        color = componentInput.get(DataComponents.BASE_COLOR);
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void removeComponentsFromTag(CompoundTag tag) {
+        super.removeComponentsFromTag(tag);
+        tag.remove("Color");
+    }
+
+    private void putColor(CompoundTag tag) {
+        if (color != null) {
+            tag.putString("Color", color.getSerializedName());
+        }
+    }
+
+    private static DyeColor readColor(CompoundTag tag) {
+        return tag.contains("Color", Tag.TAG_STRING) ? DyeColor.byName(tag.getString("Color"), null) : null;
     }
 
     @Override
@@ -537,19 +600,21 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return withNoiseFactor(currentVisualState().save());
+        CompoundTag tag = withNoiseFactor(currentVisualState().save());
+        putColor(tag);
+        return tag;
     }
 
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
         readNoiseFactor(tag);
         visualState = BatteryChassisVisualState.load(tag);
+        color = readColor(tag);
     }
 
     @Override
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
-        readNoiseFactor(packet.getTag());
-        visualState = BatteryChassisVisualState.load(packet.getTag());
+        handleUpdateTag(packet.getTag(), registries);
     }
 
     private void syncInventoryToClient() {
@@ -1277,6 +1342,9 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
             BlockPos targetPos = pos.relative(direction);
             BlockEntity blockEntity = level.getBlockEntity(targetPos);
             if (blockEntity instanceof BatteryChassisBlockEntity targetChassis) {
+                if (!linksTo(targetChassis)) {
+                    continue;
+                }
                 int delivered = equalizeWithAdjacentChassis(targetChassis, direction, remainingOutput, context);
                 remainingOutput -= delivered;
                 exported |= delivered > 0;

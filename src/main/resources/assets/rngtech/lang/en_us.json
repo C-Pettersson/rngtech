@@ -3397,6 +3397,7 @@
   "rngtech.tooltip.battery_cell.material": "Cell material: %s",
   "rngtech.tooltip.battery_chassis.material": "Chassis material: %s",
   "rngtech.tooltip.battery_chassis.slots": "Battery slots: %s",
+  "rngtech.tooltip.battery_chassis.color": "Band color: %s",
   "rngtech.tooltip.crusher_chassis.material": "Chassis material: %s",
   "rngtech.tooltip.furnace_chassis.material": "Chassis material: %s",
   "rngtech.tooltip.alloy_furnace_chassis.material": "Chassis material: %s",

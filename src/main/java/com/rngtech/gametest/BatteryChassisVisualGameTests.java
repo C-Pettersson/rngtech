@@ -17,14 +17,27 @@ import com.rngtech.content.registry.ModItems;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
-/** The world view of a Battery Chassis: its cells and their charge, which way FE flows, and the plate on each side. */
+import java.util.List;
+
+/** The world view of a Battery Chassis: its cells and their charge, which way FE flows, the plate on each side, and its band dye. */
 @GameTestHolder(RNGTech.MOD_ID)
 @PrefixGameTestTemplate(false)
 public final class BatteryChassisVisualGameTests {
@@ -128,6 +141,92 @@ public final class BatteryChassisVisualGameTests {
             check(state.plate(Direction.DOWN) == BatteryChassisVisualState.Plate.NONE, "Nothing below gives no plate: " + state);
             helper.succeed();
         });
+    }
+
+    /** A dye colours a metal chassis's band for one dye, syncs to the client, and stays on the dropped and replaced chassis. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void dyeColoursTheBandAndSurvivesBreaking(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        BatteryChassisBlockEntity chassis = chassis(helper, pos, BatteryChassisMaterial.IRON);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.RED_DYE, 2));
+        check(useHeldItem(helper, pos, player).consumesAction(), "Red dye should colour an Iron chassis");
+        check(chassis.color() == DyeColor.RED, "The chassis should be red: " + chassis.color());
+        check(player.getMainHandItem().getCount() == 1, "Dyeing should spend one dye");
+        check(useHeldItem(helper, pos, player) == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                && player.getMainHandItem().getCount() == 1, "The same colour again should pass and spend nothing");
+        check("red".equals(chassis.getUpdateTag(helper.getLevel().registryAccess()).getString("Color")), "The colour should reach the client");
+
+        List<ItemStack> drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos), chassis);
+        check(drops.size() == 1 && drops.getFirst().get(DataComponents.BASE_COLOR) == DyeColor.RED, "The drop should stay red: " + drops);
+        BatteryChassisBlockEntity placed = chassis(helper, pos.east(), BatteryChassisMaterial.IRON);
+        placed.applyComponentsFromItemStack(drops.getFirst());
+        check(placed.color() == DyeColor.RED, "Placing the red chassis should keep the colour: " + placed.color());
+        helper.succeed();
+    }
+
+    /** A Water Bottle washes the dye off a placed chassis and leaves a Glass Bottle; on an undyed chassis it passes. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void waterBottleWashesTheBandOff(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        BatteryChassisBlockEntity chassis = chassis(helper, pos, BatteryChassisMaterial.IRON);
+        chassis.setColor(DyeColor.RED);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, PotionContents.createItemStack(Items.POTION, Potions.WATER));
+        check(useHeldItem(helper, pos, player).consumesAction(), "A Water Bottle should wash a red chassis");
+        check(chassis.color() == null, "The chassis should be undyed: " + chassis.color());
+        check(player.getMainHandItem().is(Items.GLASS_BOTTLE), "Washing should leave a Glass Bottle: " + player.getMainHandItem());
+
+        player.setItemInHand(InteractionHand.MAIN_HAND, PotionContents.createItemStack(Items.POTION, Potions.WATER));
+        check(useHeldItem(helper, pos, player) == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+                && player.getMainHandItem().is(Items.POTION), "Washing an undyed chassis should pass and keep the bottle");
+        helper.succeed();
+    }
+
+    /** Touching chassis dyed two colours neither share FE nor show a contact plate; undyeing one links them again. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 2 * FLOW_TICKS + 40)
+    public static void differentColoursDoNotShareCharge(GameTestHelper helper) {
+        BatteryChassisBlockEntity full = chassis(helper, new BlockPos(1, 1, 2), BatteryChassisMaterial.IRON);
+        BatteryChassisBlockEntity empty = chassis(helper, new BlockPos(2, 1, 2), BatteryChassisMaterial.IRON);
+        full.getInventory().setStackInSlot(0, cell(BatteryCellMaterial.IRON, 1.0));
+        empty.getInventory().setStackInSlot(0, cell(BatteryCellMaterial.IRON, 0.0));
+        full.setColor(DyeColor.RED);
+        empty.setColor(DyeColor.BLUE);
+        helper.startSequence()
+                .thenExecuteAfter(FLOW_TICKS, () -> {
+                    BatteryChassisVisualState source = full.currentVisualState();
+                    BatteryChassisVisualState sink = empty.currentVisualState();
+                    check(sink.charge() <= 0.0F && sink.flow() == BatteryChassisVisualState.Flow.IDLE,
+                            "A blue chassis took FE from a red one: " + sink);
+                    check(source.plate(Direction.EAST) == BatteryChassisVisualState.Plate.NONE
+                            && sink.plate(Direction.WEST) == BatteryChassisVisualState.Plate.NONE,
+                            "Unlinked chassis should not show contact plates: " + source + ", " + sink);
+                    empty.setColor(null);
+                })
+                .thenExecuteAfter(FLOW_TICKS, () -> {
+                    BatteryChassisVisualState sink = empty.currentVisualState();
+                    check(sink.charge() > 0.0F && sink.plate(Direction.WEST) == BatteryChassisVisualState.Plate.CONTACT,
+                            "An undyed chassis should link to the red one: " + sink);
+                })
+                .thenSucceed();
+    }
+
+    /** The Wooden crate has no band, so a dye passes through to the default interaction. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void woodenChassisTakesNoDye(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 2);
+        BatteryChassisBlockEntity chassis = chassis(helper, pos, BatteryChassisMaterial.WOODEN);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.RED_DYE));
+        check(useHeldItem(helper, pos, player) == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION, "A Wooden chassis took dye");
+        check(chassis.color() == null && player.getMainHandItem().getCount() == 1, "A Wooden chassis changed or spent the dye");
+        helper.succeed();
+    }
+
+    private static ItemInteractionResult useHeldItem(GameTestHelper helper, BlockPos pos, Player player) {
+        BlockPos absolute = helper.absolutePos(pos);
+        BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(absolute), Direction.NORTH, absolute, false);
+        return helper.getBlockState(pos).useItemOn(player.getMainHandItem(), helper.getLevel(), player, InteractionHand.MAIN_HAND, hit);
     }
 
     private static BatteryChassisBlockEntity chassis(GameTestHelper helper, BlockPos pos, BatteryChassisMaterial material) {
