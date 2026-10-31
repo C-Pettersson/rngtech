@@ -95,7 +95,7 @@ A job has one to three parts, and it is done when every part is done. The termin
 | Any work of a stage | Crush 256 items needing Processing Level 6+ |
 | Any work | Smelt 768 items |
 | A machine setting | Smelt 192 items with the heat slider at 50%+ |
-| A kind of output | Press 96 plates and 48 gears |
+| A kind of output | Press 128 plates and 64 gears |
 | A streak | Calibrate 12 components in a row at 80+ stability |
 | A stat goal | Reach a Processing Speed of 3.1 on a Crusher |
 

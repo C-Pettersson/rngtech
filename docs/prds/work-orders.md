@@ -144,7 +144,7 @@ The **Dispatch Terminal** is the vendor:
 | IV | 7 | About 30 minutes on a good Stage 7 build |
 | V | 8 | About 30 minutes on a good Stage 8 build |
 
-The stage requirement is the lower of the tier's stage and the family's top stage, because the Metal Press and Forestry Companion top out at Stage 4, the Alloy Furnace and Melter at 6, and the Resonance Calibrator at 7. Default orders have no Mastery level requirement. An order template can add one; a condition that adds one (Veteran Crew) is [deferred](#deferred). Objective sizes come from one good-build speed table per family and tier: the processing balance simulation's 75th percentile build for the Crusher and Furnace (the Crusher's Tier V held at its Tier IV speed), and for the other families the bare chassis's throughput times a good-to-bare ratio, about 1.5 for heated machines and 4 for the rest. The Resonance Calibrator, Component Assembler, and Component Recycler are material-bound: their counts are set by the materials their work eats, and the table sets only their Rush clock.
+The stage requirement is the lower of the tier's stage and the family's top stage, because the Metal Press and Forestry Companion top out at Stage 4, the Alloy Furnace and Melter at 6, and the Resonance Calibrator at 7. Default orders have no Mastery level requirement. An order template can add one; a condition that adds one (Veteran Crew) is [deferred](#deferred). Objective sizes come from one good-build speed table per family and tier: the processing balance simulation's 75th percentile build for the Crusher and Furnace (the Crusher's Tier V held at its Tier IV speed), and for the other families the measured speed of a bare build (the best chassis at the stage, matching plain Gear, and a Battery Cell) times a good-to-bare ratio, about 1.5 for heated machines and 4 for the rest. A GameTest re-measures those builds and fails when a row drifts more than 15%. The Resonance Calibrator, Component Assembler, and Component Recycler are material-bound: their counts are set by the materials their work eats, and the table sets only their Rush clock.
 
 ## Objectives
 
@@ -153,7 +153,7 @@ Objectives come from `data/rngtech/work_orders/objectives/*.json`. Each entry na
 The mix should feel balanced, with no one kind dominating. Draft kinds, tuned by entry weight rather than fixed rules:
 
 - **Specific items:** one to three named items, each with its own count, such as "Smelt 96 Tin Dust and 64 Copper Dust". An entry lists options, each an item or fluid id (the input for the Crusher and Furnace, the output for the other machines), with a weight and a stage. The terminal picks the parts when it rolls the job, never the same option twice in one job. Each part counts separately, and the job is done when every part is.
-- **Groups of work:** one or two kinds of output, counted across every recipe of that kind, such as "Press 96 plates and 48 gears" on the Metal Press (by mold: plates, gears, casings, connectors) or "Calibrate 24 Logic components" on the Resonance Calibrator (by calibration family). A group entry uses `"filter": "group"` with options naming the groups its family reports.
+- **Groups of work:** one or two kinds of output, counted across every recipe of that kind, such as "Press 128 plates and 64 gears" on the Metal Press (by mold: plates, gears, casings, connectors) or "Calibrate 24 Logic components" on the Resonance Calibrator (by calibration family). A group entry uses `"filter": "group"` with options naming the groups its family reports.
 - **Any work of a stage:** a count of any completed work whose recipe is at or above a stage, such as "Crush 256 items of Stage 6 or higher".
 - **Broad counts:** a large count of any completed work, with no stage or item filter, such as "Smelt 768 items".
 - **Work with a machine filter:** a count of work done a particular way, such as "Smelt 192 items with the heat slider at 50% or more" or "Crush 256 ores that need Processing Level 6 or more".
@@ -179,8 +179,8 @@ Counts are illustrative; the shipped ranges are in the objective files.
 | Furnace | Any work of a stage | Smelt 640 items of work of Stage 5 or higher |
 | Furnace | Machine filter | Smelt 140 items of work with the heat slider at 50% or more |
 | Furnace | Stat goal | Reach 1.6 Heat Transfer |
-| Alloy Furnace | Any work of a stage | Alloy 110 items of work from Stage 6+ recipes |
-| Metal Press | Group | Press 96 plates and 48 gears |
+| Alloy Furnace | Any work of a stage | Alloy 240 items of work from Stage 6+ recipes |
+| Metal Press | Group | Press 128 plates and 64 gears |
 | Metal Press | Streak | Press 200 times in a row without a failure |
 | Melter | Specific fluid | Make 32 B of Lubricant |
 | Resonance Calibrator | Streak | Calibrate 12 components in a row at 80+ stability |
@@ -315,7 +315,7 @@ Conditions only add costs, and a domain check fails on any condition that raises
 
 ## Delivery Phases
 
-Every phase shipped. [Open Items](#open-items) lists what is left to tune, and [Deferred](#deferred) what waits until after 2.0.
+Every phase shipped. [Deferred](#deferred) lists what waits until after 2.0.
 
 1. **PRD and state.** This document and [its state page](work-orders-state.md).
 2. **Order data and storage:** the readable job data, the `rngtech:work_orders` machine component with three slots and an active index, drop carry, and round-trip checks.
@@ -438,9 +438,9 @@ Resolved 2026-10-26, before release:
 - Thin Margins and drive bay panels are dropped.
 - Veteran Crew, condition data that packs can replace, naming conditions in a template, and Jade for the Forestry Companion are deferred until after 2.0. The Bonus Summary section waits until playtesters ask for it.
 
-## Open Items
+Resolved 2026-10-31:
 
-- Playtest timings for every family's job sizes. Only the Crusher and Furnace come from the simulation; the others are estimated from chassis base stats.
+- The estimated speed rows are measured, not playtested: `WorkOrderTimingGameTests` runs each family's bare build against an Any-work chip, and the table is that speed times the good-to-bare ratio. The Battery Cell counts as part of a bare build, since a machine without one runs at 0.85x. Heated machines ran far faster than the base-stat estimate, because Heat Cores and Crucibles add Thermal Conductivity, so Alloy Furnace jobs grew about 1.7x (Tiers I and II) and 2.6x (Tiers III to V), and Metal Press jobs 1.3x. The Recycler's Disassembly Head and the Calibrator's Stage 7 Nullite Coil make those Rush clocks tighter; their counts stay material-bound. The good-to-bare ratios are still assumptions until players report job times.
 
 ## Deferred
 
