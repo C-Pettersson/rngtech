@@ -110,7 +110,7 @@ Current slot rule of thumb:
 | Instant Process and Super Output chance | Suffix |
 | Conditional behavior flags | Enchant, suffix, or fixed identity behavior depending on the behavior |
 
-Rare machines can have at most three prefixes and three suffixes.
+Rare machines can have at most three prefixes and three suffixes. Jewels are the exception: two of each, and a Rare jewel rolls three or four affixes at `50/50`. Every jewel family has one tier, so tier operations never apply to a jewel, and the three colours share one pool that `JewelColour` reweights at roll time (home lines `150`, away lines `60`, chase lines their own weight, and only a colour's own attribute-threshold line). Their roll rules sit in `RollTuning`, beside the modular tool tuning.
 
 Implicit authored modifiers and behavior flags do not count against Magic or Rare prefix/suffix limits.
 

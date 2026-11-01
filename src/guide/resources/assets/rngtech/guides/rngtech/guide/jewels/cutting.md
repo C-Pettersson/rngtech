@@ -2,7 +2,7 @@
 navigation:
   title: "Cutting"
   parent: jewels.md
-  position: 1
+  position: 2
   icon: rngtech:drive_jewel
 ---
 

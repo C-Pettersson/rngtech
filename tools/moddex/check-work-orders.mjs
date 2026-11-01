@@ -31,6 +31,9 @@ const REWARD_ITEMS = new Set([
     "rngtech:volatile_catalyst",
     "rngtech:ascension_matrix",
     "rngtech:mirror_catalyst",
+    "rngtech:control_jewel",
+    "rngtech:drive_jewel",
+    "rngtech:reserve_jewel",
 ]);
 
 // The Work Order families whose machines have a Gear slot for each Unique host. Battery Cells power every machine, so they

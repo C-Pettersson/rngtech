@@ -3,6 +3,7 @@ package com.rngtech.rpg.jewel;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.ModifierDefinition;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.util.StringRepresentable;
 
 import java.util.Locale;
@@ -23,6 +24,7 @@ public enum JewelColour implements StringRepresentable {
             JewelAffixes.CAPACITIVE_GROUP, JewelAffixes.DEEP_GROUP, JewelAffixes.THRIFTY_GROUP,
             JewelAffixes.OUTPUT_GROUP, JewelAffixes.RESERVE_GROUP, JewelAffixes.DEPTH_GROUP));
 
+    public static final Codec<JewelColour> CODEC = StringRepresentable.fromEnum(JewelColour::values);
     /** A home line's share of the pool against an ordinary line's {@code 100}. */
     public static final int HOME_WEIGHT = 150;
     /** An away line's share: still common enough that a Control jewel can carry speed. */

@@ -4,7 +4,7 @@
 
 PRD status: Accepted
 
-Implementation status: In progress on `feature/jewels-bonus-output-7b4ab9`. The Bonus Output cap (phase 2), the jewel items and pool (phase 3), the tree sockets (phase 4), and the body sockets (phase 5) are implemented; sources and refinement polish (phase 6) and the remaining documentation follow on the same branch.
+Implementation status: Implemented on `feature/jewels-bonus-output-7b4ab9` (2026-11-01), awaiting playtest. Deferred: body sockets and a Jewels tab for the Forestry Companion, and the Bonus Summary section.
 
 Release: 2.0
 

@@ -43,6 +43,10 @@ A Stage 3 or higher [Resonance Calibrator](resonance-calibrator.md) cuts a Jewel
 
 The cut's stability sets the jewel's Refinement Potential: 2 RP below 50%, 3 RP from 50%, and 4 RP from 80%. A jewel comes out of the Calibrator **Unidentified**. Put it alone in a crafting grid to identify it, like any other [rolled item](rarity-and-affixes.md#identification).
 
+### Finding jewels
+
+Uncut jewels also turn up in village, mineshaft, and ruined portal chests, and more often in igloo basements, bastion treasure rooms, and Nether fortresses. Tier III and higher [Work Orders](work-orders.md) can pay one. A found jewel comes Unidentified and was never cut, so it identifies with 2 to 4 RP at random.
+
 ## Rarity and affixes
 
 A jewel holds up to two prefixes and two suffixes. A Magic jewel rolls one or two lines. A Rare jewel rolls three or four. Every jewel line has one tier, so refinement changes which lines a jewel has and how high they rolled, never a tier.
