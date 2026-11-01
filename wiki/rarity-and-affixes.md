@@ -43,9 +43,11 @@ Rarity sets how many affixes an item can hold.
 | Rarity | Prefixes | Suffixes | Notes |
 |---|---:|---:|---|
 | **Normal** | 0 | 0 | Base stats only. |
-| **Magic** | 1 | 1 | Named after its affixes, for example "Hellish Iron Furnace Chassis of Smelting". |
-| **Rare** | up to 3 | up to 3 | Rolls three of each when crafted, if enough different affixes fit the item. The name uses its first prefix and first suffix. |
+| **Magic** | up to 1 | up to 1 | Rolls one or two affixes when crafted. Named after its affixes, for example "Hellish Iron Furnace Chassis of Smelting". |
+| **Rare** | up to 3 | up to 3 | Rolls three to six affixes when crafted. The name uses its first prefix and first suffix. |
 | **Unique** | — | — | Found, not crafted. Rolled stat lines, no RP, and only a [Volatile Catalyst](#corruption) can change it. |
+
+Each affix goes to a random side that still has room. A Rare rolls 3 affixes 35% of the time, 4 affixes 35% of the time, 5 affixes 20% of the time, and 6 affixes 10% of the time. Most crafted items therefore have open slots. Use an [Affix Injector](affix-forge.md#catalysts) to fill them with your RP. An item rolls fewer affixes if not enough different affixes fit it.
 
 [Uniques](uniques.md) have their own page: where to find them, how their ranged stats roll, and what each one does.
 
@@ -56,7 +58,7 @@ The odds depend on the item's [stage](stages.md):
 | Item stage | Normal | Magic | Rare |
 |---|---:|---:|---:|
 | 0 | 35% | 50% | 15% |
-| 1–4 | — | 70% | 30% |
+| 1–4 | — | 35% | 65% |
 | 5 and higher | 50% | 40% | 10% |
 
 Stage 1–4 items are never Normal, so the gear you build early always shows some affixes. From Stage 5 up, a Normal roll is common, and the [Affix Forge](affix-forge.md) does more of the work.

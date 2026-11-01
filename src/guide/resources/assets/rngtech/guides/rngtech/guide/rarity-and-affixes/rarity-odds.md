@@ -13,7 +13,7 @@ The odds depend on the item's [stage](rngtech:stages.md):
 | Item stage | Normal | Magic | Rare |
 |---|---:|---:|---:|
 | 0 | 35% | 50% | 15% |
-| 1–4 | — | 70% | 30% |
+| 1–4 | — | 35% | 65% |
 | 5 and higher | 50% | 40% | 10% |
 
 Stage 1–4 items are never Normal, so the gear you build early always shows some affixes. From Stage 5 up, a Normal roll is common, and the [Affix Forge](rngtech:affix-forge.md) does more of the work.
