@@ -10,7 +10,7 @@ navigation:
 
 | Side | Behavior |
 |---|---|
-| Top and sides | Insert into the input, catalyst, and stabilizer slots. Each slot accepts only items a calibration recipe uses there. |
+| Top and sides | Insert into the input, catalyst, and stabilizer slots. Each slot accepts only items that a recipe for the selected pattern and the current input uses there. |
 | Bottom | Extracts finished components. |
 | Any | Accepts FE, for example from a [Universal Cable](rngtech:universal-cable.md). |
 
