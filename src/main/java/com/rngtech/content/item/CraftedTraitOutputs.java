@@ -7,6 +7,8 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierEligibilityProfile;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
+import com.rngtech.rpg.jewel.JewelAffixes;
+import com.rngtech.rpg.jewel.JewelColour;
 import com.rngtech.rpg.unique.UniqueDefinition;
 import com.rngtech.rpg.unique.UniqueItems;
 
@@ -92,7 +94,8 @@ public final class CraftedTraitOutputs {
                 || stack.getItem() instanceof MinersCompanionItem
                 || stack.getItem() instanceof ForestryCartItem
                 || stack.getItem() instanceof ToolHeadItem
-                || stack.getItem() instanceof ToolRodItem;
+                || stack.getItem() instanceof ToolRodItem
+                || stack.getItem() instanceof JewelItem;
     }
 
     public static ItemStack unidentifiedVariant(ItemStack stack) {
@@ -196,6 +199,17 @@ public final class CraftedTraitOutputs {
             );
             return true;
         }
+        if (stack.getItem() instanceof JewelItem jewel) {
+            // A jewel's Refinement Potential follows its cut, not its stage: Annealed luck has nothing to improve.
+            MachineTraits rolled = rollTraits(false, ModifierEligibilityProfiles.forJewel(jewel.colour()), JewelColour.COMPONENT_STAGE, random);
+            Integer stability = JewelItem.cutStability(stack);
+            int potential = stability == null ? JewelAffixes.uncutRefinementPotential(random) : JewelAffixes.refinementPotential(stability);
+            stack.set(
+                    ModDataComponents.MACHINE_TRAITS.get(),
+                    new MachineTraits(rolled.rarity(), potential, rolled.modifiers(), rolled.behaviors())
+            );
+            return true;
+        }
         return false;
     }
 
@@ -228,6 +242,9 @@ public final class CraftedTraitOutputs {
         if (stack.getItem() instanceof ToolRodItem rod) {
             return rod.material().stage();
         }
+        if (stack.getItem() instanceof JewelItem) {
+            return JewelColour.COMPONENT_STAGE;
+        }
         return 0;
     }
 
@@ -256,6 +273,9 @@ public final class CraftedTraitOutputs {
         }
         if (stack.getItem() instanceof ToolRodItem) {
             return key(MachineType.TOOL_ROD.name());
+        }
+        if (stack.getItem() instanceof JewelItem jewel) {
+            return jewel.colour().profileId();
         }
         return "";
     }

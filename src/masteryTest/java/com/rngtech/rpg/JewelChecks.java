@@ -1,0 +1,158 @@
+package com.rngtech.rpg;
+
+import com.rngtech.rpg.jewel.JewelAffixes;
+import com.rngtech.rpg.jewel.JewelColour;
+import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.unique.UniqueStatReaders;
+
+import net.minecraft.util.RandomSource;
+
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/** The jewel pool: one tier per line, every line read somewhere, the 2/2 slot limit, and the colour weighting. */
+public final class JewelChecks {
+    private static final int ROLLS = 4_000;
+    private static int checks;
+
+    private JewelChecks() {
+    }
+
+    public static int run() {
+        checks = 0;
+        onePoolOneTierEachReadSomewhere();
+        colourWeightsTheSharedPool();
+        jewelsHoldTwoOfEachSide();
+        refinementPotentialFollowsTheCut();
+        return checks;
+    }
+
+    private static void onePoolOneTierEachReadSomewhere() {
+        List<ModifierDefinition> pool = ModifierEligibilityProfiles.forJewel(JewelColour.CONTROL).definitions();
+        for (JewelColour colour : JewelColour.values()) {
+            ModifierEligibilityProfile profile = ModifierEligibilityProfiles.forJewel(colour);
+            require(profile.id().equals(colour.profileId()), colour + " profile id matches its colour");
+            require(profile.definitions().equals(pool), colour + " shares the one jewel pool");
+            require(profile.rollableBehaviors().isEmpty(), "jewels roll no behaviors");
+        }
+        require(pool.size() == 20, "the jewel pool has twenty families, found " + pool.size());
+        Set<String> thresholds = Set.of(JewelAffixes.MOMENTUM_ID, JewelAffixes.POISE_ID, JewelAffixes.DEPTH_ID);
+        for (ModifierDefinition definition : pool) {
+            require(definition.id().startsWith("jewel_") && definition.modGroup().equals(definition.id()),
+                    definition.id() + " uses its own jewel group");
+            for (ModifierEffectDefinition effect : definition.effects()) {
+                require(effect.rangeForTier(1).equals(effect.rangeForTier(7)), definition.id() + " has one tier");
+                require(readSomewhere(effect.stat()), definition.id() + " is read by some machine: " + effect.stat());
+            }
+            require(definition.canRoll(), definition.id() + " rolls");
+            require(ModifierEligibilityProfiles.hasCustomDescription(definition) == thresholds.contains(definition.id()),
+                    definition.id() + " describes its condition only when it has one");
+        }
+        require(JewelAffixes.thresholdColour(JewelAffixes.MOMENTUM_ID) == JewelColour.DRIVE
+                        && JewelAffixes.thresholdAttribute(JewelAffixes.POISE_ID) == MachineStat.CONTROL
+                        && JewelAffixes.thresholdColour(JewelAffixes.DEPTH_ID) == JewelColour.RESERVE
+                        && JewelAffixes.thresholdColour("jewel_pace") == null,
+                "threshold lines name their colour and attribute");
+    }
+
+    private static boolean readSomewhere(MachineStat stat) {
+        // Attributes and Mastery XP gain are machine-wide: every Mastery machine reads them outside the family table.
+        if (MachineStat.isMachineWide(stat)) {
+            return true;
+        }
+        for (MachineMasteryFamily family : MachineMasteryFamily.values()) {
+            if (family.supports(stat)) {
+                return true;
+            }
+        }
+        for (UniqueStatReaders.Reader reader : UniqueStatReaders.Reader.values()) {
+            if (UniqueStatReaders.reads(reader, stat)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void colourWeightsTheSharedPool() {
+        ModifierEligibilityProfile drive = ModifierEligibilityProfiles.forJewel(JewelColour.DRIVE);
+        Map<String, ModifierDefinition> byId = new HashMap<>();
+        drive.definitions().forEach(definition -> byId.put(definition.id(), definition));
+        require(drive.rollWeight(byId.get("jewel_pace")) == JewelColour.HOME_WEIGHT, "a home line weighs 150 on its colour");
+        require(drive.rollWeight(byId.get("jewel_frugal")) == JewelColour.AWAY_WEIGHT, "an away line weighs 60");
+        require(drive.rollWeight(byId.get("jewel_headroom")) == 25, "Headroom keeps its chase weight on every colour");
+        require(drive.rollWeight(byId.get(JewelAffixes.MOMENTUM_ID)) == 20, "a colour's own threshold line keeps its weight");
+        require(drive.rollWeight(byId.get(JewelAffixes.POISE_ID)) == 0 && drive.rollWeight(byId.get(JewelAffixes.DEPTH_ID)) == 0,
+                "another colour's threshold line never rolls");
+        require(ModifierEligibilityProfiles.forMachine(MachineType.CRUSHER).rollWeight(byId.get("jewel_pace")) == 100,
+                "other profiles keep the family weight");
+
+        for (JewelColour colour : JewelColour.values()) {
+            Map<String, Integer> seen = new HashMap<>();
+            RandomSource random = RandomSource.create(7L + colour.ordinal());
+            for (int roll = 0; roll < ROLLS; roll++) {
+                for (MachineModifier modifier : MachineTraitRoller.roll(ModifierEligibilityProfiles.forJewel(colour), JewelColour.COMPONENT_STAGE, random, false).modifiers()) {
+                    seen.merge(modifier.affixId(), 1, Integer::sum);
+                }
+            }
+            String ownThreshold = switch (colour) {
+                case CONTROL -> JewelAffixes.POISE_ID;
+                case DRIVE -> JewelAffixes.MOMENTUM_ID;
+                case RESERVE -> JewelAffixes.DEPTH_ID;
+            };
+            for (String threshold : List.of(JewelAffixes.MOMENTUM_ID, JewelAffixes.POISE_ID, JewelAffixes.DEPTH_ID)) {
+                require(threshold.equals(ownThreshold) == seen.containsKey(threshold), colour + " rolls only its own threshold line: " + seen);
+            }
+            String home = "jewel_" + colour.getSerializedName();
+            String away = "jewel_" + (colour == JewelColour.CONTROL ? "drive" : "control");
+            require(seen.getOrDefault(home, 0) > seen.getOrDefault(away, 0), colour + " rolls its own attribute more than another's: " + seen);
+        }
+    }
+
+    private static void jewelsHoldTwoOfEachSide() {
+        RandomSource random = RandomSource.create(99L);
+        Map<Rarity, Integer> rarities = new EnumMap<>(Rarity.class);
+        int three = 0;
+        int four = 0;
+        for (int roll = 0; roll < ROLLS; roll++) {
+            MachineTraits traits = MachineTraitRoller.roll(ModifierEligibilityProfiles.forJewel(JewelColour.RESERVE), JewelColour.COMPONENT_STAGE, random, false);
+            rarities.merge(traits.rarity(), 1, Integer::sum);
+            long prefixes = traits.modifiers().stream().filter(modifier -> modifier.slot() == ModifierSlot.PREFIX).count();
+            long suffixes = traits.modifiers().stream().filter(modifier -> modifier.slot() == ModifierSlot.SUFFIX).count();
+            require(prefixes <= 2 && suffixes <= 2, "a jewel holds at most two prefixes and two suffixes");
+            if (traits.rarity() == Rarity.RARE) {
+                int count = traits.modifiers().size();
+                require(count == 3 || count == 4, "a Rare jewel rolls three or four lines, rolled " + count);
+                if (count == 3) { three++; } else { four++; }
+            } else if (traits.rarity() == Rarity.MAGIC) {
+                require(traits.modifiers().size() <= 2, "a Magic jewel rolls one or two lines");
+            }
+        }
+        require(rarities.getOrDefault(Rarity.NORMAL, 0) == 0 && rarities.getOrDefault(Rarity.RARE, 0) > ROLLS / 2,
+                "a Stage 3 jewel is Magic or Rare, mostly Rare: " + rarities);
+        require(three > ROLLS / 8 && four > ROLLS / 8, "three and four lines both come up often: " + three + " / " + four);
+
+        MachineTraits part = MachineTraitRoller.roll(ModifierEligibilityProfiles.forMachine(MachineType.CRUSHER), 7, RandomSource.create(1L), false);
+        require(part.modifiers().size() <= 6, "other items keep the three-per-side limit");
+    }
+
+    private static void refinementPotentialFollowsTheCut() {
+        require(JewelAffixes.refinementPotential(0) == 2 && JewelAffixes.refinementPotential(49) == 2, "a rough cut gives 2 RP");
+        require(JewelAffixes.refinementPotential(50) == 3 && JewelAffixes.refinementPotential(79) == 3, "a fair cut gives 3 RP");
+        require(JewelAffixes.refinementPotential(80) == 4 && JewelAffixes.refinementPotential(100) == 4, "a fine cut gives 4 RP");
+        RandomSource random = RandomSource.create(3L);
+        for (int roll = 0; roll < 200; roll++) {
+            int potential = JewelAffixes.uncutRefinementPotential(random);
+            require(potential >= 2 && potential <= 4, "an uncut jewel stays inside the cut range");
+        }
+    }
+
+    private static void require(boolean condition, String message) {
+        checks++;
+        if (!condition) {
+            throw new AssertionError(message);
+        }
+    }
+}

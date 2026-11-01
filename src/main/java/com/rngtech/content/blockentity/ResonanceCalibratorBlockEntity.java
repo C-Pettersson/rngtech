@@ -883,6 +883,8 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         int rp = currentRefinementPotentialRange(recipe, stats).roll(level.random);
         ItemStack result = recipeResult.stackWithState(recipe.family(), stability, rp);
         result.setCount(Math.min(result.getMaxStackSize(), result.getCount() * operations));
+        // An output that rolls traits, such as a cut jewel, leaves the Calibrator Unidentified like a crafted part.
+        CraftedTraitOutputs.seedIfMissing(result, level.random);
         return result;
     }
 

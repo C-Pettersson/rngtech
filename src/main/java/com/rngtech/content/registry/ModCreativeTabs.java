@@ -44,6 +44,7 @@ import com.rngtech.content.tool.ToolHeadFamily;
 import com.rngtech.content.tool.ToolHeadMaterial;
 import com.rngtech.content.tool.ToolRodMaterial;
 import com.rngtech.rpg.PhaseArrayRules;
+import com.rngtech.rpg.jewel.JewelColour;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -282,6 +283,10 @@ public final class ModCreativeTabs {
                         }
                         output.accept(ModItems.CALIBRATED_DIAMOND_CRYSTAL.get());
                         output.accept(ModItems.CAVITATION_ROTOR_HUB.get());
+                        output.accept(ModItems.JEWEL_BLANK.get());
+                        for (JewelColour colour : JewelColour.values()) {
+                            output.accept(ModItems.jewel(colour).get());
+                        }
                         output.accept(ModItems.PLATE_MOLD.get());
                         output.accept(ModItems.CASING_MOLD.get());
                         output.accept(ModItems.GEAR_MOLD.get());

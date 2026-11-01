@@ -4,7 +4,7 @@
 
 PRD status: Accepted
 
-Implementation status: Planned (the Bonus Output cap slice is in progress)
+Implementation status: In progress on `feature/jewels-bonus-output-7b4ab9`. The Bonus Output cap (phase 2) is implemented; the jewel phases follow on the same branch.
 
 Release: 2.0
 
@@ -98,7 +98,7 @@ The roller's `MAGIC_SLOT_LIMIT` and `RARE_SLOT_LIMIT` are constants today, and t
 
 ### The jewel pool
 
-One pool, machine-agnostic, every family read by at least one machine family. Values sit around the lower half of the machine Tier 3 table, so one jewel line is worth about one and a half ordinary tree nodes and a four-line Rare about the same as a Magic Gear part. Weights are per colour: a colour's **home** lines roll at `150`, **away** lines at `60`, and chase lines at the weight shown on every colour.
+One pool, machine-agnostic, every family read by at least one machine family. Values sit around the lower half of the machine Tier 3 table, so one jewel line is worth about one and a half ordinary tree nodes and a four-line Rare about the same as a Magic Gear part. Weights are per colour: a colour's **home** lines roll at `150`, **away** lines at `60`, and chase lines at the weight shown on every colour. The three profiles list the same twenty definitions; `JewelColour` holds the home groups and reweights the pool at roll time, so ModDex shows the family weights, not the colour's.
 
 Prefixes:
 
@@ -202,7 +202,7 @@ Maximum Bonus Output stays out of the corruption pools, because it unlocks yield
 
 ### Sources
 
-- **Cut at the Resonance Calibrator.** A Jewel Blank is a crafting-grid item: four Gold Nuggets around a colour stone (Prismarine Crystals for Control, a Gold Ingot for Drive, a Block of Redstone for Reserve). A Stage 3 Structural calibration cuts it into the jewel; the cut's stability sets the jewel's Refinement Potential, so a well-tuned Calibrator cuts better jewels. The jewel comes out Unidentified. This is the mod-challenge gate, as the Volatile Catalyst and the Seals are gated.
+- **Cut at the Resonance Calibrator.** A Jewel Blank is a crafting-grid item: four Gold Nuggets around an Amethyst Shard. A Stage 3 Structural calibration cuts it into a jewel, and the catalyst picks the colour: Prismarine Crystals for Control, a Gold Ingot for Drive, a Block of Redstone for Reserve. The cut's stability (30-90 before Gear) sets the jewel's Refinement Potential (2 below 50, 3 below 80, 4 from 80), so a well-tuned Calibrator cuts better jewels. The jewel comes out Unidentified, like a crafted part. This is the mod-challenge gate, as the Volatile Catalyst and the Seals are gated.
 - **Work Orders.** Tier III and higher jobs add a jewel kind to `rngtech:challenges/work_order`, roughly one jewel per fifteen listed jobs, Tier V jobs guaranteeing Rare through a loot function. `check-work-orders.mjs` holds the rate.
 - **Vanilla chests, configurable.** An unidentified jewel of a random colour sits in the same structure tables the Uniques use, through `neoforge:add_table` loot modifiers, at a draft 4% per common chest and 8% per uncommon chest, behind the common config keys `jewels.loot.enabled` and `jewels.loot.<colour>.enabled`. The Calibrator stays the reliable source; chests are the early surprise.
 

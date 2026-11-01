@@ -1,5 +1,7 @@
 package com.rngtech.rpg;
 
+import com.rngtech.rpg.jewel.JewelColour;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -38,4 +40,9 @@ public record ModifierEligibilityProfile(
                 .toList();
     }
 
+    /** {@code definition}'s roll weight on this profile: a jewel colour reweights the shared pool, every other profile keeps the family weight. */
+    public int rollWeight(ModifierDefinition definition) {
+        JewelColour colour = JewelColour.forProfile(id);
+        return colour == null ? definition.rollWeight() : colour.rollWeight(definition);
+    }
 }

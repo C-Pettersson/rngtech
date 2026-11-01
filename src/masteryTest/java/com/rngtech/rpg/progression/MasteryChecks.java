@@ -11,6 +11,7 @@ import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.CodecRoundTripChecks;
 import com.rngtech.rpg.CorruptionChecks;
 import com.rngtech.rpg.CrusherYieldChecks;
+import com.rngtech.rpg.JewelChecks;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierEffect;
 import com.rngtech.rpg.MachineStat;
@@ -72,6 +73,7 @@ public final class MasteryChecks {
         checks += com.rngtech.rpg.AnnealingChecks.run();
         checks += com.rngtech.rpg.RarityRollChecks.run();
         checks += CrusherYieldChecks.run();
+        checks += JewelChecks.run();
         checks += com.rngtech.content.energy.CorrosionCellLoadChecks.run();
         checks += RefinementChecks.run();
         checks += CorruptionChecks.run();
