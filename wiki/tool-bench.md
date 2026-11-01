@@ -44,6 +44,8 @@ Mine a placed Tool Bench with a pickaxe. It drops itself.
 
 To build a tool, leave the Tool slot empty, put a [Tool Head](modular-tools.md#parts), a Tool Rod, and optionally a Battery Cell in the Build tab, and press **Apply**. The head's type picks the tool; see [Tool types](modular-tools.md#tool-types). A Hammer, Digger, or Treefeller also needs a Tiny Anvil in the [Gear](#gear) tab.
 
+An unidentified head, rod, or Battery Cell rolls its traits when you press **Apply**. This also applies when you change parts.
+
 ### Changing parts
 
 Put a finished tool in the Tool slot, put a new head, rod, or Battery Cell in the matching Build slot, and press **Apply**. The old part returns to your inventory with its rolls intact. Press **Remove Battery Cell** to take out just the cell, or **Disassemble** to break the tool back into its head, rod, and cell.

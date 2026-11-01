@@ -29,9 +29,7 @@ The placed bench faces you, with a bed of gravel between its legs. A tool in its
 
 ## Usage
 
-### Building a tool
-
-To build a tool, leave the Tool slot empty, put a [Tool Head](rngtech:modular-tools/parts.md), a Tool Rod, and optionally a Battery Cell in the Build tab, and press **Apply**. The head's type picks the tool; see [Tool types](rngtech:modular-tools.md#tool-types). A Hammer, Digger, or Treefeller also needs a Tiny Anvil in the [Gear](rngtech:tool-bench/gear.md) tab.
+- [Building a tool](rngtech:tool-bench/building-a-tool.md)
 
 ### Changing parts
 
@@ -51,7 +49,9 @@ The Tool Bench has no item automation. With an Energy Connector installed, it ac
 
 ## Obtaining
 
-- [Crafting](rngtech:tool-bench/crafting.md)
+### Crafting
+
+<RecipesFor id="rngtech:tool_bench" />
 
 ### Breaking
 

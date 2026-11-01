@@ -2,7 +2,7 @@
 navigation:
   title: "Gear"
   parent: tool-bench.md
-  position: 2
+  position: 3
   icon: rngtech:tool_bench
 ---
 

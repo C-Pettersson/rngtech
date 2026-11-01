@@ -5,6 +5,7 @@ import com.rngtech.content.block.BatteryChassisBlock;
 import com.rngtech.content.block.CableBlock;
 import com.rngtech.content.block.UniversalConnectorBlock;
 import com.rngtech.content.cable.CableGraph;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.menu.BatteryChassisMenu;
 import com.rngtech.content.registry.ModBlockEntities;
@@ -165,7 +166,7 @@ public class BatteryChassisBlockEntity extends BaseMachineBlockEntity implements
         }
         block = chassisBlock;
         burstTicksRemaining = block.material().burstDuration();
-        inventory = new ItemStackHandler(maximumCellSlots()) {
+        inventory = new IdentifyingItemHandler(maximumCellSlots(), this::getLevel) {
             @Override
             public boolean isItemValid(int slot, ItemStack stack) {
                 return slot >= 0 && slot < activeCellSlots() && isCell(stack);

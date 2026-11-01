@@ -58,7 +58,7 @@ Cells roll affixes like any other Gear. Capacity affixes come in two kinds: flat
 
 ## Cells in machines
 
-Most powered machines have one Battery Cell slot on their Gear tab. FE you feed the machine fills its small internal buffer first, then charges the cell. While working, the machine spends its buffer first, then draws from the cell.
+Most powered machines have one Battery Cell slot on their Gear tab. An unidentified cell rolls its traits when you install it. FE you feed the machine fills its small internal buffer first, then charges the cell. While working, the machine spends its buffer first, then draws from the cell.
 
 The cell's rates still apply inside a machine. It accepts at most its Input rate each tick and hands over at most its Output rate each tick. When a machine is running on stored power alone, a low-tier cell can limit how fast it works.
 

@@ -2,6 +2,7 @@ package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.ToolBenchBlock;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.CraftedTraitOutputs;
 import com.rngtech.content.item.EnergyConnectorItem;
 import com.rngtech.content.item.MinersCompanionItem;
 import com.rngtech.content.item.ModularToolItem;
@@ -551,11 +552,12 @@ public class ToolBenchBlockEntity extends BlockEntity implements MenuProvider {
             ItemStack batteryCell
     ) {
         int storedWear = Math.max(ModularToolItem.storedWear(head), ModularToolItem.storedWear(rod));
-        ItemStack storedHead = head.copy();
-        ItemStack storedRod = rod.copy();
+        ItemStack storedHead = identified(head.copy());
+        ItemStack storedRod = identified(rod.copy());
+        ItemStack storedCell = identified(batteryCell.copy());
         ModularToolItem.clearStoredWear(storedHead);
         ModularToolItem.clearStoredWear(storedRod);
-        FieldToolAssembly assembly = new FieldToolAssembly(storedHead, storedRod, batteryCell);
+        FieldToolAssembly assembly = new FieldToolAssembly(storedHead, storedRod, storedCell);
         if (!assembly.isValidFor(family)) {
             return ItemStack.EMPTY;
         }
@@ -564,10 +566,18 @@ public class ToolBenchBlockEntity extends BlockEntity implements MenuProvider {
         FieldToolEnchantments.migrateOuterEnchantments(result);
         ModularToolItem.refreshMaxDamage(result);
         ModularToolItem.applyDamageWear(result, storedWear);
-        if (!batteryCell.isEmpty() && !ModularToolItem.isBatteryAccepted(result, batteryCell)) {
+        if (!storedCell.isEmpty() && !ModularToolItem.isBatteryAccepted(result, storedCell)) {
             return ItemStack.EMPTY;
         }
         return result;
+    }
+
+    /** Rolls an unidentified part as it goes onto the tool. */
+    private ItemStack identified(ItemStack part) {
+        if (level != null && !level.isClientSide && CraftedTraitOutputs.isUnidentified(part)) {
+            CraftedTraitOutputs.rollIfMissing(part, level.random);
+        }
+        return part;
     }
 
     private boolean setRefinementTarget(boolean headTarget, ItemStack refinedTarget) {

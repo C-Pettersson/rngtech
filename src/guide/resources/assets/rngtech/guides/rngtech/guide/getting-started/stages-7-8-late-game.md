@@ -2,7 +2,7 @@
 navigation:
   title: "Stages 7–8: late game"
   parent: getting-started.md
-  position: 4
+  position: 5
   icon: rngtech:wooden_crusher_chassis
 ---
 

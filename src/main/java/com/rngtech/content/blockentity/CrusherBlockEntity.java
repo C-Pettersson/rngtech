@@ -3,6 +3,7 @@ package com.rngtech.content.blockentity;
 import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.CrusherBlock;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.CrushHeadItem;
 import com.rngtech.content.item.GearParts;
@@ -127,7 +128,12 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
 
-    private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
+    private final ItemStackHandler inventory = new IdentifyingItemHandler(SLOT_COUNT, this::getLevel) {
+        @Override
+        protected boolean identifiesSlot(int slot) {
+            return slot == SLOT_FUEL || slot == SLOT_CRUSH_HEAD;
+        }
+
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (slot == SLOT_OUTPUT) {

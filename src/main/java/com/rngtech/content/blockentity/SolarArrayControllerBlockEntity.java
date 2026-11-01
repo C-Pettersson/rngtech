@@ -3,6 +3,7 @@ package com.rngtech.content.blockentity;
 import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.energy.SolarPanelMaterial;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.menu.GenerationMenuSupport;
@@ -95,7 +96,7 @@ public class SolarArrayControllerBlockEntity extends BaseMachineBlockEntity impl
     private static final int DATA_PACK_GENERATION_MULTIPLIER = 23;
     private static final int STAT_SCALE = 100;
 
-    private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(GEAR_SLOT_COUNT, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return switch (slot) {

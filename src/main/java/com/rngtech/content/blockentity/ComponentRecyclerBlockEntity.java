@@ -3,6 +3,7 @@ package com.rngtech.content.blockentity;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.ComponentRecyclerBlock;
 import com.rngtech.content.block.HandCrankBlock;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.DisassemblyHeadItem;
 import com.rngtech.content.item.GearParts;
@@ -126,7 +127,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
             setChanged();
         }
     };
-    private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(GEAR_SLOT_COUNT, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (isManual()) {

@@ -2,7 +2,7 @@
 navigation:
   title: "When a machine underperforms"
   parent: getting-started.md
-  position: 9
+  position: 10
   icon: rngtech:wooden_crusher_chassis
 ---
 

@@ -2,7 +2,7 @@
 navigation:
   title: "Power basics"
   parent: getting-started.md
-  position: 5
+  position: 6
   icon: rngtech:wooden_crusher_chassis
 ---
 

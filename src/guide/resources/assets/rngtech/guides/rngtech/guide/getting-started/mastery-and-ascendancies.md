@@ -2,7 +2,7 @@
 navigation:
   title: "Mastery and Ascendancies"
   parent: getting-started.md
-  position: 8
+  position: 9
   icon: rngtech:wooden_crusher_chassis
 ---
 

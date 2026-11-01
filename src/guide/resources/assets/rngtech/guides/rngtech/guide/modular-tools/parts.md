@@ -22,4 +22,4 @@ The tool takes its name from its parts. The head material and tool type give the
 
 <RecipesFor id="rngtech:wooden_tool_rod" />
 
-See [Building a tool](rngtech:tool-bench.md#building-a-tool) for putting the parts together.
+See [Building a tool](rngtech:tool-bench/building-a-tool.md) for putting the parts together.

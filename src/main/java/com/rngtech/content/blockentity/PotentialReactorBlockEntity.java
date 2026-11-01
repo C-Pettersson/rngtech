@@ -3,6 +3,7 @@ package com.rngtech.content.blockentity;
 import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.PotentialReactorBlock;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.PotentialReactorPartItem;
 import com.rngtech.content.menu.GenerationMenuSupport;
@@ -129,7 +130,7 @@ public class PotentialReactorBlockEntity extends BaseMachineBlockEntity implemen
             setChanged();
         }
     };
-    private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(GEAR_SLOT_COUNT, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return switch (slot) {

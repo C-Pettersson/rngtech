@@ -3,6 +3,7 @@ package com.rngtech.content.dormant;
 import com.rngtech.RNGTech;
 import com.rngtech.RNGTechConfig;
 import com.rngtech.content.blockentity.MachineInfoSnapshot;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.loot.GlyphSources;
 import com.rngtech.rpg.dormant.DormantSite;
@@ -61,7 +62,7 @@ public final class DormantCore {
     }
 
     private final Host host;
-    private final ItemStackHandler cells = new ItemStackHandler(CELL_SLOTS) {
+    private final ItemStackHandler cells = new IdentifyingItemHandler(CELL_SLOTS, this::hostLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return BatteryCellItem.isBatteryCell(stack);
@@ -117,6 +118,10 @@ public final class DormantCore {
 
     public DormantCore(Host host) {
         this.host = host;
+    }
+
+    private Level hostLevel() {
+        return host.hostLevel();
     }
 
     public void tick(ServerLevel level) {

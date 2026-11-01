@@ -2,7 +2,7 @@
 navigation:
   title: "Stages 3–4: the steel factory"
   parent: getting-started.md
-  position: 2
+  position: 3
   icon: rngtech:wooden_crusher_chassis
 ---
 
