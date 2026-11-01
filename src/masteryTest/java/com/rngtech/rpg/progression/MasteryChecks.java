@@ -70,6 +70,7 @@ public final class MasteryChecks {
         checks += com.rngtech.rpg.SharedAffixChecks.run();
         checks += com.rngtech.rpg.PhaseArrayChecks.run();
         checks += com.rngtech.rpg.AnnealingChecks.run();
+        checks += com.rngtech.rpg.RarityRollChecks.run();
         checks += CrusherYieldChecks.run();
         checks += com.rngtech.content.energy.CorrosionCellLoadChecks.run();
         checks += RefinementChecks.run();

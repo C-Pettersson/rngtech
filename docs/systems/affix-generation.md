@@ -15,13 +15,13 @@ Use [Modifiers](../modifiers/index.md) for the modifier inventory and [Modifier 
 | Suffix | Rolled modifier after the item name. |
 | Enchant | Special modifier layer used for enchant-style effects. |
 
-Prefix and suffix modifiers each provide a named affix word. Magic machines use one prefix and one suffix in their generated name. Rare machines may have multiple prefix or suffix modifiers; their generated name uses the first prefix and first suffix, while the remaining affix words remain visible in tooltips.
+Prefix and suffix modifiers each provide a named affix word. Magic machines use their prefix and suffix, whichever they have, in their generated name. Rare machines may have multiple prefix or suffix modifiers; their generated name uses the first prefix and first suffix, while the remaining affix words remain visible in tooltips.
 
 When an item stack is created, its identity may add an authored base stat profile, fixed implicit modifiers, or fixed behavior flags, then its rarity roll adds actual prefix and suffix affixes from the legal affix pools. Refinement consumables operate on rolled affixes and do not remove authored base profiles or fixed identity implicits.
 
-Current generation rolls rarity and Refinement Potential independently. Rarity controls starting affix count, while Refinement Potential comes from component stage. Starting modifiers do not spend or reduce that rolled potential.
+Current generation rolls rarity and Refinement Potential independently. Rarity controls starting affix count (Magic one or two, Rare three to six weighted `35/35/20/10`, each landing on a random side with room, as in Path of Exile), while Refinement Potential comes from component stage. Starting modifiers do not spend or reduce that rolled potential.
 
-Current rarity weights are stage-sensitive. Stage `0` targets roll `35%` Normal, `50%` Magic, and `15%` Rare. Stage `1-4` targets roll `70%` Magic and `30%` Rare with no natural Normal outcome, making early crafted gear reliably show affixes while it is still likely to be replaced later. Stage `5+` targets roll `50%` Normal, `40%` Magic, and `10%` Rare. Unique remains authored-only.
+Current rarity weights are stage-sensitive. Stage `0` targets roll `35%` Normal, `50%` Magic, and `15%` Rare. Stage `1-4` targets roll `35%` Magic and `65%` Rare with no natural Normal outcome, so early crafted gear reliably shows affixes and usually leaves open slots for early Refinement Potential to fill. Stage `5+` targets roll `50%` Normal, `40%` Magic, and `10%` Rare. Unique remains authored-only.
 
 After rarity and slot-count rules choose a slot, generation uses two weighted steps. First, it filters legal affix families by target profile, slot, `CAN_ROLL`, target stats, and `mod_group` conflicts, then chooses one family by roll weight. Second, it chooses a tier for that family by combining the global tier weight, the family's tier weight, and component-stage weighting. Rarity controls affix count only; it does not control tier eligibility. Ordinary families default to family weight `100` and equal tier base weights unless code overrides them.
 
