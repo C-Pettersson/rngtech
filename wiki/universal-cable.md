@@ -17,6 +17,7 @@ wiki:
     - rngtech:gold_fluid_connector
     - rngtech:sparksteel_fluid_connector
     - rngtech:arclite_fluid_connector
+    - rngtech:crude_item_connector
     - rngtech:basic_item_connector
     - rngtech:copper_item_connector
     - rngtech:gold_item_connector
@@ -53,9 +54,9 @@ Cables, connectors, and modules do not roll rarity or affixes, and cannot be ref
 
 ### Crafting
 
-One craft makes 12 Cables or 2 Universal Connectors. The {{ item('rngtech:crude_energy_connector') }} is the only connector module you can craft by hand.
+One craft makes 12 Cables or 2 Universal Connectors. The {{ item('rngtech:crude_energy_connector') }} and {{ item('rngtech:crude_item_connector') }} are the only connector modules you can craft by hand.
 
-{{ crafting("rngtech:cable", "rngtech:universal_connector", "rngtech:crude_energy_connector", "rngtech:advanced_item_filter") }}
+{{ crafting("rngtech:cable", "rngtech:universal_connector", "rngtech:crude_energy_connector", "rngtech:crude_item_connector", "rngtech:advanced_item_filter") }}
 
 The network connectors have recipes only when their mod is installed:
 
@@ -173,6 +174,7 @@ The Item tab works the same way as the Fluid tab, with three Item Connector rows
 
 | Connector | Stage | Shipment | Every | Jam chance, pause |
 |---|---:|---:|---:|---:|
+| {{ item('rngtech:crude_item_connector') }} | 1 | 1 item | 12 s | 12%, 24 s |
 | {{ item('rngtech:basic_item_connector') }} | 1 | 1 item | 4 s | 12%, 8 s |
 | {{ item('rngtech:copper_item_connector') }} | 2 | 4 items | 2 s | 8%, 6 s |
 | {{ item('rngtech:gold_item_connector') }} | 3 | 16 items | 1 s | 5%, 4 s |

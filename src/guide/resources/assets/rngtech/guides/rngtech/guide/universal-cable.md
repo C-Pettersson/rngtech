@@ -20,6 +20,7 @@ item_ids:
   - rngtech:gold_fluid_connector
   - rngtech:sparksteel_fluid_connector
   - rngtech:arclite_fluid_connector
+  - rngtech:crude_item_connector
   - rngtech:basic_item_connector
   - rngtech:copper_item_connector
   - rngtech:gold_item_connector
@@ -66,6 +67,7 @@ The Item tab works the same way as the Fluid tab, with three Item Connector rows
 
 | Connector | Stage | Shipment | Every | Jam chance, pause |
 |---|---:|---:|---:|---:|
+| <ItemLink id="rngtech:crude_item_connector" /> | 1 | 1 item | 12 s | 12%, 24 s |
 | <ItemLink id="rngtech:basic_item_connector" /> | 1 | 1 item | 4 s | 12%, 8 s |
 | <ItemLink id="rngtech:copper_item_connector" /> | 2 | 4 items | 2 s | 8%, 6 s |
 | <ItemLink id="rngtech:gold_item_connector" /> | 3 | 16 items | 1 s | 5%, 4 s |
