@@ -69,16 +69,17 @@ CELL_X, CELL_Y, CELL_Z = 14.0, 4.25, 12.75
 JOB_LAMP = ((3.25, 11.5, 0.0), (5.0, 12.25, 0.25))
 JOB_LAMP_FACES = ("north", "east", "west", "up", "down")
 
-METAL_CHASSIS = ("iron", "copper", "bronze", "steel", "aluminum", "titanium", "tungstensteel", "exotic")
+METAL_CHASSIS = ("iron", "copper", "gold", "bronze", "steel", "aluminum", "titanium", "tungstensteel", "exotic")
 HEAVY = ("tungstensteel", "exotic")
-STONE_FOOTED = ("iron", "copper", "bronze")
+STONE_FOOTED = ("iron", "copper", "gold", "bronze")
 # The hopper rim is the metal at the top middle of each chassis recipe.
 RIM = {
-    "iron": "copper", "copper": "copper", "bronze": "bronze", "steel": "steel",
+    "iron": "copper", "copper": "copper", "gold": "gold", "bronze": "bronze", "steel": "steel",
     "aluminum": "aluminum", "titanium": "arclite", "tungstensteel": "nullite", "exotic": "naquadah",
 }
 # Rolls shown on each item model, which has no renderer: the Crush Head of the chassis stage.
-ITEM_HEADS = {"wooden": "flint", **{chassis: chassis for chassis in METAL_CHASSIS}}
+# The Gold chassis is a Stage 3 body, so its item shows the Bronze head.
+ITEM_HEADS = {"wooden": "flint", **{chassis: chassis for chassis in METAL_CHASSIS}, "gold": "bronze"}
 HEADS = ("flint", "iron", "copper", "bronze", "steel", "aluminum", "titanium", "tungstensteel", "exotic", "unique")
 
 
@@ -496,6 +497,7 @@ LINER = (52, 54, 58)
 CHASSIS_COLORS = {
     "iron": ((118, 118, 114), (168, 168, 162)),
     "copper": ((142, 82, 48), (214, 134, 82)),
+    "gold": ((196, 152, 56), (240, 206, 96)),
     "bronze": ((160, 116, 60), (204, 166, 92)),
     "steel": ((72, 82, 94), (150, 158, 168)),
     "aluminum": ((168, 178, 190), (212, 220, 230)),
@@ -505,6 +507,7 @@ CHASSIS_COLORS = {
 }
 RIM_COLORS = {
     "copper": (214, 128, 72),
+    "gold": (240, 200, 88),
     "bronze": (204, 160, 84),
     "steel": (150, 158, 168),
     "aluminum": (206, 214, 224),
@@ -537,6 +540,10 @@ def write_chassis_textures() -> None:
             flecks(shell, "copper_dimples", shade(shell_color, 24), 80, 6)
             panel_seams(shell, step=32, depth=28)
             blotches(shell, "copper_tarnish", (92, 56, 36), 5, 11, 0.5)
+        elif chassis == "gold":
+            # Soft, polished plate: wide panels, no rivets, and a few bright glints.
+            shell = panel_seams(noisy(64, shell_color, "gold_shell", amount=5, streak=8), step=32, rivets=False, depth=22)
+            flecks(shell, "gold_glints", (252, 238, 168), 28, 6)
         elif chassis == "bronze":
             shell = panel_seams(noisy(64, shell_color, "bronze_shell", amount=5, streak=10), step=16, rivets=False, depth=24)
         elif chassis == "steel":

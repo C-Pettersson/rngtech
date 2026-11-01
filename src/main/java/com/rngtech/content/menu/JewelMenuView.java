@@ -17,4 +17,9 @@ public interface JewelMenuView {
 
     /** Whether the Jewels tab is the open one, for its slots and renderer. */
     boolean jewelsTabSelected();
+
+    /** Whether this machine has a Mastery tree, and so a tree row at all. */
+    default boolean hasTreeSockets() {
+        return false;
+    }
 }

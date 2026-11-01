@@ -11,6 +11,8 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
+import java.util.List;
+
 public class CompressorTankScreen extends AbstractContainerScreen<CompressorTankMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int PANEL_DARK = 0xFF8B8B8B;
@@ -95,6 +97,7 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
         tabs = builder
                 .stats(CompressorTankMenu.TAB_STATS)
                 .refinement(CompressorTankMenu.TAB_REFINEMENT)
+                .jewels(CompressorTankMenu.TAB_JEWELS)
                 .build();
     }
 
@@ -108,6 +111,12 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == CompressorTankMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -118,6 +127,9 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
         tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
+        if (menu.selectedTab() == CompressorTankMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
+        }
         renderSlotFrames(guiGraphics);
 
         if (menu.selectedTab() == CompressorTankMenu.TAB_PROCESSING) {

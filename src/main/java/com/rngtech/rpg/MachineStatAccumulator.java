@@ -863,6 +863,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.BURST_DURATION, 0.0);
         stats.baseValues.put(MachineStat.IDLE_LOSS, 0.0);
         stats.baseValues.put(MachineStat.BATTERY_SLOTS, 0.0);
+        stats.baseValues.put(MachineStat.JEWEL_SOCKETS, 0.0);
         stats.baseValues.put(MachineStat.GLOBAL_MODIFIER_STRENGTH, 1.0);
         stats.baseValues.put(MachineStat.FLUID_CAPACITY, 0.0);
         stats.baseValues.put(MachineStat.COMPRESSION_RATIO, 1.0);

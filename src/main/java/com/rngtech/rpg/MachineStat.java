@@ -148,7 +148,9 @@ public enum MachineStat implements StringRepresentable {
     /** A Telemetry body's comparator gauge; the affix id names which gauge replaces the work-state signal. */
     COMPARATOR_READOUT,
     /** The most increased Bonus Output a machine pays, in percent: 75 before modifiers, raised by flat additions. */
-    MAX_OUTPUT_AMOUNT;
+    MAX_OUTPUT_AMOUNT,
+    /** Jewel sockets on the machine body itself, from the Bedazzling suffix and a Gold body's implicit; read from the body's own rolls. */
+    JEWEL_SOCKETS;
 
     public static final Codec<MachineStat> CODEC = Codec.STRING.comapFlatMap(
             name -> {

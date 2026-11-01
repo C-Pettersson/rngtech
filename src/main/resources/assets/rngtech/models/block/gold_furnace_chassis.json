@@ -1,0 +1,9 @@
+{
+  "parent": "rngtech:block/furnace/electric",
+  "textures": {
+    "particle": "rngtech:block/furnace/shell/gold",
+    "shell": "rngtech:block/furnace/shell/gold",
+    "trim": "rngtech:block/furnace/trim/gold",
+    "crown": "rngtech:block/furnace/crown/gold"
+  }
+}

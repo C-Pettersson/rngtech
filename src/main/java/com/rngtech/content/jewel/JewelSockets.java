@@ -2,6 +2,11 @@ package com.rngtech.content.jewel;
 
 import com.rngtech.content.item.CraftedTraitOutputs;
 import com.rngtech.content.item.JewelItem;
+import com.rngtech.rpg.MachineModifier;
+import com.rngtech.rpg.MachineModifierEffect;
+import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.jewel.JewelHost;
 import com.rngtech.rpg.jewel.MachineJewels;
 
@@ -37,6 +42,19 @@ public final class JewelSockets implements IItemHandlerModifiable {
                 return 1;
             }
         };
+    }
+
+    /** Body sockets a body's traits grant: every flat Jewel Sockets effect, affix or identity, up to the body row. */
+    public static int bodySockets(MachineTraits traits) {
+        double sockets = 0.0;
+        for (MachineModifier modifier : traits.activeModifiers()) {
+            for (MachineModifierEffect effect : modifier.effects()) {
+                if (effect.stat() == MachineStat.JEWEL_SOCKETS && effect.operation() == ModifierOperation.ADD) {
+                    sockets += effect.value();
+                }
+            }
+        }
+        return Math.max(0, Math.min(MachineJewels.BODY_SLOTS, (int) Math.floor(sockets)));
     }
 
     /** Only an identified jewel: an Unidentified one has no lines to read until the player identifies it. */

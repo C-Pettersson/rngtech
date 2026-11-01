@@ -87,6 +87,7 @@ public final class MachineStatDisplay {
             case IDLE_LOSS -> formatNumber(value) + "%/min";
             case SUPER_OUTPUT_CHANCE, INSTANT_PROCESS_CHANCE, CRUSHER_SALVAGE_CHANCE -> formatSignedPercentPoints(value) + " chance";
             case MAX_OUTPUT_AMOUNT -> formatNumber(value) + "%";
+            case JEWEL_SOCKETS -> formatUnit(value, "socket", "sockets");
             case MOONLIGHT_CONVERSION,
                     WEATHER_RECOVERY,
                     SOLAR_PANEL_SYNCHRONIZATION,
@@ -245,6 +246,7 @@ public final class MachineStatDisplay {
             case BATTERY_SLOTS -> formatSignedUnit(value, "cell", "cells");
             case CRUSHER_INPUT_FILTER -> formatSignedUnit(value, "filter", "filters");
             case BATCH_SIZE -> formatSignedUnit(value, "item", "items");
+            case JEWEL_SOCKETS -> formatSignedUnit(value, "socket", "sockets");
             case BATCH_OVERHEAD -> formatSignedPercentPoints(value) + " per extra item";
             case FLUID_CAPACITY -> formatSignedNumber(value) + " mB";
             case FLUID_TRANSFER -> formatSignedNumber(value) + " mB/t";

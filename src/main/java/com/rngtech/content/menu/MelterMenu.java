@@ -196,6 +196,8 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
     }
     @Override public int jewelTreeCapacity() { return MegaPassiveTree.allocatedSocketCount(masterySnapshot()); }
     @Override public boolean jewelsTabSelected() { return selectedTab == TAB_JEWELS; }
+    @Override public boolean hasTreeSockets() { return true; }
+    @Override public int jewelBodyCapacity() { return JewelSockets.bodySockets(machineTraits()); }
     private boolean jewelSlotOpen(int index) {
         return JewelSocketSlot.isTreeSlot(index) ? index < jewelTreeCapacity() : index - JewelSockets.BODY_START < jewelBodyCapacity();
     }

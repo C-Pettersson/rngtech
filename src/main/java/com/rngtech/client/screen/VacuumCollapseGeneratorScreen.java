@@ -107,6 +107,7 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
                 .gear(VacuumCollapseGeneratorMenu.TAB_GEAR)
                 .stats(VacuumCollapseGeneratorMenu.TAB_STATS)
                 .refinement(VacuumCollapseGeneratorMenu.TAB_REFINEMENT)
+                .jewels(VacuumCollapseGeneratorMenu.TAB_JEWELS)
                 .build();
     }
 
@@ -120,6 +121,12 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == VacuumCollapseGeneratorMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -130,6 +137,9 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
         tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
+        if (menu.selectedTab() == VacuumCollapseGeneratorMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
+        }
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == VacuumCollapseGeneratorMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);

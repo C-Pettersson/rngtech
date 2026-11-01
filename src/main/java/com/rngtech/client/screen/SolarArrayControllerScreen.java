@@ -11,6 +11,8 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
+import java.util.List;
+
 public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArrayControllerMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC7D0C0;
     private static final int PANEL_DARK = 0xFF7B8672;
@@ -79,6 +81,7 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
                 .gear(SolarArrayControllerMenu.TAB_GEAR)
                 .stats(SolarArrayControllerMenu.TAB_STATS)
                 .refinement(SolarArrayControllerMenu.TAB_REFINEMENT)
+                .jewels(SolarArrayControllerMenu.TAB_JEWELS)
                 .style(new MachineTabs.Style(PANEL, PANEL_LIGHT, PANEL_DARK, 0xFF9DA894, 0xFFB3BDAA, TEXT, 0xFF2F382D))
                 .build();
     }
@@ -93,6 +96,12 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == SolarArrayControllerMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -103,6 +112,9 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
         tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
+        if (menu.selectedTab() == SolarArrayControllerMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
+        }
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == SolarArrayControllerMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);

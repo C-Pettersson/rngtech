@@ -124,6 +124,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
                 .gear(CavitationGeneratorMenu.TAB_GEAR)
                 .stats(CavitationGeneratorMenu.TAB_STATS)
                 .refinement(CavitationGeneratorMenu.TAB_REFINEMENT)
+                .jewels(CavitationGeneratorMenu.TAB_JEWELS)
                 .build();
     }
 
@@ -137,6 +138,12 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == CavitationGeneratorMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -147,6 +154,9 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
         tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
+        if (menu.selectedTab() == CavitationGeneratorMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
+        }
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == CavitationGeneratorMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);

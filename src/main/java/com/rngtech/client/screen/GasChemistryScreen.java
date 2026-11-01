@@ -73,6 +73,7 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
                 .gear(GasChemistryMenu.TAB_GEAR)
                 .stats(GasChemistryMenu.TAB_STATS)
                 .refinement(GasChemistryMenu.TAB_REFINEMENT)
+                .jewels(GasChemistryMenu.TAB_JEWELS)
                 .style(new MachineTabs.Style(PANEL, 0xFFE9E9E9, 0xFF8B8B8B, 0xFF9A9A9A, 0xFFB0B0B0, 0xFF3F3F3F, 0xFF2F2F2F))
                 .build();
     }
@@ -95,6 +96,12 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == GasChemistryMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -105,13 +112,16 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         guiGraphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, PANEL);
         tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
+        if (menu.selectedTab() == GasChemistryMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, MUTED, (x, y) -> slot(guiGraphics, x, y));
+        }
         if (menu.selectedTab() == GasChemistryMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
         } else if (menu.selectedTab() == GasChemistryMenu.TAB_GEAR) {
             renderGear(guiGraphics);
         } else if (menu.selectedTab() == GasChemistryMenu.TAB_STATS) {
             MachineScreenStyle.renderStatPanel(guiGraphics, leftPos, topPos, 8, 18, 224, statLines().length, STAT_ACCENT);
-        } else {
+        } else if (menu.selectedTab() == GasChemistryMenu.TAB_REFINEMENT) {
             slot(guiGraphics, RefinementScreenStyle.TARGET_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
             slot(guiGraphics, RefinementScreenStyle.CONSUMABLE_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
             RefinementScreenStyle.render(guiGraphics, leftPos, topPos, menu.machineTraits(), STAT_ACCENT);

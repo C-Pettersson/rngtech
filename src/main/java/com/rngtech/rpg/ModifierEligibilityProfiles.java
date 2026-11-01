@@ -1651,6 +1651,27 @@ public final class ModifierEligibilityProfiles {
             MachineStat.OVERHOLD_CHANCE, ModifierOperation.ADD, PHASE_FOCUS_RANGES
     ).withRollWeight(60);
 
+    /** Body sockets: one through Tier 3, two through Tier 6, three at Tier 7, so three needs a Stage 8 Exotic body. */
+    private static final List<ModifierValueRange> BEDAZZLING_ADD_RANGES = List.of(
+            ModifierValueRange.fixed(1),
+            ModifierValueRange.fixed(1),
+            ModifierValueRange.fixed(1),
+            ModifierValueRange.fixed(2),
+            ModifierValueRange.fixed(2),
+            ModifierValueRange.fixed(2),
+            ModifierValueRange.fixed(3)
+    );
+    private static final int BEDAZZLING_WEIGHT = 40;
+    /** Jewel sockets on a machine body; every body with a screen rolls it, so a jewel has somewhere to go on any machine. */
+    private static final ModifierDefinition BEDAZZLING = ModifierDefinition.rollable(
+            "bedazzling",
+            "jewel_sockets",
+            ModifierSlot.SUFFIX,
+            MachineStat.JEWEL_SOCKETS,
+            ModifierOperation.ADD,
+            BEDAZZLING_ADD_RANGES
+    ).withRollWeight(BEDAZZLING_WEIGHT);
+
     // The jewel pool: machine-agnostic, machine-wide, one tier per family. Every colour rolls all of it; JewelColour
     // weights each family for its colour, and only a colour's own threshold line rolls on it.
     private static final List<ModifierValueRange> JEWEL_CAPACITIVE_RANGES = List.of(
@@ -1953,6 +1974,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CRUSHER = profile(
             "crusher",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -1990,6 +2012,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile FURNACE = profile(
             "furnace",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -2020,6 +2043,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile ELECTRIC_FURNACE = profile(
             "electric_furnace",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -2053,6 +2077,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile SOLID_FUEL_BURNER = profile(
             "solid_fuel_burner",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2075,6 +2100,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile BIO_GENERATOR = profile(
             "bio_generator",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2108,6 +2134,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile SOLAR_ARRAY_CONTROLLER = profile(
             "solar_array_controller",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2123,6 +2150,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile POTENTIAL_REACTOR = profile(
             "potential_reactor",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2146,6 +2174,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CORROSION_CELL = profile(
             "corrosion_cell",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2175,6 +2204,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile VACUUM_COLLAPSE_GENERATOR = profile(
             "vacuum_collapse_generator",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2199,6 +2229,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile COMPONENT_RECYCLER = profile(
             "component_recycler",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2222,6 +2253,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile METAL_PRESS = profile(
             "metal_press",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -2255,6 +2287,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile MELTER = profile(
             "melter",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -2286,6 +2319,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile BATTERY_ASSEMBLER = profile(
             "battery_assembler",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2313,6 +2347,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile COAL_GASIFIER = profile(
             "coal_gasifier",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2341,6 +2376,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile SYNGAS_COMBUSTOR = profile(
             "syngas_combustor",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2366,6 +2402,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile STEAM_METHANE_REFORMER = profile(
             "steam_methane_reformer",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2392,6 +2429,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CAVITATION_GENERATOR = profile(
             "cavitation_generator",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2423,6 +2461,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile AMMONIA_SYNTHESIZER = profile(
             "ammonia_synthesizer",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2449,6 +2488,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile AMMONIA_FUEL_CELL = profile(
             "ammonia_fuel_cell",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2522,6 +2562,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile COMPRESSOR_TANK = profile(
             "compressor_tank",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2544,6 +2585,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile FLUID_TANK = profile(
             "fluid_tank",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_FLUID_STORAGE,
                     ModifierCapability.HAS_FLUID_INPUT,
                     ModifierCapability.HAS_FLUID_OUTPUT
@@ -2553,6 +2595,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile ALLOY_FURNACE = profile(
             "alloy_furnace",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -2586,6 +2629,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile RESONANCE_CALIBRATOR = profile(
             "resonance_calibrator",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -2748,6 +2792,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile BATTERY_CHASSIS = profile(
             "battery_chassis",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -3422,6 +3467,10 @@ public final class ModifierEligibilityProfiles {
             definitions = new ArrayList<>(definitions);
             definitions.addAll(telemetryAffixes(id));
         }
+        if (capabilities.contains(ModifierCapability.HAS_JEWEL_SOCKETS)) {
+            definitions = new ArrayList<>(definitions);
+            definitions.add(BEDAZZLING);
+        }
         ModifierEligibilityProfile profile = new ModifierEligibilityProfile(id, capabilities, definitions, rollableBehaviors);
         validateProfile(profile);
         return profile;
@@ -3473,6 +3522,11 @@ public final class ModifierEligibilityProfiles {
 
     public static boolean isBehaviorOnlyAffix(ModifierDefinition definition) {
         return definition.isBehaviorOnly();
+    }
+
+    /** The most body sockets Bedazzling grants at its top tier. */
+    public static int maxBedazzlingSockets() {
+        return (int) BEDAZZLING_ADD_RANGES.getLast().max();
     }
 
     public static boolean hasCustomDescription(MachineModifier modifier) {
@@ -3862,6 +3916,7 @@ public final class ModifierEligibilityProfiles {
                 JEWEL_YIELDING, JEWEL_FORTUNATE, JEWEL_PACE, JEWEL_OUTPUT, JEWEL_CONTROL, JEWEL_DRIVE, JEWEL_RESERVE,
                 JEWEL_STUDY, JEWEL_FLASHES, JEWEL_HEADROOM, JEWEL_MOMENTUM, JEWEL_POISE, JEWEL_DEPTH
         );
+        put(definitions, ModifierCapability.HAS_JEWEL_SOCKETS, BEDAZZLING);
         return Map.copyOf(definitions);
     }
 

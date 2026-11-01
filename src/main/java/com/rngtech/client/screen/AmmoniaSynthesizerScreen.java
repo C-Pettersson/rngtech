@@ -10,6 +10,8 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
+import java.util.List;
+
 public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSynthesizerMenu> implements MachineTabs.Host {
     private static final int PANEL = 0xFFC6C6C6;
     private static final int DARK = 0xFF5F5F5F;
@@ -36,6 +38,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
                 .gear(AmmoniaSynthesizerMenu.TAB_GEAR)
                 .stats(AmmoniaSynthesizerMenu.TAB_STATS)
                 .refinement(AmmoniaSynthesizerMenu.TAB_REFINEMENT)
+                .jewels(AmmoniaSynthesizerMenu.TAB_JEWELS)
                 .build();
     }
 
@@ -49,6 +52,12 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -59,6 +68,9 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         guiGraphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, PANEL);
         tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
+        if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, MUTED, (x, y) -> slot(guiGraphics, x, y));
+        }
         if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_PROCESSING) {
             bar(guiGraphics, 28, 28, menu.energyFill(), ENERGY);
             bar(guiGraphics, 48, 28, menu.nitrogenFill(), NITROGEN);
@@ -75,7 +87,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
             slot(guiGraphics, 79, 47);
         } else if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_STATS) {
             MachineScreenStyle.renderStatPanel(guiGraphics, leftPos, topPos, 8, 18, 224, statLines().length, STAT_ACCENT);
-        } else {
+        } else if (menu.selectedTab() == AmmoniaSynthesizerMenu.TAB_REFINEMENT) {
             slot(guiGraphics, RefinementScreenStyle.TARGET_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
             slot(guiGraphics, RefinementScreenStyle.CONSUMABLE_SLOT_X - 1, RefinementScreenStyle.SLOT_Y - 1);
             RefinementScreenStyle.render(guiGraphics, leftPos, topPos, menu.machineTraits(), STAT_ACCENT);

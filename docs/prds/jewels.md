@@ -4,7 +4,7 @@
 
 PRD status: Accepted
 
-Implementation status: In progress on `feature/jewels-bonus-output-7b4ab9`. The Bonus Output cap (phase 2) is implemented; the jewel phases follow on the same branch.
+Implementation status: In progress on `feature/jewels-bonus-output-7b4ab9`. The Bonus Output cap (phase 2), the jewel items and pool (phase 3), the tree sockets (phase 4), and the body sockets (phase 5) are implemented; sources and refinement polish (phase 6) and the remaining documentation follow on the same branch.
 
 Release: 2.0
 
@@ -173,7 +173,7 @@ Behaviour rules:
 | 4-6 | +2 | Natural at Stage 7-8, a lucky overflow before |
 | 7 | +3 | Stage 8 Exotic bodies only, from a roll, an Imprint, or an Exalt from Tier 6 |
 
-Roll weight `40`. It rolls on every placed machine body profile through a new capability, `HAS_JEWEL_SOCKETS`: processing machines, generators, the Battery Chassis, the Fluid and Compressor Tanks, and the Dispatch Terminal if it ever rolls traits. It never rolls on Gear, cells, chips, tool parts, or companions, so a machine can only have one Bedazzling line and sockets never nest.
+Roll weight `40`. It rolls on every placed machine body with a screen through a new capability, `HAS_JEWEL_SOCKETS`: processing machines, generators, the Battery Chassis, and the Fluid and Compressor Tanks. The Solar Panel, Phase Emitter, and Phase Coil have no screen to socket through, so they do not roll it. It never rolls on Gear, cells, chips, tool parts, or companions, so a machine can only have one Bedazzling line and sockets never nest.
 
 A **Gold body** carries one body socket as a fixed identity implicit, the way Steel Crushers carry Output Guard. Gold is a Stage 3 material that today feeds refinement, connectors, Solar Panels, and one body: the Gold Battery Chassis (`BatteryChassisMaterial.GOLD`, Stage 3). That makes it the natural "socket base", as the Stygian Vise is in Path of Exile. The first slice gives the existing Gold Battery Chassis the implicit, and adds a Gold Crusher Chassis and a Gold Furnace Chassis: the two Stage 0-3 ladders every player climbs, and the two Mastery families with the most yield and heat lines to fill. A new Gold body's other stats sit at its stage's Copper body: the socket is the upgrade, not the numbers. Art follows the stage and the recipe: a Copper-era body with gold trim and a visible empty setting on its front.
 
@@ -181,7 +181,7 @@ Shared rules:
 
 - Sockets stack: implicit plus suffix, capped at **4** per machine. A Gold body with Tier 7 Bedazzling has four.
 - Every socketed jewel lives in one `rngtech:jewels` component on the block entity: a tree row of up to nine stacks and a body row of up to four, each a slot row whose first entries are the live ones. It is kept on the dropped item like traits and Job Chips, and Soul Transfer carries the tree row with the Mastery.
-- They show as a socket row in the Gear tab, or in the Stats tab on a machine without Gear, as empty settings that fill with the jewel's icon. Hover shows the jewel's tooltip with this machine's inactive lines dimmed.
+- They show as the body row of the Jewels tab, under the tree row, on every machine with a screen; on a machine without Mastery the tab shows the body row alone. The count is the body's `JEWEL_SOCKETS` stat, summed from its own rolls and identity, so the client reads it from the synced traits without another data slot. Shift-clicking a jewel from the inventory fills the first open body slot.
 - A body-socket jewel is the same effect source as a tree-socket jewel; only the storage differs.
 - A refinement operation that would remove occupied sockets (a Chaos Crystal, Nullifier Coil, Excise, Transmute, or Reforge on the Bedazzling line) is rejected until the jewels are taken out. The station names the reason, as a Gear conflict does on the Mastery screen. No operation ever deletes or drops a jewel.
 - Soul Transfer moves tree-socket jewels with the Mastery; body-socket jewels stay with the body, because the sockets do.

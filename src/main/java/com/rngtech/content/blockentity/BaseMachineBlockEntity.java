@@ -24,6 +24,7 @@ import com.rngtech.content.block.SolarPanelBlock;
 import com.rngtech.content.block.SolidFuelBurnerBlock;
 import com.rngtech.content.block.WorkOrderMachineBlock;
 import com.rngtech.content.item.RefinementConsumableItem;
+import com.rngtech.content.jewel.JewelSockets;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.MachineImplicitCatalog;
 import com.rngtech.rpg.MachineModifier;
@@ -35,8 +36,10 @@ import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.TelemetryReadout;
+import com.rngtech.rpg.jewel.JewelEffects;
 import com.rngtech.rpg.jewel.JewelHost;
 import com.rngtech.rpg.jewel.MachineJewels;
+import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
@@ -107,7 +110,7 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
     };
     private final List<ItemStack> removedGear = new ArrayList<>();
     private final MachineStatsCache statsCache = new MachineStatsCache();
-    private final Supplier<MachineStatAccumulator> statsBuilder = this::buildStats;
+    private final Supplier<MachineStatAccumulator> statsBuilder = this::buildStatsWithBodyJewels;
     private MachineTraits effectiveTraits;
     private MachineTraits effectiveTraitsStored;
     private Block effectiveTraitsBlock;
@@ -199,6 +202,24 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
     /** Builds this machine's stats from scratch. Machines that cache stats through {@link #cachedStats} override it. */
     protected MachineStatAccumulator buildStats() {
         throw new UnsupportedOperationException(getClass().getSimpleName() + " does not build cached stats");
+    }
+
+    /**
+     * {@link #buildStats} plus the body sockets' jewels on a machine without Mastery. Mastery machines read their jewels
+     * inside {@code buildStats}, with the tree's nodes, so their attribute lines land before the conversions.
+     */
+    private MachineStatAccumulator buildStatsWithBodyJewels() {
+        MachineStatAccumulator stats = buildStats();
+        if (!(this instanceof MachineMasteryHost) && bodySocketCount() > 0) {
+            JewelEffects.applyLines(stats, this, MachineProgressionState.EMPTY, null);
+        }
+        return stats;
+    }
+
+    /** Body sockets from the body's own rolls and identity: the Bedazzling suffix plus a Gold body's setting. */
+    @Override
+    public int bodySocketCount() {
+        return JewelSockets.bodySockets(effectiveTraits());
     }
 
     /**

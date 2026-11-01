@@ -92,6 +92,7 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
                 .gear(SolidFuelBurnerMenu.TAB_GEAR)
                 .stats(SolidFuelBurnerMenu.TAB_STATS)
                 .refinement(SolidFuelBurnerMenu.TAB_REFINEMENT)
+                .jewels(SolidFuelBurnerMenu.TAB_JEWELS)
                 .build();
     }
 
@@ -105,6 +106,12 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -115,6 +122,9 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
         tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
+        if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
+        }
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);

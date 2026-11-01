@@ -38,7 +38,39 @@ public final class JewelChecks {
         refinementPotentialFollowsTheCut();
         treeSocketsOpenSlots();
         socketedJewelsApplyWhereRead();
+        bodySocketsComeFromBedazzlingAndGold();
         return checks;
+    }
+
+    private static void bodySocketsComeFromBedazzlingAndGold() {
+        List<ModifierEligibilityProfile> bedazzled = ModifierEligibilityProfiles.allProfiles().stream()
+                .filter(profile -> profile.definitions().stream().anyMatch(definition -> definition.id().equals("bedazzling")))
+                .toList();
+        Set<String> expected = Set.of("crusher", "furnace", "electric_furnace", "solid_fuel_burner", "bio_generator", "solar_array_controller",
+                "potential_reactor", "corrosion_cell", "vacuum_collapse_generator", "component_recycler", "metal_press", "melter", "battery_assembler",
+                "coal_gasifier", "syngas_combustor", "steam_methane_reformer", "cavitation_generator", "ammonia_synthesizer", "ammonia_fuel_cell",
+                "compressor_tank", "fluid_tank", "alloy_furnace", "resonance_calibrator", "battery_chassis");
+        Set<String> actual = new java.util.HashSet<>();
+        bedazzled.forEach(profile -> actual.add(profile.id()));
+        require(actual.equals(expected), "Bedazzling rolls on every machine body with a screen and nowhere else: " + actual);
+        ModifierDefinition bedazzling = bedazzled.getFirst().definitions().stream().filter(definition -> definition.id().equals("bedazzling")).findFirst().orElseThrow();
+        require(bedazzling.slot() == ModifierSlot.SUFFIX && bedazzling.modGroup().equals("jewel_sockets") && bedazzling.rollWeight() == 40,
+                "Bedazzling is a weight-40 suffix in its own group");
+        int[] sockets = {1, 1, 1, 2, 2, 2, 3};
+        for (int tier = 1; tier <= 7; tier++) {
+            require(bedazzling.rangeForTier(tier).min() == sockets[tier - 1] && bedazzling.rangeForTier(tier).max() == sockets[tier - 1],
+                    "Bedazzling Tier " + tier + " grants " + sockets[tier - 1] + " sockets");
+        }
+        require(ModifierEligibilityProfiles.maxBedazzlingSockets() == 3, "three body sockets need Tier 7");
+
+        MachineTraits gold = new MachineTraits(Rarity.RARE, 0, List.of(
+                new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.JEWEL_SOCKETS, ModifierOperation.ADD, 1.0),
+                bedazzling.roll(7, RandomSource.create(1L))));
+        require(com.rngtech.content.jewel.JewelSockets.bodySockets(gold) == 4, "a Gold body's setting and Tier 7 Bedazzling make four sockets");
+        require(com.rngtech.content.jewel.JewelSockets.bodySockets(MachineTraits.EMPTY) == 0, "a plain body has no sockets");
+        MachineTraits many = new MachineTraits(Rarity.RARE, 0, List.of(
+                new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.JEWEL_SOCKETS, ModifierOperation.ADD, 9.0)));
+        require(com.rngtech.content.jewel.JewelSockets.bodySockets(many) == MachineJewels.BODY_SLOTS, "body sockets stop at the body row");
     }
 
     private static void treeSocketsOpenSlots() {

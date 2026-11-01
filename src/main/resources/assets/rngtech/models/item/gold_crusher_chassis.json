@@ -1,0 +1,15 @@
+{
+  "parent": "rngtech:item/crusher_template",
+  "textures": {
+    "particle": "rngtech:block/crusher/shell/gold",
+    "shell": "rngtech:block/crusher/shell/gold",
+    "trim": "rngtech:block/crusher/trim/gold",
+    "rim": "rngtech:block/crusher/rim/gold",
+    "plinth_top": "rngtech:block/crusher/stone_top",
+    "plinth_side": "rngtech:block/crusher/stone_side",
+    "roll": "rngtech:block/crusher/roll/bronze",
+    "roll_v": "rngtech:block/crusher/roll/bronze_v",
+    "roll_end": "rngtech:block/crusher/roll/bronze_end",
+    "hub": "rngtech:block/crusher/roll/bronze_hub"
+  }
+}

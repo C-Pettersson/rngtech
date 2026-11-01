@@ -39,5 +39,7 @@ public enum ModifierCapability {
     /** Machine bodies with a comparator gauge to report, which can roll Telemetry. */
     HAS_TELEMETRY,
     /** Jewels, which roll the machine-agnostic jewel pool and nothing else. */
-    HAS_JEWEL
+    HAS_JEWEL,
+    /** Placed machine bodies with a screen, which can roll Bedazzling body sockets. */
+    HAS_JEWEL_SOCKETS
 }

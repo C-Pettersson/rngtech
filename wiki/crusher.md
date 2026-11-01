@@ -6,6 +6,7 @@ wiki:
     - rngtech:wooden_crusher_chassis
     - rngtech:iron_crusher_chassis
     - rngtech:copper_crusher_chassis
+    - rngtech:gold_crusher_chassis
     - rngtech:bronze_crusher_chassis
     - rngtech:steel_crusher_chassis
     - rngtech:aluminum_crusher_chassis
@@ -22,6 +23,7 @@ wiki:
         ["Wooden", "rngtech:wooden_crusher_chassis"],
         ["Iron", "rngtech:iron_crusher_chassis"],
         ["Copper", "rngtech:copper_crusher_chassis"],
+        ["Gold", "rngtech:gold_crusher_chassis"],
         ["Bronze", "rngtech:bronze_crusher_chassis"],
         ["Steel", "rngtech:steel_crusher_chassis"],
         ["Aluminum", "rngtech:aluminum_crusher_chassis"],
@@ -123,6 +125,7 @@ Super Output is a separate chance for one extra copy of the base output. On a Cr
 | 0 | {{ item('rngtech:wooden_crusher_chassis') }} | Primitive body: weak buffer, slow, and uses more energy. |
 | 1 | {{ item('rngtech:iron_crusher_chassis') }} | Baseline powered Crusher. |
 | 2 | {{ item('rngtech:copper_crusher_chassis') }} | Better energy use, smaller buffer. |
+| 3 | {{ item('rngtech:gold_crusher_chassis') }} | Copper numbers with one built-in [jewel socket](jewels.md#body-sockets). |
 | 3 | {{ item('rngtech:bronze_crusher_chassis') }} | More output, higher energy use. |
 | 4 | {{ item('rngtech:steel_crusher_chassis') }} | Durable and efficient but slower. Has Output Guard. |
 | 5 | {{ item('rngtech:aluminum_crusher_chassis') }} | Fast and efficient, smaller buffer. |

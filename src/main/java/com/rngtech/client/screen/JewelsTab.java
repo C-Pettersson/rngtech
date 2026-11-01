@@ -43,11 +43,13 @@ public final class JewelsTab {
         int x = leftPos + JewelSocketSlot.X;
         if (tree > 0) {
             guiGraphics.drawString(font, Component.translatable("rngtech.jewels.tree_sockets", tree, MachineJewels.TREE_SLOTS), x, topPos + HEADING_Y, text, false);
-        } else {
+        } else if (view.hasTreeSockets()) {
             drawWrapped(guiGraphics, font, Component.translatable("rngtech.jewels.tree_sockets.none"), x, topPos + HEADING_Y, muted);
         }
         if (body > 0) {
             guiGraphics.drawString(font, Component.translatable("rngtech.jewels.body_sockets", body), x, topPos + BODY_HEADING_Y, text, false);
+        } else {
+            drawWrapped(guiGraphics, font, Component.translatable("rngtech.jewels.body_sockets.none"), x, topPos + BODY_HEADING_Y, muted);
         }
         drawWrapped(guiGraphics, font, Component.translatable("rngtech.jewels.hint"), x, topPos + HINT_Y, muted);
     }
