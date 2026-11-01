@@ -1,0 +1,88 @@
+{
+    "hosts": [
+        "control_jewel",
+        "drive_jewel",
+        "reserve_jewel"
+    ],
+    "blessed": [
+        {
+            "id": "set_control",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "control",
+                    "operation": "add",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "set_drive",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "drive",
+                    "operation": "add",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "set_reserve",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "reserve",
+                    "operation": "add",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "studious_cut",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "mastery_xp_gain",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "hungry_cut",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "energy_usage",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "sluggish_cut",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "processing_speed",
+                    "operation": "less",
+                    "value": 0.95
+                }
+            ]
+        },
+        {
+            "id": "flawed_cut",
+            "weight": 10,
+            "modifiers": [
+                {
+                    "stat": "stability",
+                    "operation": "less",
+                    "value": 0.9
+                }
+            ]
+        }
+    ]
+}

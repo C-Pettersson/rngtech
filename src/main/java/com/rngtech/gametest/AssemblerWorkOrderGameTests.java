@@ -6,6 +6,7 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
 import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.menu.BatteryAssemblerMenu;
+import com.rngtech.content.menu.DriveBaySlot;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModDataComponents;
@@ -98,18 +99,28 @@ public final class AssemblerWorkOrderGameTests {
         List<ItemStack> drops = Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos), assembler);
         check(drops.stream().anyMatch(stack -> assembler.workOrders().equals(stack.get(ModDataComponents.WORK_ORDERS.get()))),
                 "The dropped Assembler lost its chips: " + drops);
-        menu.clicked(menu.slots.size() - MachineWorkOrders.SLOTS, 0, ClickType.PICKUP, player);
+        menu.clicked(firstBay(menu), 0, ClickType.PICKUP, player);
         check(assembler.workOrders().isEmpty() && JobChipItem.isWorkOrder(menu.getCarried()), "The chip did not come back out of its bay");
         helper.succeed();
     }
 
     private static void shiftClick(BatteryAssemblerMenu menu, Player player, int inventorySlot) {
-        for (int index = 0; index < menu.slots.size() - MachineWorkOrders.SLOTS; index++) {
+        for (int index = 0; index < firstBay(menu); index++) {
             Slot slot = menu.getSlot(index);
             if (slot.container == player.getInventory() && slot.getContainerSlot() == inventorySlot) {
                 menu.quickMoveStack(player, index);
                 return;
             }
         }
+    }
+
+    /** The menu index of the first drive bay: the bays follow the player inventory, ahead of the jewel slots. */
+    private static int firstBay(BatteryAssemblerMenu menu) {
+        for (int index = 0; index < menu.slots.size(); index++) {
+            if (menu.getSlot(index) instanceof DriveBaySlot) {
+                return index;
+            }
+        }
+        throw new IllegalStateException("The menu has no drive bays");
     }
 }

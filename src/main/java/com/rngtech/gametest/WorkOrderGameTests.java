@@ -24,6 +24,7 @@ import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.machine.FurnaceChassisMaterial;
 import com.rngtech.content.menu.CrusherMenu;
+import com.rngtech.content.menu.DriveBaySlot;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.recipe.CrusherRecipe;
@@ -635,9 +636,14 @@ public final class WorkOrderGameTests {
         return menu;
     }
 
-    /** The menu index of drive bay {@code bay}; the bays are the menu's last slots. */
+    /** The menu index of drive bay {@code bay}: the bays follow the player inventory, ahead of the jewel slots. */
     private static int bay(CrusherMenu menu, int bay) {
-        return menu.slots.size() - MachineWorkOrders.SLOTS + bay;
+        for (int index = 0; index < menu.slots.size(); index++) {
+            if (menu.getSlot(index) instanceof DriveBaySlot) {
+                return index + bay;
+            }
+        }
+        throw new IllegalStateException("The Crusher menu has no drive bays");
     }
 
     /** Shift-clicks the player's inventory slot {@code slot} and returns whether it went into a bay. */
@@ -653,7 +659,7 @@ public final class WorkOrderGameTests {
     }
 
     private static long loadedBays(CrusherMenu menu) {
-        return menu.slots.subList(bay(menu, 0), menu.slots.size()).stream().filter(Slot::hasItem).count();
+        return menu.slots.subList(bay(menu, 0), bay(menu, 0) + MachineWorkOrders.SLOTS).stream().filter(Slot::hasItem).count();
     }
 
     /** The loaded orders as the Orders tab reads them from the menu's synced data. */

@@ -80,6 +80,7 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
                 .gear(BatteryAssemblerMenu.TAB_GEAR)
                 .stats(BatteryAssemblerMenu.TAB_CONFIGURATION)
                 .refinement(BatteryAssemblerMenu.TAB_REFINEMENT)
+                .jewels(BatteryAssemblerMenu.TAB_JEWELS, menu::jewelsShown)
                 .orders(BatteryAssemblerMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
@@ -95,6 +96,12 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == BatteryAssemblerMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         if (menu.selectedTab() == BatteryAssemblerMenu.TAB_ORDERS) {
             List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
             if (!orderTooltip.isEmpty()) {
@@ -111,6 +118,9 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
         tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
+        if (menu.selectedTab() == BatteryAssemblerMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
+        }
         renderSlotFrames(guiGraphics);
 
         if (menu.selectedTab() == BatteryAssemblerMenu.TAB_PROCESSING) {

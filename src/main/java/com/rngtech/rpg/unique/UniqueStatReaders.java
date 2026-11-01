@@ -59,7 +59,7 @@ public final class UniqueStatReaders {
 
     static {
         stats(Reader.CRUSHER, BATCHING, MachineStat.PROCESSING_LEVEL, MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE,
-                MachineStat.OUTPUT_AMOUNT, MachineStat.SUPER_OUTPUT_CHANCE, MachineStat.CRUSHER_SALVAGE_CHANCE,
+                MachineStat.OUTPUT_AMOUNT, MachineStat.MAX_OUTPUT_AMOUNT, MachineStat.SUPER_OUTPUT_CHANCE, MachineStat.CRUSHER_SALVAGE_CHANCE,
                 MachineStat.INSTANT_PROCESS_CHANCE, MachineStat.JAM_CHANCE, MachineStat.JAM_RECOVERY, MachineStat.CYCLE_JAM_CHANCE,
                 MachineStat.UNDER_LEVEL_EFFICIENCY);
         stats(Reader.MINERS_COMPANION, Set.of(), MachineStat.PROCESSING_LEVEL);
@@ -81,7 +81,7 @@ public final class UniqueStatReaders {
         // Heat strain reads Heat Transfer, Strain Recovery, Overheat Tolerance, and Max Temperature; it has no warmup,
         // isolation, or idle cooling, so those Heat Core stats stay unread.
         stats(Reader.CAVITATION_GENERATOR, Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.STABILITY, MachineStat.EFFICIENCY,
-                MachineStat.FLUID_TRANSFER, MachineStat.OUTPUT_AMOUNT, MachineStat.TEMPERATURE_STABILITY, MachineStat.HEAT_TRANSFER,
+                MachineStat.FLUID_TRANSFER, MachineStat.OUTPUT_AMOUNT, MachineStat.MAX_OUTPUT_AMOUNT, MachineStat.TEMPERATURE_STABILITY, MachineStat.HEAT_TRANSFER,
                 MachineStat.STRAIN_RECOVERY, MachineStat.OVERHEAT_TOLERANCE, MachineStat.MAX_TEMPERATURE);
         // The Heat Core is only a stage gate here; Efficiency is the Syngas Combustor's.
         stats(Reader.GAS_CHEMISTRY, Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.EFFICIENCY,
@@ -133,8 +133,8 @@ public final class UniqueStatReaders {
     ));
 
     /** Yield stats outside the Mastery declarations. */
-    private static final Set<MachineStat> YIELD = EnumSet.of(MachineStat.OUTPUT_AMOUNT, MachineStat.SUPER_OUTPUT_CHANCE,
-            MachineStat.CRUSHER_SALVAGE_CHANCE, MachineStat.FLUID_YIELD, MachineStat.LEDGER_RATE);
+    private static final Set<MachineStat> YIELD = EnumSet.of(MachineStat.OUTPUT_AMOUNT, MachineStat.MAX_OUTPUT_AMOUNT,
+            MachineStat.SUPER_OUTPUT_CHANCE, MachineStat.CRUSHER_SALVAGE_CHANCE, MachineStat.FLUID_YIELD, MachineStat.LEDGER_RATE);
 
     private UniqueStatReaders() {
     }

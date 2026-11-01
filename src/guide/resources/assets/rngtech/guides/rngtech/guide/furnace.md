@@ -9,6 +9,7 @@ item_ids:
   - rngtech:furnace
   - rngtech:iron_furnace_chassis
   - rngtech:copper_furnace_chassis
+  - rngtech:gold_furnace_chassis
   - rngtech:bronze_furnace_chassis
   - rngtech:steel_furnace_chassis
   - rngtech:lead_furnace_chassis
@@ -26,6 +27,7 @@ item_ids:
   <ItemImage id="rngtech:furnace" scale="2" />
   <ItemImage id="rngtech:iron_furnace_chassis" scale="2" />
   <ItemImage id="rngtech:copper_furnace_chassis" scale="2" />
+  <ItemImage id="rngtech:gold_furnace_chassis" scale="2" />
   <ItemImage id="rngtech:bronze_furnace_chassis" scale="2" />
   <ItemImage id="rngtech:steel_furnace_chassis" scale="2" />
   <ItemImage id="rngtech:lead_furnace_chassis" scale="2" />

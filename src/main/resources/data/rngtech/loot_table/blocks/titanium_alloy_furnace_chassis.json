@@ -18,6 +18,7 @@
                 "rngtech:machine_traits",
                 "rngtech:machine_progression",
                 "rngtech:work_orders",
+                "rngtech:jewels",
                 "rngtech:mirrored"
               ],
               "source": "block_entity"

@@ -6,6 +6,7 @@ wiki:
     - rngtech:wooden_crusher_chassis
     - rngtech:iron_crusher_chassis
     - rngtech:copper_crusher_chassis
+    - rngtech:gold_crusher_chassis
     - rngtech:bronze_crusher_chassis
     - rngtech:steel_crusher_chassis
     - rngtech:aluminum_crusher_chassis
@@ -22,6 +23,7 @@ wiki:
         ["Wooden", "rngtech:wooden_crusher_chassis"],
         ["Iron", "rngtech:iron_crusher_chassis"],
         ["Copper", "rngtech:copper_crusher_chassis"],
+        ["Gold", "rngtech:gold_crusher_chassis"],
         ["Bronze", "rngtech:bronze_crusher_chassis"],
         ["Steel", "rngtech:steel_crusher_chassis"],
         ["Aluminum", "rngtech:aluminum_crusher_chassis"],
@@ -106,7 +108,8 @@ A jam on a recipe of hardness 5 or higher drops one {{ item('rngtech:jam_debris'
 Output Amount sets how much extra crushed material an ore block or raw metal gives. Only that first crush counts: crushing crushed material into dust, or ingots back into dust, never gets bonus output.
 
 - The chassis sets a base multiplier. Everything else adds to one **increased** total: the Crush Head's own yield, its rolled affixes, Crusher affixes, Mastery nodes, ascendancy nodes, and At-Level Output on recipes at the head's hardness.
-- That total has diminishing returns. Bonuses adding up to +50% give about +33% more output, +100% gives +50%, and the result never reaches +100%.
+- That total stops at **Maximum Bonus Output**, 75% to begin with. Bonuses adding up to +100% pay +75%, and the Stats tab shows how much is over the cap.
+- Maximum Bonus Output can be raised, up to 90%. The **Overflow Gate** notable in [Machine Mastery](machine-mastery.md) adds +2%, and the jewel line **of Headroom** adds +1-2% per jewel.
 - **Big yield affixes cost speed.** Crusher Jaws and Crush Head Pulverizing give the most Bonus Output, but each also rolls reduced Processing Speed, which slows every recipe. The Output Amount suffix is much smaller and has no penalty.
 - Output Amount never drops below 1×, so a Crusher always makes at least the recipe's base output.
 - Without a Battery Cell, the Crusher keeps only 75% of its bonus above 1×. A 1.4× Crusher drops to 1.3×, and a 1× Crusher loses nothing.
@@ -122,6 +125,7 @@ Super Output is a separate chance for one extra copy of the base output. On a Cr
 | 0 | {{ item('rngtech:wooden_crusher_chassis') }} | Primitive body: weak buffer, slow, and uses more energy. |
 | 1 | {{ item('rngtech:iron_crusher_chassis') }} | Baseline powered Crusher. |
 | 2 | {{ item('rngtech:copper_crusher_chassis') }} | Better energy use, smaller buffer. |
+| 3 | {{ item('rngtech:gold_crusher_chassis') }} | Copper numbers with one built-in [jewel socket](jewels.md#body-sockets). |
 | 3 | {{ item('rngtech:bronze_crusher_chassis') }} | More output, higher energy use. |
 | 4 | {{ item('rngtech:steel_crusher_chassis') }} | Durable and efficient but slower. Has Output Guard. |
 | 5 | {{ item('rngtech:aluminum_crusher_chassis') }} | Fast and efficient, smaller buffer. |
@@ -209,7 +213,7 @@ The Crusher screen has six tabs:
 
 - **Process**: input, output, energy, progress, the bonus output bar, and status squares for the recipe and Battery Cell. Hover the progress bar for time remaining, expected items per minute with your Gear and Mastery applied (chance bonuses such as Super Output are not counted), FE per tick, FE per craft, hardness penalties, and jam chance.
 - **Gear**: Crush Head and Battery Cell slots.
-- **Stats**: the machine's current stats, including traits, Gear, and Mastery. Hold Shift over Bonus Output to see what your yield bonuses add up to and the diminishing-returns math.
+- **Stats**: the machine's current stats, including traits, Gear, and Mastery. Hold Shift over Bonus Output to see what your yield bonuses add up to, your Maximum Bonus Output, and how much is over the cap.
 - **Refinement**: refine the placed Crusher's traits with a catalyst.
 - **Mastery**: machine XP, level, and the passive tree.
 - **Orders**: three drive bays for [Job Chips](work-orders.md), with each chip's job, progress, and the Activate, Pause, Rush, and Abandon buttons.

@@ -141,6 +141,54 @@
         },
         {
           "type": "minecraft:item",
+          "name": "rngtech:control_jewel",
+          "weight": 25,
+          "conditions": [
+            {
+              "condition": "rngtech:order_tier",
+              "min": 3
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:drive_jewel",
+          "weight": 25,
+          "conditions": [
+            {
+              "condition": "rngtech:order_tier",
+              "min": 3
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "rngtech:reserve_jewel",
+          "weight": 25,
+          "conditions": [
+            {
+              "condition": "rngtech:order_tier",
+              "min": 3
+            }
+          ],
+          "functions": [
+            {
+              "function": "rngtech:unidentified"
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
           "name": "rngtech:affix_upgrade",
           "weight": 40,
           "conditions": [

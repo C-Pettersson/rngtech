@@ -1,21 +1,28 @@
 package com.rngtech.rpg;
 
+import com.rngtech.rpg.jewel.JewelColour;
+
 import net.minecraft.util.RandomSource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 public final class MachineTraitRoller {
-    private static final RollTuning DEFAULT_ROLL_TUNING = new RollTuning(0, 0);
-    private static final RollTuning MODULAR_TOOL_ROLL_TUNING = new RollTuning(2, 5);
     private static final int MAX_STANDARD_RANDOM_TIER = 6;
     private static final int MAX_EXOTIC_RANDOM_TIER = 7;
     private static final int MAX_UPGRADE_TIER = 6;
     private static final int MAGIC_SLOT_LIMIT = 1;
     private static final int RARE_SLOT_LIMIT = 3;
+    /** A Rare's chance of three, four, five, and six affixes. */
+    private static final int[] RARE_AFFIX_WEIGHTS = {35, 35, 20, 10};
+    private static final RollTuning DEFAULT_ROLL_TUNING = new RollTuning(0, 0, MAGIC_SLOT_LIMIT, RARE_SLOT_LIMIT, RARE_AFFIX_WEIGHTS);
+    private static final RollTuning MODULAR_TOOL_ROLL_TUNING = new RollTuning(2, 5, MAGIC_SLOT_LIMIT, RARE_SLOT_LIMIT, RARE_AFFIX_WEIGHTS);
+    /** Jewels hold two prefixes and two suffixes, as Path of Exile's do, and a Rare jewel rolls three or four lines. */
+    private static final RollTuning JEWEL_ROLL_TUNING = new RollTuning(0, 0, MAGIC_SLOT_LIMIT, 2, new int[] {50, 50, 0, 0});
 
     public static MachineTraits roll(MachineType type, RandomSource random) {
         return roll(ModifierEligibilityProfiles.forMachine(type), random);
@@ -117,9 +124,9 @@ public final class MachineTraitRoller {
         int wanted = switch (rarity) {
             case NORMAL, UNIQUE -> 0;
             case MAGIC -> 1 + random.nextInt(2);
-            case RARE -> rareAffixCount(random);
+            case RARE -> rareAffixCount(tuning, random);
         };
-        int slotLimit = rarity == Rarity.RARE ? RARE_SLOT_LIMIT : MAGIC_SLOT_LIMIT;
+        int slotLimit = rarity == Rarity.RARE ? tuning.rareSlotLimit() : tuning.magicSlotLimit();
         int prefixes = 0;
         int suffixes = 0;
         for (int index = 0; index < wanted; index++) {
@@ -138,13 +145,13 @@ public final class MachineTraitRoller {
                 break;
             }
             if (!prefixPool.isEmpty() && (!suffixOpen || random.nextBoolean())) {
-                ModifierDefinition definition = weightedDefinition(prefixPool, random);
+                ModifierDefinition definition = weightedDefinition(profile, prefixPool, random);
                 int tier = rollModifierTier(definition, componentStage, tuning, Integer.MAX_VALUE, random);
                 modifiers.add(definition.roll(tier, random));
                 prefixes++;
                 continue;
             }
-            WeightedSuffixSelection selection = weightedSuffixSelection(suffixPool, behaviorPool, random);
+            WeightedSuffixSelection selection = weightedSuffixSelection(profile, suffixPool, behaviorPool, random);
             if (selection == null) {
                 break;
             }
@@ -160,18 +167,17 @@ public final class MachineTraitRoller {
         modifiers.sort(Comparator.comparing(modifier -> modifier.slot() != ModifierSlot.PREFIX));
     }
 
-    private static int rareAffixCount(RandomSource random) {
+    private static int rareAffixCount(RollTuning tuning, RandomSource random) {
+        int[] weights = tuning.rareAffixWeights();
         int roll = random.nextInt(100);
-        if (roll < 35) {
-            return 3;
+        int cursor = 0;
+        for (int index = 0; index < weights.length; index++) {
+            cursor += weights[index];
+            if (roll < cursor) {
+                return 3 + index;
+            }
         }
-        if (roll < 70) {
-            return 4;
-        }
-        if (roll < 90) {
-            return 5;
-        }
-        return 6;
+        return 3 + weights.length - 1;
     }
 
     private static List<ModifierDefinition> availableDefinitions(
@@ -352,22 +358,32 @@ public final class MachineTraitRoller {
     }
 
     public static ModifierDefinition weightedDefinition(List<ModifierDefinition> definitions, RandomSource random) {
+        return weightedDefinition(null, definitions, random);
+    }
+
+    /** Draws by family weight; on a jewel colour's profile, by that colour's weighting of the shared pool. */
+    public static ModifierDefinition weightedDefinition(ModifierEligibilityProfile profile, List<ModifierDefinition> definitions, RandomSource random) {
         if (definitions.isEmpty()) {
             throw new IllegalArgumentException("Cannot select from an empty modifier definition pool.");
         }
-        int totalWeight = definitions.stream().mapToInt(ModifierDefinition::rollWeight).sum();
+        int totalWeight = definitions.stream().mapToInt(definition -> rollWeight(profile, definition)).sum();
         if (totalWeight <= 0) {
             return definitions.get(random.nextInt(definitions.size()));
         }
         int roll = random.nextInt(totalWeight);
         int cursor = 0;
         for (ModifierDefinition definition : definitions) {
-            cursor += definition.rollWeight();
+            cursor += rollWeight(profile, definition);
             if (roll < cursor) {
                 return definition;
             }
         }
         return definitions.getLast();
+    }
+
+    /** {@code definition}'s weight on {@code profile}, or its family weight when no profile is known. */
+    public static int rollWeight(ModifierEligibilityProfile profile, ModifierDefinition definition) {
+        return profile == null ? definition.rollWeight() : profile.rollWeight(definition);
     }
 
     private static int rollModifierTier(
@@ -541,11 +557,12 @@ public final class MachineTraitRoller {
     }
 
     private static WeightedSuffixSelection weightedSuffixSelection(
+            ModifierEligibilityProfile profile,
             List<ModifierDefinition> definitions,
             List<MachineBehavior> behaviors,
             RandomSource random
     ) {
-        int totalWeight = definitions.stream().mapToInt(ModifierDefinition::rollWeight).sum()
+        int totalWeight = definitions.stream().mapToInt(definition -> rollWeight(profile, definition)).sum()
                 + behaviors.stream().mapToInt(ModifierEligibilityProfiles::behaviorRollWeight).sum();
         if (totalWeight <= 0) {
             return null;
@@ -553,7 +570,7 @@ public final class MachineTraitRoller {
         int roll = random.nextInt(totalWeight);
         int cursor = 0;
         for (ModifierDefinition definition : definitions) {
-            cursor += definition.rollWeight();
+            cursor += rollWeight(profile, definition);
             if (roll < cursor) {
                 return new WeightedSuffixSelection(definition, null);
             }
@@ -568,6 +585,9 @@ public final class MachineTraitRoller {
     }
 
     private static RollTuning tuningFor(ModifierEligibilityProfile profile) {
+        if (JewelColour.forProfile(profile.id()) != null) {
+            return JEWEL_ROLL_TUNING;
+        }
         return switch (profile.id()) {
             case "tool_head", "treefeller_head", "ore_burst_head", "pick_head", "ore_burst_pick_head", "tool_rod", "modular_tool" ->
                     MODULAR_TOOL_ROLL_TUNING;
@@ -591,13 +611,26 @@ public final class MachineTraitRoller {
         }
     }
 
+    /**
+     * Per-profile roll rules: Refinement Potential and overflow-tier bonuses, how many affixes a side holds on Magic and
+     * Rare items, and a Rare's chance of three, four, five, and six affixes.
+     */
     private record RollTuning(
             int refinementPotentialBonus,
-            int overflowTierChanceBonus
+            int overflowTierChanceBonus,
+            int magicSlotLimit,
+            int rareSlotLimit,
+            int[] rareAffixWeights
     ) {
         private RollTuning {
             if (overflowTierChanceBonus < 0 || overflowTierChanceBonus > 100) {
                 throw new IllegalArgumentException("Overflow tier chance bonus must be between 0 and 100.");
+            }
+            if (magicSlotLimit < 1 || rareSlotLimit < magicSlotLimit) {
+                throw new IllegalArgumentException("Slot limits must hold at least one affix and grow with rarity.");
+            }
+            if (rareAffixWeights.length != 4 || Arrays.stream(rareAffixWeights).sum() != 100) {
+                throw new IllegalArgumentException("Rare affix weights must cover three to six affixes and sum to 100.");
             }
         }
     }

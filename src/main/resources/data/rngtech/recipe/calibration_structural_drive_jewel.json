@@ -1,0 +1,16 @@
+{
+    "type": "rngtech:calibration",
+    "family": "structural",
+    "ingredient": { "item": "rngtech:jewel_blank" },
+    "pattern": { "item": "rngtech:structural_calibration_pattern" },
+    "catalyst": { "item": "minecraft:gold_ingot" },
+    "processing_ticks": 320,
+    "energy": 4000,
+    "machine_xp": 4,
+    "bonus_output": false,
+    "result": {
+        "stack": { "id": "rngtech:drive_jewel" },
+        "stage": 3,
+        "stability": { "min": 30, "max": 90 }
+    }
+}

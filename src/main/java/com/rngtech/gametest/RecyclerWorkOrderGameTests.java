@@ -6,6 +6,7 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
 import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.menu.ComponentRecyclerMenu;
+import com.rngtech.content.menu.DriveBaySlot;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.recycling.ComponentRecyclerChassis;
 import com.rngtech.content.recycling.DisassemblyHeadMaterial;
@@ -15,7 +16,6 @@ import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.workorder.WorkOrderOperations;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
-import com.rngtech.rpg.workorder.MachineWorkOrders;
 import com.rngtech.rpg.workorder.WorkFilter;
 import com.rngtech.rpg.workorder.WorkObjective;
 import com.rngtech.rpg.workorder.WorkObjectiveType;
@@ -88,12 +88,22 @@ public final class RecyclerWorkOrderGameTests {
     }
 
     private static void shiftClick(ComponentRecyclerMenu menu, Player player, int inventorySlot) {
-        for (int index = 0; index < menu.slots.size() - MachineWorkOrders.SLOTS; index++) {
+        for (int index = 0; index < firstBay(menu); index++) {
             Slot slot = menu.getSlot(index);
             if (slot.container == player.getInventory() && slot.getContainerSlot() == inventorySlot) {
                 menu.quickMoveStack(player, index);
                 return;
             }
         }
+    }
+
+    /** The menu index of the first drive bay: the bays follow the player inventory, ahead of the jewel slots. */
+    private static int firstBay(ComponentRecyclerMenu menu) {
+        for (int index = 0; index < menu.slots.size(); index++) {
+            if (menu.getSlot(index) instanceof DriveBaySlot) {
+                return index;
+            }
+        }
+        throw new IllegalStateException("The menu has no drive bays");
     }
 }

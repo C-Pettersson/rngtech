@@ -6,7 +6,7 @@ export const START_ANGLES = [-150, -90, -30, 30, 90, 150];
 export const RING_RADII = { hub: 210, core: 840, start: 1200, middle: 2250, outer: 3100 };
 // Design radii are authored at a readable size, then scaled to the density of the reward pockets.
 const SCALE = 0.58;
-const RADIUS = { STARTER: 20, TRAVEL: 6, NODE: 9, NOTABLE: 17, KEYSTONE: 24 };
+const RADIUS = { STARTER: 20, TRAVEL: 6, NODE: 9, NOTABLE: 17, KEYSTONE: 24, JEWEL_SOCKET: 12 };
 // Keystones may sit directly on a road, but never within this many allocations of any start.
 export const KEYSTONE_START_DISTANCE = 10;
 const KEYSTONE_SPACING = 280;
@@ -65,6 +65,9 @@ const SHAPES = {
     },
     star: { gateLinks: [0], nodes: starPoints(), links: Array.from({ length: 12 }, (_, i) => [i, (i + 1) % 12]) },
     keyDirect: { gateLinks: [0], nodes: [["KEYSTONE", 96, 0]], links: [] },
+    // Jewel Sockets: a leaf at the end of a one-node arm in the home regions, or hung directly off an outer road.
+    socketArm: { gateLinks: [0], nodes: [["NODE", 60, 0], ["JEWEL_SOCKET", 112, 0]], links: [[0, 1]] },
+    socketDirect: { gateLinks: [0], nodes: [["JEWEL_SOCKET", 72, 0]], links: [] },
     // Two keystones hanging from the same travel node, for a pair of related choices.
     keyPair: { gateLinks: [0, 1], nodes: [["KEYSTONE", 92, -52], ["KEYSTONE", 92, 52]], links: [] },
     keyArc: { gateLinks: [0], nodes: [["NODE", 62, 0], ["NODE", 110, 24], ["NOTABLE", 162, 66], ["KEYSTONE", 238, 120]], links: [[0, 1], [1, 2], [2, 3]] },

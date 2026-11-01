@@ -37,5 +37,9 @@ public enum ModifierCapability {
     /** Machine bodies with a sound profile and no Machine Mastery, which can roll Discreet. */
     HAS_MACHINE_NOISE,
     /** Machine bodies with a comparator gauge to report, which can roll Telemetry. */
-    HAS_TELEMETRY
+    HAS_TELEMETRY,
+    /** Jewels, which roll the machine-agnostic jewel pool and nothing else. */
+    HAS_JEWEL,
+    /** Placed machine bodies with a screen, which can roll Bedazzling body sockets. */
+    HAS_JEWEL_SOCKETS
 }

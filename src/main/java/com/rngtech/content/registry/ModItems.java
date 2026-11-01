@@ -57,6 +57,7 @@ import com.rngtech.content.item.FurnaceChassisBlockItem;
 import com.rngtech.content.item.GasChemistryPartItem;
 import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.item.ItemConnectorItem;
+import com.rngtech.content.item.JewelItem;
 import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.item.MachineBlockItem;
 import com.rngtech.content.item.MachineChassisItem;
@@ -115,6 +116,7 @@ import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierLensTag;
 import com.rngtech.rpg.PhaseArrayRules;
+import com.rngtech.rpg.jewel.JewelColour;
 import com.rngtech.rpg.refinement.RefinementModifier;
 import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.unique.UniqueCatalog;
@@ -748,6 +750,9 @@ public final class ModItems {
             "cavitation_rotor_hub",
             () -> new CalibratedComponentItem(CalibrationFamily.KINETIC, new Item.Properties())
     );
+    /** The uncut stone a Resonance Calibrator cuts into a jewel of the catalyst's colour. */
+    public static final DeferredItem<Item> JEWEL_BLANK = ITEMS.register("jewel_blank", () -> new Item(new Item.Properties()));
+    public static final Map<JewelColour, DeferredItem<JewelItem>> JEWELS = registerJewels();
 
     public static final Map<CrushHeadMaterial, DeferredItem<CrushHeadItem>> CRUSH_HEADS = registerCrushHeads();
     public static final DeferredItem<CrushHeadItem> FLINT_CRUSH_HEAD = crushHead(CrushHeadMaterial.FLINT);
@@ -1351,6 +1356,18 @@ public final class ModItems {
             families.put(family, Collections.unmodifiableMap(items));
         }
         return Collections.unmodifiableMap(families);
+    }
+
+    private static Map<JewelColour, DeferredItem<JewelItem>> registerJewels() {
+        Map<JewelColour, DeferredItem<JewelItem>> items = new EnumMap<>(JewelColour.class);
+        for (JewelColour colour : JewelColour.values()) {
+            items.put(colour, ITEMS.register(colour.itemId(), () -> new JewelItem(colour, new Item.Properties().stacksTo(1))));
+        }
+        return Collections.unmodifiableMap(items);
+    }
+
+    public static DeferredItem<JewelItem> jewel(JewelColour colour) {
+        return JEWELS.get(colour);
     }
 
     private static Map<ToolRodMaterial, DeferredItem<ToolRodItem>> registerToolRods() {

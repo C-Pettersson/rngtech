@@ -80,6 +80,9 @@ public class ResonanceCalibratorBlock extends WorkOrderMachineBlock {
                 stack.set(ModDataComponents.CALIBRATION_STREAK.get(), calibrator.persistentStreak());
             }
         }
+        if (level.getBlockEntity(pos) instanceof BaseMachineBlockEntity jewelled && !jewelled.jewels().isEmpty()) {
+            stack.set(ModDataComponents.JEWELS.get(), jewelled.jewels());
+        }
         return stack;
     }
 

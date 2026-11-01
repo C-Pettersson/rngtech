@@ -161,6 +161,13 @@ By default, Uniques drop from vanilla structures and mobs. The [Uniques](uniques
 - **Give a Glyph:** `/rngtech glyph give <players> <tier>` gives a Glyph of tier 1 to 5. Machines do not drop loot on their own events, so quests are the way to reward machine play.
 - **Add your own Uniques:** put a JSON file in `config/rngtech/uniques/`.
 
+## Jewels
+
+By default, uncut [jewels](jewels.md) also turn up in village, mineshaft, ruined portal, igloo, bastion, and Nether fortress chests, and Tier III and higher Work Orders can reward one.
+
+- **Turn off chest drops:** `jewels.loot.enabled`, or one colour with `jewels.loot.<control|drive|reserve>.enabled`. The Resonance Calibrator cut and Work Order rewards stay.
+- **Your own loot:** add `rngtech:control_jewel`, `rngtech:drive_jewel`, or `rngtech:reserve_jewel` to a loot table with the `rngtech:unidentified` function, so each player rolls their own copy.
+
 The [Uniques guide for pack makers](https://github.com/c-pettersson/rngtech/blob/main/extras/uniques/README.md) covers the file format and rules.
 
 ## Dormant Machines

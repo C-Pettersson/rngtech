@@ -4,6 +4,7 @@ import com.rngtech.content.material.MaterialCatalog;
 import com.rngtech.content.material.MaterialFamily;
 import com.rngtech.content.material.OreCatalog;
 import com.rngtech.content.material.OreDefinition;
+import com.rngtech.rpg.jewel.JewelColour;
 import com.rngtech.rpg.unique.UniqueCatalog;
 import com.rngtech.rpg.unique.UniqueDefinition;
 
@@ -12,6 +13,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,6 +155,10 @@ public final class RNGTechConfig {
     /** Gates every default Unique loot table; pack sources such as challenge tables and quests are unaffected. */
     public static final ModConfigSpec.BooleanValue UNIQUE_LOOT_ENABLED = UNIQUE_LOOT_CONFIG.enabled();
     public static final Map<String, ModConfigSpec.BooleanValue> UNIQUE_LOOT = UNIQUE_LOOT_CONFIG.uniques();
+    private static final JewelLootConfig JEWEL_LOOT_CONFIG = defineJewelLoot();
+    /** Gates the default jewel chest tables; the Calibrator cut and Work Order rewards are unaffected. */
+    public static final ModConfigSpec.BooleanValue JEWEL_LOOT_ENABLED = JEWEL_LOOT_CONFIG.enabled();
+    public static final Map<JewelColour, ModConfigSpec.BooleanValue> JEWEL_LOOT = JEWEL_LOOT_CONFIG.colours();
 
     // Phase Array. The operations themselves are rngtech:phase_array recipes; these are the line's own numbers.
     public static final ModConfigSpec.DoubleValue PHASE_COIL_HOLD_CHANCE = BUILDER
@@ -240,6 +246,26 @@ public final class RNGTechConfig {
         return Collections.unmodifiableMap(values);
     }
 
+    private record JewelLootConfig(ModConfigSpec.BooleanValue enabled, Map<JewelColour, ModConfigSpec.BooleanValue> colours) {
+    }
+
+    private static JewelLootConfig defineJewelLoot() {
+        BUILDER.push("jewels");
+        BUILDER.push("loot");
+        ModConfigSpec.BooleanValue enabled = BUILDER
+                .comment("Whether the default chest tables, such as village and Nether fortress chests, can hold uncut jewels.")
+                .define("enabled", true);
+        Map<JewelColour, ModConfigSpec.BooleanValue> values = new EnumMap<>(JewelColour.class);
+        for (JewelColour colour : JewelColour.values()) {
+            values.put(colour, BUILDER
+                    .comment("Whether the default chest tables can hold " + colour.getSerializedName() + " jewels.")
+                    .define(colour.getSerializedName() + ".enabled", true));
+        }
+        BUILDER.pop();
+        BUILDER.pop();
+        return new JewelLootConfig(enabled, Collections.unmodifiableMap(values));
+    }
+
     private static UniqueLootConfig defineUniqueLoot() {
         BUILDER.push("uniques");
         BUILDER.push("loot");
@@ -280,6 +306,11 @@ public final class RNGTechConfig {
     /** {@code energy} FE from a Stage {@code stage} RNGTech generator, scaled by the pack's global and stage multipliers. */
     public static double generatedEnergy(double energy, int stage) {
         return energy * packGenerationMultiplier(stage);
+    }
+
+    /** Whether the default chest tables may drop jewels, or jewels of {@code colour} when one is named. */
+    public static boolean jewelLootEnabled(JewelColour colour) {
+        return JEWEL_LOOT_ENABLED.get() && (colour == null || JEWEL_LOOT.get(colour).get());
     }
 
     /** Whether the default loot tables may drop {@code uniqueId}. */

@@ -11,6 +11,7 @@ import com.rngtech.content.minerscompanion.MinersCompanionState;
 import com.rngtech.content.tool.FieldToolAssembly;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.OutputAmountTracker;
+import com.rngtech.rpg.jewel.MachineJewels;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.SoulTransfer;
 import com.rngtech.rpg.workorder.FulfilledWorkOrder;
@@ -67,6 +68,13 @@ public final class ModDataComponents {
                     builder -> builder
                             .persistent(CalibrationStreak.CODEC)
                             .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(CalibrationStreak.CODEC))
+            );
+
+    /** The jewels in a machine's tree and body sockets, kept on the dropped or picked machine. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<MachineJewels>> JEWELS =
+            DATA_COMPONENTS.registerComponentType(
+                    "jewels",
+                    builder -> builder.persistent(MachineJewels.CODEC).networkSynchronized(MachineJewels.STREAM_CODEC)
             );
 
     /** Crusher bonus banks kept on a dropped or picked machine by the Assayer's Wide Ledger. */

@@ -34,10 +34,13 @@ public final class MachineStatAccumulator {
     private static final Component RARITY_SOURCE = Component.translatable("rngtech.stat.breakdown.source.rarity");
     private static final Component FALLBACK_SOURCE = Component.translatable("rngtech.stat.breakdown.source.machine");
     private static final Component CRUSHER_SOURCE = Component.translatable("rngtech.stat.breakdown.source.crusher");
+    private static final Component OUTPUT_CAP_SOURCE = Component.translatable("rngtech.stat.breakdown.source.output_cap");
     private static final Source NO_SOURCE = () -> {
     };
-    /** The Crusher's Output Amount bucket {@code B} pays {@code B * K / (B + K)} percent, so yield never passes +K%. */
-    public static final double CRUSHER_YIELD_SOFT_CAP = 100.0;
+    /** Increased Bonus Output pays no more than Maximum Bonus Output, which starts here and flat additions raise. */
+    public static final double BASE_MAX_OUTPUT_AMOUNT = 75.0;
+    /** Maximum Bonus Output itself stops here, however many +1% sources a machine stacks. */
+    public static final double MAX_OUTPUT_AMOUNT_CEILING = 90.0;
     /** Two top-tier Super Output rolls plus the Assayer would reach 26%; the Crusher stops at 25%. */
     public static final double CRUSHER_SUPER_OUTPUT_CEILING = 25.0;
     /** Stats whose reductions divide instead of emptying the increased bucket, so no single roll reaches the floor. */
@@ -47,7 +50,8 @@ public final class MachineStatAccumulator {
     private final Map<MachineStat, Double> additiveValues = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> increasedPercentValues = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> reducedPercentValues = new EnumMap<>(MachineStat.class);
-    private final Map<MachineStat, Double> increasedSoftCaps = new EnumMap<>(MachineStat.class);
+    /** Stats whose increased bucket pays no more than another stat's value, keyed by the capped stat. */
+    private final Map<MachineStat, MachineStat> increasedCaps = new EnumMap<>(MachineStat.class);
     private final Map<MachineStat, Double> moreValues = new EnumMap<>(MachineStat.class);
     private double flatEnergyGenerationBonus;
     private double partEnergyGenerationMore = 1.0;
@@ -97,7 +101,7 @@ public final class MachineStatAccumulator {
         copy.additiveValues.putAll(additiveValues);
         copy.increasedPercentValues.putAll(increasedPercentValues);
         copy.reducedPercentValues.putAll(reducedPercentValues);
-        copy.increasedSoftCaps.putAll(increasedSoftCaps);
+        copy.increasedCaps.putAll(increasedCaps);
         copy.moreValues.putAll(moreValues);
         copy.flatEnergyGenerationBonus = flatEnergyGenerationBonus;
         copy.partEnergyGenerationMore = partEnergyGenerationMore;
@@ -216,6 +220,11 @@ public final class MachineStatAccumulator {
             terms.add(new StatBreakdown.Term(StatBreakdown.Kind.BASE, base, BASE_SOURCE));
         }
         terms.addAll(recorded.getOrDefault(resolvedStat, List.of()));
+        // The cap is another stat's final value, so it is resolved here rather than when the rule was recorded.
+        MachineStat capStat = increasedCaps.get(resolvedStat);
+        if (capStat != null) {
+            terms.add(new StatBreakdown.Term(StatBreakdown.Kind.INCREASED_CAP, value(capStat), Component.translatable(capStat.translationKey())));
+        }
         increasedConversions.forEach((from, conversion) -> {
             double converted = conversion.perPercent() * increasedPercentValues.getOrDefault(from, 0.0);
             if (conversion.to() == resolvedStat && converted != 0.0) {
@@ -277,13 +286,26 @@ public final class MachineStatAccumulator {
         return stats;
     }
 
-    /** The Crusher's yield rules: a soft-capped Output Amount bucket and a Super Output ceiling. */
+    /** The Crusher's yield rules: the Bonus Output cap and a Super Output ceiling. */
     MachineStatAccumulator withCrusherYieldRules() {
+        withOutputCap();
         try (Source ignored = source(CRUSHER_SOURCE)) {
-            increasedSoftCaps.put(MachineStat.OUTPUT_AMOUNT, CRUSHER_YIELD_SOFT_CAP);
-            record(StatBreakdown.Kind.SOFT_CAP, MachineStat.OUTPUT_AMOUNT, CRUSHER_YIELD_SOFT_CAP);
             capAbsolute(MachineStat.SUPER_OUTPUT_CHANCE, CRUSHER_SUPER_OUTPUT_CEILING);
         }
+        return this;
+    }
+
+    /**
+     * The Bonus Output cap, for every machine that reads Output Amount: its increased bucket pays no more than Maximum
+     * Bonus Output, which starts at {@link #BASE_MAX_OUTPUT_AMOUNT} and stops at {@link #MAX_OUTPUT_AMOUNT_CEILING}.
+     */
+    MachineStatAccumulator withOutputCap() {
+        checkMutable();
+        baseValues.put(MachineStat.MAX_OUTPUT_AMOUNT, BASE_MAX_OUTPUT_AMOUNT);
+        try (Source ignored = source(OUTPUT_CAP_SOURCE)) {
+            capAbsolute(MachineStat.MAX_OUTPUT_AMOUNT, MAX_OUTPUT_AMOUNT_CEILING);
+        }
+        increasedCaps.put(MachineStat.OUTPUT_AMOUNT, MachineStat.MAX_OUTPUT_AMOUNT);
         return this;
     }
 
@@ -292,9 +314,9 @@ public final class MachineStatAccumulator {
         return DIVIDING_REDUCTION_STATS.contains(accumulationStat(stat));
     }
 
-    /** A positive increased bucket after a soft cap of {@code capPercent}: {@code B * K / (B + K)}. */
-    public static double softCapped(double increasedPercent, double capPercent) {
-        return increasedPercent <= 0.0 ? increasedPercent : increasedPercent * capPercent / (increasedPercent + capPercent);
+    /** An increased bucket under a cap of {@code capPercent}: the bucket itself up to the cap, the cap beyond it. */
+    public static double capped(double increasedPercent, double capPercent) {
+        return Math.min(increasedPercent, capPercent);
     }
 
     /** The scale of a dividing stat: increases multiply, reductions divide. */
@@ -841,6 +863,7 @@ public final class MachineStatAccumulator {
         stats.baseValues.put(MachineStat.BURST_DURATION, 0.0);
         stats.baseValues.put(MachineStat.IDLE_LOSS, 0.0);
         stats.baseValues.put(MachineStat.BATTERY_SLOTS, 0.0);
+        stats.baseValues.put(MachineStat.JEWEL_SOCKETS, 0.0);
         stats.baseValues.put(MachineStat.GLOBAL_MODIFIER_STRENGTH, 1.0);
         stats.baseValues.put(MachineStat.FLUID_CAPACITY, 0.0);
         stats.baseValues.put(MachineStat.COMPRESSION_RATIO, 1.0);
@@ -979,14 +1002,20 @@ public final class MachineStatAccumulator {
         return floor == null ? ordinary * bonusMore : floor + Math.max(0.0, ordinary - floor) * bonusMore;
     }
 
-    /** The summed increased and reduced percent on {@code stat}, before any soft cap. */
+    /** The summed increased and reduced percent on {@code stat}, before any cap. */
     public double increasedPercent(MachineStat stat) {
         return increasedPercentValues.getOrDefault(accumulationStat(stat), 0.0);
     }
 
+    /** The value of the stat that caps {@code stat}'s increased bucket, or null when it has none. */
+    public Double increasedCap(MachineStat stat) {
+        MachineStat capStat = increasedCaps.get(accumulationStat(stat));
+        return capStat == null ? null : value(capStat);
+    }
+
     /**
-     * The increased bucket on {@code stat} plus {@code extraPercent}, after the stat's soft cap: a positive bucket
-     * {@code B} pays {@code B * K / (B + K)}. Stats without a soft cap return the bucket unchanged.
+     * The increased bucket on {@code stat} plus {@code extraPercent}, after the stat's cap: Bonus Output pays no more
+     * than Maximum Bonus Output. Stats without a cap return the bucket unchanged.
      */
     public double effectiveIncreasedPercent(MachineStat stat, double extraPercent) {
         MachineStat resolvedStat = accumulationStat(stat);
@@ -994,8 +1023,8 @@ public final class MachineStatAccumulator {
         if (increasedConversions.containsKey(resolvedStat)) {
             increased = 0.0;
         }
-        Double cap = increasedSoftCaps.get(resolvedStat);
-        return cap == null ? increased : softCapped(increased, cap);
+        Double cap = increasedCap(resolvedStat);
+        return cap == null ? increased : capped(increased, cap);
     }
 
     /** Dividing stats scale by {@code (1 + increases) / (1 + reductions)}; the rest by {@code 1 + bucket}. */
@@ -1172,7 +1201,7 @@ public final class MachineStatAccumulator {
     private static double merge(StatBreakdown.Kind kind, double current, double next) {
         return switch (kind) {
             case MORE -> current * next;
-            case FIXED, CEILING, SOFT_CAP -> Math.min(current, next);
+            case FIXED, CEILING, INCREASED_CAP -> Math.min(current, next);
             default -> current + next;
         };
     }

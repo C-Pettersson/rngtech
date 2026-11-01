@@ -26,7 +26,7 @@ public final class StatBreakdownChecks {
         overridesRecombine();
         partContributionsCarryThePartLabel();
         flatCapacityFoldsIntoCapacity();
-        crusherYieldSoftCapRecombines();
+        crusherYieldCapRecombines();
         multiplierFormulaUsesFactors();
         floorAndBonusScaleRecombine();
         energyUsageReductionsRecombine();
@@ -198,7 +198,7 @@ public final class StatBreakdownChecks {
                 "same-named sources share one summed line: " + lines);
     }
 
-    private static void crusherYieldSoftCapRecombines() {
+    private static void crusherYieldCapRecombines() {
         MachineStatAccumulator stats = MachineStatAccumulator.recording(() -> {
             MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.2))
                     .withCrusherYieldRules();
@@ -207,11 +207,23 @@ public final class StatBreakdownChecks {
             return recorded;
         });
         StatBreakdown breakdown = stats.breakdown(MachineStat.OUTPUT_AMOUNT).orElseThrow();
-        near(breakdown.recompute(), stats.value(MachineStat.OUTPUT_AMOUNT), "the soft-capped yield bucket recombines");
-        near(breakdown.paidIncreasedPercent(), 289.0 * 100 / 389, "the breakdown pays the soft-capped bonus");
+        near(breakdown.recompute(), stats.value(MachineStat.OUTPUT_AMOUNT), "the capped yield bucket recombines");
+        near(breakdown.paidIncreasedPercent(), MachineStatAccumulator.BASE_MAX_OUTPUT_AMOUNT, "the breakdown pays the capped bonus");
         String text = StatBreakdownText.lines(breakdown).stream().map(Component::getString).collect(Collectors.joining("\n"));
-        require(text.contains("rngtech.stat.breakdown.soft_cap"),
-                "the breakdown shows the soft-cap math:\n" + text);
+        require(text.contains("rngtech.stat.breakdown.increased_cap"), "the breakdown shows the over-cap amount:\n" + text);
+
+        MachineStatAccumulator raised = MachineStatAccumulator.recording(() -> {
+            MachineStatAccumulator recorded = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.0))
+                    .withCrusherYieldRules();
+            recorded.apply(Component.literal("Overflow Gate"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.MAX_OUTPUT_AMOUNT, ModifierOperation.ADD, 2));
+            recorded.apply(Component.literal("Jaws"), new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 70));
+            return recorded;
+        });
+        StatBreakdown underCap = raised.breakdown(MachineStat.OUTPUT_AMOUNT).orElseThrow();
+        near(underCap.lowest(StatBreakdown.Kind.INCREASED_CAP).value(), 77, "the cap term carries the raised Maximum Bonus Output");
+        near(underCap.recompute(), 1.7, "a bucket under the cap pays every percent");
+        String headroom = StatBreakdownText.lines(underCap).stream().map(Component::getString).collect(Collectors.joining("\n"));
+        require(headroom.contains("rngtech.stat.breakdown.increased_headroom"), "the breakdown shows the headroom left:\n" + headroom);
     }
 
     private static void multiplierFormulaUsesFactors() {
@@ -222,14 +234,14 @@ public final class StatBreakdownChecks {
             return recorded;
         });
         StatBreakdown breakdown = stats.breakdown(MachineStat.OUTPUT_AMOUNT).orElseThrow();
-        near(breakdown.recompute(), 1.44, "a soft-capped +25% increased scales a ×1.2 yield to ×1.44");
+        near(breakdown.recompute(), 1.5, "+25% increased under the cap scales a ×1.2 yield to ×1.5");
         Component formula = StatBreakdownText.lines(breakdown).stream()
                 .filter(line -> line.getContents() instanceof TranslatableContents contents
                         && contents.getKey().equals("rngtech.stat.breakdown.formula"))
                 .findFirst()
                 .orElseThrow();
         List<String> operands = Arrays.stream(((TranslatableContents) formula.getContents()).getArgs()).map(String::valueOf).toList();
-        require(operands.equals(List.of("1.2", "1.2", "1", "1.44 (+44%)")),
+        require(operands.equals(List.of("1.2", "1.25", "1", "1.5 (+50%)")),
                 "a multiplier stat's formula multiplies factors, not its +20% display: " + operands);
     }
 
@@ -246,7 +258,7 @@ public final class StatBreakdownChecks {
         });
         StatBreakdown breakdown = stats.breakdown(MachineStat.OUTPUT_AMOUNT).orElseThrow();
         near(breakdown.recompute(), stats.value(MachineStat.OUTPUT_AMOUNT), "the floor and bonus scale recombine");
-        near(breakdown.recompute(), 1 + 0.75 * (60.0 / 160), "only the bonus above the floor scales");
+        near(breakdown.recompute(), 1 + 0.75 * 0.6, "only the bonus above the floor scales");
         String text = StatBreakdownText.lines(breakdown).stream().map(Component::getString).collect(Collectors.joining("\n"));
         require(text.contains("rngtech.stat.breakdown.bonus_formula"), "the breakdown shows the bonus-only math:\n" + text);
 

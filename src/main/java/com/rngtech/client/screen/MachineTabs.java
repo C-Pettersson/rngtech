@@ -1,6 +1,7 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.rpg.jewel.JewelColour;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -285,6 +286,11 @@ public final class MachineTabs {
 
         public Builder mastery(int id) {
             return tab(id, "rngtech.tab.mastery", ModItems.MASTERY_REFUND.get());
+        }
+
+        /** The Jewels tab, hidden until {@code shown} holds: a machine with no socket has nothing to put a jewel in. */
+        public Builder jewels(int id, BooleanSupplier shown) {
+            return tab(id, Component.translatable("rngtech.tab.jewels"), new ItemStack(ModItems.jewel(JewelColour.DRIVE).get()), shown);
         }
 
         /** The Orders tab, hidden until {@code shown} holds, so players who have not found Work Orders do not see it. */

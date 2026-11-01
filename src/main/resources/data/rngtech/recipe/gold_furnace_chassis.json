@@ -1,0 +1,43 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "gold"
+    }
+  ],
+  "type": "rngtech:calibrated_shaped",
+  "category": "redstone",
+  "pattern": [
+    "IBI",
+    "RFR",
+    "CXS"
+  ],
+  "key": {
+    "B": {
+      "ingredient": { "tag": "rngtech:circuits/basic" }
+    },
+    "C": {
+      "ingredient": { "tag": "c:ingots/gold" }
+    },
+    "F": {
+      "ingredient": { "tag": "rngtech:machine_frames/base" }
+    },
+    "I": {
+      "ingredient": { "tag": "c:ingots/gold" }
+    },
+    "R": {
+      "ingredient": { "item": "minecraft:redstone" }
+    },
+    "S": {
+      "ingredient": { "item": "minecraft:smooth_stone" }
+    },
+    "X": {
+      "ingredient": { "item": "rngtech:calibrated_thermal_component" },
+      "calibration": { "family": "thermal", "min_stage": 2, "min_stability": 45 }
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:gold_furnace_chassis"
+  }
+}

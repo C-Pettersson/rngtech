@@ -35,6 +35,7 @@ import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.OutputLedger;
+import com.rngtech.rpg.jewel.JewelEffects;
 import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -771,9 +772,11 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
         MachineStatAccumulator stats = MachineBaseStatCatalog.metalPress();
         stats.apply(effectiveTraits());
         MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.METAL_PRESS);
+        JewelEffects.applyLines(stats, this, machineProgression(), MachineMasteryFamily.METAL_PRESS);
         applyHeatCoreStats(stats);
         applyServoStats(stats);
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.METAL_PRESS);
+        JewelEffects.applyThresholds(stats, this, machineProgression(), MachineMasteryFamily.METAL_PRESS);
         WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(

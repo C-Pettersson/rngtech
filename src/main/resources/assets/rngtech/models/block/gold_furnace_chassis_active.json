@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/gold_furnace_chassis",
+  "textures": {
+    "lamp": "rngtech:block/furnace/lamp_on"
+  }
+}

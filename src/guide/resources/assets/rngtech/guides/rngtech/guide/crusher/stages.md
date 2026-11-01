@@ -13,6 +13,7 @@ navigation:
 | 0 | <ItemLink id="rngtech:wooden_crusher_chassis" /> | Primitive body: weak buffer, slow, and uses more energy. |
 | 1 | <ItemLink id="rngtech:iron_crusher_chassis" /> | Baseline powered Crusher. |
 | 2 | <ItemLink id="rngtech:copper_crusher_chassis" /> | Better energy use, smaller buffer. |
+| 3 | <ItemLink id="rngtech:gold_crusher_chassis" /> | Copper numbers with one built-in [jewel socket](rngtech:jewels.md#body-sockets). |
 | 3 | <ItemLink id="rngtech:bronze_crusher_chassis" /> | More output, higher energy use. |
 | 4 | <ItemLink id="rngtech:steel_crusher_chassis" /> | Durable and efficient but slower. Has Output Guard. |
 | 5 | <ItemLink id="rngtech:aluminum_crusher_chassis" /> | Fast and efficient, smaller buffer. |

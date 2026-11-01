@@ -3108,6 +3108,116 @@
             "theme": "Actuation",
             "region": "control",
             "layer": "outer"
+        },
+        {
+            "id": "reward_405",
+            "x": 5553,
+            "y": 3220,
+            "role": "reward",
+            "shape": "diamond",
+            "gate": "path_0390",
+            "theme": "Recovery",
+            "region": "drive",
+            "layer": "outer"
+        },
+        {
+            "id": "reward_406",
+            "x": 3066,
+            "y": 3624,
+            "role": "reward",
+            "shape": "socketArm",
+            "gate": "path_0148",
+            "theme": "Precision",
+            "region": "control",
+            "layer": "home"
+        },
+        {
+            "id": "reward_407",
+            "x": 4247,
+            "y": 3037,
+            "role": "reward",
+            "shape": "socketArm",
+            "gate": "path_0190",
+            "theme": "Actuation",
+            "region": "control_drive",
+            "layer": "home"
+        },
+        {
+            "id": "reward_408",
+            "x": 4656,
+            "y": 3521,
+            "role": "reward",
+            "shape": "socketArm",
+            "gate": "path_0218",
+            "theme": "Momentum",
+            "region": "drive",
+            "layer": "home"
+        },
+        {
+            "id": "reward_409",
+            "x": 4907,
+            "y": 4292,
+            "role": "reward",
+            "shape": "socketArm",
+            "gate": "path_0253",
+            "theme": "Heat Flow",
+            "region": "drive_reserve",
+            "layer": "home"
+        },
+        {
+            "id": "reward_410",
+            "x": 3806,
+            "y": 4975,
+            "role": "reward",
+            "shape": "socketArm",
+            "gate": "path_0287",
+            "theme": "Reserves",
+            "region": "reserve",
+            "layer": "home"
+        },
+        {
+            "id": "reward_411",
+            "x": 3278,
+            "y": 4648,
+            "role": "reward",
+            "shape": "socketArm",
+            "gate": "path_0321",
+            "theme": "Conservation",
+            "region": "reserve_control",
+            "layer": "home"
+        },
+        {
+            "id": "reward_412",
+            "x": 4075,
+            "y": 2320,
+            "role": "reward",
+            "shape": "socketDirect",
+            "gate": "path_0376",
+            "theme": "Actuation",
+            "region": "control_drive",
+            "layer": "outer"
+        },
+        {
+            "id": "reward_413",
+            "x": 5773,
+            "y": 4333,
+            "role": "reward",
+            "shape": "socketDirect",
+            "gate": "path_0443",
+            "theme": "Heat Flow",
+            "region": "drive_reserve",
+            "layer": "outer"
+        },
+        {
+            "id": "reward_414",
+            "x": 2900,
+            "y": 4933,
+            "role": "reward",
+            "shape": "socketDirect",
+            "gate": "path_0324",
+            "theme": "Conservation",
+            "region": "reserve_control",
+            "layer": "outer"
         }
     ],
     "nodes": [
@@ -30759,6 +30869,337 @@
             "group": "reward_404"
         },
         {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "overflow_gate_1",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 5552,
+            "y": 3268,
+            "group": "reward_405"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "overflow_gate_2",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 5519,
+            "y": 3220,
+            "group": "reward_405"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "overflow_gate_3",
+            "name": "Recovery",
+            "kind": "NODE",
+            "x": 5586,
+            "y": 3221,
+            "group": "reward_405"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "MAX_OUTPUT_AMOUNT",
+                    "operation": "ADD",
+                    "value": 2
+                },
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 1.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "overflow_gate",
+            "kind": "NOTABLE",
+            "name": "Overflow Gate",
+            "x": 5553,
+            "y": 3171,
+            "group": "reward_405"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "STABILITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "socket_control_1",
+            "name": "Precision",
+            "kind": "NODE",
+            "x": 3071,
+            "y": 3650,
+            "group": "reward_406"
+        },
+        {
+            "effects": [],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "jewel_socket_1",
+            "name": "Jewel Socket",
+            "kind": "JEWEL_SOCKET",
+            "x": 3061,
+            "y": 3599,
+            "group": "reward_406"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "socket_control_drive_1",
+            "name": "Actuation",
+            "kind": "NODE",
+            "x": 4235,
+            "y": 3058,
+            "group": "reward_407"
+        },
+        {
+            "effects": [],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "jewel_socket_2",
+            "name": "Jewel Socket",
+            "kind": "JEWEL_SOCKET",
+            "x": 4258,
+            "y": 3017,
+            "group": "reward_407"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "socket_drive_1",
+            "name": "Momentum",
+            "kind": "NODE",
+            "x": 4663,
+            "y": 3496,
+            "group": "reward_408"
+        },
+        {
+            "effects": [],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "jewel_socket_3",
+            "name": "Jewel Socket",
+            "kind": "JEWEL_SOCKET",
+            "x": 4649,
+            "y": 3546,
+            "group": "reward_408"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "HEAT_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 2
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "socket_drive_reserve_1",
+            "name": "Heat Flow",
+            "kind": "NODE",
+            "x": 4883,
+            "y": 4295,
+            "group": "reward_409"
+        },
+        {
+            "effects": [],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "jewel_socket_4",
+            "name": "Jewel Socket",
+            "kind": "JEWEL_SOCKET",
+            "x": 4930,
+            "y": 4288,
+            "group": "reward_409"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "ENERGY_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 3
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "socket_reserve_1",
+            "name": "Reserves",
+            "kind": "NODE",
+            "x": 3826,
+            "y": 4959,
+            "group": "reward_410"
+        },
+        {
+            "effects": [],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "jewel_socket_5",
+            "name": "Jewel Socket",
+            "kind": "JEWEL_SOCKET",
+            "x": 3785,
+            "y": 4991,
+            "group": "reward_410"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "socket_reserve_control_1",
+            "name": "Conservation",
+            "kind": "NODE",
+            "x": 3289,
+            "y": 4625,
+            "group": "reward_411"
+        },
+        {
+            "effects": [],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "jewel_socket_6",
+            "name": "Jewel Socket",
+            "kind": "JEWEL_SOCKET",
+            "x": 3267,
+            "y": 4672,
+            "group": "reward_411"
+        },
+        {
+            "effects": [],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "jewel_socket_7",
+            "name": "Jewel Socket",
+            "kind": "JEWEL_SOCKET",
+            "x": 4075,
+            "y": 2320,
+            "group": "reward_412"
+        },
+        {
+            "effects": [],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "jewel_socket_8",
+            "name": "Jewel Socket",
+            "kind": "JEWEL_SOCKET",
+            "x": 5773,
+            "y": 4333,
+            "group": "reward_413"
+        },
+        {
+            "effects": [],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "jewel_socket_9",
+            "name": "Jewel Socket",
+            "kind": "JEWEL_SOCKET",
+            "x": 2900,
+            "y": 4933,
+            "group": "reward_414"
+        },
+        {
             "effects": [],
             "behaviors": [
                 "MUTE_MACHINE_SOUND"
@@ -37683,6 +38124,86 @@
         [
             "cam_followers",
             "cam_followers_5"
+        ],
+        [
+            "path_0390",
+            "overflow_gate_1"
+        ],
+        [
+            "overflow_gate_1",
+            "overflow_gate_2"
+        ],
+        [
+            "overflow_gate_1",
+            "overflow_gate_3"
+        ],
+        [
+            "overflow_gate_2",
+            "overflow_gate"
+        ],
+        [
+            "overflow_gate_3",
+            "overflow_gate"
+        ],
+        [
+            "path_0148",
+            "socket_control_1"
+        ],
+        [
+            "socket_control_1",
+            "jewel_socket_1"
+        ],
+        [
+            "path_0190",
+            "socket_control_drive_1"
+        ],
+        [
+            "socket_control_drive_1",
+            "jewel_socket_2"
+        ],
+        [
+            "path_0218",
+            "socket_drive_1"
+        ],
+        [
+            "socket_drive_1",
+            "jewel_socket_3"
+        ],
+        [
+            "path_0253",
+            "socket_drive_reserve_1"
+        ],
+        [
+            "socket_drive_reserve_1",
+            "jewel_socket_4"
+        ],
+        [
+            "path_0287",
+            "socket_reserve_1"
+        ],
+        [
+            "socket_reserve_1",
+            "jewel_socket_5"
+        ],
+        [
+            "path_0321",
+            "socket_reserve_control_1"
+        ],
+        [
+            "socket_reserve_control_1",
+            "jewel_socket_6"
+        ],
+        [
+            "path_0376",
+            "jewel_socket_7"
+        ],
+        [
+            "path_0443",
+            "jewel_socket_8"
+        ],
+        [
+            "path_0324",
+            "jewel_socket_9"
         ]
     ]
 }

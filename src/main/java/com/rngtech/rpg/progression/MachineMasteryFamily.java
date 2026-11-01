@@ -78,8 +78,8 @@ public enum MachineMasteryFamily {
             case STABILITY -> this == RESONANCE_CALIBRATOR || this == METAL_PRESS;
             case SUPER_OUTPUT_CHANCE -> this != FORESTRY && this != MELTER;
             case ENERGY_CAPACITY_FLAT -> this == CRUSHER || this == FURNACE;
-            // Only the Crusher reads Output Amount; other machines' bonus output is Super Output.
-            case OUTPUT_AMOUNT -> this == CRUSHER;
+            // Only the Crusher reads Output Amount and its cap; other machines' bonus output is Super Output.
+            case OUTPUT_AMOUNT, MAX_OUTPUT_AMOUNT -> this == CRUSHER;
             case BATCH_SIZE -> this != FORESTRY;
             // Every heated machine, the Melter included, runs on the shared heat engine.
             case MAX_TEMPERATURE, HEAT_TRANSFER, THERMAL_CONDUCTIVITY, HEAT_ISOLATION, TEMPERATURE_STABILITY, THERMAL_MASS, COOLING_RATE,

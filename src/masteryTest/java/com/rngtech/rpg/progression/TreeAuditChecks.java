@@ -49,7 +49,9 @@ final class TreeAuditChecks {
             "adjustedEnergyCost", Set.of(MachineStat.ENERGY_USAGE),
             "adjustedFuelTicks", Set.of(MachineStat.FUEL_EFFICIENCY, MachineStat.FUEL_DURATION),
             // Flat Energy Capacity folds into Energy Capacity inside the accumulator.
-            "MachineStat.ENERGY_CAPACITY)", Set.of(MachineStat.ENERGY_CAPACITY_FLAT));
+            "MachineStat.ENERGY_CAPACITY)", Set.of(MachineStat.ENERGY_CAPACITY_FLAT),
+            // Output Amount pays no more than Maximum Bonus Output inside the accumulator.
+            "valueWithIncreased(MachineStat.OUTPUT_AMOUNT", Set.of(MachineStat.MAX_OUTPUT_AMOUNT));
     /** Static helper classes whose methods read stats for the machine that calls them. */
     private static final List<String> HELPER_CLASSES = List.of(
             "content/blockentity/HeatControl.java", "content/blockentity/HeatEngine.java", "content/blockentity/ProcessingChance.java",
@@ -166,7 +168,8 @@ final class TreeAuditChecks {
     /** Every reward node and keystone must benefit at least one machine; otherwise its points buy nothing. */
     private static void everyNodePaysSomeMachine() {
         for (MegaPassiveNode node : MegaPassiveTree.TREE.nodes()) {
-            if (node.kind() == PassiveNodeKind.STARTER || node.kind() == PassiveNodeKind.TRAVEL) {
+            // A Jewel Socket pays through the jewel it holds, not through effects of its own.
+            if (node.kind() == PassiveNodeKind.STARTER || node.kind() == PassiveNodeKind.TRAVEL || node.kind() == PassiveNodeKind.JEWEL_SOCKET) {
                 continue;
             }
             boolean pays = false;

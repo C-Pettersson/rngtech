@@ -1,0 +1,35 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "include": [
+                "rngtech:machine_traits",
+                "rngtech:machine_progression",
+                "rngtech:output_banks",
+                "rngtech:work_orders",
+                "rngtech:jewels",
+                "rngtech:mirrored"
+              ],
+              "source": "block_entity"
+            }
+          ],
+          "name": "rngtech:gold_crusher_chassis"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "rngtech:blocks/gold_crusher_chassis"
+}

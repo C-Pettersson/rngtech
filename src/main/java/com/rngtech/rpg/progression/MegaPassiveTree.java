@@ -73,6 +73,23 @@ public final class MegaPassiveTree {
         return behaviors(state).contains(behavior);
     }
 
+    /** Allocated Jewel Sockets: how many tree jewel slots the machine reads. */
+    public static int allocatedSocketCount(MachineProgressionState state) {
+        int count = 0;
+        for (String id : state.allocatedNodes()) {
+            MegaPassiveNode node = node(id);
+            if (node != null && node.kind() == PassiveNodeKind.JEWEL_SOCKET) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /** Every Jewel Socket in the catalog. */
+    public static List<MegaPassiveNode> socketNodes() {
+        return TREE.nodes().stream().filter(node -> node.kind() == PassiveNodeKind.JEWEL_SOCKET).toList();
+    }
+
     private static Map<MachineStat, Double> noBonusOutputCeilings() {
         Map<MachineStat, Double> ceilings = new LinkedHashMap<>();
         ceilings.put(MachineStat.OUTPUT_AMOUNT, 1.0);

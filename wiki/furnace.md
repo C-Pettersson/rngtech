@@ -6,6 +6,7 @@ wiki:
     - rngtech:furnace
     - rngtech:iron_furnace_chassis
     - rngtech:copper_furnace_chassis
+    - rngtech:gold_furnace_chassis
     - rngtech:bronze_furnace_chassis
     - rngtech:steel_furnace_chassis
     - rngtech:lead_furnace_chassis
@@ -22,6 +23,7 @@ wiki:
         ["0", "rngtech:furnace"],
         ["Iron", "rngtech:iron_furnace_chassis"],
         ["Copper", "rngtech:copper_furnace_chassis"],
+        ["Gold", "rngtech:gold_furnace_chassis"],
         ["Bronze", "rngtech:bronze_furnace_chassis"],
         ["Steel", "rngtech:steel_furnace_chassis"],
         ["Lead", "rngtech:lead_furnace_chassis"],
@@ -94,6 +96,7 @@ Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 
 | 0 | {{ item('rngtech:furnace') }} | Burns standard furnace fuel. Slow, and reaches 800 heat. |
 | 1 | {{ item('rngtech:iron_furnace_chassis') }} | First electric Furnace. |
 | 2 | {{ item('rngtech:copper_furnace_chassis') }} | Better early heat throughput and energy use. |
+| 3 | {{ item('rngtech:gold_furnace_chassis') }} | Copper numbers with one built-in [jewel socket](jewels.md#body-sockets). |
 | 3 | {{ item('rngtech:bronze_furnace_chassis') }} | Smelts Bronze Blend and Steel Blend faster. |
 | 4 | {{ item('rngtech:steel_furnace_chassis') }} | More efficient midgame chassis. |
 | 4 | {{ item('rngtech:lead_furnace_chassis') }} | Four smelting lanes sharing one Heat Core, at half the base speed. |

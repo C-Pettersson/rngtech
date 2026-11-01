@@ -75,6 +75,7 @@ nav:
       - Phase Array: prds/phase-array.md
       - Phase Array State: prds/phase-array-state.md
       - Energy Storage Ladder: prds/energy-storage.md
+      - Jewels and the Bonus Output Cap: prds/jewels.md
   - Reference:
       - Releasing: releasing.md
       - Tick Benchmark: reference/benchmarking.md

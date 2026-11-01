@@ -146,7 +146,11 @@ public enum MachineStat implements StringRepresentable {
     /** Reduced machine sound and particles from a Discreet body; only its decreased bucket is read, on the client. */
     MACHINE_NOISE,
     /** A Telemetry body's comparator gauge; the affix id names which gauge replaces the work-state signal. */
-    COMPARATOR_READOUT;
+    COMPARATOR_READOUT,
+    /** The most increased Bonus Output a machine pays, in percent: 75 before modifiers, raised by flat additions. */
+    MAX_OUTPUT_AMOUNT,
+    /** Jewel sockets on the machine body itself, from the Bedazzling suffix and a Gold body's implicit; read from the body's own rolls. */
+    JEWEL_SOCKETS;
 
     public static final Codec<MachineStat> CODEC = Codec.STRING.comapFlatMap(
             name -> {

@@ -1,0 +1,66 @@
+{
+    "type": "minecraft:chest",
+    "pools": [
+        {
+            "rolls": 1.0,
+            "bonus_rolls": 0.0,
+            "conditions": [
+                {
+                    "condition": "rngtech:jewel_loot_enabled"
+                },
+                {
+                    "condition": "minecraft:random_chance",
+                    "chance": 0.04
+                }
+            ],
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "rngtech:control_jewel",
+                    "conditions": [
+                        {
+                            "condition": "rngtech:jewel_loot_enabled",
+                            "colour": "control"
+                        }
+                    ],
+                    "functions": [
+                        {
+                            "function": "rngtech:unidentified"
+                        }
+                    ]
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "rngtech:drive_jewel",
+                    "conditions": [
+                        {
+                            "condition": "rngtech:jewel_loot_enabled",
+                            "colour": "drive"
+                        }
+                    ],
+                    "functions": [
+                        {
+                            "function": "rngtech:unidentified"
+                        }
+                    ]
+                },
+                {
+                    "type": "minecraft:item",
+                    "name": "rngtech:reserve_jewel",
+                    "conditions": [
+                        {
+                            "condition": "rngtech:jewel_loot_enabled",
+                            "colour": "reserve"
+                        }
+                    ],
+                    "functions": [
+                        {
+                            "function": "rngtech:unidentified"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "random_sequence": "rngtech:jewels/common_chest"
+}

@@ -4,6 +4,7 @@ import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.rpg.CorruptionOutcome;
 import com.rngtech.rpg.MachineCorruption;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.ProcessingBalanceSimulation;
 import com.rngtech.rpg.Rarity;
@@ -392,6 +393,10 @@ public final class WorkOrderRuleChecks {
             for (int tier = WorkOrder.MIN_TIER; tier <= WorkOrder.MAX_TIER; tier++) {
                 int stage = WorkOrderFamilies.stageCap(entry.family(), tier);
                 double top = entry.goal(tier).max() / (double) WorkPart.STAT_SCALE;
+                if (stat == MachineStat.OUTPUT_AMOUNT) {
+                    require(top <= 1.0 + MachineStatAccumulator.MAX_OUTPUT_AMOUNT_CEILING / 100.0 + 1e-9,
+                            entry.id() + " Tier " + tier + "'s top target " + top + " stays under the Bonus Output ceiling");
+                }
                 double best = simulation.bestStat(family, stage, stat, REFERENCE_LEVEL);
                 require(top <= best + 1e-9, entry.id() + " Tier " + tier + "'s top target " + top + " is reachable on a Stage " + stage
                         + " reference build, which reaches " + Math.round(best * 100) / 100.0);

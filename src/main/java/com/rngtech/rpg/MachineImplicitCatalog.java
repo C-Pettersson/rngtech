@@ -516,12 +516,17 @@ public final class MachineImplicitCatalog {
         return identity("stabilizer_matrix." + material.getSerializedName(), Rarity.NORMAL, material.refinementPotential(), List.of());
     }
 
+    /** A Gold body's setting: one jewel socket, the only stat an identity carries. */
+    private static final MachineModifier JEWEL_SETTING =
+            new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.JEWEL_SOCKETS, ModifierOperation.ADD, 1.0);
+
     private static Identity crusher(CrusherChassisMaterial material) {
         MachineBehavior[] behaviors = switch (material) {
             case STEEL, TITANIUM, TUNGSTENSTEEL, EXOTIC -> new MachineBehavior[] {MachineBehavior.OUTPUT_GUARD};
             default -> new MachineBehavior[0];
         };
-        return identity("crusher." + material.getSerializedName(), Rarity.NORMAL, 0, List.of(), behaviors);
+        List<MachineModifier> modifiers = material == CrusherChassisMaterial.GOLD ? List.of(JEWEL_SETTING) : List.of();
+        return identity("crusher." + material.getSerializedName(), Rarity.NORMAL, 0, modifiers, behaviors);
     }
 
     private static Identity furnace(FurnaceChassisMaterial material) {
@@ -531,7 +536,8 @@ public final class MachineImplicitCatalog {
             case TITANIUM, TUNGSTENSTEEL, EXOTIC -> new MachineBehavior[] {MachineBehavior.THERMAL_BUFFER, MachineBehavior.OUTPUT_GUARD};
             default -> new MachineBehavior[0];
         };
-        return identity("furnace." + material.getSerializedName(), Rarity.NORMAL, 0, List.of(), behaviors);
+        List<MachineModifier> modifiers = material == FurnaceChassisMaterial.GOLD ? List.of(JEWEL_SETTING) : List.of();
+        return identity("furnace." + material.getSerializedName(), Rarity.NORMAL, 0, modifiers, behaviors);
     }
 
     private static Identity alloyFurnace(AlloyFurnaceChassisMaterial material) {
@@ -556,7 +562,8 @@ public final class MachineImplicitCatalog {
             };
             default -> new MachineBehavior[0];
         };
-        return identity("battery_chassis." + material.getSerializedName(), Rarity.NORMAL, 0, List.of(), behaviors);
+        List<MachineModifier> modifiers = material == BatteryChassisMaterial.GOLD ? List.of(JEWEL_SETTING) : List.of();
+        return identity("battery_chassis." + material.getSerializedName(), Rarity.NORMAL, 0, modifiers, behaviors);
     }
 
     private static Identity batteryCell(BatteryCellMaterial material) {

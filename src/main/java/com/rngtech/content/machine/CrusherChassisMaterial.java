@@ -8,6 +8,8 @@ public enum CrusherChassisMaterial implements StringRepresentable {
     WOODEN(0, 0.50, 0.25, 0.70, 1.25, 0.65, 1.00),
     IRON(1, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00),
     COPPER(2, 0.85, 1.50, 1.08, 0.95, 1.08, 1.00),
+    /** A Copper-era body with a jewel setting: the socket is its upgrade, not its numbers. */
+    GOLD(3, 0.85, 1.50, 1.08, 0.95, 1.08, 1.00),
     BRONZE(3, 1.10, 1.10, 0.98, 1.05, 0.95, 1.10),
     STEEL(4, 1.60, 0.90, 1.08, 0.90, 0.90, 1.08),
     ALUMINUM(5, 0.95, 1.30, 1.12, 0.92, 1.20, 1.00),

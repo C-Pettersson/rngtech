@@ -371,11 +371,12 @@ public final class MachineBaseStatCatalog {
         );
     }
 
+    /** The Cavitation Generator reads Output Amount for its Water saving and Nitrogen yield, so it shares the Bonus Output cap. */
     public static MachineStatAccumulator cavitationGenerator() {
         return MachineStatAccumulator.fluidHeatGeneratorBase(
                 CAVITATION_GENERATOR_ENERGY_CAPACITY,
                 CAVITATION_GENERATOR_ENERGY_TRANSFER
-        );
+        ).withOutputCap();
     }
 
     public static MachineStatAccumulator compressorTank(CompressorTankMaterial material) {

@@ -17,6 +17,7 @@
               "include": [
                 "rngtech:machine_traits",
                 "rngtech:work_orders",
+                "rngtech:jewels",
                 "rngtech:mirrored"
               ],
               "source": "block_entity"

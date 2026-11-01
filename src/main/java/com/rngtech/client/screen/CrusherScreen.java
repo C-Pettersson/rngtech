@@ -9,6 +9,7 @@ import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MegaPassiveNode;
@@ -20,6 +21,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Locale;
@@ -56,6 +58,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             "rngtech.stat.crush_hardness",
             "rngtech.stat.batch_size",
             "rngtech.stat.output_amount",
+            "rngtech.stat.max_output_amount",
             "rngtech.stat.crusher_salvage_chance",
             "rngtech.stat.processing_speed",
             "rngtech.stat.energy_usage",
@@ -70,6 +73,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             CrusherMenu.processingLevelDataIndex(),
             CrusherMenu.batchSizeDataIndex(),
             CrusherMenu.outputAmountDataIndex(),
+            CrusherMenu.maxOutputAmountDataIndex(),
             CrusherMenu.crusherSalvageChanceDataIndex(),
             CrusherMenu.processingSpeedDataIndex(),
             CrusherMenu.energyUsageDataIndex(),
@@ -84,6 +88,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             MachineStat.PROCESSING_LEVEL,
             MachineStat.BATCH_SIZE,
             MachineStat.OUTPUT_AMOUNT,
+            MachineStat.MAX_OUTPUT_AMOUNT,
             MachineStat.CRUSHER_SALVAGE_CHANCE,
             MachineStat.PROCESSING_SPEED,
             MachineStat.ENERGY_USAGE,
@@ -117,6 +122,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
                 .stats(CrusherMenu.TAB_CONFIGURATION)
                 .refinement(CrusherMenu.TAB_REFINEMENT)
                 .mastery(CrusherMenu.TAB_MASTERY)
+                .jewels(CrusherMenu.TAB_JEWELS, menu::jewelsShown)
                 .orders(CrusherMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         masterySupport = new MasteryScreenSupport<>(
@@ -144,6 +150,11 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
                     @Override
                     public void geometryChanged() {
                         updateImageSizeForSelectedTab();
+                    }
+
+                    @Override
+                    public ItemStack socketedJewel(int index) {
+                        return menu.jewel(index);
                     }
                 },
                 new MasteryScreenSupport.Palette(
@@ -186,6 +197,12 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
                 guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
             }
         }
+        if (menu.selectedTab() == CrusherMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
     }
@@ -204,6 +221,8 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             renderRefinement(guiGraphics);
         } else if (menu.selectedTab() == CrusherMenu.TAB_ORDERS) {
             workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        } else if (menu.selectedTab() == CrusherMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
         } else if (menu.selectedTab() == CrusherMenu.TAB_MASTERY) {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }
@@ -772,6 +791,9 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
         }
         if (dataIndex == CrusherMenu.batchSizeDataIndex()) {
             return value > 1.001;
+        }
+        if (dataIndex == CrusherMenu.maxOutputAmountDataIndex()) {
+            return value > MachineStatAccumulator.BASE_MAX_OUTPUT_AMOUNT + 0.001;
         }
         return value > 1.001;
     }

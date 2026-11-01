@@ -2,6 +2,7 @@ package com.rngtech.rpg;
 
 import com.rngtech.content.tool.ToolHeadFamily;
 import com.rngtech.content.tool.ToolHeadMaterial;
+import com.rngtech.rpg.jewel.JewelColour;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -407,7 +408,16 @@ public final class ModifierEligibilityProfiles {
     );
     private static final ModifierDefinition EFFICIENCY = percent(ModifierSlot.PREFIX, MachineStat.EFFICIENCY);
     private static final ModifierDefinition ENERGY_USAGE = percent(ModifierSlot.SUFFIX, MachineStat.ENERGY_USAGE);
-    private static final ModifierDefinition OUTPUT_AMOUNT = percent(ModifierSlot.SUFFIX, MachineStat.OUTPUT_AMOUNT);
+    /**
+     * Output Amount on the Cavitation Generator and its Gear: the yield table without the Crusher Jaws' speed penalty, so
+     * no single roll is born over the Bonus Output cap.
+     */
+    private static final ModifierDefinition OUTPUT_AMOUNT = ModifierDefinition.rollable(
+            ModifierSlot.SUFFIX,
+            MachineStat.OUTPUT_AMOUNT,
+            ModifierOperation.INCREASED_PERCENT,
+            YIELD_TIER_RANGES
+    );
     /**
      * The Crusher and Crush Head roll a small, penalty-free {@code output_amount} suffix. Its own group lets it sit beside
      * a yield prefix.
@@ -1641,7 +1651,252 @@ public final class ModifierEligibilityProfiles {
             MachineStat.OVERHOLD_CHANCE, ModifierOperation.ADD, PHASE_FOCUS_RANGES
     ).withRollWeight(60);
 
+    /** Body sockets: one through Tier 3, two through Tier 6, three at Tier 7, so three needs a Stage 8 Exotic body. */
+    private static final List<ModifierValueRange> BEDAZZLING_ADD_RANGES = List.of(
+            ModifierValueRange.fixed(1),
+            ModifierValueRange.fixed(1),
+            ModifierValueRange.fixed(1),
+            ModifierValueRange.fixed(2),
+            ModifierValueRange.fixed(2),
+            ModifierValueRange.fixed(2),
+            ModifierValueRange.fixed(3)
+    );
+    private static final int BEDAZZLING_WEIGHT = 40;
+    /** Jewel sockets on a machine body; every body with a screen rolls it, so a jewel has somewhere to go on any machine. */
+    private static final ModifierDefinition BEDAZZLING = ModifierDefinition.rollable(
+            "bedazzling",
+            "jewel_sockets",
+            ModifierSlot.SUFFIX,
+            MachineStat.JEWEL_SOCKETS,
+            ModifierOperation.ADD,
+            BEDAZZLING_ADD_RANGES
+    ).withRollWeight(BEDAZZLING_WEIGHT);
+
+    // The jewel pool: machine-agnostic, machine-wide, one tier per family. Every colour rolls all of it; JewelColour
+    // weights each family for its colour, and only a colour's own threshold line rolls on it.
+    private static final List<ModifierValueRange> JEWEL_CAPACITIVE_RANGES = List.of(
+            new ModifierValueRange(10, 20, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_FRUGAL_RANGES = List.of(
+            new ModifierValueRange(4, 8, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_STEADY_RANGES = List.of(
+            new ModifierValueRange(5, 10, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_DEEP_RANGES = List.of(
+            new ModifierValueRange(10, 20, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_INSULATED_RANGES = List.of(
+            new ModifierValueRange(6, 12, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_CONDUCTIVE_RANGES = List.of(
+            new ModifierValueRange(6, 12, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_THRIFTY_RANGES = List.of(
+            new ModifierValueRange(4, 8, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_YIELDING_RANGES = List.of(
+            new ModifierValueRange(4, 8, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_FORTUNATE_RANGES = List.of(
+            new ModifierValueRange(1, 2, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_PACE_RANGES = List.of(
+            new ModifierValueRange(6, 10, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_OUTPUT_RANGES = List.of(
+            new ModifierValueRange(6, 10, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_ATTRIBUTE_RANGES = List.of(
+            new ModifierValueRange(6, 10, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_STUDY_RANGES = List.of(
+            new ModifierValueRange(10, 20, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_FLASHES_RANGES = List.of(
+            new ModifierValueRange(1, 2, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_HEADROOM_RANGES = List.of(
+            new ModifierValueRange(1, 2, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_MOMENTUM_RANGES = List.of(
+            new ModifierValueRange(12, 12, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_POISE_RANGES = List.of(
+            new ModifierValueRange(8, 8, true)
+    );
+    private static final List<ModifierValueRange> JEWEL_DEPTH_RANGES = List.of(
+            new ModifierValueRange(25, 25, true)
+    );
+    /** The Maximum Bonus Output line: a chase line on every colour. */
+    private static final int JEWEL_HEADROOM_WEIGHT = 25;
+    /** The attribute-threshold lines: a chase line on their own colour only. */
+    private static final int JEWEL_THRESHOLD_WEIGHT = 20;
+    private static final ModifierDefinition JEWEL_CAPACITIVE = ModifierDefinition.rollable(
+            "jewel_capacitive",
+            "jewel_capacitive",
+            ModifierSlot.PREFIX,
+            MachineStat.ENERGY_CAPACITY,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_CAPACITIVE_RANGES
+    );
+    private static final ModifierDefinition JEWEL_FRUGAL = ModifierDefinition.rollable(
+            "jewel_frugal",
+            "jewel_frugal",
+            ModifierSlot.PREFIX,
+            MachineStat.ENERGY_USAGE,
+            ModifierOperation.DECREASED_PERCENT,
+            JEWEL_FRUGAL_RANGES
+    );
+    private static final ModifierDefinition JEWEL_STEADY = ModifierDefinition.rollable(
+            "jewel_steady",
+            "jewel_steady",
+            ModifierSlot.PREFIX,
+            MachineStat.STABILITY,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_STEADY_RANGES
+    );
+    private static final ModifierDefinition JEWEL_DEEP = ModifierDefinition.rollable(
+            "jewel_deep",
+            "jewel_deep",
+            ModifierSlot.PREFIX,
+            MachineStat.FLUID_CAPACITY,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_DEEP_RANGES
+    );
+    private static final ModifierDefinition JEWEL_INSULATED = ModifierDefinition.rollable(
+            "jewel_insulated",
+            "jewel_insulated",
+            ModifierSlot.PREFIX,
+            MachineStat.HEAT_ISOLATION,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_INSULATED_RANGES
+    );
+    private static final ModifierDefinition JEWEL_CONDUCTIVE = ModifierDefinition.rollable(
+            "jewel_conductive",
+            "jewel_conductive",
+            ModifierSlot.PREFIX,
+            MachineStat.HEAT_TRANSFER,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_CONDUCTIVE_RANGES
+    );
+    private static final ModifierDefinition JEWEL_THRIFTY = ModifierDefinition.rollable(
+            "jewel_thrifty",
+            "jewel_thrifty",
+            ModifierSlot.PREFIX,
+            MachineStat.FUEL_EFFICIENCY,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_THRIFTY_RANGES
+    );
+    private static final ModifierDefinition JEWEL_YIELDING = ModifierDefinition.rollable(
+            "jewel_yielding",
+            "jewel_yielding",
+            ModifierSlot.PREFIX,
+            MachineStat.OUTPUT_AMOUNT,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_YIELDING_RANGES
+    );
+    private static final ModifierDefinition JEWEL_FORTUNATE = ModifierDefinition.rollable(
+            "jewel_fortunate",
+            "jewel_fortunate",
+            ModifierSlot.PREFIX,
+            MachineStat.SUPER_OUTPUT_CHANCE,
+            ModifierOperation.ADD,
+            JEWEL_FORTUNATE_RANGES
+    );
+    private static final ModifierDefinition JEWEL_PACE = ModifierDefinition.rollable(
+            "jewel_pace",
+            "jewel_pace",
+            ModifierSlot.SUFFIX,
+            MachineStat.PROCESSING_SPEED,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_PACE_RANGES
+    );
+    private static final ModifierDefinition JEWEL_OUTPUT = ModifierDefinition.rollable(
+            "jewel_output",
+            "jewel_output",
+            ModifierSlot.SUFFIX,
+            MachineStat.ENERGY_GENERATION,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_OUTPUT_RANGES
+    );
+    private static final ModifierDefinition JEWEL_CONTROL = ModifierDefinition.rollable(
+            "jewel_control",
+            "jewel_control",
+            ModifierSlot.SUFFIX,
+            MachineStat.CONTROL,
+            ModifierOperation.ADD,
+            JEWEL_ATTRIBUTE_RANGES
+    );
+    private static final ModifierDefinition JEWEL_DRIVE = ModifierDefinition.rollable(
+            "jewel_drive",
+            "jewel_drive",
+            ModifierSlot.SUFFIX,
+            MachineStat.DRIVE,
+            ModifierOperation.ADD,
+            JEWEL_ATTRIBUTE_RANGES
+    );
+    private static final ModifierDefinition JEWEL_RESERVE = ModifierDefinition.rollable(
+            "jewel_reserve",
+            "jewel_reserve",
+            ModifierSlot.SUFFIX,
+            MachineStat.RESERVE,
+            ModifierOperation.ADD,
+            JEWEL_ATTRIBUTE_RANGES
+    );
+    private static final ModifierDefinition JEWEL_STUDY = ModifierDefinition.rollable(
+            "jewel_study",
+            "jewel_study",
+            ModifierSlot.SUFFIX,
+            MachineStat.MASTERY_XP_GAIN,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_STUDY_RANGES
+    );
+    private static final ModifierDefinition JEWEL_FLASHES = ModifierDefinition.rollable(
+            "jewel_flashes",
+            "jewel_flashes",
+            ModifierSlot.SUFFIX,
+            MachineStat.INSTANT_PROCESS_CHANCE,
+            ModifierOperation.ADD,
+            JEWEL_FLASHES_RANGES
+    );
+    private static final ModifierDefinition JEWEL_HEADROOM = ModifierDefinition.rollable(
+            "jewel_headroom",
+            "jewel_headroom",
+            ModifierSlot.SUFFIX,
+            MachineStat.MAX_OUTPUT_AMOUNT,
+            ModifierOperation.ADD,
+            JEWEL_HEADROOM_RANGES
+    ).withRollWeight(JEWEL_HEADROOM_WEIGHT);
+    private static final ModifierDefinition JEWEL_MOMENTUM = ModifierDefinition.rollable(
+            "jewel_momentum",
+            "jewel_momentum",
+            ModifierSlot.SUFFIX,
+            MachineStat.PROCESSING_SPEED,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_MOMENTUM_RANGES
+    ).withRollWeight(JEWEL_THRESHOLD_WEIGHT);
+    private static final ModifierDefinition JEWEL_POISE = ModifierDefinition.rollable(
+            "jewel_poise",
+            "jewel_poise",
+            ModifierSlot.SUFFIX,
+            MachineStat.ENERGY_USAGE,
+            ModifierOperation.DECREASED_PERCENT,
+            JEWEL_POISE_RANGES
+    ).withRollWeight(JEWEL_THRESHOLD_WEIGHT);
+    private static final ModifierDefinition JEWEL_DEPTH = ModifierDefinition.rollable(
+            "jewel_depth",
+            "jewel_depth",
+            ModifierSlot.SUFFIX,
+            MachineStat.ENERGY_CAPACITY,
+            ModifierOperation.INCREASED_PERCENT,
+            JEWEL_DEPTH_RANGES
+    ).withRollWeight(JEWEL_THRESHOLD_WEIGHT);
+
     private static final Set<String> DESCRIBED_AFFIX_IDS = Set.of(
+            JEWEL_MOMENTUM.id(),
+            JEWEL_POISE.id(),
+            JEWEL_DEPTH.id(),
             TELEMETRY_ENERGY.id(),
             TELEMETRY_PROGRESS.id(),
             TELEMETRY_OUTPUT.id(),
@@ -1719,6 +1974,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CRUSHER = profile(
             "crusher",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -1756,6 +2012,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile FURNACE = profile(
             "furnace",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -1786,6 +2043,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile ELECTRIC_FURNACE = profile(
             "electric_furnace",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -1819,6 +2077,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile SOLID_FUEL_BURNER = profile(
             "solid_fuel_burner",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -1841,6 +2100,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile BIO_GENERATOR = profile(
             "bio_generator",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -1874,6 +2134,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile SOLAR_ARRAY_CONTROLLER = profile(
             "solar_array_controller",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -1889,6 +2150,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile POTENTIAL_REACTOR = profile(
             "potential_reactor",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -1912,6 +2174,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CORROSION_CELL = profile(
             "corrosion_cell",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -1941,6 +2204,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile VACUUM_COLLAPSE_GENERATOR = profile(
             "vacuum_collapse_generator",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -1965,6 +2229,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile COMPONENT_RECYCLER = profile(
             "component_recycler",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -1988,6 +2253,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile METAL_PRESS = profile(
             "metal_press",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -2021,6 +2287,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile MELTER = profile(
             "melter",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -2052,6 +2319,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile BATTERY_ASSEMBLER = profile(
             "battery_assembler",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2079,6 +2347,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile COAL_GASIFIER = profile(
             "coal_gasifier",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2107,6 +2376,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile SYNGAS_COMBUSTOR = profile(
             "syngas_combustor",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2132,6 +2402,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile STEAM_METHANE_REFORMER = profile(
             "steam_methane_reformer",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2158,6 +2429,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile CAVITATION_GENERATOR = profile(
             "cavitation_generator",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2189,6 +2461,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile AMMONIA_SYNTHESIZER = profile(
             "ammonia_synthesizer",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2215,6 +2488,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile AMMONIA_FUEL_CELL = profile(
             "ammonia_fuel_cell",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2256,9 +2530,39 @@ public final class ModifierEligibilityProfiles {
             )
     );
 
+    // The three jewel colours share one pool; JewelColour reweights it per colour at roll time.
+    public static final ModifierEligibilityProfile CONTROL_JEWEL = profile(
+            "control_jewel",
+            Set.of(ModifierCapability.HAS_JEWEL),
+            List.of(
+                    JEWEL_CAPACITIVE, JEWEL_FRUGAL, JEWEL_STEADY, JEWEL_DEEP, JEWEL_INSULATED, JEWEL_CONDUCTIVE, JEWEL_THRIFTY,
+                    JEWEL_YIELDING, JEWEL_FORTUNATE, JEWEL_PACE, JEWEL_OUTPUT, JEWEL_CONTROL, JEWEL_DRIVE, JEWEL_RESERVE,
+                    JEWEL_STUDY, JEWEL_FLASHES, JEWEL_HEADROOM, JEWEL_MOMENTUM, JEWEL_POISE, JEWEL_DEPTH
+            )
+    );
+    public static final ModifierEligibilityProfile DRIVE_JEWEL = profile(
+            "drive_jewel",
+            Set.of(ModifierCapability.HAS_JEWEL),
+            List.of(
+                    JEWEL_CAPACITIVE, JEWEL_FRUGAL, JEWEL_STEADY, JEWEL_DEEP, JEWEL_INSULATED, JEWEL_CONDUCTIVE, JEWEL_THRIFTY,
+                    JEWEL_YIELDING, JEWEL_FORTUNATE, JEWEL_PACE, JEWEL_OUTPUT, JEWEL_CONTROL, JEWEL_DRIVE, JEWEL_RESERVE,
+                    JEWEL_STUDY, JEWEL_FLASHES, JEWEL_HEADROOM, JEWEL_MOMENTUM, JEWEL_POISE, JEWEL_DEPTH
+            )
+    );
+    public static final ModifierEligibilityProfile RESERVE_JEWEL = profile(
+            "reserve_jewel",
+            Set.of(ModifierCapability.HAS_JEWEL),
+            List.of(
+                    JEWEL_CAPACITIVE, JEWEL_FRUGAL, JEWEL_STEADY, JEWEL_DEEP, JEWEL_INSULATED, JEWEL_CONDUCTIVE, JEWEL_THRIFTY,
+                    JEWEL_YIELDING, JEWEL_FORTUNATE, JEWEL_PACE, JEWEL_OUTPUT, JEWEL_CONTROL, JEWEL_DRIVE, JEWEL_RESERVE,
+                    JEWEL_STUDY, JEWEL_FLASHES, JEWEL_HEADROOM, JEWEL_MOMENTUM, JEWEL_POISE, JEWEL_DEPTH
+            )
+    );
+
     public static final ModifierEligibilityProfile COMPRESSOR_TANK = profile(
             "compressor_tank",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2281,6 +2585,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile FLUID_TANK = profile(
             "fluid_tank",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_FLUID_STORAGE,
                     ModifierCapability.HAS_FLUID_INPUT,
                     ModifierCapability.HAS_FLUID_OUTPUT
@@ -2290,6 +2595,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile ALLOY_FURNACE = profile(
             "alloy_furnace",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -2323,6 +2629,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile RESONANCE_CALIBRATOR = profile(
             "resonance_calibrator",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_TELEMETRY,
                     ModifierCapability.HAS_MASTERY_ATTRIBUTES,
@@ -2485,6 +2792,7 @@ public final class ModifierEligibilityProfiles {
     public static final ModifierEligibilityProfile BATTERY_CHASSIS = profile(
             "battery_chassis",
             Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
                     ModifierCapability.HAS_WORK_LIGHT,
                     ModifierCapability.HAS_MACHINE_NOISE,
                     ModifierCapability.HAS_TELEMETRY,
@@ -2982,8 +3290,19 @@ public final class ModifierEligibilityProfiles {
                 CONTROL_BOARD,
                 STABILIZER_MATRIX,
                 PHASE_EMITTER,
-                PHASE_COIL
+                PHASE_COIL,
+                CONTROL_JEWEL,
+                DRIVE_JEWEL,
+                RESERVE_JEWEL
         );
+    }
+
+    public static ModifierEligibilityProfile forJewel(JewelColour colour) {
+        return switch (colour) {
+            case CONTROL -> CONTROL_JEWEL;
+            case DRIVE -> DRIVE_JEWEL;
+            case RESERVE -> RESERVE_JEWEL;
+        };
     }
 
     public static ModifierEligibilityProfile forMachine(MachineType type) {
@@ -3148,6 +3467,10 @@ public final class ModifierEligibilityProfiles {
             definitions = new ArrayList<>(definitions);
             definitions.addAll(telemetryAffixes(id));
         }
+        if (capabilities.contains(ModifierCapability.HAS_JEWEL_SOCKETS)) {
+            definitions = new ArrayList<>(definitions);
+            definitions.add(BEDAZZLING);
+        }
         ModifierEligibilityProfile profile = new ModifierEligibilityProfile(id, capabilities, definitions, rollableBehaviors);
         validateProfile(profile);
         return profile;
@@ -3199,6 +3522,11 @@ public final class ModifierEligibilityProfiles {
 
     public static boolean isBehaviorOnlyAffix(ModifierDefinition definition) {
         return definition.isBehaviorOnly();
+    }
+
+    /** The most body sockets Bedazzling grants at its top tier. */
+    public static int maxBedazzlingSockets() {
+        return (int) BEDAZZLING_ADD_RANGES.getLast().max();
     }
 
     public static boolean hasCustomDescription(MachineModifier modifier) {
@@ -3581,6 +3909,14 @@ public final class ModifierEligibilityProfiles {
                 PHASE_THRIFT, PHASE_RECOVERY, PHASE_SALVAGE, PHASE_MERCY, PHASE_BANKING, PHASE_PATIENCE,
                 PHASE_POISE, PHASE_FOCUS
         );
+        put(
+                definitions,
+                ModifierCapability.HAS_JEWEL,
+                JEWEL_CAPACITIVE, JEWEL_FRUGAL, JEWEL_STEADY, JEWEL_DEEP, JEWEL_INSULATED, JEWEL_CONDUCTIVE, JEWEL_THRIFTY,
+                JEWEL_YIELDING, JEWEL_FORTUNATE, JEWEL_PACE, JEWEL_OUTPUT, JEWEL_CONTROL, JEWEL_DRIVE, JEWEL_RESERVE,
+                JEWEL_STUDY, JEWEL_FLASHES, JEWEL_HEADROOM, JEWEL_MOMENTUM, JEWEL_POISE, JEWEL_DEPTH
+        );
+        put(definitions, ModifierCapability.HAS_JEWEL_SOCKETS, BEDAZZLING);
         return Map.copyOf(definitions);
     }
 

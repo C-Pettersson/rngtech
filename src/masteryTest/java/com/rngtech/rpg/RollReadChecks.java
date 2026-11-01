@@ -154,6 +154,14 @@ public final class RollReadChecks {
                 "vacuum_collapse_generator", "cavitation_generator", "battery_chassis")) {
             READS.get(quiet).add(MachineStat.MACHINE_NOISE);
         }
+        // Bedazzling: the shared machine block entity counts the body's jewel sockets from its own rolls.
+        for (String bedazzled : List.of("crusher", "furnace", "electric_furnace", "alloy_furnace", "metal_press", "melter",
+                "resonance_calibrator", "battery_assembler", "component_recycler", "compressor_tank", "fluid_tank", "coal_gasifier",
+                "steam_methane_reformer", "syngas_combustor", "ammonia_synthesizer", "ammonia_fuel_cell", "solid_fuel_burner",
+                "bio_generator", "solar_array_controller", "potential_reactor", "corrosion_cell",
+                "vacuum_collapse_generator", "cavitation_generator", "battery_chassis")) {
+            READS.get(bedazzled).add(MachineStat.JEWEL_SOCKETS);
+        }
     }
 
     private RollReadChecks() {

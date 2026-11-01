@@ -828,6 +828,7 @@ public enum ForestryCompanionPassiveNode implements StringRepresentable, Passive
             case NODE -> 16;
             case NOTABLE -> 48;
             case KEYSTONE -> 60;
+            case JEWEL_SOCKET -> 24;
         };
     }
 

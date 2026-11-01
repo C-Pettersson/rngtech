@@ -85,6 +85,7 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
                     .gear(ComponentRecyclerMenu.TAB_GEAR)
                     .stats(ComponentRecyclerMenu.TAB_STATS)
                     .refinement(ComponentRecyclerMenu.TAB_REFINEMENT)
+                    .jewels(ComponentRecyclerMenu.TAB_JEWELS, menu::jewelsShown)
                     .orders(ComponentRecyclerMenu.TAB_ORDERS, menu::workOrdersShown);
         }
         tabs = tabBuilder.build();
@@ -101,6 +102,12 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == ComponentRecyclerMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         if (menu.selectedTab() == ComponentRecyclerMenu.TAB_ORDERS) {
             List<Component> orderTooltip = workOrdersTab.tooltip(mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight);
             if (!orderTooltip.isEmpty()) {
@@ -117,6 +124,9 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
         tabs.render(guiGraphics, mouseX, mouseY, menu.isManual() ? ComponentRecyclerMenu.TAB_PROCESSING : menu.selectedTab());
+        if (menu.selectedTab() == ComponentRecyclerMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
+        }
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == ComponentRecyclerMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);

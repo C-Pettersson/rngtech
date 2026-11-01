@@ -3,8 +3,11 @@ package com.rngtech.client.screen;
 import com.rngtech.RNGTech;
 import com.rngtech.content.menu.MasteryMenuView;
 import com.rngtech.content.network.MasteryActionPayload;
+import com.rngtech.rpg.MachineModifier;
+import com.rngtech.rpg.MachineModifierText;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatDisplay;
+import com.rngtech.rpg.jewel.JewelEffects;
 import com.rngtech.rpg.progression.AscendancyCatalog;
 import com.rngtech.rpg.progression.AscendancyNode;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
@@ -40,6 +43,7 @@ import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
 
@@ -1001,6 +1005,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
                 case NOTABLE -> 0xFF27434C;
                 case NODE -> 0xFF263C3E;
                 case TRAVEL -> 0xFF30382D;
+                case JEWEL_SOCKET -> 0xFF4A3A1E;
             };
         }
         if (unlockable) {
@@ -1012,6 +1017,7 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             case KEYSTONE -> 0xFF291E35;
             case NOTABLE -> 0xFF1C3037;
             case NODE -> 0xFF202A2D;
+            case JEWEL_SOCKET -> 0xFF2A2318;
         };
     }
 
@@ -1037,6 +1043,9 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
             tooltip.add(Component.translatable("rngtech.mastery.tooltip.notable").withStyle(ChatFormatting.AQUA));
         }
         if (node instanceof MegaPassiveNode shared) {
+            if (shared.kind() == PassiveNodeKind.JEWEL_SOCKET) {
+                socketTooltip(shared, tooltip);
+            }
             effectLines(shared, view, tooltip);
             if (shared.kind() == PassiveNodeKind.STARTER) {
                 if (shared.id().equals(view.masteryFamily().startNodeId())) {
@@ -1609,5 +1618,43 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
 
         default void geometryChanged() {
         }
+
+        /** The jewel in the machine's {@code index}th tree jewel slot, counting allocated sockets in allocation order. */
+        default ItemStack socketedJewel(int index) {
+            return ItemStack.EMPTY;
+        }
+    }
+
+    /** A Jewel Socket's tooltip: the jewel it holds, with the lines this machine ignores dimmed, or why it is empty. */
+    private void socketTooltip(MegaPassiveNode node, List<Component> tooltip) {
+        int index = socketIndex(node);
+        ItemStack jewel = index < 0 ? ItemStack.EMPTY : callbacks.socketedJewel(index);
+        if (jewel.isEmpty()) {
+            tooltip.add(Component.translatable(index < 0 ? "rngtech.mastery.jewel_socket.locked" : "rngtech.mastery.jewel_socket.empty")
+                    .withStyle(ChatFormatting.GRAY));
+            return;
+        }
+        tooltip.add(jewel.getHoverName().copy().withStyle(ChatFormatting.AQUA));
+        for (MachineModifier modifier : JewelEffects.traits(jewel).modifiers()) {
+            Component line = MachineModifierText.tooltipLine(modifier);
+            tooltip.add(view.masterySupports(modifier.stat())
+                    ? line.copy().withStyle(ChatFormatting.GRAY)
+                    : Component.translatable("rngtech.mastery.inactive", line).withStyle(ChatFormatting.DARK_GRAY));
+        }
+    }
+
+    /** Where {@code node} sits among the allocated sockets, in allocation order, or -1 when it is not allocated. */
+    private int socketIndex(MegaPassiveNode node) {
+        int index = 0;
+        for (String id : snapshot.allocatedNodes()) {
+            if (id.equals(node.id())) {
+                return index;
+            }
+            MegaPassiveNode other = MegaPassiveTree.node(id);
+            if (other != null && other.kind() == PassiveNodeKind.JEWEL_SOCKET) {
+                index++;
+            }
+        }
+        return -1;
     }
 }

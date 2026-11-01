@@ -111,7 +111,7 @@ Most affixes have a **tier** from 1 to 7. The tier sets the range, and the affix
 | 6 | 80–100% |
 | 7 | 110–140% |
 
-Crusher yield affixes use smaller tables, because they all feed the Crusher's [Output Amount](crusher.md#output-amount) total, which already has diminishing returns.
+Crusher yield affixes use smaller tables, because they all feed the Crusher's [Output Amount](crusher.md#output-amount) total, which stops at Maximum Bonus Output. The Cavitation Generator and its Gear roll Bonus Output on the Jaws table below, without the speed penalty.
 
 - **Crusher Jaws** and **Crush Head Pulverizing** (prefixes) give the most Bonus Output, but also roll reduced Processing Speed. The speed penalty rolls on its own, wider range, so a light penalty is a lucky roll.
 - The **Output Amount** suffix on Crushers and Crush Heads is small and has no penalty. It can sit beside Jaws or Pulverizing.
@@ -195,6 +195,7 @@ These affixes roll only on the machine block, never on Gear. They have no downsi
 |---|---|
 | Glow (of Glow) | The machine gives light at level 4, 7, 10, or 13. The light comes on when the FE buffer is at least 10% full. It goes off when the buffer falls below 5%. Each change stays for at least 5 seconds, so the light does not flash between crafts. A fuel Furnace has no buffer, so it lights when it is hot. The light stops mob spawns like a torch. A dark machine has no power. Fluid Tanks cannot roll Glow. |
 | Discreet | The machine sound is 25% to 85% quieter. The machine also makes fewer particles. Machines with [Machine Mastery](machine-mastery.md) cannot roll it. Use the Silent Operation keystone on those machines. |
+| Bedazzling (of Bedazzling) | The machine body gets 1 jewel socket at Tier 1 to 3, 2 at Tier 4 to 6, and 3 at Tier 7. Every machine with a screen can roll it. See [Jewels](jewels.md). |
 | Telemetry (of Telemetry) | A Redstone Comparator reads one gauge instead of the work state. The tooltip names the gauge: FE buffer, craft progress, output slots, or temperature. An empty gauge gives 0 and a full gauge gives 15. The comparator updates within one second. A machine only rolls the gauges it has. |
 
 ### Other named affixes
