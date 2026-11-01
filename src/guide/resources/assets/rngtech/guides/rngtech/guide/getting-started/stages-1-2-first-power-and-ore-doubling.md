@@ -2,7 +2,7 @@
 navigation:
   title: "Stages 1–2: first power and ore doubling"
   parent: getting-started.md
-  position: 1
+  position: 2
   icon: rngtech:wooden_crusher_chassis
 ---
 

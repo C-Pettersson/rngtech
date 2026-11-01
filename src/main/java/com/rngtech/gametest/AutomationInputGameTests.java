@@ -7,6 +7,9 @@ import com.rngtech.content.blockentity.AlloyFurnaceBlockEntity;
 import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
 import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.blockentity.RecipeCache;
+import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
+import com.rngtech.content.calibration.CalibrationFamily;
+import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.machine.AlloyCrucibleMaterial;
 import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
@@ -311,6 +314,44 @@ public final class AutomationInputGameTests {
                     assertAccepts(melter.getItemHandler(Direction.UP), new ItemStack(Items.HONEY_BOTTLE));
                 })
                 .thenSucceed();
+    }
+
+    /**
+     * Stabilization Catalyst is the Reinforced Iron Plate catalyst and the Resonant Iron Gear stabilizer, so a
+     * Kinetic Calibrator sends a feed of it to the stabilizer slot and keeps the catalyst slot for the Matrix.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void calibratorKeepsTheCatalystSlotForTheFamilyCatalyst(GameTestHelper helper) {
+        ResonanceCalibratorBlockEntity kinetic = calibrator(helper, new BlockPos(1, 1, 2), CalibrationFamily.KINETIC);
+        IItemHandler top = kinetic.getItemHandler(Direction.UP);
+
+        flood(top, item("rngtech:stabilization_catalyst", 64), 3);
+        check(slots(top).equals("[0 air, 0 air, 64 stabilization_catalyst]"),
+                "Stabilization Catalyst did not stay in the stabilizer slot: " + slots(top));
+        flood(top, item("rngtech:matrix", 16), 1);
+        check(slots(top).equals("[0 air, 16 matrix, 64 stabilization_catalyst]"),
+                "The Matrix could not join as the catalyst: " + slots(top));
+        flood(top, item("rngtech:iron_plate", 8), 1);
+        check(slots(top).equals("[0 air, 16 matrix, 64 stabilization_catalyst]"),
+                "An Iron Plate entered a Kinetic Calibrator: " + slots(top));
+        flood(top, item("rngtech:iron_gear", 8), 1);
+        check(slots(top).equals("[8 iron_gear, 16 matrix, 64 stabilization_catalyst]"),
+                "The Iron Gear could not enter: " + slots(top));
+
+        ResonanceCalibratorBlockEntity structural = calibrator(helper, new BlockPos(3, 1, 2), CalibrationFamily.STRUCTURAL);
+        flood(structural.getItemHandler(Direction.UP), item("rngtech:stabilization_catalyst", 16), 1);
+        check(structural.getProcessInventory().getStackInSlot(ResonanceCalibratorBlockEntity.SLOT_CATALYST).getCount() == 16,
+                "Stabilization Catalyst was refused as the Reinforced Iron Plate catalyst: "
+                        + slots(structural.getItemHandler(Direction.UP)));
+        helper.succeed();
+    }
+
+    private static ResonanceCalibratorBlockEntity calibrator(GameTestHelper helper, BlockPos pos, CalibrationFamily family) {
+        ResonanceCalibratorBlockEntity calibrator = MachineTestSupport.place(helper, pos,
+                ModBlocks.resonanceCalibrator(ResonanceCalibratorChassis.IRON).get(), ResonanceCalibratorBlockEntity.class);
+        calibrator.getGearInventory().setStackInSlot(ResonanceCalibratorBlockEntity.SLOT_PATTERN_STORAGE,
+                new ItemStack(ModItems.calibrationPattern(family).get()));
+        return calibrator;
     }
 
     /** Offers a stack to every slot in order, the way hoppers and Universal Cables do, {@code rounds} times. */

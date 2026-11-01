@@ -1,6 +1,7 @@
 package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.AmmoniaPartItem;
 import com.rngtech.content.menu.AmmoniaSynthesizerMenu;
 import com.rngtech.content.purge.FluidPurgeRole;
@@ -87,7 +88,7 @@ public class AmmoniaSynthesizerBlockEntity extends BaseMachineBlockEntity
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
 
-    private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(GEAR_SLOT_COUNT, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return slot == SLOT_CATALYST_BED && isCatalystBed(stack);

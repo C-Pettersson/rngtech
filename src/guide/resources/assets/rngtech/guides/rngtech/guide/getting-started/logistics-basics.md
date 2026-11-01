@@ -2,7 +2,7 @@
 navigation:
   title: "Logistics basics"
   parent: getting-started.md
-  position: 6
+  position: 7
   icon: rngtech:wooden_crusher_chassis
 ---
 

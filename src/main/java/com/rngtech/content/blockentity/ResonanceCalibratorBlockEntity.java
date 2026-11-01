@@ -7,6 +7,7 @@ import com.rngtech.content.calibration.CalibrationRecipeResult;
 import com.rngtech.content.calibration.CalibrationStreak;
 import com.rngtech.content.calibration.CalibrationValueRange;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.CalibrationGearItem;
 import com.rngtech.content.item.CalibrationPatternItem;
@@ -68,6 +69,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -167,7 +169,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             setChanged();
         }
     };
-    private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(GEAR_SLOT_COUNT, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (isPatternSlot(slot)) {
@@ -1317,11 +1319,43 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         }
     }
 
+    /**
+     * Automation and shift-clicks offer an item to the input, catalyst, and stabilizer slots in that order, so each
+     * slot takes only what a recipe for the selected pattern and the present input uses there. Stabilization Catalyst
+     * is the Reinforced Iron Plate catalyst but a stabilizer everywhere else, so without this a Kinetic feed of it
+     * fills the catalyst slot. With no pattern and no input, any calibration recipe counts.
+     */
     public boolean isCalibrationInput(int slot, ItemStack stack) {
-        return switch (slot) {
+        boolean usedSomewhere = switch (slot) {
             case SLOT_INPUT -> INGREDIENT_FILTER.accepts(level, stack);
             case SLOT_CATALYST -> CATALYST_FILTER.accepts(level, stack);
             case SLOT_STABILIZER -> STABILIZER_FILTER.accepts(level, stack);
+            default -> false;
+        };
+        if (!usedSomewhere) {
+            return false;
+        }
+        ItemStack pattern = patternStack();
+        ItemStack input = slot == SLOT_INPUT ? ItemStack.EMPTY : inputStack();
+        if (pattern.isEmpty() && input.isEmpty()) {
+            return true;
+        }
+        for (RecipeHolder<CalibrationRecipe> holder : level.getRecipeManager().getAllRecipesFor(ModRecipes.CALIBRATION_TYPE.get())) {
+            CalibrationRecipe recipe = holder.value();
+            if ((pattern.isEmpty() || recipe.pattern().test(pattern))
+                    && (input.isEmpty() || recipe.ingredient().test(input))
+                    && usesInSlot(recipe, slot, stack)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean usesInSlot(CalibrationRecipe recipe, int slot, ItemStack stack) {
+        return switch (slot) {
+            case SLOT_INPUT -> recipe.ingredient().test(stack);
+            case SLOT_CATALYST -> recipe.catalyst().test(stack);
+            case SLOT_STABILIZER -> recipe.stabilizer().filter(stabilizer -> stabilizer.test(stack)).isPresent();
             default -> false;
         };
     }

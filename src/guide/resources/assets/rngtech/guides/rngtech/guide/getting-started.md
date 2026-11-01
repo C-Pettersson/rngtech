@@ -24,12 +24,7 @@ Every machine is built in layers, and each layer is its own item with its own ro
 - **Refinement Potential.** Each rolled item also has a budget you spend to add, upgrade, reroll, or remove affixes. Higher-stage items roll a bigger budget. See [Refinement Potential](rngtech:rarity-and-affixes.md#refinement-potential).
 - **Machine Mastery.** Placed machines earn XP from their work and spend points in a passive tree. See [Machine Mastery](rngtech:machine-mastery.md).
 
-### Identifying new items
-
-Crafted machines, Gear parts, tool parts, and Battery Cells come out **unidentified**. The crafting preview keeps the roll hidden on purpose. To reveal one:
-
-- Put a single unidentified item alone in a crafting grid and take the result. Repeat for each item in a stack.
-- Or place an unidentified machine block. Only the placed block is identified; the rest of the stack stays unidentified.
+- [Identifying new items](rngtech:getting-started/identifying-new-items.md)
 
 ## Start: tools
 

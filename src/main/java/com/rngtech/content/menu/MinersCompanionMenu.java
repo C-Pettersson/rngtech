@@ -1,5 +1,6 @@
 package com.rngtech.content.menu;
 
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.MinersCompanionItem;
 import com.rngtech.content.minerscompanion.MinersCompanionState;
@@ -303,7 +304,12 @@ public class MinersCompanionMenu extends AbstractContainerMenu {
     }
 
     private ItemStackHandler createGearInventory() {
-        return new ItemStackHandler(GEAR_SLOT_COUNT) {
+        return new IdentifyingItemHandler(GEAR_SLOT_COUNT, () -> inventory.player.level()) {
+            @Override
+            protected boolean identifiesSlot(int slot) {
+                return !loading;
+            }
+
             @Override
             public boolean isItemValid(int slot, ItemStack stack) {
                 return switch (slot) {

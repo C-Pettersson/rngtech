@@ -4,6 +4,7 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.PhaseCoilBlock;
 import com.rngtech.content.block.PhaseCradleBlock;
 import com.rngtech.content.block.PhaseEmitterBlock;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.menu.PhaseCradleMenu;
@@ -199,7 +200,7 @@ public class PhaseCradleBlockEntity extends BlockEntity implements MenuProvider,
     };
     /** Items from an Exotic Affix Forge save that have no Cradle slot, kept until a player is near enough to collect them. */
     private final List<ItemStack> heldItems = new ArrayList<>();
-    private final ItemStackHandler cells = new ItemStackHandler(CELL_SLOTS) {
+    private final ItemStackHandler cells = new IdentifyingItemHandler(CELL_SLOTS, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return BatteryCellItem.isBatteryCell(stack);
