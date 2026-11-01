@@ -4,10 +4,12 @@ import { fileURLToPath } from "node:url";
 import { KEYSTONE_START_DISTANCE } from "./layout-mega-tree.mjs";
 
 export const megaCatalogUrl = new URL("../../src/main/resources/data/rngtech/mastery/machine_tree.json", import.meta.url);
-export const diameters = { STARTER: 40, TRAVEL: 12, NODE: 18, NOTABLE: 34, KEYSTONE: 48 };
-export const CATALOG_NODES = 1372;
+export const diameters = { STARTER: 40, TRAVEL: 12, NODE: 18, NOTABLE: 34, KEYSTONE: 48, JEWEL_SOCKET: 24 };
+export const CATALOG_NODES = 1387;
 // Points earned from levels 2-100. Allocation storage allows 120 for future non-level sources.
 export const LEVEL_POINTS = 99;
+export const JEWEL_SOCKETS = 9;
+export const SOCKET_START_DISTANCE = 4;
 
 export function auditMegaTree(tree) {
     const errors = [], byId = new Map(tree.nodes.map(node => [node.id, node]));
@@ -18,10 +20,10 @@ export function auditMegaTree(tree) {
         if (a === b || !byId.has(a) || !byId.has(b) || edgeIds.has(id)) { errors.push(`Invalid or duplicate link ${id}`); continue; }
         edgeIds.add(id); adjacency.get(a).push(b); adjacency.get(b).push(a);
     }
-    const caps = { STARTER: 3, TRAVEL: 4, NODE: 3, NOTABLE: 2, KEYSTONE: 1 };
+    const caps = { STARTER: 3, TRAVEL: 4, NODE: 3, NOTABLE: 2, KEYSTONE: 1, JEWEL_SOCKET: 1 };
     for (const node of tree.nodes) {
         const degree = adjacency.get(node.id).length;
-        if (degree > caps[node.kind] || ["STARTER", "KEYSTONE"].includes(node.kind) && degree !== caps[node.kind]) errors.push(`Degree ${degree}: ${node.id}`);
+        if (degree > caps[node.kind] || ["STARTER", "KEYSTONE", "JEWEL_SOCKET"].includes(node.kind) && degree !== caps[node.kind]) errors.push(`Degree ${degree}: ${node.id}`);
         if (node.kind === "TRAVEL" && degree < 2) errors.push(`Travel dead end without a reward: ${node.id}`);
         if (node.kind === "TRAVEL" && node.effects.some(e => !tree.attributes.includes(e.stat))) errors.push(`Non-attribute travel ${node.id}`);
         for (const effect of node.effects) {
@@ -60,7 +62,7 @@ export function auditMegaTree(tree) {
     if(!travelNodes.length||walkTravel(travelNodes[0].id).size!==travelNodes.length)errors.push("Travel network must connect without reward nodes or foreign starts");
     const seenRewards=new Set(), gates=[], notableInvestment=[], keystoneInvestment=[];
     let rewardPockets=0;
-    for(const node of tree.nodes.filter(n=>["NODE","NOTABLE","KEYSTONE"].includes(n.kind))) {
+    for(const node of tree.nodes.filter(n=>["NODE","NOTABLE","KEYSTONE","JEWEL_SOCKET"].includes(n.kind))) {
         if(seenRewards.has(node.id))continue;
         const component=[node.id],entries=new Set();
         seenRewards.add(node.id);rewardPockets++;
@@ -111,6 +113,10 @@ export function auditMegaTree(tree) {
         for (const [id, distance] of Object.entries(distances[root.id])) {
             if (distance < KEYSTONE_START_DISTANCE || distance > LEVEL_POINTS) errors.push(`Keystone commitment ${root.id} / ${id}: ${distance}`);
         }
+        // A Jewel Socket is a small investment, but never a start's neighbour.
+        for (const socket of tree.nodes.filter(n => n.kind === "JEWEL_SOCKET")) {
+            if (depth.get(socket.id) < SOCKET_START_DISTANCE) errors.push(`Jewel Socket too close to ${root.id}: ${socket.id} at ${depth.get(socket.id)}`);
+        }
         const ordered = [];
         const candidates = tree.nodes.filter(n=>n.kind === "KEYSTONE").sort((a,b)=>depth.get(a.id)-depth.get(b.id));
         // Representative route combines the nearest endpoint with an opposite-sector specialty.
@@ -152,6 +158,7 @@ export async function checkMegaTree({log=true}={}) {
     assert.equal(tree.nodes.length,CATALOG_NODES);
     assert.equal(new Set(tree.nodes.map(n=>n.id)).size,tree.nodes.length);
     assert.equal(audit.metrics.starts,6);
+    assert.equal(tree.nodes.filter(n=>n.kind==="JEWEL_SOCKET").length,JEWEL_SOCKETS);
     if(log) console.log(`Mega tree ${audit.errors.length ? "FAIL" : "PASS"}: ${JSON.stringify({...audit.metrics,distances:undefined})}`);
     assert.equal(audit.errors.length,0,audit.errors.slice(0,30).join("\n"));
     // These mutations would preserve reward values while breaking the investment rules.

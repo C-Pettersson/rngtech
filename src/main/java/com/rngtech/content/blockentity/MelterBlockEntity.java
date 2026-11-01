@@ -38,6 +38,7 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.jewel.JewelEffects;
 import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -747,11 +748,13 @@ public class MelterBlockEntity extends BaseMachineBlockEntity
         MachineStatAccumulator stats = MachineBaseStatCatalog.melter();
         stats.apply(effectiveTraits());
         MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.MELTER);
+        JewelEffects.applyLines(stats, this, machineProgression(), MachineMasteryFamily.MELTER);
         applyHeatCoreStats(stats);
         applyCrushHeadStats(stats);
         applyServoStats(stats);
         applyFluidPumpStats(stats);
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.MELTER);
+        JewelEffects.applyThresholds(stats, this, machineProgression(), MachineMasteryFamily.MELTER);
         WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(

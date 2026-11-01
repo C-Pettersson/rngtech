@@ -100,6 +100,9 @@ public class MelterBlock extends WorkOrderMachineBlock {
                 stack.set(ModDataComponents.MACHINE_PROGRESSION.get(), progression);
             }
         }
+        if (level.getBlockEntity(pos) instanceof BaseMachineBlockEntity jewelled && !jewelled.jewels().isEmpty()) {
+            stack.set(ModDataComponents.JEWELS.get(), jewelled.jewels());
+        }
         return stack;
     }
 

@@ -18,6 +18,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Map;
@@ -181,6 +182,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
                 .stats(FurnaceMenu.TAB_CONFIGURATION)
                 .refinement(FurnaceMenu.TAB_REFINEMENT)
                 .mastery(FurnaceMenu.TAB_MASTERY)
+                .jewels(FurnaceMenu.TAB_JEWELS)
                 .orders(FurnaceMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         masterySupport = new MasteryScreenSupport<>(
@@ -210,6 +212,11 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
                     @Override
                     public void geometryChanged() {
                         updateImageSizeForSelectedTab();
+                    }
+
+                    @Override
+                    public ItemStack socketedJewel(int index) {
+                        return menu.jewel(index);
                     }
                 },
                 new MasteryScreenSupport.Palette(
@@ -252,6 +259,12 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
                 guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
             }
         }
+        if (menu.selectedTab() == FurnaceMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
     }
@@ -272,6 +285,8 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
             renderRefinement(guiGraphics);
         } else if (menu.selectedTab() == FurnaceMenu.TAB_ORDERS) {
             workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        } else if (menu.selectedTab() == FurnaceMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
         } else {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }

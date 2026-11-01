@@ -168,7 +168,8 @@ final class TreeAuditChecks {
     /** Every reward node and keystone must benefit at least one machine; otherwise its points buy nothing. */
     private static void everyNodePaysSomeMachine() {
         for (MegaPassiveNode node : MegaPassiveTree.TREE.nodes()) {
-            if (node.kind() == PassiveNodeKind.STARTER || node.kind() == PassiveNodeKind.TRAVEL) {
+            // A Jewel Socket pays through the jewel it holds, not through effects of its own.
+            if (node.kind() == PassiveNodeKind.STARTER || node.kind() == PassiveNodeKind.TRAVEL || node.kind() == PassiveNodeKind.JEWEL_SOCKET) {
                 continue;
             }
             boolean pays = false;

@@ -34,6 +34,7 @@ import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.OutputLedger;
+import com.rngtech.rpg.jewel.JewelEffects;
 import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -689,10 +690,12 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
         MachineStatAccumulator stats = MachineBaseStatCatalog.alloyFurnace(chassis());
         stats.apply(activeTraits());
         MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
+        JewelEffects.applyLines(stats, this, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
         applyGearStats(stats, heatCoreStack());
         applyGearStats(stats, crucibleStack());
         applyGearStats(stats, servoStack());
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
+        JewelEffects.applyThresholds(stats, this, machineProgression(), MachineMasteryFamily.ALLOY_FURNACE);
         WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(

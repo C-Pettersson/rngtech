@@ -21,6 +21,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Locale;
@@ -121,6 +122,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
                 .stats(CrusherMenu.TAB_CONFIGURATION)
                 .refinement(CrusherMenu.TAB_REFINEMENT)
                 .mastery(CrusherMenu.TAB_MASTERY)
+                .jewels(CrusherMenu.TAB_JEWELS)
                 .orders(CrusherMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         masterySupport = new MasteryScreenSupport<>(
@@ -148,6 +150,11 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
                     @Override
                     public void geometryChanged() {
                         updateImageSizeForSelectedTab();
+                    }
+
+                    @Override
+                    public ItemStack socketedJewel(int index) {
+                        return menu.jewel(index);
                     }
                 },
                 new MasteryScreenSupport.Palette(
@@ -190,6 +197,12 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
                 guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
             }
         }
+        if (menu.selectedTab() == CrusherMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
     }
@@ -208,6 +221,8 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             renderRefinement(guiGraphics);
         } else if (menu.selectedTab() == CrusherMenu.TAB_ORDERS) {
             workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        } else if (menu.selectedTab() == CrusherMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
         } else if (menu.selectedTab() == CrusherMenu.TAB_MASTERY) {
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         }

@@ -12,6 +12,7 @@
                             "function": "minecraft:copy_components",
                             "include": [
                                 "rngtech:work_orders",
+                                "rngtech:jewels",
                                 "rngtech:mirrored"
                             ],
                             "source": "block_entity"

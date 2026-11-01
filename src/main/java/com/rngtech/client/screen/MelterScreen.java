@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
@@ -124,6 +125,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements
                 .stats(MelterMenu.TAB_CONFIGURATION)
                 .refinement(MelterMenu.TAB_REFINEMENT)
                 .mastery(MelterMenu.TAB_MASTERY)
+                .jewels(MelterMenu.TAB_JEWELS)
                 .orders(MelterMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
@@ -142,6 +144,11 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements
                     @Override
                     public void geometryChanged() {
                         updateImageSizeForSelectedTab();
+                    }
+
+                    @Override
+                    public ItemStack socketedJewel(int index) {
+                        return menu.jewel(index);
                     }
                 },
                 new MasteryScreenSupport.Palette(
@@ -183,6 +190,12 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements
                 guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
             }
         }
+        if (menu.selectedTab() == MelterMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
     }
@@ -203,6 +216,8 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         } else if (menu.selectedTab() == MelterMenu.TAB_ORDERS) {
             workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        } else if (menu.selectedTab() == MelterMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
         }
     }
 

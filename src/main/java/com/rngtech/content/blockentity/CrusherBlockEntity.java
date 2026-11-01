@@ -27,6 +27,7 @@ import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.OutputAmountTracker;
+import com.rngtech.rpg.jewel.JewelEffects;
 import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
@@ -822,12 +823,14 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         stats.apply(activeTraits);
 
         MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.CRUSHER);
+        JewelEffects.applyLines(stats, this, machineProgression(), MachineMasteryFamily.CRUSHER);
         ItemStack crushHead = crushHeadStack();
         if (isAllowedCrushHead(crushHead)) {
             ComponentBaseStatCatalog.applyEffectiveContribution(stats, crushHead);
             ComponentBaseStatCatalog.applyAttributeAffixes(stats, crushHead);
         }
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.CRUSHER);
+        JewelEffects.applyThresholds(stats, this, machineProgression(), MachineMasteryFamily.CRUSHER);
         WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             try (MachineStatAccumulator.Source ignored = stats.source(MachineStatAccumulator.NO_BATTERY_SOURCE)) {

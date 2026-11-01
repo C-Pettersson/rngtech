@@ -1,6 +1,7 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.rpg.jewel.JewelColour;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -283,6 +284,10 @@ public final class MachineTabs {
 
         public Builder mastery(int id) {
             return tab(id, "rngtech.tab.mastery", ModItems.MASTERY_REFUND.get());
+        }
+
+        public Builder jewels(int id) {
+            return tab(id, "rngtech.tab.jewels", ModItems.jewel(JewelColour.DRIVE).get());
         }
 
         /** The Orders tab, hidden until {@code shown} holds, so players who have not found Work Orders do not see it. */

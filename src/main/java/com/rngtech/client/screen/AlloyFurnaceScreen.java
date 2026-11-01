@@ -16,6 +16,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
@@ -125,6 +126,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 .stats(AlloyFurnaceMenu.TAB_STATS)
                 .refinement(AlloyFurnaceMenu.TAB_REFINEMENT)
                 .mastery(AlloyFurnaceMenu.TAB_MASTERY)
+                .jewels(AlloyFurnaceMenu.TAB_JEWELS)
                 .orders(AlloyFurnaceMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
@@ -143,6 +145,11 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                     @Override
                     public void geometryChanged() {
                         updateImageSizeForSelectedTab();
+                    }
+
+                    @Override
+                    public ItemStack socketedJewel(int index) {
+                        return menu.jewel(index);
                     }
                 },
                 new MasteryScreenSupport.Palette(
@@ -192,6 +199,12 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
             }
         }
+        if (menu.selectedTab() == AlloyFurnaceMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
     }
@@ -211,6 +224,8 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         } else if (menu.selectedTab() == AlloyFurnaceMenu.TAB_ORDERS) {
             workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        } else if (menu.selectedTab() == AlloyFurnaceMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
         }
     }
 

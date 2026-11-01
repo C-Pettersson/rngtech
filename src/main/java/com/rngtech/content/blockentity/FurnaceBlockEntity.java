@@ -30,6 +30,7 @@ import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
 import com.rngtech.rpg.OutputLedger;
+import com.rngtech.rpg.jewel.JewelEffects;
 import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.FurnacePassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
@@ -813,6 +814,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         MachineTraits activeTraits = effectiveTraits();
         stats.apply(activeTraits);
         MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.FURNACE);
+        JewelEffects.applyLines(stats, this, machineProgression(), MachineMasteryFamily.FURNACE);
         for (int slot = 0; slot < gearInventory.getSlots(); slot++) {
             ItemStack gear = gearInventory.getStackInSlot(slot);
             if (isAllowedGearComponent(slot, gear)) {
@@ -821,6 +823,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
             }
         }
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.FURNACE);
+        JewelEffects.applyThresholds(stats, this, machineProgression(), MachineMasteryFamily.FURNACE);
         WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (isElectric() && !hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(

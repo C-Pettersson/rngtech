@@ -2,11 +2,20 @@ package com.rngtech.rpg;
 
 import com.rngtech.rpg.jewel.JewelAffixes;
 import com.rngtech.rpg.jewel.JewelColour;
+import com.rngtech.rpg.jewel.JewelEffects;
+import com.rngtech.rpg.jewel.MachineJewels;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
+import com.rngtech.rpg.progression.MachineProgressionState;
+import com.rngtech.rpg.progression.MegaPassiveNode;
+import com.rngtech.rpg.progression.MegaPassiveTree;
+import com.rngtech.rpg.progression.PassiveNodeKind;
 import com.rngtech.rpg.unique.UniqueStatReaders;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +36,97 @@ public final class JewelChecks {
         colourWeightsTheSharedPool();
         jewelsHoldTwoOfEachSide();
         refinementPotentialFollowsTheCut();
+        treeSocketsOpenSlots();
+        socketedJewelsApplyWhereRead();
         return checks;
+    }
+
+    private static void treeSocketsOpenSlots() {
+        List<MegaPassiveNode> sockets = MegaPassiveTree.socketNodes();
+        require(sockets.size() == MachineJewels.TREE_SLOTS, "nine Jewel Sockets, found " + sockets.size());
+        for (MegaPassiveNode socket : sockets) {
+            require(socket.effects().isEmpty() && socket.tagged().isEmpty() && socket.behaviors().isEmpty(), socket.id() + " grants nothing itself");
+            require(socket.links().size() == 1, socket.id() + " is a leaf");
+            require(socket.masteryIconKey().equals("jewel_socket"), socket.id() + " draws the socket icon");
+        }
+        MachineProgressionState empty = MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.CRUSHER);
+        require(MegaPassiveTree.allocatedSocketCount(empty) == 0 && !JewelEffects.treeSlotOpen(empty, 0), "no socket, no open slot");
+        MachineProgressionState one = withNodes(empty, pathTo(empty, sockets.getFirst()));
+        require(MegaPassiveTree.allocatedSocketCount(one) == 1 && JewelEffects.treeSlotOpen(one, 0) && !JewelEffects.treeSlotOpen(one, 1),
+                "one allocated socket opens the first slot only");
+        require(MegaPassiveTree.allocatedSocketCount(one.withoutNode(sockets.getFirst().id())) == 0, "refunding the socket closes the slot again");
+    }
+
+    private static void socketedJewelsApplyWhereRead() {
+        List<JewelEffects.Jewel> jewels = List.of(new JewelEffects.Jewel(Component.literal("Test Jewel"), new MachineTraits(Rarity.RARE, 0, List.of(
+                modifier("jewel_pace", MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 10),
+                modifier("jewel_yielding", MachineStat.OUTPUT_AMOUNT, ModifierOperation.INCREASED_PERCENT, 8),
+                modifier("jewel_drive", MachineStat.DRIVE, ModifierOperation.ADD, 10),
+                modifier(JewelAffixes.MOMENTUM_ID, MachineStat.PROCESSING_SPEED, ModifierOperation.INCREASED_PERCENT, 12)))));
+
+        MachineStatAccumulator furnace = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0, MachineStat.OUTPUT_AMOUNT, 1.0, MachineStat.DRIVE, 0.0));
+        JewelEffects.applyLines(furnace, jewels, MachineMasteryFamily.FURNACE);
+        near(furnace.increasedPercent(MachineStat.PROCESSING_SPEED), 10, "a Furnace reads the jewel's speed line");
+        near(furnace.increasedPercent(MachineStat.OUTPUT_AMOUNT), 0, "a Furnace ignores a Bonus Output line it never reads");
+        near(furnace.value(MachineStat.DRIVE), 10, "the jewel's flat Drive lands before the conversions");
+        JewelEffects.applyThresholds(furnace, jewels, MachineMasteryFamily.FURNACE);
+        near(furnace.increasedPercent(MachineStat.PROCESSING_SPEED), 10, "Momentum waits for 100 Drive");
+
+        MachineStatAccumulator driven = MachineStatAccumulator.componentBase(Map.of(MachineStat.PROCESSING_SPEED, 1.0, MachineStat.DRIVE, 95.0));
+        JewelEffects.applyLines(driven, jewels, MachineMasteryFamily.FURNACE);
+        JewelEffects.applyThresholds(driven, jewels, MachineMasteryFamily.FURNACE);
+        near(driven.increasedPercent(MachineStat.PROCESSING_SPEED), 22, "Momentum pays once the jewel's own Drive takes the total to 100");
+
+        MachineStatAccumulator crusher = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.0));
+        JewelEffects.applyLines(crusher, jewels, MachineMasteryFamily.CRUSHER);
+        near(crusher.increasedPercent(MachineStat.OUTPUT_AMOUNT), 8, "a Crusher reads the Bonus Output line");
+
+        MachineStatAccumulator anyMachine = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.0));
+        JewelEffects.applyLines(anyMachine, jewels, null);
+        near(anyMachine.increasedPercent(MachineStat.OUTPUT_AMOUNT), 8, "a machine without Mastery reads every line");
+    }
+
+    private static MachineModifier modifier(String id, MachineStat stat, ModifierOperation operation, double value) {
+        return MachineModifier.roll(id, id, ModifierSlot.SUFFIX, 1, List.of(new MachineModifierEffect(stat, operation, new ModifierValueRange(value, value, true), value)));
+    }
+
+    /** The shortest allocation path from the family's start to {@code target}, in allocation order. */
+    private static List<String> pathTo(MachineProgressionState state, MegaPassiveNode target) {
+        Map<String, String> parent = new HashMap<>();
+        ArrayDeque<String> queue = new ArrayDeque<>(List.of(state.startNodeId()));
+        parent.put(state.startNodeId(), null);
+        while (!queue.isEmpty()) {
+            String current = queue.poll();
+            if (current.equals(target.id())) {
+                break;
+            }
+            for (String next : MegaPassiveTree.node(current).links()) {
+                MegaPassiveNode node = MegaPassiveTree.node(next);
+                if (!parent.containsKey(next) && node.kind() != PassiveNodeKind.STARTER) {
+                    parent.put(next, current);
+                    queue.add(next);
+                }
+            }
+        }
+        List<String> path = new ArrayList<>();
+        for (String id = target.id(); id != null && !id.equals(state.startNodeId()); id = parent.get(id)) {
+            path.addFirst(id);
+        }
+        return path;
+    }
+
+    private static MachineProgressionState withNodes(MachineProgressionState state, List<String> ids) {
+        MachineProgressionState next = new MachineProgressionState(0, 0, MachineProgressionState.MAX_LEVEL, List.of(), state.startNodeId(), List.of(), false,
+                state.ascendancy(), state.ascendancyNodes(), state.sealTiers(), state.freeReset());
+        for (String id : ids) {
+            next = next.withUnlockedNode(MegaPassiveTree.node(id).index());
+        }
+        require(next.allocatedNodes().size() == ids.size(), "the socket path allocates in order: " + ids);
+        return next;
+    }
+
+    private static void near(double actual, double expected, String message) {
+        require(Math.abs(actual - expected) < 0.0001, message + ": expected " + expected + " but was " + actual);
     }
 
     private static void onePoolOneTierEachReadSomewhere() {

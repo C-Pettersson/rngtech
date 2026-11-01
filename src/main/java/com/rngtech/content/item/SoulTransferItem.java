@@ -7,6 +7,8 @@ import com.rngtech.content.dormant.DormantCore;
 import com.rngtech.content.dormant.DormantPhase;
 import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.rpg.dormant.DormantSoul;
+import com.rngtech.rpg.jewel.JewelHost;
+import com.rngtech.rpg.jewel.MachineJewels;
 import com.rngtech.rpg.progression.AscendancyCatalog;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -139,6 +141,11 @@ public class SoulTransferItem extends Item {
             return InteractionResult.SUCCESS;
         }
         stack.set(ModDataComponents.SOUL_CHARGE.get(), new SoulTransfer.Charge(host.masteryFamily(), state));
+        // The tree's jewels leave with the soul, on the same item; the body's stay with the body.
+        if (host instanceof JewelHost jewelled && !jewelled.jewels().tree().isEmpty()) {
+            stack.set(ModDataComponents.JEWELS.get(), MachineJewels.EMPTY.withTree(jewelled.jewels().tree()));
+            jewelled.setJewels(jewelled.jewels().withTree(List.of()));
+        }
         host.setMachineProgression(MachineProgressionState.EMPTY.forFamily(host.masteryFamily()));
         host.masteryChanged();
         playSound(player, pos, SoundEvents.SOUL_ESCAPE.value());
@@ -169,9 +176,20 @@ public class SoulTransferItem extends Item {
             }
             case RELEASE -> { }
         }
+        // Read the carried jewels first: an emptied stack answers no components.
+        MachineJewels carried = stack.getOrDefault(ModDataComponents.JEWELS.get(), MachineJewels.EMPTY);
         // Always used up, also in Creative, so a soul never lands in two machines.
         stack.shrink(1);
         host.applyMasteryState(charge.state());
+        if (host instanceof JewelHost jewelled && !carried.tree().isEmpty()) {
+            // Jewels already in the target's tree go back to the player rather than under the arriving ones.
+            for (ItemStack jewel : jewelled.jewels().tree()) {
+                if (!jewel.isEmpty()) {
+                    player.getInventory().placeItemBackInInventory(jewel.copy());
+                }
+            }
+            jewelled.setJewels(jewelled.jewels().withTree(carried.tree()));
+        }
         playSound(player, pos, SoundEvents.RESPAWN_ANCHOR_CHARGE);
         message(player, SoulTransfer.hasSoul(target)
                 ? Component.translatable("rngtech.soul_transfer.message.replaced", charge.state().level(), target.level())

@@ -61,7 +61,40 @@ def main() -> None:
     for name, stone in STONES.items():
         render({**BEZEL, **stone}).save(OUT / f"{name}.png")
         print(f"wrote {name}.png")
+    render_socket()
+
+
+# The Mastery tree's Jewel Socket icon: an empty gold setting, drawn at the tree's 16 px icon size.
+SOCKET_MASK = (
+    "................",
+    ".....OOOOOO.....",
+    "...OOBBBBBBOO...",
+    "..OBBb....bBBO..",
+    "..OBb......bBO..",
+    ".OBb........bBO.",
+    ".OB..........BO.",
+    ".OB..........BO.",
+    ".OB..........BO.",
+    ".OB..........BO.",
+    ".ObB........BbO.",
+    "..ObB......BbO..",
+    "..ObbB....BbbO..",
+    "...OObbbbbbOO...",
+    ".....OOOOOO.....",
+    "................",
+)
+SOCKET_OUT = ROOT / "src/main/resources/assets/rngtech/textures/gui/mastery/jewel_socket.png"
+
+
+def render_socket() -> None:
+    image = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for y, row in enumerate(SOCKET_MASK):
+        for x, key in enumerate(row):
+            if key != ".":
+                image.putpixel((x, y), BEZEL[key])
+    image.save(SOCKET_OUT)
+    print("wrote gui/mastery/jewel_socket.png")
 
 
 if __name__ == "__main__":
-    main()
+    render_socket()

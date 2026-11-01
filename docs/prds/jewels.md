@@ -156,8 +156,8 @@ The sockets are added through `EXTRAS` in `author-mega-tree.mjs`, so every exist
 
 Behaviour rules:
 
-- Socketing and removing a jewel are server actions from the Mastery screen, on an allocated socket only. Removing returns the jewel to the player.
-- Refunding a socket, a Clear, or a Full Reset leaves the jewel in place and inactive, with its node dimmed, so a respec never drops items. Target builds and build codes carry the socket node but never the jewel.
+- Jewels go in and out through menu slots on a **Jewels tab** of the machine screen, one slot per allocated socket in allocation order, with the player inventory visible; the Mastery tab's socket nodes show which jewel each socket holds and what this machine reads of it. Shift-clicking a jewel on the Jewels tab fills the first open slot. All tree sockets are equivalent, so a slot is "the nth allocated socket", not a fixed node.
+- Refunding a socket, a Clear, or a Full Reset leaves the jewel in its slot and inactive, so a respec never drops items; allocating a socket again reads it. Target builds and build codes carry the socket node but never the jewel.
 - A socket's jewel is one more `MasteryEffectSource`. Its effects apply with the tree's nodes in `applyNodeStats`, before Gear and `applyAttributeStats`, so jewel attributes feed the conversions and thresholds like Gear attributes do. Each line applies where `MachineMasteryFamily.supports` says the family reads the stat, the same gate every node passes. A stat breakdown labels the line "Jewel: <jewel name>".
 - The Mastery tab syncs through `ContainerData` ints, which cannot carry an item. The socket contents reach the client through menu slots over the socket inventory, one per socket, so the screen draws the real stacks and the existing click handling moves them.
 - Single Pass still removes every yield line a jewel carries, because yield is declared by stat, not by source.
@@ -180,7 +180,7 @@ A **Gold body** carries one body socket as a fixed identity implicit, the way St
 Shared rules:
 
 - Sockets stack: implicit plus suffix, capped at **4** per machine. A Gold body with Tier 7 Bedazzling has four.
-- Every socketed jewel lives in one `rngtech:jewels` component on the block entity: body sockets as a list of up to four stacks, tree sockets as a map from socket node ID to stack. It is kept on the dropped item like traits and Job Chips, and Soul Transfer copies the tree-keyed entries with the Mastery.
+- Every socketed jewel lives in one `rngtech:jewels` component on the block entity: a tree row of up to nine stacks and a body row of up to four, each a slot row whose first entries are the live ones. It is kept on the dropped item like traits and Job Chips, and Soul Transfer carries the tree row with the Mastery.
 - They show as a socket row in the Gear tab, or in the Stats tab on a machine without Gear, as empty settings that fill with the jewel's icon. Hover shows the jewel's tooltip with this machine's inactive lines dimmed.
 - A body-socket jewel is the same effect source as a tree-socket jewel; only the storage differs.
 - A refinement operation that would remove occupied sockets (a Chaos Crystal, Nullifier Coil, Excise, Transmute, or Reforge on the Bedazzling line) is rejected until the jewels are taken out. The station names the reason, as a Gear conflict does on the Mastery screen. No operation ever deletes or drops a jewel.
@@ -249,8 +249,8 @@ Budget: the tree gives +5%. Reaching the 90% ceiling then needs five +2% jewels,
 
 ## Storage and Saves
 
-- A new data component, `rngtech:jewels`, holds every socketed jewel: `body`, a list of up to four stacks, and `tree`, a map from socket node ID to stack. It sits beside `rngtech:machine_traits` and `rngtech:machine_progression` in the block entity's components, is kept on the dropped item, and uses a lenient codec so a jewel that no longer decodes is dropped without touching the machine's other data. `MachineProgressionState` is unchanged, so build codes, the 120-slot sync, and the Forestry cart's NBT keep their shape; the cart carries the component on its entity.
-- Soul Transfer copies the `tree` entries with the Mastery and leaves `body` with the body. A tree entry whose node is not allocated in the new machine stays stored and inactive.
+- A new data component, `rngtech:jewels`, holds every socketed jewel: `tree`, a row of up to nine stacks, and `body`, a row of up to four. It sits beside `rngtech:machine_traits` and `rngtech:machine_progression` in the block entity's components and is kept on the dropped and picked machine. `MachineProgressionState` is unchanged, so build codes and the 120-slot sync keep their shape. The Forestry Companion has no Jewels tab yet, so its tree sockets open nothing until its cart UI gets one.
+- Soul Transfer carries the `tree` row with the Mastery and leaves `body` with the body; jewels already in the target's tree row go back to the player. A tree entry past the new machine's socket count stays stored and inactive.
 - No catalog version bump: sockets and Headroom nodes are appended extras.
 - Existing Crushers recompute on load; no yield data is stored.
 

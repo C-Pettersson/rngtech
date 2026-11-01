@@ -35,6 +35,8 @@ import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.PhaseArrayRules;
 import com.rngtech.rpg.TelemetryReadout;
+import com.rngtech.rpg.jewel.JewelHost;
+import com.rngtech.rpg.jewel.MachineJewels;
 import com.rngtech.rpg.progression.MachineProgressionState;
 import com.rngtech.rpg.progression.MegaPassiveTree;
 import com.rngtech.rpg.workorder.LoadedWorkOrder;
@@ -68,7 +70,7 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public abstract class BaseMachineBlockEntity extends BlockEntity implements RefinableMachine {
+public abstract class BaseMachineBlockEntity extends BlockEntity implements RefinableMachine, JewelHost {
     private static final long REMOVED_GEAR_CHECK_INTERVAL = 20L;
     private static final double REMOVED_GEAR_PLAYER_RANGE = 16.0D;
     private static final int BODY_CUE_INTERVAL = 20;
@@ -315,6 +317,23 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
                 .set(ModDataComponents.MACHINE_PROGRESSION.get(), progression)
                 .build()
         );
+        setChanged();
+    }
+
+    /** The jewels in this machine's tree and body sockets, stored as a component so they drop with it. */
+    @Override
+    public MachineJewels jewels() {
+        MachineJewels jewels = components().get(ModDataComponents.JEWELS.get());
+        return jewels == null ? MachineJewels.EMPTY : jewels;
+    }
+
+    @Override
+    public void setJewels(MachineJewels jewels) {
+        DataComponentMap.Builder builder = DataComponentMap.builder().addAll(components());
+        builder.set(ModDataComponents.JEWELS.get(), jewels == null || jewels.isEmpty() ? null : jewels);
+        setComponents(builder.build());
+        // The stats cache keys on traits, progression, and orders; jewels change beside them, so bump it by hand.
+        statsCache.invalidate();
         setChanged();
     }
 
