@@ -14,6 +14,9 @@ description='''
 A tech mod where your machines drop like loot. Machines, Gear parts, and Battery Cells roll rarity and affixes, Refinement Potential limits how far you can craft them, and machines level up on a shared passive tree with ascendancies. Build ore processing, alloying, power generation, and automation across nine material stages.
 '''
 
+[[mixins]]
+config="rngtech.mixins.json"
+
 [[dependencies.${mod_id}]]
 modId="neoforge"
 type="required"
