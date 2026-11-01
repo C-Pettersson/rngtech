@@ -84,7 +84,8 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
     private static final int DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED = DATA_BATTERY_SLOT_BLOCKED + 1;
     private static final int DATA_CHASSIS_STAGE = DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED + 1;
     private static final int DATA_OUTPUT_PER_MINUTE = DATA_CHASSIS_STAGE + 1;
-    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
+    private static final int DATA_MAX_OUTPUT_AMOUNT = DATA_OUTPUT_PER_MINUTE + 1;
+    private static final int DATA_COUNT = DATA_MAX_OUTPUT_AMOUNT + 1;
     private static final int STAT_SCALE = 100;
     private static final int OUTPUT_BONUS_SCALE = 1000;
     private static final int MACHINE_SLOT_COUNT = CrusherBlockEntity.SLOT_COUNT;
@@ -385,6 +386,10 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     public static int outputAmountDataIndex() {
         return DATA_OUTPUT_AMOUNT;
+    }
+
+    public static int maxOutputAmountDataIndex() {
+        return DATA_MAX_OUTPUT_AMOUNT;
     }
 
     public static int processingSpeedDataIndex() {

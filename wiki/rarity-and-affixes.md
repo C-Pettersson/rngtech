@@ -108,7 +108,7 @@ Most affixes have a **tier** from 1 to 7. The tier sets the range, and the affix
 | 6 | 80–100% |
 | 7 | 110–140% |
 
-Crusher yield affixes use smaller tables, because they all feed the Crusher's [Output Amount](crusher.md#output-amount) total, which already has diminishing returns.
+Crusher yield affixes use smaller tables, because they all feed the Crusher's [Output Amount](crusher.md#output-amount) total, which stops at Maximum Bonus Output. The Cavitation Generator and its Gear roll Bonus Output on the Jaws table below, without the speed penalty.
 
 - **Crusher Jaws** and **Crush Head Pulverizing** (prefixes) give the most Bonus Output, but also roll reduced Processing Speed. The speed penalty rolls on its own, wider range, so a light penalty is a lucky roll.
 - The **Output Amount** suffix on Crushers and Crush Heads is small and has no penalty. It can sit beside Jaws or Pulverizing.

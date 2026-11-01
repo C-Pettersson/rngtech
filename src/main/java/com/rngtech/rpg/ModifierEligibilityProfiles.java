@@ -407,7 +407,16 @@ public final class ModifierEligibilityProfiles {
     );
     private static final ModifierDefinition EFFICIENCY = percent(ModifierSlot.PREFIX, MachineStat.EFFICIENCY);
     private static final ModifierDefinition ENERGY_USAGE = percent(ModifierSlot.SUFFIX, MachineStat.ENERGY_USAGE);
-    private static final ModifierDefinition OUTPUT_AMOUNT = percent(ModifierSlot.SUFFIX, MachineStat.OUTPUT_AMOUNT);
+    /**
+     * Output Amount on the Cavitation Generator and its Gear: the yield table without the Crusher Jaws' speed penalty, so
+     * no single roll is born over the Bonus Output cap.
+     */
+    private static final ModifierDefinition OUTPUT_AMOUNT = ModifierDefinition.rollable(
+            ModifierSlot.SUFFIX,
+            MachineStat.OUTPUT_AMOUNT,
+            ModifierOperation.INCREASED_PERCENT,
+            YIELD_TIER_RANGES
+    );
     /**
      * The Crusher and Crush Head roll a small, penalty-free {@code output_amount} suffix. Its own group lets it sit beside
      * a yield prefix.

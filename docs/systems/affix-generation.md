@@ -137,7 +137,7 @@ Final stat calculation:
 Two stats bend the increased layer:
 
 - `ENERGY_USAGE` divides by its reductions instead of subtracting them, so one large roll cannot empty the bucket and hit the usage floor: `(base + additions) * more and less factors * (1 + increased / 100) / (1 + reduced / 100)`.
-- Crusher `OUTPUT_AMOUNT` bends its increased bucket with a soft cap; see [Crusher Yield](../reference/machine-stats.md#crusher-yield).
+- `OUTPUT_AMOUNT` pays no more of its increased bucket than `MAX_OUTPUT_AMOUNT`; see [Crusher Yield](../reference/machine-stats.md#crusher-yield).
 
 Status: Implemented
 
@@ -237,7 +237,7 @@ Three quality-of-life lines roll on machine bodies only, never on Gear, and carr
 
 The code-backed source for modifier value ranges is `ModifierEligibilityProfiles`. Each `ModifierDefinition` owns its affix id, modifier group, slot, `CAN_ROLL` flag, family roll weight, optional tier weights, target effects, and tier ranges.
 
-Most current rollable stat effects use the shared percent tier table above. Crusher yield affixes use smaller tables, because they share one soft-capped bucket. Crusher Jaws and Crush Head Pulverizing are compound prefixes: Output Amount on the yield table (`YIELD_TIER_RANGES`) plus reduced Processing Speed on a wider penalty table (`YIELD_SPEED_PENALTY_RANGES`). The Crusher and Crush Head Output Amount suffix uses the penalty-free clean table (`CLEAN_YIELD_TIER_RANGES`) in its own `clean_output_amount` group:
+Most current rollable stat effects use the shared percent tier table above. Yield affixes use smaller tables, because they share one capped bucket. Crusher Jaws and Crush Head Pulverizing are compound prefixes: Output Amount on the yield table (`YIELD_TIER_RANGES`) plus reduced Processing Speed on a wider penalty table (`YIELD_SPEED_PENALTY_RANGES`). The Crusher and Crush Head Output Amount suffix uses the penalty-free clean table (`CLEAN_YIELD_TIER_RANGES`) in its own `clean_output_amount` group, and every other Output Amount suffix uses the yield table without a penalty:
 
 | Modifier definition | Slot | Operation | Tier table |
 |---|---|---|---|
@@ -247,7 +247,7 @@ Most current rollable stat effects use the shared percent tier table above. Crus
 | `HEAT_TRANSFER` | Prefix | `INCREASED_PERCENT` | Shared percent table |
 | `PROCESSING_SPEED` | Suffix | `INCREASED_PERCENT` | Shared percent table |
 | `ENERGY_USAGE` | Suffix | `DECREASED_PERCENT` | Shared percent table |
-| `OUTPUT_AMOUNT` | Suffix | `INCREASED_PERCENT` | Shared percent table; clean yield table on the Crusher and Crush Head |
+| `OUTPUT_AMOUNT` | Suffix | `INCREASED_PERCENT` | Yield table; clean yield table on the Crusher and Crush Head |
 | `INPUT_SLOTS` / fuel slots | Suffix | `ADD` | Flat slot table |
 | `FLUID_CAPACITY` flat | Prefix | `ADD` | `250-500 mB` at Tier 1 to `6,500-9,000 mB` at Tier 7 |
 | `FLUID_CAPACITY` | Suffix | `INCREASED_PERCENT` | Shared percent table |

@@ -35,6 +35,9 @@ const THEMES = {
         ["Hardened Bearings", "Arc Pressure Drive", "Carbide Teeth", "Tempered Jaws", "Impact Plates", "Diamond Edges", "Bedrock Breakers", "Stress Relief", "Work Hardening", "Shock Mounts", "Manganese Liners", "Anvil Beds"]),
     recovery: theme("Recovery", ["OUTPUT_AMOUNT", "INCREASED_PERCENT"], 0.5, 1.5, effect("PROCESSING_SPEED", 2),
         ["Ore Sieve", "Dust Recovery", "Sorting Rake", "Sample Tray", "Clean Dust Ledge", "Material Memory", "Fine Screens", "Tailings Pass", "Double Sort", "Scrap Catcher", "Riffle Tables", "Grit Traps"]),
+    // Raises the Bonus Output cap: Output Amount pays no more than Maximum Bonus Output, 75% before this pocket.
+    headroom: theme("Headroom", ["MAX_OUTPUT_AMOUNT", "ADD"], 1, 2, effect("OUTPUT_AMOUNT", 1.5),
+        ["Overflow Gate", "Spillway", "Surge Bin"]),
     thermalReach: theme("Thermal Reach", ["MAX_TEMPERATURE", "INCREASED_PERCENT"], 1, 3, effect("HEAT_TRANSFER", 2),
         ["White Heat", "Refractory Lining", "Blast Nozzles", "Firebrick Walls", "Oxygen Feed", "Crucible Glaze", "Arc Chamber", "Stoked Core", "Molten Pour", "Superheat", "Bellows Draft", "Kiln Crown"]),
     heatFlow: theme("Heat Flow", ["HEAT_TRANSFER", "INCREASED_PERCENT"], 2, 6, effect("THERMAL_MASS", 2, "DECREASED_PERCENT"),
@@ -205,7 +208,10 @@ const EXTRAS = [
     // pockets beside its start and a larger Actuation pocket further out.
     { id: "press_actuation", angle: -158, radius: 1450, shapes: ["chain", "fork", "diamond"], theme: "actuation" },
     { id: "press_heat_flow", angle: -140, radius: 1500, shapes: ["fork", "diamond", "chain"], theme: "heatFlow" },
-    { id: "press_actuation_outer", angle: -145, radius: 2200, shapes: ["wheel", "chain", "fork"], theme: "actuation" }
+    { id: "press_actuation_outer", angle: -145, radius: 2200, shapes: ["wheel", "chain", "fork"], theme: "actuation" },
+    // The Headroom diamond sits in the Drive region's outer field, among the Crusher's Recovery pockets: three +1%
+    // Maximum Bonus Output smalls and the Overflow Gate notable at +2%, the only tree source of the stat.
+    { id: "headroom", angle: -22, radius: 2750, shapes: ["diamond"], theme: "headroom" }
 ];
 
 const regionAt = angle => {

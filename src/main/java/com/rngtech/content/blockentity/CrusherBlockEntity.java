@@ -123,7 +123,8 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED = DATA_BATTERY_SLOT_BLOCKED + 1;
     private static final int DATA_CHASSIS_STAGE = DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED + 1;
     private static final int DATA_OUTPUT_PER_MINUTE = DATA_CHASSIS_STAGE + 1;
-    private static final int DATA_COUNT = DATA_OUTPUT_PER_MINUTE + 1;
+    private static final int DATA_MAX_OUTPUT_AMOUNT = DATA_OUTPUT_PER_MINUTE + 1;
+    private static final int DATA_COUNT = DATA_MAX_OUTPUT_AMOUNT + 1;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
 
@@ -209,6 +210,7 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 case DATA_CRUSH_HEAD_MATCHING_STAGE_REQUIRED -> matchingStageCrushHeadRequired() ? 1 : 0;
                 case DATA_CHASSIS_STAGE -> chassisMaterial().stage();
                 case DATA_OUTPUT_PER_MINUTE -> currentOutputPerMinuteTenths(stats);
+                case DATA_MAX_OUTPUT_AMOUNT -> scaledStat(stats, MachineStat.MAX_OUTPUT_AMOUNT);
                 default -> 0;
             };
         }

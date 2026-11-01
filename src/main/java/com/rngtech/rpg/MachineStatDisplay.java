@@ -86,6 +86,7 @@ public final class MachineStatDisplay {
             case VEIN_MINE_FE_USAGE, ORE_BURST_FE_USAGE -> formatNumber(value) + " FE";
             case IDLE_LOSS -> formatNumber(value) + "%/min";
             case SUPER_OUTPUT_CHANCE, INSTANT_PROCESS_CHANCE, CRUSHER_SALVAGE_CHANCE -> formatSignedPercentPoints(value) + " chance";
+            case MAX_OUTPUT_AMOUNT -> formatNumber(value) + "%";
             case MOONLIGHT_CONVERSION,
                     WEATHER_RECOVERY,
                     SOLAR_PANEL_SYNCHRONIZATION,
@@ -255,6 +256,7 @@ public final class MachineStatDisplay {
             case SUPER_OUTPUT_CHANCE,
                     INSTANT_PROCESS_CHANCE,
                     CRUSHER_SALVAGE_CHANCE,
+                    MAX_OUTPUT_AMOUNT,
                     MOONLIGHT_CONVERSION,
                     WEATHER_RECOVERY,
                     SOLAR_PANEL_SYNCHRONIZATION,
@@ -330,6 +332,7 @@ public final class MachineStatDisplay {
         return switch (stat) {
             case OUTPUT_AMOUNT -> "rngtech.tooltip.stat_effect.output_amount";
             case SUPER_OUTPUT_CHANCE -> "rngtech.tooltip.stat_effect.super_output_chance";
+            case MAX_OUTPUT_AMOUNT -> "rngtech.tooltip.stat_effect.max_output_amount";
             case PROCESSING_SPEED -> "rngtech.tooltip.stat_effect.processing_speed";
             case INSTANT_PROCESS_CHANCE -> "rngtech.tooltip.stat_effect.instant_process_chance";
             case ENERGY_USAGE -> "rngtech.tooltip.stat_effect.energy_usage";

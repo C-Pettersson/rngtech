@@ -9,6 +9,7 @@ import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.progression.CrusherPassiveTree;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MegaPassiveNode;
@@ -56,6 +57,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             "rngtech.stat.crush_hardness",
             "rngtech.stat.batch_size",
             "rngtech.stat.output_amount",
+            "rngtech.stat.max_output_amount",
             "rngtech.stat.crusher_salvage_chance",
             "rngtech.stat.processing_speed",
             "rngtech.stat.energy_usage",
@@ -70,6 +72,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             CrusherMenu.processingLevelDataIndex(),
             CrusherMenu.batchSizeDataIndex(),
             CrusherMenu.outputAmountDataIndex(),
+            CrusherMenu.maxOutputAmountDataIndex(),
             CrusherMenu.crusherSalvageChanceDataIndex(),
             CrusherMenu.processingSpeedDataIndex(),
             CrusherMenu.energyUsageDataIndex(),
@@ -84,6 +87,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
             MachineStat.PROCESSING_LEVEL,
             MachineStat.BATCH_SIZE,
             MachineStat.OUTPUT_AMOUNT,
+            MachineStat.MAX_OUTPUT_AMOUNT,
             MachineStat.CRUSHER_SALVAGE_CHANCE,
             MachineStat.PROCESSING_SPEED,
             MachineStat.ENERGY_USAGE,
@@ -772,6 +776,9 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
         }
         if (dataIndex == CrusherMenu.batchSizeDataIndex()) {
             return value > 1.001;
+        }
+        if (dataIndex == CrusherMenu.maxOutputAmountDataIndex()) {
+            return value > MachineStatAccumulator.BASE_MAX_OUTPUT_AMOUNT + 0.001;
         }
         return value > 1.001;
     }

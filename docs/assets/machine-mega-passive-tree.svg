@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="1829 1536 4369 4769" width="1200" height="1310" role="img" aria-labelledby="title description">
 <title id="title">RNGTech shared machine passive tree</title>
-<desc id="description">1368 nodes, six starts, 1525 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
+<desc id="description">1372 nodes, six starts, 1530 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
 <rect x="1829" y="1536" width="4369" height="4769" fill="#111820"/>
-<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1368 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
+<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1372 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
 <g stroke="#66727d" stroke-width="5" opacity="0.65">
 <path d="M4000,4000 L3939,3895"/>
 <path d="M4000,4000 L4122,3998"/>
@@ -1529,6 +1529,11 @@
 <path d="M2799,3355 L2826,3413"/>
 <path d="M2762,3408 L2725,3460"/>
 <path d="M2762,3408 L2735,3350"/>
+<path d="M5551,3323 L5552,3268"/>
+<path d="M5552,3268 L5519,3220"/>
+<path d="M5552,3268 L5586,3221"/>
+<path d="M5519,3220 L5553,3171"/>
+<path d="M5586,3221 L5553,3171"/>
 </g>
 <circle cx="3388" cy="3633" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control (start_control)</title></circle>
 <circle cx="4000" cy="3310" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control / drive (start_control_drive)</title></circle>
@@ -2863,6 +2868,10 @@
 <circle cx="2735" cy="3350" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_5)</title></circle>
 <circle cx="2799" cy="3355" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_6)</title></circle>
 <circle cx="2762" cy="3408" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Cam Followers (cam_followers)</title></circle>
+<circle cx="5552" cy="3268" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Headroom (overflow_gate_1)</title></circle>
+<circle cx="5519" cy="3220" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Headroom (overflow_gate_2)</title></circle>
+<circle cx="5586" cy="3221" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Headroom (overflow_gate_3)</title></circle>
+<circle cx="5553" cy="3171" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Overflow Gate (overflow_gate)</title></circle>
 <circle cx="4047" cy="3916" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Silent Operation (silent_operation)</title></circle>
 <circle cx="2579" cy="3318" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Manual Throttle (manual_throttle)</title></circle>
 <circle cx="3900" cy="2301" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Seedling Magnet (seedling_magnet)</title></circle>

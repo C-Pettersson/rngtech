@@ -3108,6 +3108,17 @@
             "theme": "Actuation",
             "region": "control",
             "layer": "outer"
+        },
+        {
+            "id": "reward_405",
+            "x": 5553,
+            "y": 3220,
+            "role": "reward",
+            "shape": "diamond",
+            "gate": "path_0390",
+            "theme": "Headroom",
+            "region": "drive",
+            "layer": "outer"
         }
     ],
     "nodes": [
@@ -30759,6 +30770,91 @@
             "group": "reward_404"
         },
         {
+            "effects": [
+                {
+                    "stat": "MAX_OUTPUT_AMOUNT",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "overflow_gate_1",
+            "name": "Headroom",
+            "kind": "NODE",
+            "x": 5552,
+            "y": 3268,
+            "group": "reward_405"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "MAX_OUTPUT_AMOUNT",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "overflow_gate_2",
+            "name": "Headroom",
+            "kind": "NODE",
+            "x": 5519,
+            "y": 3220,
+            "group": "reward_405"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "MAX_OUTPUT_AMOUNT",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "overflow_gate_3",
+            "name": "Headroom",
+            "kind": "NODE",
+            "x": 5586,
+            "y": 3221,
+            "group": "reward_405"
+        },
+        {
+            "effects": [
+                {
+                    "stat": "MAX_OUTPUT_AMOUNT",
+                    "operation": "ADD",
+                    "value": 2
+                },
+                {
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 1.5
+                }
+            ],
+            "behaviors": [],
+            "fixed": {},
+            "ceilings": {},
+            "scaling": [],
+            "passive": {},
+            "id": "overflow_gate",
+            "kind": "NOTABLE",
+            "name": "Overflow Gate",
+            "x": 5553,
+            "y": 3171,
+            "group": "reward_405"
+        },
+        {
             "effects": [],
             "behaviors": [
                 "MUTE_MACHINE_SOUND"
@@ -37683,6 +37779,26 @@
         [
             "cam_followers",
             "cam_followers_5"
+        ],
+        [
+            "path_0390",
+            "overflow_gate_1"
+        ],
+        [
+            "overflow_gate_1",
+            "overflow_gate_2"
+        ],
+        [
+            "overflow_gate_1",
+            "overflow_gate_3"
+        ],
+        [
+            "overflow_gate_2",
+            "overflow_gate"
+        ],
+        [
+            "overflow_gate_3",
+            "overflow_gate"
         ]
     ]
 }
