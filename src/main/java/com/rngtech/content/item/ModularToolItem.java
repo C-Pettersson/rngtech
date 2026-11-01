@@ -8,7 +8,10 @@ import com.rngtech.content.tool.OreHardness;
 import com.rngtech.content.tool.ToolBaseStatCatalog;
 import com.rngtech.content.tool.ToolHeadFamily;
 import com.rngtech.content.tool.ToolHeadMaterial;
+import com.rngtech.rpg.MachineModifier;
+import com.rngtech.rpg.MachineNameGenerator;
 import com.rngtech.rpg.MachineTraits;
+import com.rngtech.rpg.ModifierSlot;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -551,6 +554,33 @@ public class ModularToolItem extends Item {
     @Override
     public int getBarColor(ItemStack stack) {
         return 0x6FC46F;
+    }
+
+    @Override
+    public Component getName(ItemStack stack) {
+        FieldToolAssembly assembly = assembly(stack);
+        if (!assembly.isValidFor(family)
+                || !(assembly.head().getItem() instanceof ToolHeadItem headItem)
+                || !(assembly.rod().getItem() instanceof ToolRodItem rodItem)) {
+            return super.getName(stack);
+        }
+        MachineTraits headTraits = headItem.traits(assembly.head());
+        MachineTraits rodTraits = rodItem.traits(assembly.rod());
+        Component baseName = Component.translatable(
+                "item.rngtech.modular_tool.assembled",
+                Component.translatable(headItem.material().translationKey()),
+                Component.translatable(family.translationKey())
+        );
+        return MachineNameGenerator.generatedName(
+                firstAffix(headTraits, rodTraits, ModifierSlot.PREFIX),
+                firstAffix(headTraits, rodTraits, ModifierSlot.SUFFIX),
+                baseName
+        );
+    }
+
+    private static MachineModifier firstAffix(MachineTraits headTraits, MachineTraits rodTraits, ModifierSlot slot) {
+        MachineModifier modifier = MachineNameGenerator.firstModifier(headTraits, slot);
+        return modifier != null ? modifier : MachineNameGenerator.firstModifier(rodTraits, slot);
     }
 
     @Override
