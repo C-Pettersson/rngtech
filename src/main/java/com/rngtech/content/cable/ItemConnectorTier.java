@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 public enum ItemConnectorTier implements StringRepresentable {
+    CRUDE("crude_item_connector", 1, 1, 240, 120, 480, false),
     BASIC("basic_item_connector", 1, 1, 80, 120, 160, false),
     COPPER("copper_item_connector", 2, 4, 40, 80, 120, false),
     GOLD("gold_item_connector", 3, 16, 20, 50, 80, false),
