@@ -3,6 +3,7 @@ package com.rngtech.content.blockentity;
 import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.FurnaceBlock;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
@@ -160,7 +161,12 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
 
-    private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
+    private final ItemStackHandler inventory = new IdentifyingItemHandler(SLOT_COUNT, this::getLevel) {
+        @Override
+        protected boolean identifiesSlot(int slot) {
+            return slot == SLOT_FUEL;
+        }
+
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (isOutputSlot(slot)) {
@@ -195,7 +201,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         }
     };
 
-    private final ItemStackHandler gearInventory = new ItemStackHandler(MAX_GEAR_SLOTS) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(MAX_GEAR_SLOTS, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return slot >= 0 && slot < activeGearSlots() && isAllowedGearComponent(slot, stack);

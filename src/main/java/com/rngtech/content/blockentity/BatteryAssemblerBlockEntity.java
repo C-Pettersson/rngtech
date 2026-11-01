@@ -2,6 +2,7 @@ package com.rngtech.content.blockentity;
 
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.calibration.CalibrationState;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.menu.BatteryAssemblerMenu;
 import com.rngtech.content.purge.FluidPurgeRole;
@@ -149,7 +150,7 @@ public class BatteryAssemblerBlockEntity extends BaseMachineBlockEntity
             setChanged();
         }
     };
-    private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(GEAR_SLOT_COUNT, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return slot == SLOT_BATTERY_CELL && BatteryCellItem.isBatteryCell(stack);

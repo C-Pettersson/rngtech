@@ -3,6 +3,7 @@ package com.rngtech.content.blockentity;
 import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.energy.BiogasDigestion;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.BiogasMembraneItem;
 import com.rngtech.content.item.GearParts;
@@ -171,7 +172,7 @@ public class BioGeneratorBlockEntity extends BaseMachineBlockEntity implements M
             setChanged();
         }
     };
-    private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(GEAR_SLOT_COUNT, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return switch (slot) {

@@ -6,6 +6,7 @@ import com.rngtech.content.block.SolidFuelBurnerBlock;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.SolidFuelBurnerFuelRules;
 import com.rngtech.content.energy.SolidFuelBurnerStoke;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
@@ -129,7 +130,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
             setChanged();
         }
     };
-    private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(GEAR_SLOT_COUNT, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return switch (slot) {

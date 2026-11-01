@@ -7,6 +7,7 @@ import com.rngtech.content.calibration.CalibrationRecipeResult;
 import com.rngtech.content.calibration.CalibrationStreak;
 import com.rngtech.content.calibration.CalibrationValueRange;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.CalibrationGearItem;
 import com.rngtech.content.item.CalibrationPatternItem;
@@ -166,7 +167,7 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
             setChanged();
         }
     };
-    private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(GEAR_SLOT_COUNT, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (isPatternSlot(slot)) {

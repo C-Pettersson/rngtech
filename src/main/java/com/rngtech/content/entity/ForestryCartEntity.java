@@ -3,6 +3,7 @@ package com.rngtech.content.entity;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.blockentity.InstalledBatteryCell;
 import com.rngtech.content.blockentity.LedgerNbt;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.ConfiguratorItem;
 import com.rngtech.content.item.ForestryCartItem;
@@ -238,7 +239,7 @@ public class ForestryCartEntity extends AbstractMinecart implements MenuProvider
             return super.insertItem(slot, stack, simulate);
         }
     };
-    private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(GEAR_SLOT_COUNT, this::level) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return switch (slot) {

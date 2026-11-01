@@ -8,7 +8,7 @@ navigation:
 
 # Identifying a Unique
 
-A Unique usually drops **Unidentified**. Its tooltip shows the range of every stat line. To roll its values, put it **alone** in a crafting grid and take the result, the same way you [identify crafted items](rngtech:rarity-and-affixes/identification.md). The values were fixed when it dropped, so identifying it again elsewhere does not change them.
+A Unique usually drops **Unidentified**. Its tooltip shows the range of every stat line. To roll its values, put it **alone** in a crafting grid and take the result, the same way you [identify crafted items](rngtech:rarity-and-affixes/identification.md). You can also install it: it rolls its values as it goes into its slot. The values were fixed when it dropped, so identifying it again elsewhere does not change them.
 
 The <ItemLink id="rngtech:unique_potato_battery_cell" /> has no ranges, so it never needs identifying.
 

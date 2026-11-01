@@ -4,6 +4,7 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.CableBlock;
 import com.rngtech.content.block.CompressorTankBlock;
 import com.rngtech.content.block.UniversalConnectorBlock;
+import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.ServoItem;
@@ -140,7 +141,7 @@ public class CompressorTankBlockEntity extends BaseMachineBlockEntity
             setChanged();
         }
     };
-    private final ItemStackHandler gearInventory = new ItemStackHandler(GEAR_SLOT_COUNT) {
+    private final ItemStackHandler gearInventory = new IdentifyingItemHandler(GEAR_SLOT_COUNT, this::getLevel) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             return switch (slot) {

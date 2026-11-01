@@ -2,7 +2,7 @@
 navigation:
   title: "Stages 5–6: fluids and chemistry"
   parent: getting-started.md
-  position: 3
+  position: 4
   icon: rngtech:wooden_crusher_chassis
 ---
 
