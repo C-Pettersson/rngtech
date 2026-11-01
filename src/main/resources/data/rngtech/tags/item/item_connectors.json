@@ -1,5 +1,6 @@
 {
   "values": [
+    "rngtech:crude_item_connector",
     "rngtech:basic_item_connector",
     "rngtech:copper_item_connector",
     "rngtech:gold_item_connector",

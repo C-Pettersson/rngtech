@@ -69,7 +69,7 @@ Mine a placed Affix Forge with a pickaxe. It drops itself and everything inside 
 
 Every refinable item has a [rarity](rarity-and-affixes.md) and a budget of [Refinement Potential](rarity-and-affixes.md#refinement-potential) (RP):
 
-- **Rarity** sets how many affixes the item can hold. Normal items have none, Magic items hold one prefix and one suffix, and Rare items hold up to three of each.
+- **Rarity** sets how many affixes the item can hold. Normal items have none, Magic items hold up to one prefix and one suffix, and Rare items hold up to three of each.
 - **RP** is spent by every successful operation. When an item runs out, you cannot refine it further, so plan where you spend it.
 
 A failed or illegal operation costs nothing: no catalyst and no RP. Identify an item before you refine it (see [Getting Started](getting-started.md)). Unidentified items, recycled (stripped) items, [Corrupted](rarity-and-affixes.md#corruption) items, and [Mirrored](rarity-and-affixes.md#mirrored-items) items cannot be refined. Unique items accept only a Volatile Catalyst.

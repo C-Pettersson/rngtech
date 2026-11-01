@@ -3,6 +3,7 @@ package com.rngtech.rpg;
 import net.minecraft.util.RandomSource;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,8 @@ public final class MachineTraitRoller {
     private static final int MAX_STANDARD_RANDOM_TIER = 6;
     private static final int MAX_EXOTIC_RANDOM_TIER = 7;
     private static final int MAX_UPGRADE_TIER = 6;
+    private static final int MAGIC_SLOT_LIMIT = 1;
+    private static final int RARE_SLOT_LIMIT = 3;
 
     public static MachineTraits roll(MachineType type, RandomSource random) {
         return roll(ModifierEligibilityProfiles.forMachine(type), random);
@@ -55,7 +58,7 @@ public final class MachineTraitRoller {
             return Rarity.RARE;
         }
         if (componentStage <= 4) {
-            if (roll < 70) {
+            if (roll < 35) {
                 return Rarity.MAGIC;
             }
             return Rarity.RARE;
@@ -97,6 +100,11 @@ public final class MachineTraitRoller {
         return new RefinementPotentialRange(22, 32).offset(tuning.refinementPotentialBonus());
     }
 
+    /**
+     * Rolls affixes one at a time, as Path of Exile does: Magic gets one or two with at most one prefix and one suffix,
+     * Rare gets three to six with at most three of each. Each affix lands on a random side that still has room and a
+     * legal affix, so narrow items roll fewer.
+     */
     private static void rollTraits(
             ModifierEligibilityProfile profile,
             Rarity rarity,
@@ -106,72 +114,64 @@ public final class MachineTraitRoller {
             List<MachineModifier> modifiers,
             List<MachineBehavior> behaviors
     ) {
-        int prefixCount = switch (rarity) {
+        int wanted = switch (rarity) {
             case NORMAL, UNIQUE -> 0;
-            case MAGIC -> 1;
-            case RARE -> 3;
+            case MAGIC -> 1 + random.nextInt(2);
+            case RARE -> rareAffixCount(random);
         };
-        int suffixCount = switch (rarity) {
-            case NORMAL, UNIQUE -> 0;
-            case MAGIC -> 1;
-            case RARE -> 3;
-        };
-        if (prefixCount == 0 && suffixCount == 0) {
-            return;
-        }
-
-        rollSlotModifiers(profile, ModifierSlot.PREFIX, prefixCount, componentStage, tuning, random, modifiers);
-        rollSuffixTraits(profile, suffixCount, componentStage, tuning, random, modifiers, behaviors);
-    }
-
-    private static void rollSlotModifiers(
-            ModifierEligibilityProfile profile,
-            ModifierSlot slot,
-            int targetCount,
-            int componentStage,
-            RollTuning tuning,
-            RandomSource random,
-            List<MachineModifier> modifiers
-    ) {
-        for (int index = 0; index < targetCount; index++) {
-            List<ModifierDefinition> pool = availableDefinitions(profile, slot, occupiedGroups(modifiers, List.of()));
-            if (pool.isEmpty()) {
-                return;
-            }
-            ModifierDefinition definition = weightedDefinition(pool, random);
-            int tier = rollModifierTier(definition, componentStage, tuning, Integer.MAX_VALUE, random);
-            modifiers.add(definition.roll(tier, random));
-        }
-    }
-
-    private static void rollSuffixTraits(
-            ModifierEligibilityProfile profile,
-            int targetCount,
-            int componentStage,
-            RollTuning tuning,
-            RandomSource random,
-            List<MachineModifier> modifiers,
-            List<MachineBehavior> behaviors
-    ) {
-        for (int index = 0; index < targetCount; index++) {
+        int slotLimit = rarity == Rarity.RARE ? RARE_SLOT_LIMIT : MAGIC_SLOT_LIMIT;
+        int prefixes = 0;
+        int suffixes = 0;
+        for (int index = 0; index < wanted; index++) {
             Set<String> occupiedGroups = occupiedGroups(modifiers, behaviors);
-            List<ModifierDefinition> modifierPool = availableDefinitions(profile, ModifierSlot.SUFFIX, occupiedGroups);
-            List<MachineBehavior> behaviorPool = availableBehaviors(profile, occupiedGroups);
-            if (modifierPool.isEmpty() && behaviorPool.isEmpty()) {
-                return;
+            List<ModifierDefinition> prefixPool = prefixes < slotLimit
+                    ? availableDefinitions(profile, ModifierSlot.PREFIX, occupiedGroups)
+                    : List.of();
+            List<ModifierDefinition> suffixPool = suffixes < slotLimit
+                    ? availableDefinitions(profile, ModifierSlot.SUFFIX, occupiedGroups)
+                    : List.of();
+            List<MachineBehavior> behaviorPool = suffixes < slotLimit
+                    ? availableBehaviors(profile, occupiedGroups)
+                    : List.of();
+            boolean suffixOpen = !suffixPool.isEmpty() || !behaviorPool.isEmpty();
+            if (prefixPool.isEmpty() && !suffixOpen) {
+                break;
             }
-            WeightedSuffixSelection selection = weightedSuffixSelection(modifierPool, behaviorPool, random);
+            if (!prefixPool.isEmpty() && (!suffixOpen || random.nextBoolean())) {
+                ModifierDefinition definition = weightedDefinition(prefixPool, random);
+                int tier = rollModifierTier(definition, componentStage, tuning, Integer.MAX_VALUE, random);
+                modifiers.add(definition.roll(tier, random));
+                prefixes++;
+                continue;
+            }
+            WeightedSuffixSelection selection = weightedSuffixSelection(suffixPool, behaviorPool, random);
             if (selection == null) {
-                return;
+                break;
             }
             if (selection.definition() != null) {
                 ModifierDefinition definition = selection.definition();
                 int tier = rollModifierTier(definition, componentStage, tuning, Integer.MAX_VALUE, random);
                 modifiers.add(definition.roll(tier, random));
-                continue;
+            } else {
+                behaviors.add(selection.behavior());
             }
-            behaviors.add(selection.behavior());
+            suffixes++;
         }
+        modifiers.sort(Comparator.comparing(modifier -> modifier.slot() != ModifierSlot.PREFIX));
+    }
+
+    private static int rareAffixCount(RandomSource random) {
+        int roll = random.nextInt(100);
+        if (roll < 35) {
+            return 3;
+        }
+        if (roll < 70) {
+            return 4;
+        }
+        if (roll < 90) {
+            return 5;
+        }
+        return 6;
     }
 
     private static List<ModifierDefinition> availableDefinitions(
