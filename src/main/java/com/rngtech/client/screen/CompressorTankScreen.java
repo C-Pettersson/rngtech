@@ -97,7 +97,7 @@ public class CompressorTankScreen extends AbstractContainerScreen<CompressorTank
         tabs = builder
                 .stats(CompressorTankMenu.TAB_STATS)
                 .refinement(CompressorTankMenu.TAB_REFINEMENT)
-                .jewels(CompressorTankMenu.TAB_JEWELS)
+                .jewels(CompressorTankMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 

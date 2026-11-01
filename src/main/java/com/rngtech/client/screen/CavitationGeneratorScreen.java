@@ -124,7 +124,7 @@ public class CavitationGeneratorScreen extends AbstractContainerScreen<Cavitatio
                 .gear(CavitationGeneratorMenu.TAB_GEAR)
                 .stats(CavitationGeneratorMenu.TAB_STATS)
                 .refinement(CavitationGeneratorMenu.TAB_REFINEMENT)
-                .jewels(CavitationGeneratorMenu.TAB_JEWELS)
+                .jewels(CavitationGeneratorMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 

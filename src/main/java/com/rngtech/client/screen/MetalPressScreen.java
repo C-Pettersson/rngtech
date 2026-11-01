@@ -138,7 +138,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
                 .stats(MetalPressMenu.TAB_CONFIGURATION)
                 .refinement(MetalPressMenu.TAB_REFINEMENT)
                 .mastery(MetalPressMenu.TAB_MASTERY)
-                .jewels(MetalPressMenu.TAB_JEWELS)
+                .jewels(MetalPressMenu.TAB_JEWELS, menu::jewelsShown)
                 .orders(MetalPressMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);

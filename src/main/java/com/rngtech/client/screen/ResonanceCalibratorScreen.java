@@ -120,7 +120,7 @@ public class ResonanceCalibratorScreen extends AbstractContainerScreen<Resonance
                 .stats(ResonanceCalibratorMenu.TAB_CONFIGURATION)
                 .refinement(ResonanceCalibratorMenu.TAB_REFINEMENT)
                 .mastery(ResonanceCalibratorMenu.TAB_MASTERY)
-                .jewels(ResonanceCalibratorMenu.TAB_JEWELS)
+                .jewels(ResonanceCalibratorMenu.TAB_JEWELS, menu::jewelsShown)
                 .orders(ResonanceCalibratorMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);

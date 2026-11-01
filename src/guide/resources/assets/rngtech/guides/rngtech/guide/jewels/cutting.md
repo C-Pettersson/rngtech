@@ -12,7 +12,7 @@ A Stage 3 or higher [Resonance Calibrator](rngtech:resonance-calibrator.md) cuts
 
 | Catalyst | Jewel |
 |---|---|
-| <ItemLink id="minecraft:prismarine_crystals" /> | <ItemLink id="rngtech:control_jewel" /> |
+| <ItemLink id="minecraft:lapis_lazuli" /> | <ItemLink id="rngtech:control_jewel" /> |
 | <ItemLink id="minecraft:gold_ingot" /> | <ItemLink id="rngtech:drive_jewel" /> |
 | <ItemLink id="minecraft:redstone_block" /> | <ItemLink id="rngtech:reserve_jewel" /> |
 

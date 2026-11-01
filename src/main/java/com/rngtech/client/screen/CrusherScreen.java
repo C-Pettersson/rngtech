@@ -122,7 +122,7 @@ public class CrusherScreen extends AbstractContainerScreen<CrusherMenu> implemen
                 .stats(CrusherMenu.TAB_CONFIGURATION)
                 .refinement(CrusherMenu.TAB_REFINEMENT)
                 .mastery(CrusherMenu.TAB_MASTERY)
-                .jewels(CrusherMenu.TAB_JEWELS)
+                .jewels(CrusherMenu.TAB_JEWELS, menu::jewelsShown)
                 .orders(CrusherMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         masterySupport = new MasteryScreenSupport<>(

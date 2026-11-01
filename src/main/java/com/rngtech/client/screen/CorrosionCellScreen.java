@@ -104,7 +104,7 @@ public class CorrosionCellScreen extends AbstractContainerScreen<CorrosionCellMe
                 .gear(CorrosionCellMenu.TAB_GEAR)
                 .stats(CorrosionCellMenu.TAB_STATS)
                 .refinement(CorrosionCellMenu.TAB_REFINEMENT)
-                .jewels(CorrosionCellMenu.TAB_JEWELS)
+                .jewels(CorrosionCellMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 

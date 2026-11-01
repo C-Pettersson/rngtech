@@ -85,7 +85,7 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
                     .gear(ComponentRecyclerMenu.TAB_GEAR)
                     .stats(ComponentRecyclerMenu.TAB_STATS)
                     .refinement(ComponentRecyclerMenu.TAB_REFINEMENT)
-                    .jewels(ComponentRecyclerMenu.TAB_JEWELS)
+                    .jewels(ComponentRecyclerMenu.TAB_JEWELS, menu::jewelsShown)
                     .orders(ComponentRecyclerMenu.TAB_ORDERS, menu::workOrdersShown);
         }
         tabs = tabBuilder.build();

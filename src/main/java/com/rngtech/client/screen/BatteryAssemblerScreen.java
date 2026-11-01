@@ -80,7 +80,7 @@ public class BatteryAssemblerScreen extends AbstractContainerScreen<BatteryAssem
                 .gear(BatteryAssemblerMenu.TAB_GEAR)
                 .stats(BatteryAssemblerMenu.TAB_CONFIGURATION)
                 .refinement(BatteryAssemblerMenu.TAB_REFINEMENT)
-                .jewels(BatteryAssemblerMenu.TAB_JEWELS)
+                .jewels(BatteryAssemblerMenu.TAB_JEWELS, menu::jewelsShown)
                 .orders(BatteryAssemblerMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);

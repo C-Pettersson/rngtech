@@ -107,7 +107,7 @@ public class VacuumCollapseGeneratorScreen extends AbstractContainerScreen<Vacuu
                 .gear(VacuumCollapseGeneratorMenu.TAB_GEAR)
                 .stats(VacuumCollapseGeneratorMenu.TAB_STATS)
                 .refinement(VacuumCollapseGeneratorMenu.TAB_REFINEMENT)
-                .jewels(VacuumCollapseGeneratorMenu.TAB_JEWELS)
+                .jewels(VacuumCollapseGeneratorMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 

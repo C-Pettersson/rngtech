@@ -163,7 +163,7 @@ By default, Uniques drop from vanilla structures and mobs. The [Uniques](uniques
 
 ## Jewels
 
-By default, uncut [jewels](jewels.md) also turn up in village, mineshaft, ruined portal, igloo, bastion, and Nether fortress chests, and Tier III and higher Work Orders can pay one.
+By default, uncut [jewels](jewels.md) also turn up in village, mineshaft, ruined portal, igloo, bastion, and Nether fortress chests, and Tier III and higher Work Orders can reward one.
 
 - **Turn off chest drops:** `jewels.loot.enabled`, or one colour with `jewels.loot.<control|drive|reserve>.enabled`. The Resonance Calibrator cut and Work Order rewards stay.
 - **Your own loot:** add `rngtech:control_jewel`, `rngtech:drive_jewel`, or `rngtech:reserve_jewel` to a loot table with the `rngtech:unidentified` function, so each player rolls their own copy.

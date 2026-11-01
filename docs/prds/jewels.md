@@ -16,7 +16,7 @@ Jewels are small rolled items, modeled on Path of Exile's jewels, that a player 
 
 Jewels fill two roles at once. A Magic jewel with one useful line is a gap filler: a Furnace build that lacks Energy Usage, a Crusher short of Reserve for its keystone. A Rare jewel with four wanted lines at high rolls is a chase item, the thing a player keeps cutting jewels for after the machine's own affixes are settled.
 
-The same change reworks **Bonus Output**. Today the Crusher's Output Amount bucket has diminishing returns that never reach +100%. It becomes a hard cap at **75%**, like Path of Exile's maximum resistances, and a new stat, **Maximum Bonus Output**, raises the cap. The tree offers +5% across four nodes and jewels roll +1-2%, so pushing past 75% is a build decision rather than a side effect of stacking more yield.
+The same change reworks **Bonus Output**. Today the Crusher's Output Amount bucket has diminishing returns that never reach +100%. It becomes a hard cap at **75%**, like Path of Exile's maximum resistances, and a new stat, **Maximum Bonus Output**, raises the cap. The tree offers +2% on one notable and jewels roll +1-2%, so pushing past 75% is a build decision rather than a side effect of stacking more yield.
 
 ## References
 
@@ -76,7 +76,7 @@ Key existing code:
 1. At Stage 3 the player presses Gold Plates and cuts a **Jewel Blank** in the Resonance Calibrator. The jewel comes out Unidentified; identifying it rolls rarity, affixes, and Refinement Potential like any part.
 2. On the Mastery screen they path to a Jewel Socket node, allocate it, and drop the jewel in. The node shows the jewel; its tooltip shows which lines this machine reads.
 3. A Gold Crusher body has one empty socket in its Gear tab from the start. A later Rare roll, or an Affix Injector, adds "of Bedazzling" for one more.
-4. The Stats tab's Bonus Output line reads "75% (86% rolled, 11% over cap)". The player takes the Headroom pocket on the tree and a jewel with "+2% Maximum Bonus Output", and the line reads 79%.
+4. The Stats tab's Bonus Output line reads "75% (86% rolled, 11% over cap)". The player takes the Overflow Gate on the tree and a jewel with "+2% Maximum Bonus Output", and the line reads 79%.
 5. The jewel that fills the gap is refined at the Affix Forge: an Injector fills its last slot, a Chaos Crystal rerolls a bad one, a Volatile Catalyst gambles a finished one.
 
 ## Jewels
@@ -202,7 +202,7 @@ Maximum Bonus Output stays out of the corruption pools, because it unlocks yield
 
 ### Sources
 
-- **Cut at the Resonance Calibrator.** A Jewel Blank is a crafting-grid item: four Gold Nuggets around an Amethyst Shard. A Stage 3 Structural calibration cuts it into a jewel, and the catalyst picks the colour: Prismarine Crystals for Control, a Gold Ingot for Drive, a Block of Redstone for Reserve. The cut's stability (30-90 before Gear) sets the jewel's Refinement Potential (2 below 50, 3 below 80, 4 from 80), so a well-tuned Calibrator cuts better jewels. The jewel comes out Unidentified, like a crafted part. This is the mod-challenge gate, as the Volatile Catalyst and the Seals are gated.
+- **Cut at the Resonance Calibrator.** A Jewel Blank is a crafting-grid item: four Gold Nuggets around an Amethyst Shard. A Stage 3 Structural calibration cuts it into a jewel, and the catalyst picks the colour: Lapis Lazuli for Control, a Gold Ingot for Drive, a Block of Redstone for Reserve. The cut's stability (30-90 before Gear) sets the jewel's Refinement Potential (2 below 50, 3 below 80, 4 from 80), so a well-tuned Calibrator cuts better jewels. The jewel comes out Unidentified, like a crafted part. This is the mod-challenge gate, as the Volatile Catalyst and the Seals are gated.
 - **Work Orders.** Tier III and higher jobs add a jewel kind to `rngtech:challenges/work_order`, roughly one jewel per fifteen listed jobs, Tier V jobs guaranteeing Rare through a loot function. `check-work-orders.mjs` holds the rate.
 - **Vanilla chests, configurable.** An unidentified jewel of a random colour sits in the same structure tables the Uniques use, through `neoforge:add_table` loot modifiers, at a draft 4% per common chest and 8% per uncommon chest, behind the common config keys `jewels.loot.enabled` and `jewels.loot.<colour>.enabled`. The Calibrator stays the reliable source; chests are the early surprise.
 
@@ -233,12 +233,12 @@ The Crusher yield affix tables stay as they are; they were shrunk for the soft c
 
 | Source | Amount | Notes |
 |---|---:|---|
-| Headroom pocket (tree, Drive region's outer field, among the Crusher's Recovery pockets) | +5% | A diamond off one road gate: three +1% smalls, then the notable **Overflow Gate**: +2% Maximum Bonus Output and 1.5% increased Bonus Output, the Recovery notable's scale. Four reward points plus travel. |
+| Overflow Gate (tree notable, Drive region's outer field, among the Crusher's Recovery pockets) | +2% | A Recovery diamond off one road gate: three 0.5% Bonus Output smalls, then the notable with +2% Maximum Bonus Output and 1.5% increased Bonus Output. Only the notable touches the cap. Four reward points plus travel. |
 | of Headroom (jewel suffix) | +1-2% | Weight `25` on every colour. |
 
-The pocket is an `EXTRAS` entry (`headroom` theme), placed after the original fill. Its nodes are live by the design rules because the Crusher reads the stat; a Furnace allocating one gains nothing and its tooltip says so, as with any irrelevant benefit.
+The pocket is an `EXTRAS` entry (Recovery theme with the notable overridden), placed after the original fill. Its nodes are live by the design rules because the Crusher reads the stat; a Furnace allocating one gains nothing and its tooltip says so, as with any irrelevant benefit.
 
-Budget: the tree gives +5%. Reaching the 90% ceiling then needs five +2% jewels, or more at lower rolls, each of which spends one of four lines. A player who gets there has given most of their sockets to yield.
+Budget: the tree gives +2%. Reaching the 90% ceiling then needs seven +2% jewels, or more at lower rolls, each of which spends one of four lines. A player who gets there has given most of their sockets to yield.
 
 ### UI
 
@@ -308,7 +308,7 @@ Resolved 2026-11-01:
 - Nine tree sockets. That is one per 11 points, below Path of Exile's density, and a 99-point build will reach three to five.
 - Gold is the socket base: the existing Gold Battery Chassis plus new Gold Crusher and Furnace bodies. Every machine body can roll Bedazzling, Mastery or not.
 - The cap reaches the Cavitation Generator, with its Output Amount lines moved to the yield table without the Jaws penalty.
-- The +5% of tree Maximum Bonus Output sits in one Headroom diamond rather than split across the tree, so it reads as one pocket and its notable has the three reward allocations the rules require.
+- The tree's Maximum Bonus Output sits on the Overflow Gate notable alone, at +2%; the smalls leading to it are ordinary Recovery nodes (decided in playtest 2026-11-01, replacing three +1% smalls).
 - A jewel's Refinement Potential follows the cut's calibration stability.
 - Jewels also appear in vanilla chests by default, behind a config key, as Uniques do.
 

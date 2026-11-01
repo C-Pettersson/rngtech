@@ -81,7 +81,7 @@ public class SolarArrayControllerScreen extends AbstractContainerScreen<SolarArr
                 .gear(SolarArrayControllerMenu.TAB_GEAR)
                 .stats(SolarArrayControllerMenu.TAB_STATS)
                 .refinement(SolarArrayControllerMenu.TAB_REFINEMENT)
-                .jewels(SolarArrayControllerMenu.TAB_JEWELS)
+                .jewels(SolarArrayControllerMenu.TAB_JEWELS, menu::jewelsShown)
                 .style(new MachineTabs.Style(PANEL, PANEL_LIGHT, PANEL_DARK, 0xFF9DA894, 0xFFB3BDAA, TEXT, 0xFF2F382D))
                 .build();
     }

@@ -38,7 +38,7 @@ public class AmmoniaSynthesizerScreen extends AbstractContainerScreen<AmmoniaSyn
                 .gear(AmmoniaSynthesizerMenu.TAB_GEAR)
                 .stats(AmmoniaSynthesizerMenu.TAB_STATS)
                 .refinement(AmmoniaSynthesizerMenu.TAB_REFINEMENT)
-                .jewels(AmmoniaSynthesizerMenu.TAB_JEWELS)
+                .jewels(AmmoniaSynthesizerMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 

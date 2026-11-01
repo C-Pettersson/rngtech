@@ -69,7 +69,7 @@ public class BatteryChassisScreen extends AbstractContainerScreen<BatteryChassis
                 .gear(BatteryChassisMenu.TAB_GEAR)
                 .stats(BatteryChassisMenu.TAB_STATS)
                 .refinement(BatteryChassisMenu.TAB_REFINEMENT)
-                .jewels(BatteryChassisMenu.TAB_JEWELS)
+                .jewels(BatteryChassisMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 

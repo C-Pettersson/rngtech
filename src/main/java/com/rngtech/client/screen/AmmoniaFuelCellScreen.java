@@ -50,7 +50,7 @@ public class AmmoniaFuelCellScreen extends AbstractContainerScreen<AmmoniaFuelCe
                 .gear(AmmoniaFuelCellMenu.TAB_GEAR)
                 .stats(AmmoniaFuelCellMenu.TAB_STATS)
                 .refinement(AmmoniaFuelCellMenu.TAB_REFINEMENT)
-                .jewels(AmmoniaFuelCellMenu.TAB_JEWELS)
+                .jewels(AmmoniaFuelCellMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 

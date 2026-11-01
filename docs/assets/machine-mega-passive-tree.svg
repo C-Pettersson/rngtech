@@ -2883,9 +2883,9 @@
 <circle cx="2735" cy="3350" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_5)</title></circle>
 <circle cx="2799" cy="3355" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_6)</title></circle>
 <circle cx="2762" cy="3408" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Cam Followers (cam_followers)</title></circle>
-<circle cx="5552" cy="3268" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Headroom (overflow_gate_1)</title></circle>
-<circle cx="5519" cy="3220" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Headroom (overflow_gate_2)</title></circle>
-<circle cx="5586" cy="3221" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Headroom (overflow_gate_3)</title></circle>
+<circle cx="5552" cy="3268" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (overflow_gate_1)</title></circle>
+<circle cx="5519" cy="3220" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (overflow_gate_2)</title></circle>
+<circle cx="5586" cy="3221" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (overflow_gate_3)</title></circle>
 <circle cx="5553" cy="3171" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Overflow Gate (overflow_gate)</title></circle>
 <circle cx="3071" cy="3650" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (socket_control_1)</title></circle>
 <circle cx="3061" cy="3599" r="12" fill="#e8be4a" stroke="#111820" stroke-width="3"><title>Jewel Socket (jewel_socket_1)</title></circle>

@@ -3,7 +3,7 @@
     "family": "structural",
     "ingredient": { "item": "rngtech:jewel_blank" },
     "pattern": { "item": "rngtech:structural_calibration_pattern" },
-    "catalyst": { "item": "minecraft:prismarine_crystals" },
+    "catalyst": { "item": "minecraft:lapis_lazuli" },
     "processing_ticks": 320,
     "energy": 4000,
     "machine_xp": 4,

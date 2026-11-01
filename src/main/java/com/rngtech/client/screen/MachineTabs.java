@@ -286,8 +286,9 @@ public final class MachineTabs {
             return tab(id, "rngtech.tab.mastery", ModItems.MASTERY_REFUND.get());
         }
 
-        public Builder jewels(int id) {
-            return tab(id, "rngtech.tab.jewels", ModItems.jewel(JewelColour.DRIVE).get());
+        /** The Jewels tab, hidden until {@code shown} holds: a machine with no socket has nothing to put a jewel in. */
+        public Builder jewels(int id, BooleanSupplier shown) {
+            return tab(id, Component.translatable("rngtech.tab.jewels"), new ItemStack(ModItems.jewel(JewelColour.DRIVE).get()), shown);
         }
 
         /** The Orders tab, hidden until {@code shown} holds, so players who have not found Work Orders do not see it. */

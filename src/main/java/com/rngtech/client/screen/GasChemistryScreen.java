@@ -73,7 +73,7 @@ public class GasChemistryScreen extends AbstractContainerScreen<GasChemistryMenu
                 .gear(GasChemistryMenu.TAB_GEAR)
                 .stats(GasChemistryMenu.TAB_STATS)
                 .refinement(GasChemistryMenu.TAB_REFINEMENT)
-                .jewels(GasChemistryMenu.TAB_JEWELS)
+                .jewels(GasChemistryMenu.TAB_JEWELS, menu::jewelsShown)
                 .style(new MachineTabs.Style(PANEL, 0xFFE9E9E9, 0xFF8B8B8B, 0xFF9A9A9A, 0xFFB0B0B0, 0xFF3F3F3F, 0xFF2F2F2F))
                 .build();
     }

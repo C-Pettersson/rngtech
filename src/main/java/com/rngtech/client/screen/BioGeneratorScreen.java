@@ -134,7 +134,7 @@ public class BioGeneratorScreen extends AbstractContainerScreen<BioGeneratorMenu
                 .gear(BioGeneratorMenu.TAB_GEAR)
                 .stats(BioGeneratorMenu.TAB_STATS)
                 .refinement(BioGeneratorMenu.TAB_REFINEMENT)
-                .jewels(BioGeneratorMenu.TAB_JEWELS)
+                .jewels(BioGeneratorMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 

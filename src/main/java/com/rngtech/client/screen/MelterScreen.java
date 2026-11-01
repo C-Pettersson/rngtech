@@ -125,7 +125,7 @@ public class MelterScreen extends AbstractContainerScreen<MelterMenu> implements
                 .stats(MelterMenu.TAB_CONFIGURATION)
                 .refinement(MelterMenu.TAB_REFINEMENT)
                 .mastery(MelterMenu.TAB_MASTERY)
-                .jewels(MelterMenu.TAB_JEWELS)
+                .jewels(MelterMenu.TAB_JEWELS, menu::jewelsShown)
                 .orders(MelterMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);

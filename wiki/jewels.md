@@ -37,7 +37,7 @@ A Stage 3 or higher [Resonance Calibrator](resonance-calibrator.md) cuts a Jewel
 
 | Catalyst | Jewel |
 |---|---|
-| {{ item('minecraft:prismarine_crystals') }} | {{ item('rngtech:control_jewel') }} |
+| {{ item('minecraft:lapis_lazuli') }} | {{ item('rngtech:control_jewel') }} |
 | {{ item('minecraft:gold_ingot') }} | {{ item('rngtech:drive_jewel') }} |
 | {{ item('minecraft:redstone_block') }} | {{ item('rngtech:reserve_jewel') }} |
 
@@ -45,7 +45,7 @@ The cut's stability sets the jewel's Refinement Potential: 2 RP below 50%, 3 RP 
 
 ### Finding jewels
 
-Uncut jewels also turn up in village, mineshaft, and ruined portal chests, and more often in igloo basements, bastion treasure rooms, and Nether fortresses. Tier III and higher [Work Orders](work-orders.md) can pay one. A found jewel comes Unidentified and was never cut, so it identifies with 2 to 4 RP at random.
+Uncut jewels also turn up in village, mineshaft, and ruined portal chests, and more often in igloo basements, bastion treasure rooms, and Nether fortresses. Tier III and higher [Work Orders](work-orders.md) can reward one. A found jewel comes Unidentified and was never cut, so it identifies with 2 to 4 RP at random.
 
 ## Rarity and affixes
 

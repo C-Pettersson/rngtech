@@ -126,7 +126,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
                 .stats(AlloyFurnaceMenu.TAB_STATS)
                 .refinement(AlloyFurnaceMenu.TAB_REFINEMENT)
                 .mastery(AlloyFurnaceMenu.TAB_MASTERY)
-                .jewels(AlloyFurnaceMenu.TAB_JEWELS)
+                .jewels(AlloyFurnaceMenu.TAB_JEWELS, menu::jewelsShown)
                 .orders(AlloyFurnaceMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);

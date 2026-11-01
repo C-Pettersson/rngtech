@@ -3116,7 +3116,7 @@
             "role": "reward",
             "shape": "diamond",
             "gate": "path_0390",
-            "theme": "Headroom",
+            "theme": "Recovery",
             "region": "drive",
             "layer": "outer"
         },
@@ -30871,9 +30871,9 @@
         {
             "effects": [
                 {
-                    "stat": "MAX_OUTPUT_AMOUNT",
-                    "operation": "ADD",
-                    "value": 1
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
                 }
             ],
             "behaviors": [],
@@ -30882,7 +30882,7 @@
             "scaling": [],
             "passive": {},
             "id": "overflow_gate_1",
-            "name": "Headroom",
+            "name": "Recovery",
             "kind": "NODE",
             "x": 5552,
             "y": 3268,
@@ -30891,9 +30891,9 @@
         {
             "effects": [
                 {
-                    "stat": "MAX_OUTPUT_AMOUNT",
-                    "operation": "ADD",
-                    "value": 1
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
                 }
             ],
             "behaviors": [],
@@ -30902,7 +30902,7 @@
             "scaling": [],
             "passive": {},
             "id": "overflow_gate_2",
-            "name": "Headroom",
+            "name": "Recovery",
             "kind": "NODE",
             "x": 5519,
             "y": 3220,
@@ -30911,9 +30911,9 @@
         {
             "effects": [
                 {
-                    "stat": "MAX_OUTPUT_AMOUNT",
-                    "operation": "ADD",
-                    "value": 1
+                    "stat": "OUTPUT_AMOUNT",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 0.5
                 }
             ],
             "behaviors": [],
@@ -30922,7 +30922,7 @@
             "scaling": [],
             "passive": {},
             "id": "overflow_gate_3",
-            "name": "Headroom",
+            "name": "Recovery",
             "kind": "NODE",
             "x": 5586,
             "y": 3221,

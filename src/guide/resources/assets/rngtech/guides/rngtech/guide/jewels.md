@@ -63,7 +63,7 @@ Craft a **Jewel Blank** in a crafting grid.
 
 ### Finding jewels
 
-Uncut jewels also turn up in village, mineshaft, and ruined portal chests, and more often in igloo basements, bastion treasure rooms, and Nether fortresses. Tier III and higher [Work Orders](rngtech:work-orders.md) can pay one. A found jewel comes Unidentified and was never cut, so it identifies with 2 to 4 RP at random.
+Uncut jewels also turn up in village, mineshaft, and ruined portal chests, and more often in igloo basements, bastion treasure rooms, and Nether fortresses. Tier III and higher [Work Orders](rngtech:work-orders.md) can reward one. A found jewel comes Unidentified and was never cut, so it identifies with 2 to 4 RP at random.
 
 ## More
 

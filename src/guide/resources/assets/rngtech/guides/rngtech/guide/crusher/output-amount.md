@@ -12,7 +12,7 @@ Output Amount sets how much extra crushed material an ore block or raw metal giv
 
 - The chassis sets a base multiplier. Everything else adds to one **increased** total: the Crush Head's own yield, its rolled affixes, Crusher affixes, Mastery nodes, ascendancy nodes, and At-Level Output on recipes at the head's hardness.
 - That total stops at **Maximum Bonus Output**, 75% to begin with. Bonuses adding up to +100% pay +75%, and the Stats tab shows how much is over the cap.
-- Maximum Bonus Output can be raised, up to 90%. The **Headroom** pocket in [Machine Mastery](rngtech:machine-mastery.md) adds +1% on each of its three small nodes and +2% on its notable, **Overflow Gate**.
+- Maximum Bonus Output can be raised, up to 90%. The **Overflow Gate** notable in [Machine Mastery](rngtech:machine-mastery.md) adds +2%, and the jewel line **of Headroom** adds +1-2% per jewel.
 - **Big yield affixes cost speed.** Crusher Jaws and Crush Head Pulverizing give the most Bonus Output, but each also rolls reduced Processing Speed, which slows every recipe. The Output Amount suffix is much smaller and has no penalty.
 - Output Amount never drops below 1×, so a Crusher always makes at least the recipe's base output.
 - Without a Battery Cell, the Crusher keeps only 75% of its bonus above 1×. A 1.4× Crusher drops to 1.3×, and a 1× Crusher loses nothing.

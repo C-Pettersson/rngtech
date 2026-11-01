@@ -182,7 +182,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
                 .stats(FurnaceMenu.TAB_CONFIGURATION)
                 .refinement(FurnaceMenu.TAB_REFINEMENT)
                 .mastery(FurnaceMenu.TAB_MASTERY)
-                .jewels(FurnaceMenu.TAB_JEWELS)
+                .jewels(FurnaceMenu.TAB_JEWELS, menu::jewelsShown)
                 .orders(FurnaceMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         masterySupport = new MasteryScreenSupport<>(

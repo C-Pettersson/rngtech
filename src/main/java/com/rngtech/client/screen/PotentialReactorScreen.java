@@ -91,7 +91,7 @@ public class PotentialReactorScreen extends AbstractContainerScreen<PotentialRea
                 .gear(PotentialReactorMenu.TAB_GEAR)
                 .stats(PotentialReactorMenu.TAB_STATS)
                 .refinement(PotentialReactorMenu.TAB_REFINEMENT)
-                .jewels(PotentialReactorMenu.TAB_JEWELS)
+                .jewels(PotentialReactorMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 

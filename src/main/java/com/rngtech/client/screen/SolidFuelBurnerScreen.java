@@ -92,7 +92,7 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
                 .gear(SolidFuelBurnerMenu.TAB_GEAR)
                 .stats(SolidFuelBurnerMenu.TAB_STATS)
                 .refinement(SolidFuelBurnerMenu.TAB_REFINEMENT)
-                .jewels(SolidFuelBurnerMenu.TAB_JEWELS)
+                .jewels(SolidFuelBurnerMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 
