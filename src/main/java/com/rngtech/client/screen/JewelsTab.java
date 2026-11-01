@@ -43,7 +43,7 @@ public final class JewelsTab {
         guiGraphics.drawString(font, Component.translatable(labelKey), leftPos + LABEL_X, topPos + y + LABEL_OFFSET, colour, false);
     }
 
-    /** The hint for an empty jewel slot under the cursor, or nothing. */
+    /** The name of the empty jewel slot under the cursor, or nothing. */
     public static List<Component> tooltip(AbstractContainerScreen<?> screen) {
         Slot hovered = screen.getSlotUnderMouse();
         if (!(hovered instanceof JewelSocketSlot socket) || socket.hasItem()) {
@@ -53,6 +53,6 @@ public final class JewelsTab {
         Component line = index < JewelSockets.BODY_START
                 ? Component.translatable("rngtech.jewels.slot.tree", index + 1)
                 : Component.translatable("rngtech.jewels.slot.body", index - JewelSockets.BODY_START + 1);
-        return List.of(line.copy().withStyle(ChatFormatting.GRAY), Component.translatable("rngtech.jewels.hint").withStyle(ChatFormatting.DARK_GRAY));
+        return List.of(line.copy().withStyle(ChatFormatting.GRAY));
     }
 }
