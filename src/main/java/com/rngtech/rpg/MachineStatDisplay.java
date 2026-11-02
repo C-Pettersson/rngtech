@@ -29,6 +29,7 @@ public final class MachineStatDisplay {
             MachineStat.CALIBRATION_QUALITY,
             MachineStat.CALIBRATION_PRECISION,
             MachineStat.CATALYST_EFFICIENCY,
+            MachineStat.FLUID_USAGE,
             MachineStat.POTATO_POWER,
             MachineStat.CARROT_POWER,
             MachineStat.BREAD_POWER,
@@ -99,6 +100,7 @@ public final class MachineStatDisplay {
             case REFINEMENT_POTENTIAL_BONUS -> formatSignedNumber(value) + " RP";
             case BATTERY_SUPPORT -> "stage " + formatNumber(value);
             case SOLAR_PANEL_LIMIT -> formatUnit(value, "panel", "panels");
+            case RULE_CAPACITY -> formatUnit(value, "rule", "rules");
             case HARDNESS_TOLERANCE -> formatUnit(value, "level", "levels");
             case BANK_MEMORY -> formatUnit(value, "input", "inputs");
             case JAM_RECOVERY, UNDER_LEVEL_EFFICIENCY, AT_LEVEL_OUTPUT, OVERDRIVE_CAP, LEDGER_RATE, FLUX_RATE, BLEND_SPEED -> formatSignedPercentPoints(value);
@@ -242,6 +244,7 @@ public final class MachineStatDisplay {
             case INPUT_SLOTS, OUTPUT_SLOTS, ADDON_SLOTS, BLOCK_FILTER_SLOTS -> formatSignedUnit(value, "slot", "slots");
             case CONTROL, DRIVE, RESERVE -> formatSignedUnit(value, "point", "points");
             case BATTERY_SLOTS -> formatSignedUnit(value, "cell", "cells");
+            case RULE_CAPACITY -> formatSignedUnit(value, "rule", "rules");
             case CRUSHER_INPUT_FILTER -> formatSignedUnit(value, "filter", "filters");
             case BATCH_SIZE -> formatSignedUnit(value, "item", "items");
             case BATCH_OVERHEAD -> formatSignedPercentPoints(value) + " per extra item";

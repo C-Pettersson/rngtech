@@ -5,6 +5,7 @@ import com.rngtech.content.blockentity.AlloyFurnaceBlockEntity;
 import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
 import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
+import com.rngtech.content.blockentity.IdentifierBlockEntity;
 import com.rngtech.content.blockentity.MachineInfoProvider;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
@@ -13,12 +14,15 @@ import com.rngtech.content.calibration.CalibrationGearMaterial;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
+import com.rngtech.content.item.CraftedTraitOutputs;
 import com.rngtech.content.machine.AlloyCrucibleMaterial;
 import com.rngtech.content.machine.AlloyFurnaceChassisMaterial;
+import com.rngtech.content.machine.FluidPumpMaterial;
 import com.rngtech.content.machine.ServoMaterial;
 import com.rngtech.content.recycling.ComponentRecyclerChassis;
 import com.rngtech.content.recycling.DisassemblyHeadMaterial;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.rpg.MachineStat;
 import com.rngtech.rpg.MachineStatAccumulator;
@@ -42,6 +46,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -140,6 +146,43 @@ public final class WorkOrderTimingGameTests {
     @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT, batch = BATCH)
     public static void recyclerExotic(GameTestHelper helper) {
         recycler(helper, ComponentRecyclerChassis.EXOTIC, DisassemblyHeadMaterial.EXOTIC, "exotic_crusher_chassis", 8, new int[] {5});
+    }
+
+    // Identifier: one Stage 8 body; the Servo at or below each tier's stage sets its speed. Steel serves Stage 4 and 5,
+    // Titanium 6, Tungstensteel 7, and Exotic 8.
+
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT, batch = BATCH)
+    public static void identifierSteel(GameTestHelper helper) {
+        identifier(helper, ServoMaterial.STEEL, FluidPumpMaterial.OSMIUM, BatteryCellMaterial.INVAR, new int[] {1, 2});
+    }
+
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT, batch = BATCH)
+    public static void identifierTitanium(GameTestHelper helper) {
+        identifier(helper, ServoMaterial.TITANIUM, FluidPumpMaterial.TITANIUM, BatteryCellMaterial.ARCLITE, new int[] {3});
+    }
+
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT, batch = BATCH)
+    public static void identifierTungstensteel(GameTestHelper helper) {
+        identifier(helper, ServoMaterial.TUNGSTENSTEEL, FluidPumpMaterial.TUNGSTENSTEEL, BatteryCellMaterial.NULLITE, new int[] {4});
+    }
+
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = TIMEOUT, batch = BATCH)
+    public static void identifierExotic(GameTestHelper helper) {
+        identifier(helper, ServoMaterial.EXOTIC, FluidPumpMaterial.EXOTIC, BatteryCellMaterial.EXOTIC, new int[] {5});
+    }
+
+    private static void identifier(GameTestHelper helper, ServoMaterial servo, FluidPumpMaterial pump, BatteryCellMaterial cell, int[] tiers) {
+        IdentifierBlockEntity identifier = MachineTestSupport.place(helper, MACHINE, ModBlocks.IDENTIFIER.get(), IdentifierBlockEntity.class);
+        identifier.getGearInventory().setStackInSlot(IdentifierBlockEntity.SLOT_SERVO, new ItemStack(ModItems.servo(servo).get()));
+        identifier.getGearInventory().setStackInSlot(IdentifierBlockEntity.SLOT_FLUID_PUMP, new ItemStack(ModItems.fluidPump(pump).get()));
+        identifier.getGearInventory().setStackInSlot(IdentifierBlockEntity.SLOT_BATTERY_CELL, new ItemStack(ModItems.batteryCell(cell).get()));
+        helper.onEachTick(() -> identifier.getTank().fill(
+                new FluidStack(ModFluids.IDENTIFYING_FLUID_SOURCE.get(), 8000), IFluidHandler.FluidAction.EXECUTE));
+        meter(helper, new Setup("identifier", WorkObjectiveType.IDENTIFY, tiers, 8, "identifier", "servo:" + name(servo) + cellText(cell),
+                        "exotic_servo", UNHEATED),
+                identifier, identifier::effectiveStats, identifier.getEnergyStorage(null), identifier.getProcessInventory(),
+                new Feed[] {new Feed(IdentifierBlockEntity.SLOT_INPUT, ModItems.servo(ServoMaterial.EXOTIC).get(), true)},
+                IdentifierBlockEntity.SLOT_OUTPUT);
     }
 
     private static void alloy(GameTestHelper helper, AlloyFurnaceChassisMaterial chassis, HeatCoreMaterial core, AlloyCrucibleMaterial crucible,
@@ -281,7 +324,8 @@ public final class WorkOrderTimingGameTests {
         ItemStack held = process.getStackInSlot(feed.slot());
         int max = feed.item().getDefaultMaxStackSize();
         if (held.isEmpty() || held.getCount() < max / 2) {
-            process.setStackInSlot(feed.slot(), new ItemStack(feed.item(), max));
+            ItemStack fresh = feed.unidentified() ? CraftedTraitOutputs.unidentifiedVariant(new ItemStack(feed.item())) : new ItemStack(feed.item());
+            process.setStackInSlot(feed.slot(), fresh.copyWithCount(max));
         }
     }
 
@@ -303,7 +347,11 @@ public final class WorkOrderTimingGameTests {
         return value.name().toLowerCase(Locale.ROOT);
     }
 
-    private record Feed(int slot, Item item) {
+    /** One input slot to keep full; an unidentified feed holds fresh crafted copies, as an Identifier needs. */
+    private record Feed(int slot, Item item, boolean unidentified) {
+        private Feed(int slot, Item item) {
+            this(slot, item, false);
+        }
     }
 
     private record Setup(String family, WorkObjectiveType type, int[] tiers, int stage, String chassis, String gear, String recipe, double ratio) {

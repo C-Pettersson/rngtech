@@ -21,7 +21,9 @@ public enum WorkObjectiveType {
     /** Logs a Forestry Companion fells and crops it harvests. */
     HARVEST,
     /** Parts a Component Recycler breaks down. */
-    RECYCLE;
+    RECYCLE,
+    /** Items an Identifier identifies. */
+    IDENTIFY;
 
     public String id() {
         return name().toLowerCase(Locale.ROOT);

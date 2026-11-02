@@ -1,0 +1,25 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:identifier"
+    },
+    "minimum_processing_level": 8,
+    "processing_ticks": 240,
+    "energy": 4800,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:naquadah_plate",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:ultimate_electric_circuit",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

@@ -11,6 +11,7 @@ import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
 import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
+import com.rngtech.content.blockentity.IdentifierBlockEntity;
 import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
@@ -485,7 +486,7 @@ public final class WorkOrderGameTests {
         List<Block> blocks = List.of(ModBlocks.crusherChassis(CrusherChassisMaterial.STEEL).get(), ModBlocks.furnaceChassis(FurnaceChassisMaterial.LEAD).get(),
                 ModBlocks.alloyFurnaceChassis(AlloyFurnaceChassisMaterial.TITANIUM).get(), ModBlocks.CRUDE_METAL_PRESS.get(), ModBlocks.MELTER.get(),
                 ModBlocks.resonanceCalibrator(ResonanceCalibratorChassis.IRON).get(), ModBlocks.BATTERY_ASSEMBLER.get(),
-                ModBlocks.componentRecycler(ComponentRecyclerChassis.IRON).get());
+                ModBlocks.componentRecycler(ComponentRecyclerChassis.IRON).get(), ModBlocks.IDENTIFIER.get());
         MachineTraits instant = new MachineTraits(Rarity.MAGIC, 0, List.of(new MachineModifier(ModifierSlot.PREFIX, MachineStat.INSTANT_PROCESS_CHANCE,
                 ModifierOperation.ADD, 25)));
         MachineTraits feeding = new MachineTraits(Rarity.MAGIC, 0, List.of(WorkOrderConditions.get(WorkOrderConditions.HAND_FEEDING).definition()
@@ -520,6 +521,7 @@ public final class WorkOrderGameTests {
             case ResonanceCalibratorBlockEntity calibrator -> calibrator.effectiveStats();
             case BatteryAssemblerBlockEntity assembler -> assembler.effectiveStats();
             case ComponentRecyclerBlockEntity recycler -> recycler.effectiveStats();
+            case IdentifierBlockEntity identifier -> identifier.effectiveStats();
             default -> throw new IllegalArgumentException("No Work Order machine: " + machine);
         };
         return stats.value(MachineStat.INSTANT_PROCESS_CHANCE);
@@ -535,7 +537,7 @@ public final class WorkOrderGameTests {
         MinecraftServer server = helper.getLevel().getServer();
         RegistryOps<JsonElement> ops = server.registryAccess().createSerializationContext(JsonOps.INSTANCE);
         List<String> families = List.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter", "resonance_calibrator", "forestry",
-                "component_assembler", "component_recycler");
+                "component_assembler", "component_recycler", "identifier");
         Set<Integer> bands = new HashSet<>();
         for (JsonElement element : entries(helper, "loot_table/challenges/work_order.json")) {
             JsonObject entry = element.getAsJsonObject();
@@ -574,8 +576,8 @@ public final class WorkOrderGameTests {
                 "rngtech:fortress_heater_element", heat,
                 "rngtech:igloo_basement_thermostat", heat,
                 "rngtech:crying_crucible", Set.of("alloy_furnace"),
-                "rngtech:trial_vault_escapement", Set.of("alloy_furnace", "metal_press", "melter"),
-                "rngtech:witch_bottle_reflux_pump", Set.of("melter", "forestry"),
+                "rngtech:trial_vault_escapement", Set.of("alloy_furnace", "metal_press", "melter", "identifier"),
+                "rngtech:witch_bottle_reflux_pump", Set.of("melter", "forestry", "identifier"),
                 "rngtech:ancient_echo_control_board", Set.of("resonance_calibrator"),
                 "rngtech:trial_vault_tempered_pawl", Set.of("component_recycler"))),
                 "A Unique is favoured on machines its part does not fit: " + favoured);

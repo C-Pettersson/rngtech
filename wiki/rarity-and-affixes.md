@@ -33,7 +33,10 @@ To identify an item, put it **alone** in a crafting grid and take the result. Th
 
 - **Placing** an unidentified machine rolls its traits as it goes down.
 - **Installing** an unidentified part rolls its traits as it goes into its slot. This applies to [Gear](gear.md) in a machine or companion, to Battery Cells in a [Battery Chassis](battery-chassis.md) or a socket, and to the head, rod, and cell you build into a tool at the [Tool Bench](tool-bench.md).
+- An [Identifier](identifier.md) identifies items for FE and Identifying Fluid.
 - Battery Cells made in a [Component Assembler](component-assembler.md) come out already identified.
+
+Placing and installing identify an item only when you do it yourself. A part that a cable or hopper inserts stays unidentified. A dispenser or a block placer from another mod cannot place an unidentified machine. Automation identifies items only through an Identifier.
 
 An item you put in a machine to process stays unidentified. For example, a part in a [Component Recycler](component-recycler.md) input slot does not roll.
 

@@ -1,6 +1,7 @@
 package com.rngtech.content.registry;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.affixsorter.RuleCoreMaterial;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.cable.EnergyConnectorTier;
 import com.rngtech.content.cable.FluidConnectorTier;
@@ -75,6 +76,8 @@ import com.rngtech.content.item.RefinementLensItem;
 import com.rngtech.content.item.RefinementModifierItem;
 import com.rngtech.content.item.RequisitionItem;
 import com.rngtech.content.item.ResonanceCalibratorBlockItem;
+import com.rngtech.content.item.RuleCardItem;
+import com.rngtech.content.item.RuleCoreItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolarArrayControllerBlockItem;
 import com.rngtech.content.item.SolarArrayExtenderItem;
@@ -368,6 +371,32 @@ public final class ModItems {
                 }
             }
     );
+    public static final DeferredItem<MachineBlockItem> IDENTIFIER = ITEMS.register(
+            "identifier",
+            () -> new MachineBlockItem(ModBlocks.IDENTIFIER.get(), MachineType.IDENTIFIER, new Item.Properties().stacksTo(1)) {
+                @Override
+                protected int componentStage() {
+                    return 8;
+                }
+            }
+    );
+    public static final DeferredItem<MachineBlockItem> AFFIX_SORTER = ITEMS.register(
+            "affix_sorter",
+            () -> new MachineBlockItem(ModBlocks.AFFIX_SORTER.get(), MachineType.AFFIX_SORTER, new Item.Properties().stacksTo(1)) {
+                @Override
+                protected int componentStage() {
+                    return 8;
+                }
+            }
+    );
+    public static final DeferredItem<RuleCoreItem> EXOTIC_RULE_CORE = ITEMS.register(
+            RuleCoreMaterial.EXOTIC.itemId(),
+            () -> new RuleCoreItem(RuleCoreMaterial.EXOTIC, new Item.Properties().stacksTo(1))
+    );
+    public static final DeferredItem<RuleCardItem> RULE_CARD = ITEMS.register(
+            "rule_card",
+            () -> new RuleCardItem(new Item.Properties().stacksTo(1))
+    );
     public static final DeferredItem<MachineBlockItem> MELTER = ITEMS.register(
             "melter",
             () -> new MachineBlockItem(ModBlocks.MELTER.get(), MachineType.MELTER, new Item.Properties().stacksTo(1)) {
@@ -486,6 +515,13 @@ public final class ModItems {
             "ender_slurry_bucket",
             () -> new BucketItem(
                     ModFluids.ENDER_SLURRY_SOURCE.get(),
+                    new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)
+            )
+    );
+    public static final DeferredItem<BucketItem> IDENTIFYING_FLUID_BUCKET = ITEMS.register(
+            "identifying_fluid_bucket",
+            () -> new BucketItem(
+                    ModFluids.IDENTIFYING_FLUID_SOURCE.get(),
                     new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)
             )
     );

@@ -3,6 +3,7 @@ package com.rngtech.content.registry;
 import com.rngtech.RNGTech;
 import com.rngtech.content.menu.AdvancedItemFilterMenu;
 import com.rngtech.content.menu.AffixForgeMenu;
+import com.rngtech.content.menu.AffixSorterMenu;
 import com.rngtech.content.menu.AlgaePhotobioreactorMenu;
 import com.rngtech.content.menu.AlloyFurnaceMenu;
 import com.rngtech.content.menu.AmmoniaFuelCellMenu;
@@ -28,6 +29,7 @@ import com.rngtech.content.menu.ForestryCartMenu;
 import com.rngtech.content.menu.ForestryCartStationMenu;
 import com.rngtech.content.menu.FurnaceMenu;
 import com.rngtech.content.menu.GasChemistryMenu;
+import com.rngtech.content.menu.IdentifierMenu;
 import com.rngtech.content.menu.MelterMenu;
 import com.rngtech.content.menu.MetalPressMenu;
 import com.rngtech.content.menu.MinersCompanionMenu;
@@ -157,6 +159,10 @@ public final class ModMenus {
     public static final DeferredHolder<MenuType<?>, MenuType<ComponentRecyclerMenu>> COMPONENT_RECYCLER =
             MENU_TYPES.register("component_recycler", () -> IMenuTypeExtension.create(ComponentRecyclerMenu::new));
 
+    public static final DeferredHolder<MenuType<?>, MenuType<IdentifierMenu>> IDENTIFIER =
+            MENU_TYPES.register("identifier", () -> IMenuTypeExtension.create(IdentifierMenu::new));
+    public static final DeferredHolder<MenuType<?>, MenuType<AffixSorterMenu>> AFFIX_SORTER =
+            MENU_TYPES.register("affix_sorter", () -> IMenuTypeExtension.create(AffixSorterMenu::new));
     public static final DeferredHolder<MenuType<?>, MenuType<MelterMenu>> MELTER =
             MENU_TYPES.register("melter", () -> IMenuTypeExtension.create(MelterMenu::new));
     public static final DeferredHolder<MenuType<?>, MenuType<BatteryAssemblerMenu>> BATTERY_ASSEMBLER =

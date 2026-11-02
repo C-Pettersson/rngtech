@@ -18,7 +18,7 @@ A job's tier, I to V, sets the job's size, the chassis stage it needs, and the r
 | IV | 7 | About 30 minutes on a good Stage 7 build |
 | V | 8 | About 30 minutes on a good Stage 8 build |
 
-A strong build finishes a job much faster than this, and a weak one takes longer. Resonance Calibrator, Component Assembler, and Component Recycler jobs are smaller, because their materials limit them more than machine time does.
+A strong build finishes a job much faster than this, and a weak one takes longer. Resonance Calibrator, Component Assembler, Component Recycler, and Identifier jobs are smaller, because their materials limit them more than machine time does.
 
 | Machine | Top stage |
 |---|---:|
@@ -27,5 +27,6 @@ A strong build finishes a job much faster than this, and a weak one takes longer
 | [Alloy Furnace](rngtech:alloy-furnace.md) | 6 |
 | [Melter](rngtech:melter.md) | 6 |
 | [Resonance Calibrator](rngtech:resonance-calibrator.md) | 7 |
+| [Identifier](rngtech:identifier.md) | 8 |
 
 The [Component Assembler](rngtech:component-assembler.md) has no chassis stages, so its chips need none.

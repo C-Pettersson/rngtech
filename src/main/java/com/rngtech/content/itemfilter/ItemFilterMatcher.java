@@ -246,7 +246,7 @@ public final class ItemFilterMatcher {
                 || stack.getItem() instanceof ToolRodItem;
     }
 
-    private static OptionalInt componentStage(ItemStack stack) {
+    public static OptionalInt componentStage(ItemStack stack) {
         CalibrationState calibration = stack.get(ModDataComponents.CALIBRATION_STATE.get());
         if (calibration != null) {
             return OptionalInt.of(calibration.stage());

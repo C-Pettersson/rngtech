@@ -2,9 +2,9 @@
 
 > Design requirements, not a release status report. See [Current Implementation](../reference/current-implementation.md) and the [player wiki](https://c-pettersson.github.io/rngtech/) for current behavior.
 
-PRD status: Draft
+PRD status: Accepted
 
-Implementation status: Planned
+Implementation status: Implemented
 
 Release: TBD
 
@@ -190,7 +190,7 @@ Rules save on the block and stay with it when it is broken.
 
 Resource id: `rngtech:rule_card` (draft). A craftable item that copies a rule list from one Affix Sorter to another.
 
-- Use it on a sorter to copy that sorter's rules onto the card. Use it on another sorter to write them there.
+- Sneak-use it on a sorter, or use an empty card, to copy that sorter's rules onto the card. Use a written card on another sorter to write them there.
 - Writing replaces the target's whole list. Rules above the target's Rule Capacity arrive disabled.
 - The card does not roll and is not consumed. Its tooltip shows the rule count.
 - There is no clipboard text export. Players share rule lists in game.

@@ -156,6 +156,11 @@ A Cathode sets the highest-stage Anode a [Corrosion Cell](rngtech:corrosion-cell
 - [Cavitation Rotors](rngtech:gear/cavitation-rotors.md)
 - [Collapse Nozzles](rngtech:gear/collapse-nozzles.md)
 - [Void Chambers and Dimensional Stabilizers](rngtech:gear/void-chambers-and-dimensional-stabilizers.md)
+
+### Rule Core
+
+The <ItemLink id="rngtech:exotic_rule_core" /> is the required part of the [Affix Sorter](rngtech:affix-sorter.md). It sets how many rules the sorter can run at once. It is Stage 8 and rolls Rule Capacity, Processing Speed, and Instant Process.
+
 - [Catalyst Beds and membranes](rngtech:gear/catalyst-beds-and-membranes.md)
 
 ### Battery Cells

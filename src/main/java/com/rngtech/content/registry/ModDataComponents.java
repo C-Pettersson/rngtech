@@ -1,6 +1,7 @@
 package com.rngtech.content.registry;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.affixsorter.SorterRules;
 import com.rngtech.content.calibration.CalibrationState;
 import com.rngtech.content.calibration.CalibrationStreak;
 import com.rngtech.content.configurator.ConfiguratorPreset;
@@ -161,6 +162,15 @@ public final class ModDataComponents {
                             .cacheEncoding()
             );
 
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SorterRules>> SORTER_RULES =
+            DATA_COMPONENTS.registerComponentType(
+                    "sorter_rules",
+                    builder -> builder
+                            .persistent(SorterRules.CODEC)
+                            .networkSynchronized(SorterRules.STREAM_CODEC)
+                            .cacheEncoding()
+            );
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> BATTERY_CELL_ENERGY =
             DATA_COMPONENTS.registerComponentType(

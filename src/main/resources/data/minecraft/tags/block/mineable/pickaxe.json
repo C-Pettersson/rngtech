@@ -65,6 +65,8 @@
     "rngtech:lead_furnace_chassis",
     "rngtech:lead_resonance_calibrator_chassis",
     "rngtech:melter",
+    "rngtech:affix_sorter",
+    "rngtech:identifier",
     "rngtech:metal_press",
     "rngtech:potential_reactor",
     "rngtech:silica_gel_column_casing",

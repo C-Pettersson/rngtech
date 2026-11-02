@@ -33,7 +33,9 @@ public final class UniqueStatReaders {
         COMPONENT_RECYCLER,
         /** A Battery Cell's own storage, in any machine that holds one. */
         BATTERY_CELL,
-        BATTERY_CHASSIS
+        BATTERY_CHASSIS,
+        IDENTIFIER,
+        AFFIX_SORTER
     }
 
     private static final Map<UniqueHost, List<Reader>> HOSTS = new EnumMap<>(Map.of(
@@ -42,8 +44,9 @@ public final class UniqueStatReaders {
                     Reader.SOLID_FUEL_BURNER, Reader.CAVITATION_GENERATOR, Reader.GAS_CHEMISTRY),
             UniqueHost.ALLOY_CRUCIBLE, List.of(Reader.ALLOY_FURNACE),
             UniqueHost.SERVO, List.of(Reader.METAL_PRESS, Reader.ALLOY_FURNACE, Reader.MELTER, Reader.CAVITATION_GENERATOR,
-                    Reader.GAS_CHEMISTRY, Reader.COMPRESSOR_TANK),
-            UniqueHost.FLUID_PUMP, List.of(Reader.MELTER, Reader.CORROSION_CELL, Reader.FORESTRY_CART, Reader.BIO_GENERATOR),
+                    Reader.GAS_CHEMISTRY, Reader.COMPRESSOR_TANK, Reader.IDENTIFIER, Reader.AFFIX_SORTER),
+            UniqueHost.FLUID_PUMP, List.of(Reader.MELTER, Reader.CORROSION_CELL, Reader.FORESTRY_CART, Reader.BIO_GENERATOR,
+                    Reader.IDENTIFIER),
             UniqueHost.CONTROL_BOARD, List.of(Reader.RESONANCE_CALIBRATOR),
             UniqueHost.DISASSEMBLY_HEAD, List.of(Reader.COMPONENT_RECYCLER),
             UniqueHost.BATTERY_CELL, List.of(Reader.BATTERY_CELL, Reader.BATTERY_CHASSIS)
@@ -97,6 +100,10 @@ public final class UniqueStatReaders {
                 MachineStat.REFINEMENT_POTENTIAL_BONUS, MachineStat.STREAK_CAP, MachineStat.STREAK_FLOOR);
         stats(Reader.COMPONENT_RECYCLER, Set.of(), MachineStat.PROCESSING_LEVEL, MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE,
                 MachineStat.INSTANT_PROCESS_CHANCE);
+        stats(Reader.IDENTIFIER, Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.FLUID_USAGE,
+                MachineStat.FLUID_CAPACITY, MachineStat.FLUID_TRANSFER, MachineStat.INSTANT_PROCESS_CHANCE);
+        stats(Reader.AFFIX_SORTER, Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.RULE_CAPACITY,
+                MachineStat.INSTANT_PROCESS_CHANCE);
         stats(Reader.BATTERY_CELL, Set.of(), MachineStat.ENERGY_CAPACITY, MachineStat.ENERGY_TRANSFER, MachineStat.EFFICIENCY,
                 MachineStat.IDLE_LOSS);
         stats(Reader.BATTERY_CHASSIS, Set.of(), MachineStat.BURST_TRANSFER, MachineStat.BURST_DURATION, MachineStat.STABILITY,
@@ -116,13 +123,14 @@ public final class UniqueStatReaders {
     private static final Set<MachineStat> LOWER_IS_BETTER = EnumSet.of(MachineStat.ENERGY_USAGE, MachineStat.THERMAL_MASS,
             MachineStat.IDLE_LOSS, MachineStat.JAM_CHANCE, MachineStat.CYCLE_JAM_CHANCE, MachineStat.MOLD_SWAP_TIME,
             MachineStat.BATCH_OVERHEAD, MachineStat.FE_USAGE, MachineStat.VEIN_MINE_FE_USAGE, MachineStat.ORE_BURST_FE_USAGE,
-            MachineStat.ORE_BURST_COOLDOWN);
+            MachineStat.ORE_BURST_COOLDOWN, MachineStat.FLUID_USAGE);
 
     /** Stats that hold whole numbers, so flat lines on them roll integers. */
     private static final Set<MachineStat> WHOLE_NUMBER = EnumSet.of(MachineStat.INPUT_SLOTS, MachineStat.OUTPUT_SLOTS,
             MachineStat.ADDON_SLOTS, MachineStat.BATTERY_SLOTS, MachineStat.BATCH_SIZE, MachineStat.PROCESSING_LEVEL,
             MachineStat.MAX_TEMPERATURE, MachineStat.MOLD_SWAP_TIME, MachineStat.OVERDRIVE_MARGIN, MachineStat.BLEND_HEAT_REDUCTION,
-            MachineStat.STREAK_CAP, MachineStat.STREAK_FLOOR, MachineStat.REFINEMENT_POTENTIAL_BONUS, MachineStat.BURST_DURATION);
+            MachineStat.STREAK_CAP, MachineStat.STREAK_FLOOR, MachineStat.REFINEMENT_POTENTIAL_BONUS, MachineStat.BURST_DURATION,
+            MachineStat.RULE_CAPACITY);
 
     /** Stats that gate which recipes a machine can run, heat included; a Unique may reach at most one stage past its slot stage. */
     private static final Map<UniqueHost, Set<MachineStat>> RECIPE_GATES = new EnumMap<>(Map.of(

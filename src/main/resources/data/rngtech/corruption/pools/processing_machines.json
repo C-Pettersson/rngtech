@@ -11,7 +11,9 @@
         "steam_methane_reformer",
         "ammonia_synthesizer",
         "resonance_calibrator",
-        "compressor_tank"
+        "compressor_tank",
+        "identifier",
+        "affix_sorter"
     ],
     "blessed": [
         {

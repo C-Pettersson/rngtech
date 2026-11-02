@@ -1,6 +1,7 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.item.UniqueTooltip;
+import com.rngtech.content.menu.AffixSorterMenu;
 import com.rngtech.content.menu.AlloyFurnaceMenu;
 import com.rngtech.content.menu.BatteryChassisMenu;
 import com.rngtech.content.menu.BioGeneratorMenu;
@@ -11,6 +12,7 @@ import com.rngtech.content.menu.CrusherMenu;
 import com.rngtech.content.menu.ForestryCartMenu;
 import com.rngtech.content.menu.FurnaceMenu;
 import com.rngtech.content.menu.GasChemistryMenu;
+import com.rngtech.content.menu.IdentifierMenu;
 import com.rngtech.content.menu.MasteryMenuView;
 import com.rngtech.content.menu.MelterMenu;
 import com.rngtech.content.menu.MetalPressMenu;
@@ -55,6 +57,12 @@ public final class UniqueHostReaders {
         }
         if (menu instanceof MelterMenu) {
             return Reader.MELTER;
+        }
+        if (menu instanceof IdentifierMenu) {
+            return Reader.IDENTIFIER;
+        }
+        if (menu instanceof AffixSorterMenu) {
+            return Reader.AFFIX_SORTER;
         }
         if (menu instanceof SolidFuelBurnerMenu) {
             return Reader.SOLID_FUEL_BURNER;

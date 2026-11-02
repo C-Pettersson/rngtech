@@ -2,6 +2,7 @@ package com.rngtech.content.registry;
 
 import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.AffixForgeBlockEntity;
+import com.rngtech.content.blockentity.AffixSorterBlockEntity;
 import com.rngtech.content.blockentity.AlgaePhotobioreactorBlockEntity;
 import com.rngtech.content.blockentity.AlloyFurnaceBlockEntity;
 import com.rngtech.content.blockentity.AmmoniaFuelCellBlockEntity;
@@ -25,6 +26,7 @@ import com.rngtech.content.blockentity.DormantMachineBlockEntity;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
+import com.rngtech.content.blockentity.IdentifierBlockEntity;
 import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.blockentity.PhaseCoilBlockEntity;
@@ -276,6 +278,16 @@ public final class ModBlockEntities {
                     ).build(null)
             );
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<IdentifierBlockEntity>> IDENTIFIER =
+            BLOCK_ENTITY_TYPES.register(
+                    "identifier",
+                    () -> BlockEntityType.Builder.of(IdentifierBlockEntity::new, ModBlocks.IDENTIFIER.get()).build(null)
+            );
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AffixSorterBlockEntity>> AFFIX_SORTER =
+            BLOCK_ENTITY_TYPES.register(
+                    "affix_sorter",
+                    () -> BlockEntityType.Builder.of(AffixSorterBlockEntity::new, ModBlocks.AFFIX_SORTER.get()).build(null)
+            );
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<MelterBlockEntity>> MELTER =
             BLOCK_ENTITY_TYPES.register(
                     "melter",

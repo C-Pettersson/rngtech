@@ -132,7 +132,7 @@ A few slots work differently:
 
 ## Rolls and refinement
 
-Each crafted part rolls its own rarity and affixes, and you can refine it in the [Affix Forge](affix-forge.md). Parts do not stack. An unidentified part rolls when you install it, so you do not have to [identify](rarity-and-affixes.md#identification) it first. A part's affixes are **local**: they scale that part's own stats, and the result is then added to the machine. Holding Shift on a tooltip marks these rolls "(Local)". Rolls without the mark, such as a Fluid Pump's Fluid Capacity, apply to the machine as they are.
+Each crafted part rolls its own rarity and affixes, and you can refine it in the [Affix Forge](affix-forge.md). Parts do not stack. An unidentified part rolls when you install it by hand, so you do not have to [identify](rarity-and-affixes.md#identification) it first. A part's affixes are **local**: they scale that part's own stats, and the result is then added to the machine. Holding Shift on a tooltip marks these rolls "(Local)". Rolls without the mark, such as a Fluid Pump's Fluid Capacity, apply to the machine as they are.
 
 Higher-stage parts are crafted from fresh materials, not from the previous part. You can keep a well-rolled part in service and craft the next stage separately. The {{ item('rngtech:nullite_servo') }} is the one part that upgrades from an older part, the {{ item('rngtech:titanium_servo') }}. It rolls fresh traits: the Titanium Servo's affixes and RP are lost.
 
@@ -282,6 +282,8 @@ Titanium and higher Servos need Lubricant and can also be made in the [Component
 | [Metal Press](metal-press.md) | Required on the Metal Press, optional on the Crude Metal Press. Any stage. |
 | [Alloy Furnace](alloy-furnace.md) | Optional, up to the chassis stage. |
 | [Melter](melter.md) | Optional, any stage. |
+| [Identifier](identifier.md) | Required, any stage. Sets the speed. |
+| [Affix Sorter](affix-sorter.md) | Optional, any stage. |
 | [Coal Gasifier](coal-gasifier.md), [Syngas Combustor](syngas-combustor.md), [Steam Methane Reformer](steam-methane-reformer.md) | Optional, Stage 4 or higher. |
 | [Compressor Tank](compressor-tank.md) (Steel and higher) | Four slots, at least one required, up to the tank's stage. |
 | [Cavitation Generator](cavitation-generator.md) | Optional, Stage 6 or higher. |
@@ -299,7 +301,7 @@ Fluid Pumps move fluid out of, or into, a machine. Their transfer rate before af
 | {{ item('rngtech:tungstensteel_fluid_pump') }} | 7 | 500 mB/t |
 | {{ item('rngtech:exotic_fluid_pump') }} | 8 | 1,000 mB/t |
 
-**Used in:** [Melter](melter.md) (required, lets it fill containers and pipe out fluid), [Corrosion Cell](corrosion-cell.md) (optional, lets it fill with Electrolyte Solution from the side), [Bio Generator](bio-generator.md#methane-take-off) (optional, exports its gas as Methane), and the Forestry Companion cart (optional, used by the Field Hand sprinkler; see [Machine Mastery](machine-mastery.md#ascendancies)). Any stage fits.
+**Used in:** [Melter](melter.md) (required, lets it fill containers and pipe out fluid), [Identifier](identifier.md) (required, lets Identifying Fluid in through every face), [Corrosion Cell](corrosion-cell.md) (optional, lets it fill with Electrolyte Solution from the side), [Bio Generator](bio-generator.md#methane-take-off) (optional, exports its gas as Methane), and the Forestry Companion cart (optional, used by the Field Hand sprinkler; see [Machine Mastery](machine-mastery.md#ascendancies)). Any stage fits.
 
 {{ crafting('rngtech:osmium_fluid_pump') }}
 
@@ -380,6 +382,10 @@ The [Vacuum Collapse Generator](vacuum-collapse-generator.md) needs both. The **
 | 8 | {{ item('rngtech:exotic_void_chamber') }} | {{ item('rngtech:exotic_dimensional_stabilizer') }} |
 
 **Used in:** [Vacuum Collapse Generator](vacuum-collapse-generator.md) (both required).
+
+### Rule Core
+
+The {{ item('rngtech:exotic_rule_core') }} is the required part of the [Affix Sorter](affix-sorter.md). It sets how many rules the sorter can run at once. It is Stage 8 and rolls Rule Capacity, Processing Speed, and Instant Process.
 
 ### Catalyst Beds and membranes
 

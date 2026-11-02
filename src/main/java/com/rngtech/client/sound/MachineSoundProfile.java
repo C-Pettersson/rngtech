@@ -1,5 +1,6 @@
 package com.rngtech.client.sound;
 
+import com.rngtech.content.block.AffixSorterBlock;
 import com.rngtech.content.block.AlgaePhotobioreactorBlock;
 import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.block.AmmoniaFuelCellBlock;
@@ -14,6 +15,7 @@ import com.rngtech.content.block.CorrosionCellBlock;
 import com.rngtech.content.block.CrusherBlock;
 import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.block.GasChemistryBlock;
+import com.rngtech.content.block.IdentifierBlock;
 import com.rngtech.content.block.MelterBlock;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.block.PotentialReactorBlock;
@@ -119,14 +121,16 @@ enum MachineSoundProfile {
         if (block instanceof CrusherBlock
                 || block instanceof ComponentRecyclerBlock
                 || block instanceof MetalPressBlock
-                || block instanceof ResonanceCalibratorBlock) {
+                || block instanceof ResonanceCalibratorBlock
+                || block instanceof AffixSorterBlock) {
             return KINETIC;
         }
         if (block instanceof FurnaceBlock
                 || block instanceof AlloyFurnaceBlock
                 || block instanceof SolidFuelBurnerBlock
                 || block instanceof BioGeneratorBlock
-                || block instanceof MelterBlock) {
+                || block instanceof MelterBlock
+                || block instanceof IdentifierBlock) {
             return THERMAL;
         }
         if (block instanceof GasChemistryBlock gasChemistry) {

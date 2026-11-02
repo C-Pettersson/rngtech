@@ -476,7 +476,8 @@ public final class WorkOrderRuleChecks {
                 new WorkObjective(id("melt"), new WorkPart(WorkObjectiveType.MELT, WorkFilter.ANY, 0, "", 5000)), 6, 0, 100, 0))).withActive(0);
         require(WorkOrderRules.progress(melt, new WorkReport(WorkObjectiveType.MELT, 6, 0, "rngtech:lubricant", 1000).withTicks(300))
                 .orders().activeOrder().progress().getFirst() == 1000, "the Melter counts mB, not recipe time");
-        for (String family : List.of("crusher", "furnace", "alloy_furnace", "metal_press", "resonance_calibrator", "component_assembler", "component_recycler")) {
+        for (String family : List.of("crusher", "furnace", "alloy_furnace", "metal_press", "resonance_calibrator", "component_assembler", "component_recycler",
+                "identifier")) {
             require(WorkOrderFamilies.workTicks(family) > 0, family + " counts work");
             for (int tier = WorkOrder.MIN_TIER; tier < WorkOrder.MAX_TIER; tier++) {
                 require(WorkOrderFamilies.jobSpeed(family, tier) > 0 && WorkOrderFamilies.jobSpeed(family, tier) <= WorkOrderFamilies.jobSpeed(family, tier + 1),
@@ -580,7 +581,7 @@ public final class WorkOrderRuleChecks {
                     .anyMatch(file -> read(file).getAsJsonObject("fluid_output").get("id").getAsString().equals(item));
             case CALIBRATE -> jsonFiles(recipes).stream().filter(file -> file.getFileName().toString().startsWith("calibration_"))
                     .anyMatch(file -> read(file).getAsJsonObject("result").getAsJsonObject("stack").get("id").getAsString().equals(item));
-            case HARVEST, RECYCLE -> false;
+            case HARVEST, RECYCLE, IDENTIFY -> false;
         };
     }
 

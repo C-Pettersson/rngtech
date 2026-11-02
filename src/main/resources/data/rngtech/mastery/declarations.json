@@ -163,7 +163,15 @@
             "stat": "FLUID_CAPACITY",
             "families": [
                 "melter",
-                "forestry"
+                "forestry",
+                "identifier"
+            ],
+            "yield": "none"
+        },
+        {
+            "stat": "FLUID_USAGE",
+            "families": [
+                "identifier"
             ],
             "yield": "none"
         },

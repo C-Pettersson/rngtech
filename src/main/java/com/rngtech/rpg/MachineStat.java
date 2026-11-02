@@ -146,7 +146,11 @@ public enum MachineStat implements StringRepresentable {
     /** Reduced machine sound and particles from a Discreet body; only its decreased bucket is read, on the client. */
     MACHINE_NOISE,
     /** A Telemetry body's comparator gauge; the affix id names which gauge replaces the work-state signal. */
-    COMPARATOR_READOUT;
+    COMPARATOR_READOUT,
+    /** Identifying Fluid an Identifier uses per item, as a multiplier on the item's base cost. Lower is better. */
+    FLUID_USAGE,
+    /** Enabled rules an Affix Sorter may run. A whole number: the Rule Core's base plus flat rolls. */
+    RULE_CAPACITY;
 
     public static final Codec<MachineStat> CODEC = Codec.STRING.comapFlatMap(
             name -> {

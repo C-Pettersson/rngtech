@@ -9,8 +9,9 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import java.util.function.Supplier;
 
 /**
- * An inventory that holds installed Gear. A single unidentified item rolls its traits when it goes into a Gear slot,
- * on the server only. Loading from NBT never rolls, so items installed before this stay as they are.
+ * An inventory that holds installed Gear. A single unidentified item rolls its traits when a player puts it in a Gear
+ * slot, on the server only. Menu slots and Shift-click set the stack; cables, hoppers, and other automation insert it,
+ * which never rolls, so automation identifies only through the Identifier. Loading from NBT never rolls either.
  */
 public class IdentifyingItemHandler extends ItemStackHandler {
     private final Supplier<Level> level;
@@ -23,15 +24,6 @@ public class IdentifyingItemHandler extends ItemStackHandler {
     /** Whether an item in {@code slot} is installed Gear. Inventories that mix Gear with other slots override it. */
     protected boolean identifiesSlot(int slot) {
         return true;
-    }
-
-    @Override
-    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        ItemStack remainder = super.insertItem(slot, stack, simulate);
-        if (!simulate) {
-            identify(slot);
-        }
-        return remainder;
     }
 
     @Override
