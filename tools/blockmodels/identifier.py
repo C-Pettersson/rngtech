@@ -165,11 +165,13 @@ def vial_elements(item: bool):
     for x in (x0, x1 - rail):
         for z in (z0, z1 - rail):
             elements.append(box((x, y0 + cap, z), (x + rail, y1 - cap, z + rail), "rail", faces=SIDES))
-    # The fluid: a glowing column, standing clear of the glass.
-    inset = rail
-    elements.append(box((x0 + inset, y0 + cap, z0 + inset), (x1 - inset, FLUID_Y1, z1 - inset),
-                        {"up": "fluid_top", "*": "fluid"}, faces=SIDES + ("up",), extra=GLOW))
-    if not item:
+    # The fluid: a glowing column, standing clear of the glass. The placed block leaves it to IdentifierRenderer,
+    # which draws the tank's real level.
+    if item:
+        inset = rail
+        elements.append(box((x0 + inset, y0 + cap, z0 + inset), (x1 - inset, FLUID_Y1, z1 - inset),
+                            {"up": "fluid_top", "*": "fluid"}, faces=SIDES + ("up",), extra=GLOW))
+    else:
         glass = (x0 + 0.05, y0 + cap, z0 + 0.05), (x1 - 0.05, y1 - cap, z1 - 0.05)
         elements.append(box(*glass, "glass", faces=SIDES, uv={face: [0, 0, 16, 16] for face in SIDES}))
     elements.append(box(*PIPE, "pipe", faces=("north", "south", "up", "west")))

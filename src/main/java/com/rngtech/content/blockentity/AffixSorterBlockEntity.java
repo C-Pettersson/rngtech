@@ -30,8 +30,12 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -39,7 +43,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -64,6 +70,9 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
     public static final int SLOT_SERVO = 2;
     public static final int GEAR_SLOT_COUNT = 3;
     public static final int PULSE_TICKS = 4;
+    /** Block event sent when an item is sorted; its parameter is the {@link SorterRule.Route} ordinal. */
+    public static final int EVENT_SORTED = 1;
+    private static final int VISUAL_SYNC_INTERVAL = 5;
 
     /** What a face does, by its side relative to the sorter's front. */
     public enum FaceRoute {
@@ -225,6 +234,11 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
     private int pulseTicks;
     private int lastRule = -2;
     private int lastRoute = -1;
+    private AffixSorterVisualState visualState = AffixSorterVisualState.IDLE;
+    private AffixSorterVisualState lastSyncedVisual;
+    private ItemStack displayInput = ItemStack.EMPTY;
+    private FaceRoute flashRoute = FaceRoute.NONE;
+    private long flashTime = Long.MIN_VALUE;
 
     public AffixSorterBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.AFFIX_SORTER.get(), pos, blockState, MachineType.AFFIX_SORTER, SLOT_INPUT, SLOT_INPUT, SLOT_PASS_START);
@@ -243,6 +257,9 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
     public static void serverTick(Level level, BlockPos pos, BlockState state, AffixSorterBlockEntity sorter) {
         sorter.tickPulse(level, pos, state);
         sorter.tickWork(level, pos, state);
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL == 0) {
+            sorter.syncVisualState(level);
+        }
     }
 
     private void tickWork(Level level, BlockPos pos, BlockState state) {
@@ -291,6 +308,7 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
         processInventory.setStackInSlot(SLOT_INPUT, inputStack());
         lastRule = decision.ruleIndex();
         lastRoute = decision.route().ordinal();
+        level.blockEvent(pos, state.getBlock(), EVENT_SORTED, lastRoute);
         if (decision.pulse()) {
             startPulse(level, pos, state);
         }
@@ -360,9 +378,86 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
             if (level != null) {
                 level.invalidateCapabilities(worldPosition);
                 level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
+                if (!level.isClientSide) {
+                    syncVisualState(level);
+                }
             }
             setChanged();
         }
+    }
+
+    /** Client copy of the state the renderer draws; synced from the server in the block entity update tag. */
+    public AffixSorterVisualState visualState() {
+        return visualState;
+    }
+
+    /** The input the renderer draws on the reader; client side. */
+    public ItemStack displayInput() {
+        return displayInput;
+    }
+
+    /** The route the last sorted item took, which flashes on its collars; client side. */
+    public FaceRoute flashRoute() {
+        return flashRoute;
+    }
+
+    /** Game time of the last sort the client saw. */
+    public long flashTime() {
+        return flashTime;
+    }
+
+    public AffixSorterVisualState currentVisualState() {
+        return new AffixSorterVisualState(AffixSorterVisualState.pack(faces), inputStack().getItem());
+    }
+
+    private void syncVisualState(Level level) {
+        AffixSorterVisualState current = currentVisualState();
+        if (!current.equals(lastSyncedVisual)) {
+            lastSyncedVisual = current;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    private void applyVisualState(AffixSorterVisualState state) {
+        if (displayInput.getItem() != state.input()) {
+            displayInput = state.input() == Items.AIR ? ItemStack.EMPTY : new ItemStack(state.input());
+        }
+        visualState = state;
+        for (RelativeFace face : RelativeFace.values()) {
+            faces[face.ordinal()] = state.route(face);
+        }
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return currentVisualState().save();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        applyVisualState(AffixSorterVisualState.load(tag));
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        applyVisualState(AffixSorterVisualState.load(packet.getTag()));
+    }
+
+    @Override
+    public boolean triggerEvent(int id, int type) {
+        if (id != EVENT_SORTED) {
+            return super.triggerEvent(id, type);
+        }
+        if (level != null && level.isClientSide) {
+            flashRoute = type == SorterRule.Route.PASS.ordinal() ? FaceRoute.PASS : FaceRoute.REJECT;
+            flashTime = level.getGameTime();
+        }
+        return true;
     }
 
     public SorterRules sorterRules() {

@@ -43,6 +43,13 @@ public class AffixSorterBlock extends BaseMachineBlock {
         return new AffixSorterBlockEntity(pos, state);
     }
 
+    /** Sort events flash the route on the client's collars. */
+    @Override
+    protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
+        super.triggerEvent(state, level, pos, id, param);
+        return level.getBlockEntity(pos) instanceof AffixSorterBlockEntity sorter && sorter.triggerEvent(id, param);
+    }
+
     /** A Rule Card acts on the sorter instead of opening its screen. */
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,

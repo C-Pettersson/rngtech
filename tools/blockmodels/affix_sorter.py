@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Generate the Affix Sorter blockstate, block models, item model, owned textures, and its Gear and card sprites.
 
-The Affix Sorter is an Exotic sorting gate on the slate plinth. Identified items drop through the naquadah-rimmed
-hopper on the roof into the Exotic housing and come out onto a reading deck at the front, where a reader bridge reads
-their affixes; its reader strip lights pale teal while the sorter works. Two chutes at the front corners carry the
-items away: the Pass chute on the west, its mouth collared in dull green enamel, and the Reject chute on the east,
-collared in dull red. A card slot on the east flank takes the Rule Card, the status lamp sits on the bridge, and the
-cable port is on the back. Run from the repository root:
+The Affix Sorter is a squat Exotic sorting block on the slate plinth: a thick housing between a trim skirt and a heavy
+lid with a teal band, and a square port on every face, since every face routes items. Each side port is a chunky
+collar round a cable socket; the roof port's collar rings the reader, a glass floor that lights pale teal while the
+sorter works, and the item being read lies on it. The bottom port is an inlay under the plinth. The status lamp sits
+beside the front port. AffixSorterRenderer enamels each collar in the route its face is set to, green for Pass and
+red for Reject, leaving the bare trim collar on input faces; it also draws the item on the reader. The ring positions
+here match that renderer. Run from the repository root:
 
     python tools/blockmodels/affix_sorter.py
 
@@ -16,11 +17,10 @@ It also writes the Exotic Rule Core part sprite and the Rule Card sprite with th
 from __future__ import annotations
 
 import json
-import math
 import random
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "src/main/resources/assets/rngtech"
@@ -36,28 +36,34 @@ ROTATIONS = {"north": 0, "east": 90, "south": 180, "west": 270}
 
 # ---------------------------------------------------------------- geometry
 # The front faces north (z = 0); facing the front, east (+x) is on the left.
-HOUSING = ((2.0, 2.0, 4.0), (14.0, 12.0, 15.0))
-BAND_Y = (10.0, 10.5)
-PORT = ((4.0, 4.0, 15.0), (12.0, 12.0, 16.0))
-# Feed hopper on the roof, open on top, with the naquadah rim round its mouth.
-HOPPER = ((5.0, 12.0, 6.0), (11.0, 14.5, 12.0))
-HOPPER_WALL = 0.5
-# Reading deck along the front, and the reader bridge across it.
-DECK = ((4.5, 2.0, 1.0), (11.5, 4.5, 4.0))
-POSTS = (((4.5, 4.5, 1.5), (5.5, 9.0, 3.5)), ((10.5, 4.5, 1.5), (11.5, 9.0, 3.5)))
-BRIDGE = ((4.25, 9.0, 1.0), (11.75, 10.5, 4.0))
-READER = ((5.5, 8.9, 1.75), (10.5, 9.0, 3.25))
-# The reader's window on the bridge front, which lights with the strip below, and the status lamp beside it.
-WINDOW = ((6.25, 9.4, 0.9), (11.0, 10.1, 1.0))
-STATUS_LAMP = ((4.75, 9.4, 0.75), (5.75, 10.1, 1.0))
-# Chutes at the front corners: Pass on the west (low x), Reject on the east.
-CHUTES = {"pass": (0.75, 4.0), "reject": (12.0, 15.25)}
-CHUTE_Y = (2.0, 5.5)
-CHUTE_Z = (0.75, 4.0)
-CHUTE_WALL = 0.5
-COLLAR_DEPTH = 0.5
-# Rule Card slot on the east flank.
-CARD_SLOT = ((14.0, 5.5, 7.0), (14.25, 7.0, 12.0))
+PLINTH = ((0.0, 0.0, 0.0), (16.0, 2.0, 16.0))
+SKIRT = ((1.0, 2.0, 1.0), (15.0, 3.0, 15.0))
+BODY = ((1.5, 3.0, 1.5), (14.5, 12.5, 14.5))
+LID = ((1.0, 12.5, 1.0), (15.0, 13.5, 15.0))
+LID_BAND = ((0.9, 12.75, 0.9), (15.1, 13.25, 15.1))
+STATUS_LAMP = ((12.75, 10.75, 1.25), (14.0, 12.0, 1.5))
+# Every face has a port: a square collar ring round its mouth. A ring is (u0, v0, u1, v1) across the face and (d0, d1)
+# inward from the face's outer plane; see oriented(). The side collars stand proud of the body, the roof collar stands
+# on the lid round the reader, and the bottom inlay lies just under the plinth.
+SIDE_RING = (3.5, 3.25, 12.5, 12.25)
+SIDE_DEPTH = (0.5, 1.5)
+TOP_RING = (3.5, 3.5, 12.5, 12.5)
+TOP_DEPTH = (1.0, 2.5)
+BOTTOM_RING = TOP_RING
+BOTTOM_DEPTH = (-0.1, 0.0)
+RING_WIDTH = 2.0
+MOUTH_DEPTH = 0.1
+# Relative faces for the north-facing model, as AffixSorterBlockEntity.RelativeFace maps them.
+PORTS = {
+    "front": ("north", SIDE_RING, SIDE_DEPTH),
+    "back": ("south", SIDE_RING, SIDE_DEPTH),
+    "left": ("east", SIDE_RING, SIDE_DEPTH),
+    "right": ("west", SIDE_RING, SIDE_DEPTH),
+    "top": ("up", TOP_RING, TOP_DEPTH),
+    "bottom": ("down", BOTTOM_RING, BOTTOM_DEPTH),
+}
+# The default routes: Pass on the left, Reject on the right. The item model shows them enamelled.
+ITEM_ROUTES = {"left": "pass", "right": "reject"}
 
 
 def r(value: float) -> float:
@@ -80,85 +86,82 @@ def box(start, end, textures, faces=FACES, uv=None, extra=None):
     return element
 
 
-def housing_elements():
-    (x0, y0, z0), (x1, y1, z1) = HOUSING
+def oriented(face, u0, v0, u1, v1, d0, d1):
+    """A box given across a face (u, v) and inward from its outer plane (d), as model from/to corners."""
+    if face == "north":
+        a, b = (u0, v0, d0), (u1, v1, d1)
+    elif face == "south":
+        a, b = (u0, v0, 16 - d1), (u1, v1, 16 - d0)
+    elif face == "east":
+        a, b = (16 - d1, v0, u0), (16 - d0, v1, u1)
+    elif face == "west":
+        a, b = (d0, v0, u0), (d1, v1, u1)
+    elif face == "up":
+        a, b = (u0, 16 - d1, v0), (u1, 16 - d0, v1)
+    else:
+        a, b = (u0, d0, v0), (u1, d1, v1)
+    return a, b
+
+
+def ring_bars(ring, width):
+    u0, v0, u1, v1 = ring
     return [
-        box(HOUSING[0], HOUSING[1], "shell", faces=SIDES + ("up",)),
-        box((x0 - 0.1, BAND_Y[0], z0 - 0.1), (x1 + 0.1, BAND_Y[1], z1 + 0.1), "band", faces=SIDES),
-        box(*PORT, {"south": "port", "*": "casing"}, faces=("south", "east", "west", "up", "down"),
-            uv={"south": [0, 0, 16, 16]}),
-        box(*CARD_SLOT, "card_slot", faces=("east", "north", "south", "up", "down"), uv={"east": [0, 0, 16, 16]}),
+        (u0, v0, u1, v0 + width),
+        (u0, v1 - width, u1, v1),
+        (u0, v0 + width, u0 + width, v1 - width),
+        (u1 - width, v0 + width, u1, v1 - width),
     ]
 
 
-def hopper_elements(item: bool):
-    (hx0, hy0, hz0), (hx1, hy1, hz1) = HOPPER
-    w = HOPPER_WALL
-    walls = {"*": "trim"}
-    elements = [
-        box((hx0, hy0, hz0), (hx1, hy1, hz0 + w), {"south": "liner", **walls}),
-        box((hx0, hy0, hz1 - w), (hx1, hy1, hz1), {"north": "liner", **walls}),
-        box((hx0, hy0, hz0 + w), (hx0 + w, hy1, hz1 - w), {"east": "liner", **walls}, faces=("east", "west", "up")),
-        box((hx1 - w, hy0, hz0 + w), (hx1, hy1, hz1 - w), {"west": "liner", **walls}, faces=("east", "west", "up")),
-        box((hx0 - 0.1, hy1 - 1.0, hz0 - 0.1), (hx1 + 0.1, hy1 - 0.25, hz1 + 0.1), "rim", faces=SIDES),
-    ]
-    if not item:
-        elements.append(box((hx0 + w, hy0, hz0 + w), (hx1 - w, hy0 + 0.05, hz1 - w), "throat", faces=("up",),
-                            uv={"up": [0, 0, 16, 16]}))
-    return elements
+def port_elements(name, active: bool, item: bool):
+    face, ring, (d0, d1) = PORTS[name]
+    collar = f"enamel_{ITEM_ROUTES[name]}" if item and name in ITEM_ROUTES else "trim"
+    out = []
+    if face != "down":
+        for bar in ring_bars(ring, RING_WIDTH):
+            out.append(box(*oriented(face, *bar, d0, d1), collar))
+    else:
+        # The inlay under the plinth shows only from below.
+        for bar in ring_bars(ring, RING_WIDTH):
+            out.append(box(*oriented(face, *bar, d0, d1), collar, faces=("down",)))
+    u0, v0, u1, v1 = ring
+    w = RING_WIDTH
+    mouth = (u0 + w, v0 + w, u1 - w, v1 - w)
+    if face == "up":
+        reader = "reader_on" if active else "reader_off"
+        out.append(box(*oriented(face, *mouth, d1 - MOUTH_DEPTH, d1), reader, faces=("up",),
+                       uv={"up": [0, 0, 16, 16]}, extra=GLOW if active else None))
+    elif face == "down":
+        out.append(box(*oriented(face, *mouth, d0, d1), "port", faces=("down",), uv={"down": [0, 0, 16, 16]}))
+    else:
+        out.append(box(*oriented(face, *mouth, d1 - MOUTH_DEPTH, d1), "port", faces=(face,),
+                       uv={face: [0, 0, 16, 16]}))
+    return out
 
 
-def reader_elements(active: bool):
-    elements = [
-        box(*DECK, {"up": "deck", "*": "shell"}, faces=("north", "east", "west", "up"), uv={"up": [0, 0, 16, 16]}),
+def housing_elements(item: bool):
+    (bx0, by0, bz0), (bx1, by1, bz1) = BODY
+    out = [
+        box(*PLINTH, {"up": "plinth_top", "down": "casing", "*": "plinth_side"}),
+        box(*SKIRT, "trim", faces=SIDES + ("up",)),
     ]
-    for post in POSTS:
-        elements.append(box(*post, "trim", faces=SIDES))
-    reader = "reader_on" if active else "reader_off"
-    glow = GLOW if active else None
-    elements.append(box(*BRIDGE, "trim"))
-    elements.append(box(*READER, reader, faces=("down",), uv={"down": [0, 0, 16, 16]}, extra=glow))
-    elements.append(box(*WINDOW, reader, faces=("north", "east", "west", "up", "down"),
-                        uv={"north": [0, 6, 16, 10]}, extra=glow))
-    elements.append(box(*STATUS_LAMP, "lamp", faces=("north", "east", "west", "up", "down"), extra=GLOW))
-    return elements
-
-
-def chute_elements(name: str, item: bool):
-    """A square chute out of the housing's front corner, open at the front, with an enamel collar round its mouth."""
-    x0, x1 = CHUTES[name]
-    y0, y1 = CHUTE_Y
-    z0, z1 = CHUTE_Z
-    w = CHUTE_WALL
-    collar = f"collar_{name}"
-    elements = [
-        box((x0, y0, z0), (x1, y0 + w, z1), {"up": "liner", "*": "trim"}, faces=("north", "east", "west", "up")),
-        box((x0, y1 - w, z0), (x1, y1, z1), {"down": "liner", "*": "trim"}, faces=("north", "east", "west", "up", "down")),
-        box((x0, y0 + w, z0), (x0 + w, y1 - w, z1), {"east": "liner", "*": "trim"}, faces=("north", "east", "west")),
-        box((x1 - w, y0 + w, z0), (x1, y1 - w, z1), {"west": "liner", "*": "trim"}, faces=("north", "east", "west")),
-    ]
-    # The collar: a ring of enamel round the mouth, leaving the opening clear.
-    g, d = 0.1, COLLAR_DEPTH
-    ring = ("north", "east", "west", "up", "down")
-    elements += [
-        box((x0 - g, y1 - w, z0 - g), (x1 + g, y1 + g, z0 + d), collar, faces=ring),
-        box((x0 - g, y0 - 0.05, z0 - g), (x1 + g, y0 + w, z0 + d), collar, faces=ring),
-        box((x0 - g, y0 + w, z0 - g), (x0 + w, y1 - w, z0 + d), collar, faces=ring),
-        box((x1 - w, y0 + w, z0 - g), (x1 + g, y1 - w, z0 + d), collar, faces=ring),
-    ]
-    if not item:
-        elements.append(box((x0 + w, y0 + w, z1 - 0.05), (x1 - w, y1 - w, z1), "throat", faces=("north",),
-                            uv={"north": [0, 0, 16, 16]}))
-    return elements
+    if item:
+        # The body reaches the lid top and the lid keeps only its sides: a wiki icon has no depth buffer, and a lid
+        # top drawn after the far side of the roof collar would cover it.
+        out.append(box((bx0, by0, bz0), (bx1, LID[1][1], bz1), {"up": "trim", "*": "shell"}, faces=SIDES + ("up",)))
+        out.append(box(*LID, "trim", faces=SIDES))
+    else:
+        out.append(box(*BODY, "shell", faces=SIDES))
+        out.append(box(*LID, "trim"))
+    out.append(box(*LID_BAND, "band", faces=SIDES))
+    out.append(box(*STATUS_LAMP, "lamp", faces=("north", "east", "west", "up", "down"), extra=GLOW))
+    return out
 
 
 def elements(active: bool, item: bool = False):
-    out = [box((0, 0, 0), (16, 2, 16), {"up": "plinth_top", "down": "casing", "*": "plinth_side"})]
-    out += housing_elements()
-    out += hopper_elements(item)
-    out += reader_elements(active)
-    out += chute_elements("pass", item)
-    out += chute_elements("reject", item)
+    out = housing_elements(item)
+    for name in PORTS:
+        out += port_elements(name, active, item)
     return out
 
 
@@ -166,21 +169,14 @@ TEXTURE_MAP = {
     "particle": CRUSHER + "shell/exotic",
     "shell": CRUSHER + "shell/exotic",
     "trim": CRUSHER + "trim/exotic",
-    "rim": CRUSHER + "rim/naquadah",
     "casing": CRUSHER + "casing",
     "band": CRUSHER + "band",
     "port": CRUSHER + "port",
-    "liner": CRUSHER + "liner",
-    "throat": CRUSHER + "throat",
     "plinth_top": CRUSHER + "plinth_top",
     "plinth_side": CRUSHER + "plinth_side",
     "lamp": CRUSHER + "lamp_off",
-    "deck": TEX + "deck",
     "reader_off": TEX + "reader_off",
     "reader_on": TEX + "reader_on",
-    "collar_pass": TEX + "collar_pass",
-    "collar_reject": TEX + "collar_reject",
-    "card_slot": TEX + "card_slot",
 }
 
 
@@ -205,10 +201,11 @@ def write_models() -> None:
             "textures": textures(active),
             "elements": elements(active),
         })
-    # The item shows the lit reader and leaves out the hopper floor and the chutes' back walls, which a wiki icon
-    # without a depth buffer would draw over the parts in front of them.
+    # The item shows the lit reader and the default routes enamelled on their collars.
     item_textures = textures(True)
     item_textures["lamp"] = CRUSHER + "lamp_off"
+    for route in sorted(set(ITEM_ROUTES.values())):
+        item_textures[f"enamel_{route}"] = TEX + f"enamel_{route}"
     write_json(MODELS / "item/affix_sorter.json", {
         "parent": "minecraft:block/block",
         "render_type": "minecraft:cutout",
@@ -248,8 +245,8 @@ def shade(color, amount):
     return tuple(clamp(c + amount) for c in color[:3])
 
 
-def mix(a, b, t):
-    return tuple(clamp(a[i] + (b[i] - a[i]) * t) for i in range(3))
+def multiply(a, b):
+    return tuple(clamp(a[i] * b[i] / 255) for i in range(3))
 
 
 def noisy(size, color, name, amount=6, streak=0):
@@ -269,86 +266,60 @@ def save(image, name):
     image.save(path)
 
 
-# The Exotic chassis palette (crusher.py), the RNGTech teal, and the reader's pale teal after the Identifying Fluid.
-EXOTIC_SHELL = (50, 42, 62)
+# The Exotic chassis palette (crusher.py), and the reader's pale teal after the Identifying Fluid.
 EXOTIC_TRIM = (76, 66, 92)
-EXOTIC_GLOW = (170, 96, 222)
-TEAL = (47, 179, 194)
-TEAL_DARK = (22, 92, 104)
 READ_GLOW = (0xB8, 0xF2, 0xE6)
-# Dull enamels, so the chutes read apart without looking like signal lights.
-PASS_ENAMEL = (58, 98, 74)
-REJECT_ENAMEL = (110, 56, 56)
-
-
-def deck_texture():
-    """The reading deck: a dark slat belt between trim rails, with a teal reading line across its middle."""
-    image = noisy(64, (28, 24, 34), "deck", amount=3)
-    pixels = image.load()
-    for y in range(64):
-        for x in range(64):
-            if x < 4 or x > 59:
-                pixels[x, y] = (*shade(EXOTIC_TRIM, 8 if x in (0, 60) else -6), 255)
-            elif y % 6 == 0:
-                pixels[x, y] = (*shade(pixels[x, y], -10), 255)
-            elif y % 6 == 1:
-                pixels[x, y] = (*shade(pixels[x, y], 12), 255)
-    for x in range(6, 58):
-        for y in (31, 32):
-            pixels[x, y] = (*mix(pixels[x, y], TEAL_DARK, 0.7), 255)
-    return image
+# The route colours of the Process tab; the renderer tints the pale enamel with them.
+PASS = (0x4E, 0x8A, 0x4A)
+REJECT = (0xA6, 0x47, 0x3E)
+ENAMEL = (236, 236, 232)
 
 
 def reader_texture(lit: bool):
-    """The reader strip under the bridge: a glass bar in a bezel, pale teal and bright when lit."""
+    """The reader in the roof port: a glass floor in a bezel with a cross-hair, pale teal and bright when lit."""
     core = READ_GLOW if lit else (26, 46, 54)
     image = noisy(64, core, "reader_on" if lit else "reader_off", amount=3)
     pixels = image.load()
     for y in range(64):
         for x in range(64):
-            if min(x, y, 63 - x, 63 - y) < 4:
+            edge = min(x, y, 63 - x, 63 - y)
+            if edge < 4:
                 pixels[x, y] = (*shade(EXOTIC_TRIM, -14), 255)
-            elif lit and 26 < y < 37:
-                pixels[x, y] = (*shade(pixels[x, y], 22), 255)
-            elif not lit and y == 10:
-                pixels[x, y] = (*shade(pixels[x, y], 24), 255)
+            elif x in (31, 32) or y in (31, 32):
+                pixels[x, y] = (*shade(pixels[x, y], 22 if lit else 14), 255)
     return image
 
 
-def collar_texture(name, enamel):
-    """A chute collar mapped by position: dull enamel with a darker lip line, worn at the edges."""
-    image = noisy(64, enamel, f"collar_{name}", amount=5, streak=2)
+def enamel_texture():
+    """Pale, slightly worn enamel with a darker lip every 16 texels, so collar edges read at any size."""
+    image = noisy(64, ENAMEL, "enamel", amount=4, streak=2)
     pixels = image.load()
-    rand = rng(f"collar_{name}_wear")
+    rand = rng("enamel_wear")
     for y in range(64):
         for x in range(64):
-            if y % 16 == 0:
-                pixels[x, y] = (*shade(enamel, -30), 255)
-            elif rand.random() < 0.05:
-                pixels[x, y] = (*mix(pixels[x, y], EXOTIC_TRIM, 0.6), 255)
+            if x % 16 in (0, 15) or y % 16 in (0, 15):
+                pixels[x, y] = (*shade(pixels[x, y], -34), 255)
+            elif rand.random() < 0.04:
+                pixels[x, y] = (*shade(pixels[x, y], -22), 255)
     return image
 
 
-def card_slot_texture():
-    """The Rule Card slot: a dark slit in a trim plate, with a small teal contact strip beside it."""
-    image = noisy(64, shade(EXOTIC_TRIM, -6), "card_slot", amount=4)
-    draw = ImageDraw.Draw(image)
-    draw.rectangle([0, 0, 63, 63], outline=(*shade(EXOTIC_TRIM, -28), 255), width=2)
-    draw.rectangle([8, 26, 55, 37], fill=(10, 8, 14, 255), outline=(*shade(EXOTIC_TRIM, 28), 255))
-    draw.rectangle([10, 30, 53, 33], fill=(4, 4, 6, 255))
-    for x in range(10, 54, 4):
-        draw.point((x, 44), fill=(*TEAL, 255))
-        draw.point((x + 1, 44), fill=(*TEAL_DARK, 255))
-    return image
+def tinted(image, color):
+    out = image.copy()
+    pixels = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            pixels[x, y] = (*multiply(pixels[x, y], color), 255)
+    return out
 
 
 def write_textures() -> None:
-    save(deck_texture(), "deck")
     save(reader_texture(False), "reader_off")
     save(reader_texture(True), "reader_on")
-    save(collar_texture("pass", PASS_ENAMEL), "collar_pass")
-    save(collar_texture("reject", REJECT_ENAMEL), "collar_reject")
-    save(card_slot_texture(), "card_slot")
+    enamel = enamel_texture()
+    save(enamel, "enamel")
+    save(tinted(enamel, PASS), "enamel_pass")
+    save(tinted(enamel, REJECT), "enamel_reject")
 
 
 # ---------------------------------------------------------------- item sprites

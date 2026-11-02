@@ -47,14 +47,7 @@ Each item costs FE. The cost grows faster than the number of enabled rules: 4 kF
 
 Disabled rules cost nothing. The bottom of the Rules tab shows the cost per item now. Hover it to see the cost with one more rule. Each item takes 1 second at base speed.
 
-### Routes and faces
-
-Each face of the sorter is an **input**, a **Pass** face, or a **Reject** face. Click a face on the Process tab to change it. By default, the left face is Pass and the right face is Reject, as seen from the front.
-
-- Cables and hoppers insert items through input faces.
-- Cables and hoppers extract items through Pass and Reject faces. The sorter never pushes items out.
-- Each route has three buffer slots. When the buffer for an item is full, the sorter stops. It never reroutes or voids an item.
-- The sorter accepts only identified items.
+- [Routes and faces](rngtech:affix-sorter/routes-and-faces.md)
 
 ### Rule Card
 
@@ -72,6 +65,16 @@ A <ItemLink id="rngtech:rule_card" /> copies a rule list from one sorter to anot
 | Servo | No | Any Servo, for speed. |
 | Battery Cell | No | Any Battery Cell. Without one, the sorter runs 20% slower. |
 
+## Screen
+
+The Affix Sorter has five tabs:
+
+- **Process**: the input slot, the Pass and Reject buffers, the face settings, the energy bar, and progress. The route stripe beside each buffer lights for the last route.
+- **Gear**: the Battery Cell, Rule Core, and Servo slots.
+- **Stats**: Processing Speed, Energy Use, Energy Capacity, and Rule Capacity.
+- **Refinement**: refine the placed sorter with a catalyst.
+- **Rules**: the rule list on the left and the selected rule on the right. A mark at the end of a row shows the rule that decided the last item.
+
 ## Obtaining
 
 - [Crafting](rngtech:affix-sorter/crafting.md)
@@ -79,7 +82,3 @@ A <ItemLink id="rngtech:rule_card" /> copies a rule list from one sorter to anot
 ### Breaking
 
 Mine the Affix Sorter with a pickaxe. It keeps its traits and its rules. The items in its slots drop.
-
-## More
-
-- [Screen](rngtech:affix-sorter/screen.md)

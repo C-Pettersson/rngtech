@@ -83,15 +83,22 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
     private static final int FACE_CELL = 8;
     private static final int FACE_NET_X = 80;
     private static final int FACE_NET_Y = 71;
+    private static final int BASE_IMAGE_WIDTH = 240;
+    private static final int BASE_IMAGE_HEIGHT = 200;
+    // The Rules tab hides the player inventory, so it takes a wider panel for its text.
+    private static final int RULES_IMAGE_WIDTH = 348;
+    private static final int RULES_IMAGE_HEIGHT = 236;
     private static final int LIST_X = 8;
     private static final int LIST_Y = 20;
-    private static final int LIST_WIDTH = 90;
-    private static final int ROW_HEIGHT = 11;
-    private static final int VISIBLE_ROWS = 12;
-    private static final int EDITOR_X = 102;
-    private static final int EDITOR_WIDTH = 130;
-    private static final int LINE = 12;
-    private static final int PICKER_ROWS = 11;
+    private static final int LIST_WIDTH = 110;
+    private static final int ROW_HEIGHT = 13;
+    private static final int VISIBLE_ROWS = 13;
+    private static final int EDITOR_X = 126;
+    private static final int EDITOR_WIDTH = 214;
+    private static final int LABEL_WIDTH = 40;
+    private static final int LINE = 15;
+    private static final int AFFIX_LINE = 11;
+    private static final int PICKER_ROWS = 12;
     private static final String[] STAT_LABEL_KEYS = {
             "rngtech.stat.processing_speed",
             "rngtech.stat.energy_usage",
@@ -123,8 +130,8 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
 
     public AffixSorterScreen(AffixSorterMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-        imageWidth = 240;
-        imageHeight = 200;
+        imageWidth = BASE_IMAGE_WIDTH;
+        imageHeight = BASE_IMAGE_HEIGHT;
         inventoryLabelX = 39;
         inventoryLabelY = 104;
         tabs = MachineTabs.builder(this)
@@ -144,6 +151,7 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
 
     @Override
     protected void init() {
+        updateImageSizeForSelectedTab();
         super.init();
         search = new EditBox(font, leftPos + EDITOR_X + 2, topPos + 20, EDITOR_WIDTH - 4, 12, Component.translatable("rngtech.affix_sorter.search"));
         search.setMaxLength(40);
@@ -154,6 +162,16 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
 
     private boolean rulesTab() {
         return menu.selectedTab() == AffixSorterMenu.TAB_RULES;
+    }
+
+    private void updateImageSizeForSelectedTab() {
+        imageWidth = rulesTab() ? RULES_IMAGE_WIDTH : BASE_IMAGE_WIDTH;
+        imageHeight = rulesTab() ? RULES_IMAGE_HEIGHT : BASE_IMAGE_HEIGHT;
+        leftPos = (width - imageWidth) / 2;
+        topPos = (height - imageHeight) / 2;
+        if (search != null) {
+            search.setPosition(leftPos + EDITOR_X + 2, topPos + 20);
+        }
     }
 
     @Override
@@ -240,6 +258,7 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
             if (tab >= 0) {
                 menu.selectTab(tab);
                 picking = false;
+                updateImageSizeForSelectedTab();
                 if (minecraft != null && minecraft.gameMode != null) {
                     minecraft.gameMode.handleInventoryButtonClick(menu.containerId, WorkOrderMenuSupport.BUTTON_SELECT_TAB + menu.selectedTab());
                 }
@@ -527,8 +546,8 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
             }
             int textColor = rule.enabled() && enabledSeen <= capacity ? TEXT : TEXT_MUTED;
             String label = (index + 1) + " " + summary(rule).getString();
-            guiGraphics.drawString(font, clip(label, LIST_WIDTH - 20), x + 6, rowY + 2, textColor, false);
-            renderCheck(guiGraphics, x + LIST_WIDTH - 14, rowY + 1, rule.enabled());
+            guiGraphics.drawString(font, clip(label, LIST_WIDTH - 20), x + 6, rowY + 3, textColor, false);
+            renderCheck(guiGraphics, x + LIST_WIDTH - 14, rowY + 2, rule.enabled());
             hits.add(new Hit(x + LIST_WIDTH - 14, rowY, 10, ROW_HEIGHT - 1, () -> toggleEnabled(rowIndex),
                     Component.translatable(rule.enabled() ? "rngtech.affix_sorter.rule.disable" : "rngtech.affix_sorter.rule.enable")));
             hits.add(new Hit(x, rowY, LIST_WIDTH - 14, ROW_HEIGHT - 1, () -> {
@@ -537,23 +556,23 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
             }, describe(rule)));
         }
         int buttonY = y + VISIBLE_ROWS * ROW_HEIGHT + 4;
-        button(guiGraphics, x, buttonY, 14, "+", Component.translatable("rngtech.affix_sorter.rule.add"), this::addRule);
-        button(guiGraphics, x + 16, buttonY, 14, "-", Component.translatable("rngtech.affix_sorter.rule.remove"), () -> {
+        button(guiGraphics, x, buttonY, 20, "+", Component.translatable("rngtech.affix_sorter.rule.add"), this::addRule);
+        button(guiGraphics, x + 24, buttonY, 20, "-", Component.translatable("rngtech.affix_sorter.rule.remove"), () -> {
             if (selected() != null) {
                 commit(rules().withRemoved(selectedRule));
                 selectedRule = Math.min(selectedRule, rules().rules().size() - 1);
             }
         });
-        button(guiGraphics, x + 32, buttonY, 14, "↑", Component.translatable("rngtech.affix_sorter.rule.up"), () -> move(-1));
-        button(guiGraphics, x + 48, buttonY, 14, "↓", Component.translatable("rngtech.affix_sorter.rule.down"), () -> move(1));
+        button(guiGraphics, x + 48, buttonY, 20, "↑", Component.translatable("rngtech.affix_sorter.rule.up"), () -> move(-1));
+        button(guiGraphics, x + 72, buttonY, 20, "↓", Component.translatable("rngtech.affix_sorter.rule.down"), () -> move(1));
         SorterRule.Route fallback = rules().fallback();
         Component fallbackLabel = Component.translatable("rngtech.affix_sorter.fallback." + fallback.getSerializedName());
         int fallbackX = x;
         int fallbackY = buttonY + 14;
         int width = LIST_WIDTH;
-        guiGraphics.fill(fallbackX, fallbackY, fallbackX + width, fallbackY + 11, fallback == SorterRule.Route.PASS ? PASS : REJECT);
+        guiGraphics.fill(fallbackX, fallbackY, fallbackX + width, fallbackY + 12, fallback == SorterRule.Route.PASS ? PASS : REJECT);
         guiGraphics.drawString(font, clip(fallbackLabel.getString(), width - 4), fallbackX + 3, fallbackY + 2, 0xFFFFFFFF, false);
-        hits.add(new Hit(fallbackX, fallbackY, width, 11, () -> commit(rules().withFallback(fallback.toggled())),
+        hits.add(new Hit(fallbackX, fallbackY, width, 12, () -> commit(rules().withFallback(fallback.toggled())),
                 Component.translatable("rngtech.affix_sorter.fallback.hint")));
     }
 
@@ -593,16 +612,16 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
         }
         int row = y;
         // Route, pulse
-        chip(guiGraphics, x, row, 50, Component.translatable("rngtech.affix_sorter.route." + rule.route().getSerializedName()),
+        chip(guiGraphics, x, row, 70, Component.translatable("rngtech.affix_sorter.route." + rule.route().getSerializedName()),
                 rule.route() == SorterRule.Route.PASS ? PASS : REJECT, Component.translatable("rngtech.affix_sorter.route.hint"),
                 () -> edit(rule.withRoute(rule.route().toggled())));
-        chip(guiGraphics, x + 54, row, 50, Component.translatable("rngtech.affix_sorter.pulse"), rule.pulse() ? STAT_ACCENT : PANEL_DARK,
+        chip(guiGraphics, x + 74, row, 70, Component.translatable("rngtech.affix_sorter.pulse"), rule.pulse() ? STAT_ACCENT : PANEL_DARK,
                 Component.translatable("rngtech.affix_sorter.pulse.hint"), () -> edit(rule.withPulse(!rule.pulse())));
         row += LINE + 1;
 
         // Items and tag
         label(guiGraphics, "rngtech.affix_sorter.cond.items", x, row);
-        int itemX = x + 30;
+        int itemX = x + LABEL_WIDTH;
         for (int index = 0; index < rule.items().size(); index++) {
             Item item = rule.items().get(index);
             int slotX = itemX + index * 16;
@@ -621,15 +640,15 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
         row += LINE + 2;
         label(guiGraphics, "rngtech.affix_sorter.cond.tag", x, row);
         String tagText = rule.tag().map(ResourceLocation::toString).orElseGet(() -> Component.translatable("rngtech.affix_sorter.any").getString());
-        chip(guiGraphics, x + 30, row, EDITOR_WIDTH - 30, Component.literal(tagText), PANEL_DARK,
+        chip(guiGraphics, x + LABEL_WIDTH, row, EDITOR_WIDTH - LABEL_WIDTH, Component.literal(tagText), PANEL_DARK,
                 Component.translatable("rngtech.affix_sorter.cond.tag_hint"), () -> cycleTag(rule));
         row += LINE;
 
         // Stage range
         label(guiGraphics, "rngtech.affix_sorter.cond.stage", x, row);
-        stepper(guiGraphics, x + 30, row, String.valueOf(rule.minStage()), () -> edit(rule.withStages(rule.minStage() - 1, rule.maxStage())),
+        stepper(guiGraphics, x + LABEL_WIDTH, row, String.valueOf(rule.minStage()), () -> edit(rule.withStages(rule.minStage() - 1, rule.maxStage())),
                 () -> edit(rule.withStages(Math.min(rule.maxStage(), rule.minStage() + 1), rule.maxStage())));
-        stepper(guiGraphics, x + 78, row, String.valueOf(rule.maxStage()), () -> edit(rule.withStages(rule.minStage(), Math.max(rule.minStage(), rule.maxStage() - 1))),
+        stepper(guiGraphics, x + LABEL_WIDTH + 60, row, String.valueOf(rule.maxStage()), () -> edit(rule.withStages(rule.minStage(), Math.max(rule.minStage(), rule.maxStage() - 1))),
                 () -> edit(rule.withStages(rule.minStage(), rule.maxStage() + 1)));
         row += LINE;
 
@@ -637,8 +656,8 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
         label(guiGraphics, "rngtech.affix_sorter.cond.rarity", x, row);
         for (Rarity rarity : Rarity.values()) {
             boolean on = rule.rarities().contains(rarity);
-            int chipX = x + 30 + rarity.ordinal() * 25;
-            chip(guiGraphics, chipX, row, 23, Component.translatable(rarity.translationKey()).copy(), on ? RARITY_COLORS[rarity.ordinal()] : PANEL_DARK,
+            int chipX = x + LABEL_WIDTH + rarity.ordinal() * 43;
+            chip(guiGraphics, chipX, row, 41, Component.translatable(rarity.translationKey()).copy(), on ? RARITY_COLORS[rarity.ordinal()] : PANEL_DARK,
                     Component.translatable("rngtech.affix_sorter.cond.rarity_hint"), () -> {
                         List<Rarity> next = new ArrayList<>(rule.rarities());
                         if (on) {
@@ -654,7 +673,7 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
         // Affixes
         label(guiGraphics, "rngtech.affix_sorter.cond.affixes", x, row);
         if (!rule.affixes().isEmpty()) {
-            stepper(guiGraphics, x + 46, row, Component.translatable("rngtech.affix_sorter.cond.at_least", rule.minAffixMatches()).getString(),
+            stepper(guiGraphics, x + LABEL_WIDTH + 8, row, Component.translatable("rngtech.affix_sorter.cond.at_least", rule.minAffixMatches()).getString(),
                     () -> edit(rule.withAffixes(rule.affixes(), rule.minAffixMatches() - 1)),
                     () -> edit(rule.withAffixes(rule.affixes(), rule.minAffixMatches() + 1)));
         }
@@ -674,11 +693,11 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
             int conditionIndex = index;
             ModifierDefinition definition = known.get(condition.affixId());
             String name = definition == null ? condition.affixId() : affixLabel(definition).getString();
-            guiGraphics.drawString(font, clip(name, EDITOR_WIDTH - 52), x + 2, row, TEXT, false);
+            guiGraphics.drawString(font, clip(name, EDITOR_WIDTH - 60), x + 2, row, TEXT, false);
             String tier = condition.minTier() <= 0
                     ? Component.translatable("rngtech.affix_sorter.any").getString()
                     : "T" + condition.minTier() + "+";
-            stepper(guiGraphics, x + EDITOR_WIDTH - 50, row, tier,
+            stepper(guiGraphics, x + EDITOR_WIDTH - 54, row, tier,
                     () -> editAffix(rule, conditionIndex, new SorterRule.AffixCondition(condition.affixId(), condition.minTier() - 1)),
                     () -> editAffix(rule, conditionIndex, new SorterRule.AffixCondition(condition.affixId(), condition.minTier() + 1)));
             button(guiGraphics, x + EDITOR_WIDTH - 10, row - 1, 10, "x", Component.translatable("rngtech.affix_sorter.cond.affix_remove"), () -> {
@@ -686,24 +705,24 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
                 next.remove(conditionIndex);
                 edit(rule.withAffixes(next, rule.minAffixMatches()));
             });
-            row += LINE - 2;
+            row += AFFIX_LINE;
         }
-        row = Math.max(row, topPos + LIST_Y + 7 * LINE + 6 * (LINE - 2) - 6);
+        row = Math.max(row, y + 6 * LINE + 4 + SorterRule.MAX_AFFIXES * AFFIX_LINE + 2);
 
         // Thresholds and states
         stepperLabeled(guiGraphics, x, row, "rngtech.affix_sorter.cond.quality", rule.minQuality(),
                 () -> edit(rule.withThresholds(rule.minQuality() - 1, rule.minRefinementPotential(), rule.minUniqueQuality())),
                 () -> edit(rule.withThresholds(rule.minQuality() + 1, rule.minRefinementPotential(), rule.minUniqueQuality())));
-        stepperLabeled(guiGraphics, x + 66, row, "rngtech.affix_sorter.cond.rp", rule.minRefinementPotential(),
+        stepperLabeled(guiGraphics, x + 80, row, "rngtech.affix_sorter.cond.rp", rule.minRefinementPotential(),
                 () -> edit(rule.withThresholds(rule.minQuality(), rule.minRefinementPotential() - 1, rule.minUniqueQuality())),
                 () -> edit(rule.withThresholds(rule.minQuality(), rule.minRefinementPotential() + 1, rule.minUniqueQuality())));
-        row += LINE;
-        stepperLabeled(guiGraphics, x, row, "rngtech.affix_sorter.cond.unique", rule.minUniqueQuality(),
+        stepperLabeled(guiGraphics, x + 140, row, "rngtech.affix_sorter.cond.unique", rule.minUniqueQuality(),
                 () -> edit(rule.withThresholds(rule.minQuality(), rule.minRefinementPotential(), rule.minUniqueQuality() - 5)),
                 () -> edit(rule.withThresholds(rule.minQuality(), rule.minRefinementPotential(), rule.minUniqueQuality() + 5)));
-        chip(guiGraphics, x + 66, row, 31, stateLabel("corrupted", rule.corrupted()), PANEL_DARK,
+        row += LINE;
+        chip(guiGraphics, x, row, 105, stateLabel("corrupted", rule.corrupted()), PANEL_DARK,
                 Component.translatable("rngtech.affix_sorter.cond.corrupted_hint"), () -> edit(rule.withStates(rule.corrupted().next(), rule.mirrored())));
-        chip(guiGraphics, x + 99, row, 31, stateLabel("mirrored", rule.mirrored()), PANEL_DARK,
+        chip(guiGraphics, x + 109, row, 105, stateLabel("mirrored", rule.mirrored()), PANEL_DARK,
                 Component.translatable("rngtech.affix_sorter.cond.mirrored_hint"), () -> edit(rule.withStates(rule.corrupted(), rule.mirrored().next())));
     }
 
@@ -759,7 +778,7 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
             ModifierDefinition definition = options.get(pickerScroll + row);
             int rowY = y + row * ROW_HEIGHT;
             guiGraphics.fill(x, rowY, x + EDITOR_WIDTH, rowY + ROW_HEIGHT - 1, ROW);
-            guiGraphics.drawString(font, clip(affixLabel(definition).getString(), EDITOR_WIDTH - 6), x + 3, rowY + 2, TEXT, false);
+            guiGraphics.drawString(font, clip(affixLabel(definition).getString(), EDITOR_WIDTH - 6), x + 3, rowY + 3, TEXT, false);
             hits.add(new Hit(x, rowY, EDITOR_WIDTH, ROW_HEIGHT - 1, () -> {
                 List<SorterRule.AffixCondition> next = new ArrayList<>(rule.affixes());
                 next.add(new SorterRule.AffixCondition(definition.id(), 0));
@@ -768,7 +787,7 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
                 search.setFocused(false);
             }, MachineModifierText.definitionStats(definition)));
         }
-        button(guiGraphics, x + EDITOR_WIDTH - 30, y + PICKER_ROWS * ROW_HEIGHT + 3, 30, Component.translatable("gui.cancel").getString(), null, () -> {
+        button(guiGraphics, x + EDITOR_WIDTH - 40, y + PICKER_ROWS * ROW_HEIGHT + 3, 40, Component.translatable("gui.cancel").getString(), null, () -> {
             picking = false;
             search.setFocused(false);
         });

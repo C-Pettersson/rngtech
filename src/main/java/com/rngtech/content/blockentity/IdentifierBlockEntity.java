@@ -44,8 +44,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -55,6 +59,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -228,9 +233,14 @@ public class IdentifierBlockEntity extends BaseMachineBlockEntity
         }
     };
 
+    private static final int VISUAL_SYNC_INTERVAL = 5;
+
     private int progress;
     private ItemStack activeInput = ItemStack.EMPTY;
     private int internalEnergy;
+    private IdentifierVisualState visualState = IdentifierVisualState.IDLE;
+    private IdentifierVisualState.Key lastSyncedVisual;
+    private final IdentifierVisualState.Animation animation = new IdentifierVisualState.Animation();
 
     public IdentifierBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.IDENTIFIER.get(), pos, blockState, MachineType.IDENTIFIER, SLOT_INPUT, SLOT_INPUT, SLOT_OUTPUT);
@@ -241,6 +251,56 @@ public class IdentifierBlockEntity extends BaseMachineBlockEntity
         identifier.tickWorkOrders(level);
         identifier.drainFluidContainer();
         identifier.tickWork(level, pos, state);
+        identifier.syncVisualState(level);
+    }
+
+    public IdentifierVisualState visualState() {
+        return visualState;
+    }
+
+    public IdentifierVisualState.Animation animation() {
+        return animation;
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return withNoiseFactor(currentVisualState().save(registries));
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        readNoiseFactor(tag);
+        visualState = IdentifierVisualState.load(tag, registries);
+    }
+
+    @Override
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        readNoiseFactor(packet.getTag());
+        visualState = IdentifierVisualState.load(packet.getTag(), registries);
+    }
+
+    private void syncVisualState(Level level) {
+        if (level.getGameTime() % VISUAL_SYNC_INTERVAL != 0) {
+            return;
+        }
+        IdentifierVisualState.Key key = currentVisualState().key();
+        if (!key.equals(lastSyncedVisual)) {
+            lastSyncedVisual = key;
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    public IdentifierVisualState currentVisualState() {
+        ItemStack input = activeInput.isEmpty() ? inputStack() : activeInput;
+        boolean working = getBlockState().getValue(BaseMachineBlock.ACTIVE);
+        float fill = tank.getCapacity() <= 0 ? 0.0F : tank.getFluidAmount() / (float) tank.getCapacity();
+        return new IdentifierVisualState(input.isEmpty() ? ItemStack.EMPTY : input.copyWithCount(1), working,
+                working ? processingTicks(effectiveStats()) : 0, fill);
     }
 
     private void tickWork(Level level, BlockPos pos, BlockState state) {
