@@ -36,6 +36,7 @@ public record MegaPassiveNode(
     /** Starts and keystones are drawn with their own {@code textures/gui/mastery/<id>.png}; other nodes show their first stat. */
     @Override public String masteryIconKey() {
         if (kind == PassiveNodeKind.STARTER || kind == PassiveNodeKind.KEYSTONE) { return id; }
+        if (kind == PassiveNodeKind.JEWEL_SOCKET) { return "jewel_socket"; }
         return statIconKey(effects, tagged);
     }
     /** The shared stat icon for a node's first effect. */
@@ -59,7 +60,7 @@ public record MegaPassiveNode(
         return kind == PassiveNodeKind.STARTER ? id.equals(progression.startNodeId()) : progression.hasNode(index);
     }
     @Override public int size() {
-        return switch (kind) { case STARTER -> 40; case TRAVEL -> 12; case NODE -> 18; case NOTABLE -> 34; case KEYSTONE -> 48; };
+        return switch (kind) { case STARTER -> 40; case TRAVEL -> 12; case NODE -> 18; case NOTABLE -> 34; case KEYSTONE -> 48; case JEWEL_SOCKET -> 24; };
     }
     public boolean blocksBatteryCell() { return behaviors.contains("BLOCK_BATTERY"); }
     public boolean requiresMatchingCrushHeadStage() { return behaviors.contains("MATCHING_HEAD"); }

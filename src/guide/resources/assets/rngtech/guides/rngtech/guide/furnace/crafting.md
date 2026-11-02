@@ -16,6 +16,8 @@ Each stage has its own recipe. You do not need the previous stage's Furnace to c
 
 <RecipesFor id="rngtech:copper_furnace_chassis" />
 
+<RecipesFor id="rngtech:gold_furnace_chassis" />
+
 <RecipesFor id="rngtech:bronze_furnace_chassis" />
 
 <RecipesFor id="rngtech:steel_furnace_chassis" />
@@ -33,6 +35,7 @@ Each stage has its own recipe. You do not need the previous stage's Furnace to c
 - Requires the Iron material to be enabled.
 - Requires the Copper material to be enabled.
 - **Calibrated Thermal Component** must be a Thermal calibration, Stage 2+, stability 45+.
+- Requires the Gold material to be enabled.
 - Requires the Bronze material to be enabled.
 - **Calibrated Thermal Component** must be a Thermal calibration, Stage 2+, stability 55+.
 - Requires the Steel material to be enabled.

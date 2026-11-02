@@ -4,6 +4,7 @@ import com.rngtech.content.affixsorter.SorterRules;
 import com.rngtech.content.affixsorter.SorterRulesHost;
 import com.rngtech.content.block.AffixSorterBlock;
 import com.rngtech.content.blockentity.AffixSorterBlockEntity;
+import com.rngtech.content.jewel.JewelSockets;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
@@ -20,17 +21,19 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class AffixSorterMenu extends AbstractContainerMenu implements StatBreakdownMenu, SorterRulesHost {
+public class AffixSorterMenu extends AbstractContainerMenu implements StatBreakdownMenu, SorterRulesHost, JewelMenuView {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
     public static final int TAB_REFINEMENT = 3;
     public static final int TAB_RULES = 4;
+    public static final int TAB_JEWELS = 5;
     /** Clicking a face button cycles that face between input, Pass, and Reject. */
     public static final int BUTTON_FACE_BASE = 8000;
 
@@ -109,7 +112,24 @@ public class AffixSorterMenu extends AbstractContainerMenu implements StatBreakd
         addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
 
         addPlayerInventory(playerInventory);
+        IItemHandler sockets = playerInventory.player.level().isClientSide ? JewelSockets.client() : new JewelSockets(sorter);
+        for (int index = 0; index < JewelSockets.SLOTS; index++) {
+            int slot = index;
+            addSlot(new JewelSocketSlot(sockets, slot, () -> jewelsTabSelected() && jewelSlotOpen(slot)));
+        }
         addDataSlots(data);
+    }
+
+    private static final int JEWEL_SLOT_START = HOTBAR_END;
+
+    @Override public ItemStack jewel(int index) {
+        return index >= 0 && index < JewelSockets.SLOTS ? getSlot(JEWEL_SLOT_START + index).getItem() : ItemStack.EMPTY;
+    }
+    @Override public int jewelTreeCapacity() { return 0; }
+    @Override public int jewelBodyCapacity() { return JewelSockets.bodySockets(machineTraits()); }
+    @Override public boolean jewelsTabSelected() { return selectedTab == TAB_JEWELS; }
+    private boolean jewelSlotOpen(int index) {
+        return !JewelSocketSlot.isTreeSlot(index) && index - JewelSockets.BODY_START < jewelBodyCapacity();
     }
 
     public void selectTab(int tab) {
@@ -118,6 +138,7 @@ public class AffixSorterMenu extends AbstractContainerMenu implements StatBreakd
             case TAB_STATS -> TAB_STATS;
             case TAB_REFINEMENT -> TAB_REFINEMENT;
             case TAB_RULES -> TAB_RULES;
+            case TAB_JEWELS -> TAB_JEWELS;
             default -> TAB_PROCESSING;
         };
     }
@@ -212,7 +233,7 @@ public class AffixSorterMenu extends AbstractContainerMenu implements StatBreakd
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id >= WorkOrderMenuSupport.BUTTON_SELECT_TAB && id <= WorkOrderMenuSupport.BUTTON_SELECT_TAB + TAB_RULES) {
+        if (id >= WorkOrderMenuSupport.BUTTON_SELECT_TAB && id <= WorkOrderMenuSupport.BUTTON_SELECT_TAB + TAB_JEWELS) {
             selectTab(id - WorkOrderMenuSupport.BUTTON_SELECT_TAB);
             return true;
         }
@@ -255,7 +276,16 @@ public class AffixSorterMenu extends AbstractContainerMenu implements StatBreakd
         ItemStack stack = slot.getItem();
         ItemStack moved = stack.copy();
 
-        if (index < PLAYER_INVENTORY_START) {
+        if (index >= HOTBAR_END) {
+            if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, true)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (selectedTab == TAB_JEWELS && index >= PLAYER_INVENTORY_START && JewelSockets.accepts(stack) && jewelBodyCapacity() > 0) {
+            int first = JEWEL_SLOT_START + JewelSockets.BODY_START;
+            if (!moveItemStackTo(stack, first, first + jewelBodyCapacity(), false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (index < PLAYER_INVENTORY_START) {
             if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, index != AffixSorterBlockEntity.SLOT_INPUT)) {
                 return ItemStack.EMPTY;
             }

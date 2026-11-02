@@ -92,10 +92,10 @@ CYLINDER_WINDOW = (3.5, 10.5)
 JOB_LAMP = ((13.25, CRADLE[1][1], 2.75), (14.75, CRADLE[1][1] + 1.0, 4.25))
 JOB_LAMP_FACES = SIDES + ("up",)
 
-FURNACE_TIERS = ("iron", "copper", "bronze", "steel", "lead", "aluminum", "titanium", "tungstensteel", "exotic")
+FURNACE_TIERS = ("iron", "copper", "gold", "bronze", "steel", "lead", "aluminum", "titanium", "tungstensteel", "exotic")
 # The Heat Core shown on each chassis item model, which has no renderer.
 ITEM_CORES = {
-    "iron": "iron", "copper": "copper", "bronze": "bronze", "steel": "steel", "lead": "steel",
+    "iron": "iron", "copper": "copper", "gold": "bronze", "bronze": "bronze", "steel": "steel", "lead": "steel",
     "aluminum": "aluminum", "titanium": "titanium", "tungstensteel": "titanium", "exotic": "exotic",
 }
 HEAT_CORES = ("iron", "copper", "bronze", "steel", "aluminum", "sparksteel", "titanium", "exotic", "unique")
@@ -878,6 +878,7 @@ NITROGEN = (139, 164, 201)
 TIER_COLORS = {
     "iron": ((132, 132, 128), (176, 176, 170)),
     "copper": ((136, 78, 46), (216, 138, 86)),
+    "gold": ((196, 152, 56), (240, 206, 96)),
     "bronze": ((166, 122, 64), (206, 170, 94)),
     "steel": ((72, 82, 94), (150, 158, 168)),
     "lead": ((78, 84, 102), (122, 128, 148)),
@@ -904,6 +905,10 @@ def write_tier_textures() -> None:
                 pixels[(x + 1) % 64, (y + 1) % 64] = (*shade(pixels[(x + 1) % 64, (y + 1) % 64], -18), 255)
             panel_seams(shell, step=32, depth=30)
             blotches(shell, "copper_tarnish", (96, 52, 32), 5, 11, 0.55)
+        elif tier == "gold":
+            # Soft, polished plate: wide panels, no rivets, and a few bright glints.
+            shell = panel_seams(noisy(64, shell_color, name, amount=5, streak=8), step=32, rivets=False, depth=22)
+            blotches(shell, "gold_glints", (252, 238, 168), 4, 6, 0.3)
         elif tier == "bronze":
             shell = panel_seams(noisy(64, shell_color, name, amount=5, streak=10), step=16, rivets=False, depth=24)
         elif tier == "lead":

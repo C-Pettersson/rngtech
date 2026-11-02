@@ -16,6 +16,7 @@
               "function": "minecraft:copy_components",
               "include": [
                 "rngtech:machine_traits",
+                "rngtech:jewels",
                 "rngtech:mirrored",
                 "rngtech:sorter_rules"
               ],

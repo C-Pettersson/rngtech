@@ -89,6 +89,9 @@ public class AffixSorterBlock extends BaseMachineBlock {
                 stack.set(ModDataComponents.SORTER_RULES.get(), sorter.sorterRules());
             }
         }
+        if (level.getBlockEntity(pos) instanceof BaseMachineBlockEntity jewelled && !jewelled.jewels().isEmpty()) {
+            stack.set(ModDataComponents.JEWELS.get(), jewelled.jewels());
+        }
         return stack;
     }
 

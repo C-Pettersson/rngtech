@@ -133,6 +133,7 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
                 .stats(AffixSorterMenu.TAB_STATS)
                 .refinement(AffixSorterMenu.TAB_REFINEMENT)
                 .tab(AffixSorterMenu.TAB_RULES, "rngtech.tab.rules", ModItems.RULE_CARD.get())
+                .jewels(AffixSorterMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 
@@ -177,6 +178,12 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
                 }
             }
         }
+        if (menu.selectedTab() == AffixSorterMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY,
                 menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
@@ -197,6 +204,8 @@ public class AffixSorterScreen extends AbstractContainerScreen<AffixSorterMenu> 
                     STAT_PANEL_WIDTH, statLines().length, STAT_ACCENT);
             case AffixSorterMenu.TAB_REFINEMENT -> RefinementScreenStyle.render(guiGraphics, leftPos, topPos, menu.machineTraits(), STAT_ACCENT);
             case AffixSorterMenu.TAB_RULES -> renderRules(guiGraphics, mouseX, mouseY);
+            case AffixSorterMenu.TAB_JEWELS -> JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED,
+                    (x, y) -> renderSlotFrame(guiGraphics, x, y));
             default -> {
             }
         }

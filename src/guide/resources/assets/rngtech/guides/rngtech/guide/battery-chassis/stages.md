@@ -13,7 +13,7 @@ navigation:
 | 0 | <ItemLink id="rngtech:wooden_battery_chassis" /> | 1 | Novelty holder. Poor efficiency and stability, and it leaks. |
 | 1 | <ItemLink id="rngtech:iron_battery_chassis" /> | 1 | Simple and reliable, with no leakage. Strong per-cell bonuses. |
 | 2 | <ItemLink id="rngtech:copper_battery_chassis" /> | 2 | Better transfer rating with light leakage. |
-| 3 | <ItemLink id="rngtech:gold_battery_chassis" /> | 3 | Large burst identity, but less stable and leakier. |
+| 3 | <ItemLink id="rngtech:gold_battery_chassis" /> | 3 | Large burst identity, but less stable and leakier. Has one built-in [jewel socket](rngtech:jewels.md#body-sockets). |
 | 4 | <ItemLink id="rngtech:steel_battery_chassis" /> | 4 | Stable, no chassis leakage, and cuts each installed cell's own leakage by 0.02%/min. |
 | 5 | <ItemLink id="rngtech:sparksteel_battery_chassis" /> | 5 | Charge Balancer. |
 | 6 | <ItemLink id="rngtech:arclite_battery_chassis" /> | 6 | High transfer rating with Charge Balancer. |

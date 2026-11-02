@@ -16,6 +16,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
@@ -104,6 +105,7 @@ public class IdentifierScreen extends AbstractContainerScreen<IdentifierMenu> im
                 .stats(IdentifierMenu.TAB_STATS)
                 .refinement(IdentifierMenu.TAB_REFINEMENT)
                 .mastery(IdentifierMenu.TAB_MASTERY)
+                .jewels(IdentifierMenu.TAB_JEWELS, menu::jewelsShown)
                 .orders(IdentifierMenu.TAB_ORDERS, menu::workOrdersShown)
                 .build();
         workOrdersTab = new WorkOrdersTab(menu, STAT_ACCENT);
@@ -122,6 +124,11 @@ public class IdentifierScreen extends AbstractContainerScreen<IdentifierMenu> im
                     @Override
                     public void geometryChanged() {
                         updateImageSizeForSelectedTab();
+                    }
+
+                    @Override
+                    public ItemStack socketedJewel(int index) {
+                        return menu.jewel(index);
                     }
                 },
                 new MasteryScreenSupport.Palette(PANEL_DARK, PANEL_LIGHT, TEXT, STAT_ACCENT, FLUID, START_NODE, MASTERY_RING)
@@ -155,6 +162,12 @@ public class IdentifierScreen extends AbstractContainerScreen<IdentifierMenu> im
                 guiGraphics.renderComponentTooltip(font, orderTooltip, mouseX, mouseY);
             }
         }
+        if (menu.selectedTab() == IdentifierMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY,
                 menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
         GearSlotTooltips.render(this, guiGraphics, font, mouseX, mouseY);
@@ -176,6 +189,8 @@ public class IdentifierScreen extends AbstractContainerScreen<IdentifierMenu> im
             masterySupport.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
         } else if (menu.selectedTab() == IdentifierMenu.TAB_ORDERS) {
             workOrdersTab.render(guiGraphics, leftPos, topPos, imageWidth, imageHeight, mouseX, mouseY);
+        } else if (menu.selectedTab() == IdentifierMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
         }
     }
 

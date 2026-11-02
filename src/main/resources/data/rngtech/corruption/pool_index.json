@@ -16,6 +16,7 @@
         "generator_parts",
         "generators",
         "heat_core",
+        "jewels",
         "mastery_attributes",
         "phase_array",
         "processing_machines",

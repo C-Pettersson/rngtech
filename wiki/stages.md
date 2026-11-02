@@ -108,7 +108,7 @@ Stage is not the same as affix **tier**. Tier describes how strong one affix is;
 | 0 | Primitive | Wood, flint, stone | [Tool Bench](tool-bench.md) and flint tools, the Wooden Crusher, the fuel-burning [Furnace](furnace.md), Potato Battery Cells. |
 | 1 | Iron | Iron | The first powered machines: [Solid Fuel Burner](solid-fuel-burner.md), Iron [Crusher](crusher.md), Iron [Battery Chassis](battery-chassis.md), Iron [Resonance Calibrator](resonance-calibrator.md), [Solar Panels](solar-panel.md). |
 | 2 | Copper | Copper | Faster energy transfer and heat. Copper machine sets, the [Wooden Dehumidifier](wooden-dehumidifier.md). |
-| 3 | Bronze | Bronze, tin, zinc, gold | The first alloy. Basic Electric Circuits, the Crude [Metal Press](metal-press.md), the Bronze [Alloy Furnace](alloy-furnace.md). |
+| 3 | Bronze | Bronze, tin, zinc, gold | The first alloy. Basic Electric Circuits, the Crude [Metal Press](metal-press.md), the Bronze [Alloy Furnace](alloy-furnace.md), the Gold [Crusher](crusher.md#stages) and [Furnace](furnace.md#stages) bodies, and the first [jewels](jewels.md). |
 | 4 | Steel | Steel, invar, nickel, lead, silver | Stable midgame machines, the Steel Metal Press, the Lead Furnace, the [Corrosion Cell](corrosion-cell.md). The first recoverable processing failures. |
 | 5 | Aluminum | Aluminum, sparksteel, osmium | Gas power: [Coal Gasifier](coal-gasifier.md), [Syngas Combustor](syngas-combustor.md), [Cavitation Generator](cavitation-generator.md), [Silica Gel Dehumidifier](silica-gel-dehumidifier.md). |
 | 6 | Titanium | Titanium, arclite | Chemistry: [Melter](melter.md), [Steam Methane Reformer](steam-methane-reformer.md), [Ammonia Synthesizer](ammonia-synthesizer.md), [Fuel Cell](ammonia-fuel-cell.md), the Titanium Alloy Furnace. |

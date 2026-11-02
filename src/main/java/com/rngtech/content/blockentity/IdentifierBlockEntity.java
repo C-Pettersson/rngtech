@@ -27,6 +27,7 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.jewel.JewelEffects;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
 import com.rngtech.rpg.progression.MachineProgressionState;
@@ -421,9 +422,11 @@ public class IdentifierBlockEntity extends BaseMachineBlockEntity
         MachineStatAccumulator stats = MachineBaseStatCatalog.identifier();
         stats.apply(effectiveTraits());
         MegaPassiveTree.applyNodeStats(stats, machineProgression(), MachineMasteryFamily.IDENTIFIER);
+        JewelEffects.applyLines(stats, this, machineProgression(), MachineMasteryFamily.IDENTIFIER);
         applyPartStats(stats, gearInventory.getStackInSlot(SLOT_FLUID_PUMP), true);
         applyPartStats(stats, gearInventory.getStackInSlot(SLOT_SERVO), true);
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), MachineMasteryFamily.IDENTIFIER);
+        JewelEffects.applyThresholds(stats, this, machineProgression(), MachineMasteryFamily.IDENTIFIER);
         WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(

@@ -147,6 +147,10 @@ public enum MachineStat implements StringRepresentable {
     MACHINE_NOISE,
     /** A Telemetry body's comparator gauge; the affix id names which gauge replaces the work-state signal. */
     COMPARATOR_READOUT,
+    /** The most increased Bonus Output a machine pays, in percent: 75 before modifiers, raised by flat additions. */
+    MAX_OUTPUT_AMOUNT,
+    /** Jewel sockets on the machine body itself, from the Bedazzling suffix and a Gold body's implicit; read from the body's own rolls. */
+    JEWEL_SOCKETS,
     /** Identifying Fluid an Identifier uses per item, as a multiplier on the item's base cost. Lower is better. */
     FLUID_USAGE,
     /** Enabled rules an Affix Sorter may run. A whole number: the Rule Core's base plus flat rolls. */

@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="1829 1536 4369 4769" width="1200" height="1310" role="img" aria-labelledby="title description">
 <title id="title">RNGTech shared machine passive tree</title>
-<desc id="description">1368 nodes, six starts, 1525 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
+<desc id="description">1387 nodes, six starts, 1545 links. Control in green, Drive in copper, Reserve in blue. White notables and violet keystones. Each machine earns 99 points by level 100.</desc>
 <rect x="1829" y="1536" width="4369" height="4769" fill="#111820"/>
-<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1368 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
+<g font-family="sans-serif" fill="#e5ecf3"><text x="1909" y="1686" font-size="96">Machine Mastery</text><text x="1914" y="1806" font-size="58" fill="#a9b9c9">1387 nodes · 6 starts · 3 attributes · 99 points at level 100</text></g>
 <g stroke="#66727d" stroke-width="5" opacity="0.65">
 <path d="M4000,4000 L3939,3895"/>
 <path d="M4000,4000 L4122,3998"/>
@@ -1529,6 +1529,26 @@
 <path d="M2799,3355 L2826,3413"/>
 <path d="M2762,3408 L2725,3460"/>
 <path d="M2762,3408 L2735,3350"/>
+<path d="M5551,3323 L5552,3268"/>
+<path d="M5552,3268 L5519,3220"/>
+<path d="M5552,3268 L5586,3221"/>
+<path d="M5519,3220 L5553,3171"/>
+<path d="M5586,3221 L5553,3171"/>
+<path d="M3082,3709 L3071,3650"/>
+<path d="M3071,3650 L3061,3599"/>
+<path d="M4208,3107 L4235,3058"/>
+<path d="M4235,3058 L4258,3017"/>
+<path d="M4678,3438 L4663,3496"/>
+<path d="M4663,3496 L4649,3546"/>
+<path d="M4828,4303 L4883,4295"/>
+<path d="M4883,4295 L4930,4288"/>
+<path d="M3874,4922 L3826,4959"/>
+<path d="M3826,4959 L3785,4991"/>
+<path d="M3314,4571 L3289,4625"/>
+<path d="M3289,4625 L3267,4672"/>
+<path d="M4026,2267 L4075,2320"/>
+<path d="M5774,4261 L5773,4333"/>
+<path d="M2950,4881 L2900,4933"/>
 </g>
 <circle cx="3388" cy="3633" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control (start_control)</title></circle>
 <circle cx="4000" cy="3310" r="20" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>control / drive (start_control_drive)</title></circle>
@@ -2863,6 +2883,25 @@
 <circle cx="2735" cy="3350" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_5)</title></circle>
 <circle cx="2799" cy="3355" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (cam_followers_6)</title></circle>
 <circle cx="2762" cy="3408" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Cam Followers (cam_followers)</title></circle>
+<circle cx="5552" cy="3268" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (overflow_gate_1)</title></circle>
+<circle cx="5519" cy="3220" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (overflow_gate_2)</title></circle>
+<circle cx="5586" cy="3221" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Recovery (overflow_gate_3)</title></circle>
+<circle cx="5553" cy="3171" r="17" fill="#f1dcc1" stroke="#111820" stroke-width="3"><title>Overflow Gate (overflow_gate)</title></circle>
+<circle cx="3071" cy="3650" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Precision (socket_control_1)</title></circle>
+<circle cx="3061" cy="3599" r="12" fill="#e8be4a" stroke="#111820" stroke-width="3"><title>Jewel Socket (jewel_socket_1)</title></circle>
+<circle cx="4235" cy="3058" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Actuation (socket_control_drive_1)</title></circle>
+<circle cx="4258" cy="3017" r="12" fill="#e8be4a" stroke="#111820" stroke-width="3"><title>Jewel Socket (jewel_socket_2)</title></circle>
+<circle cx="4663" cy="3496" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Momentum (socket_drive_1)</title></circle>
+<circle cx="4649" cy="3546" r="12" fill="#e8be4a" stroke="#111820" stroke-width="3"><title>Jewel Socket (jewel_socket_3)</title></circle>
+<circle cx="4883" cy="4295" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Heat Flow (socket_drive_reserve_1)</title></circle>
+<circle cx="4930" cy="4288" r="12" fill="#e8be4a" stroke="#111820" stroke-width="3"><title>Jewel Socket (jewel_socket_4)</title></circle>
+<circle cx="3826" cy="4959" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Reserves (socket_reserve_1)</title></circle>
+<circle cx="3785" cy="4991" r="12" fill="#e8be4a" stroke="#111820" stroke-width="3"><title>Jewel Socket (jewel_socket_5)</title></circle>
+<circle cx="3289" cy="4625" r="9" fill="#9fadb9" stroke="#111820" stroke-width="3"><title>Conservation (socket_reserve_control_1)</title></circle>
+<circle cx="3267" cy="4672" r="12" fill="#e8be4a" stroke="#111820" stroke-width="3"><title>Jewel Socket (jewel_socket_6)</title></circle>
+<circle cx="4075" cy="2320" r="12" fill="#e8be4a" stroke="#111820" stroke-width="3"><title>Jewel Socket (jewel_socket_7)</title></circle>
+<circle cx="5773" cy="4333" r="12" fill="#e8be4a" stroke="#111820" stroke-width="3"><title>Jewel Socket (jewel_socket_8)</title></circle>
+<circle cx="2900" cy="4933" r="12" fill="#e8be4a" stroke="#111820" stroke-width="3"><title>Jewel Socket (jewel_socket_9)</title></circle>
 <circle cx="4047" cy="3916" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Silent Operation (silent_operation)</title></circle>
 <circle cx="2579" cy="3318" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Manual Throttle (manual_throttle)</title></circle>
 <circle cx="3900" cy="2301" r="24" fill="#c79dea" stroke="#111820" stroke-width="3"><title>Seedling Magnet (seedling_magnet)</title></circle>

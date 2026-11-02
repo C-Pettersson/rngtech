@@ -57,6 +57,7 @@
             "path_0018",
             "path_0043",
             "path_0149",
+            "socket_control_1",
             "path_0164",
             "spring_returns",
             "path_0151",
@@ -66,6 +67,7 @@
             "path_0011",
             "path_0042",
             "path_0142",
+            "jewel_socket_1",
             "path_0165",
             "path_0143",
             "path_0069",
@@ -98,9 +100,7 @@
             "path_0345",
             "path_0156",
             "path_0162",
-            "path_0172",
-            "lean_draw_1",
-            "path_0074"
+            "path_0172"
         ],
         "start_control_drive": [
             "path_0130",
@@ -172,6 +172,7 @@
             "path_0197",
             "path_0208",
             "path_0191",
+            "socket_control_drive_1",
             "path_0203",
             "path_0210",
             "path_0018",
@@ -183,6 +184,7 @@
             "path_0198",
             "path_0069",
             "path_0192",
+            "jewel_socket_2",
             "path_0204",
             "driven_cadence_1",
             "path_0078",
@@ -199,9 +201,7 @@
             "path_0178",
             "rail_runner_1",
             "path_0205",
-            "driven_cadence_2",
-            "path_0082",
-            "path_0083"
+            "driven_cadence_2"
         ],
         "start_drive": [
             "path_0132",
@@ -261,6 +261,7 @@
             "path_0024",
             "clean_dust_ledge_3",
             "path_0219",
+            "socket_drive_1",
             "path_0078",
             "path_0231",
             "path_0220",
@@ -270,6 +271,7 @@
             "path_0012",
             "clean_dust_ledge_4",
             "path_0213",
+            "jewel_socket_3",
             "path_0082",
             "path_0083",
             "path_0210",
@@ -300,9 +302,7 @@
             "path_0022",
             "deep_reserves_1",
             "balanced_chassis_2",
-            "balanced_chassis_6",
-            "path_0224",
-            "orchard_plan_2"
+            "balanced_chassis_6"
         ],
         "start_drive_reserve": [
             "path_0134",
@@ -363,6 +363,7 @@
             "path_0028",
             "path_0014",
             "path_0254",
+            "socket_drive_reserve_1",
             "path_0267",
             "path_0271",
             "path_0241",
@@ -373,6 +374,7 @@
             "path_0033",
             "path_0100",
             "guiding_hand_1",
+            "jewel_socket_4",
             "path_0088",
             "path_0272",
             "path_0257",
@@ -401,9 +403,7 @@
             "balanced_chassis_2",
             "balanced_chassis_6",
             "path_0009",
-            "firebrick_walls_1",
-            "guiding_hand",
-            "path_0053"
+            "firebrick_walls_1"
         ],
         "start_reserve": [
             "path_0136",
@@ -473,6 +473,7 @@
             "path_0298",
             "path_0098",
             "path_0288",
+            "socket_reserve_1",
             "path_0111",
             "path_0112",
             "path_0343",
@@ -490,6 +491,7 @@
             "path_0103",
             "path_0269",
             "path_0275",
+            "jewel_socket_5",
             "path_0113",
             "path_0342",
             "path_0109",
@@ -502,9 +504,7 @@
             "stockpile_3",
             "path_0285",
             "path_0300",
-            "path_0302",
-            "stored_momentum_1",
-            "path_0104"
+            "path_0302"
         ],
         "start_reserve_control": [
             "path_0138",
@@ -560,6 +560,7 @@
             "setpoint_hold_1",
             "path_0041",
             "path_0322",
+            "socket_reserve_control_1",
             "path_0342",
             "path_0313",
             "path_0345",
@@ -567,6 +568,7 @@
             "setpoint_hold_6",
             "path_0016",
             "path_0314",
+            "jewel_socket_6",
             "path_0343",
             "slow_cooling_1",
             "path_0312",
@@ -603,13 +605,11 @@
             "path_0328",
             "path_0337",
             "path_0124",
-            "path_0164",
-            "stockpile_2",
-            "stockpile_3"
+            "path_0164"
         ]
     },
     "metrics": {
-        "nodes": 1368,
+        "nodes": 1387,
         "starts": 6,
         "startPositions": {
             "start_control": {
@@ -640,17 +640,18 @@
         "kinds": {
             "STARTER": 6,
             "TRAVEL": 634,
-            "NODE": 494,
-            "NOTABLE": 199,
-            "KEYSTONE": 35
+            "NODE": 503,
+            "NOTABLE": 200,
+            "KEYSTONE": 35,
+            "JEWEL_SOCKET": 9
         },
-        "groups": 405,
-        "edges": 1525,
-        "cycleRank": 158,
+        "groups": 415,
+        "edges": 1545,
+        "cycleRank": 159,
         "investment": {
             "travelNodes": 634,
-            "rewardPockets": 136,
-            "rewardComponents": 148,
+            "rewardPockets": 146,
+            "rewardComponents": 158,
             "minimumGateTravel": 2,
             "notablePointsFromRoad": {
                 "min": 3,
@@ -664,8 +665,8 @@
         "overlaps": 0,
         "throughNodes": 0,
         "crossings": 0,
-        "medianLength": 71.56116265125938,
-        "p90Length": 95.88013350011566,
+        "medianLength": 71.17583859709698,
+        "p90Length": 95.85927185202274,
         "distances": {
             "start_control": {
                 "silent_operation": 10,

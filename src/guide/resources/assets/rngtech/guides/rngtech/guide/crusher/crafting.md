@@ -16,6 +16,8 @@ Each stage has its own recipe. You do not need the previous stage's Crusher to c
 
 <RecipesFor id="rngtech:copper_crusher_chassis" />
 
+<RecipesFor id="rngtech:gold_crusher_chassis" />
+
 <RecipesFor id="rngtech:bronze_crusher_chassis" />
 
 <RecipesFor id="rngtech:steel_crusher_chassis" />
@@ -31,6 +33,7 @@ Each stage has its own recipe. You do not need the previous stage's Crusher to c
 - Requires the Iron material to be enabled.
 - Requires the Copper material to be enabled.
 - **Calibrated Kinetic Component** must be a Kinetic calibration, Stage 1+, stability 45+.
+- Requires the Gold material to be enabled.
 - Requires the Bronze material to be enabled.
 - **Calibrated Kinetic Component** must be a Kinetic calibration, Stage 1+, stability 55+.
 - Requires the Steel material to be enabled.

@@ -10,6 +10,7 @@ import com.rngtech.content.item.DisassemblyHeadItem;
 import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.ForestryCartItem;
 import com.rngtech.content.item.FurnaceChassisBlockItem;
+import com.rngtech.content.item.JewelItem;
 import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.item.MachineBlockItem;
 import com.rngtech.content.item.MachinePartItem;
@@ -32,6 +33,7 @@ import com.rngtech.rpg.ModifierEligibilityProfile;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
 import com.rngtech.rpg.Rarity;
 import com.rngtech.rpg.corruption.CorruptionCatalog;
+import com.rngtech.rpg.jewel.JewelColour;
 import com.rngtech.rpg.unique.UniqueItems;
 import com.rngtech.rpg.workorder.WorkOrder;
 import com.rngtech.rpg.workorder.WorkOrderConditions;
@@ -51,6 +53,7 @@ public final class RefinementTargets {
                 || stack.getItem() instanceof ForestryCartItem
                 || stack.getItem() instanceof ToolHeadItem
                 || stack.getItem() instanceof ToolRodItem
+                || stack.getItem() instanceof JewelItem
                 || isJobChip(stack));
     }
 
@@ -159,12 +162,18 @@ public final class RefinementTargets {
         if (stack.getItem() instanceof ToolRodItem) {
             return ModifierEligibilityProfiles.forMachine(MachineType.TOOL_ROD);
         }
+        if (stack.getItem() instanceof JewelItem jewel) {
+            return ModifierEligibilityProfiles.forJewel(jewel.colour());
+        }
         throw new IllegalArgumentException("Item stack is not a refinement target: " + stack);
     }
 
     public static int componentStage(ItemStack stack) {
         if (isJobChip(stack)) {
             return WorkOrder.tierStage(JobChipItem.data(stack).tier());
+        }
+        if (stack.getItem() instanceof JewelItem) {
+            return JewelColour.COMPONENT_STAGE;
         }
         if (stack.getItem() instanceof BatteryCellItem cell) {
             return cell.material().stage();
@@ -245,6 +254,9 @@ public final class RefinementTargets {
         }
         if (stack.getItem() instanceof ToolRodItem rod) {
             return rod.traits(stack);
+        }
+        if (stack.getItem() instanceof JewelItem jewel) {
+            return jewel.traits(stack);
         }
         if (ModularToolItem.isModularTool(stack)) {
             return MachineTraits.EMPTY;

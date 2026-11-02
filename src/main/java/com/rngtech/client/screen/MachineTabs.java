@@ -1,6 +1,7 @@
 package com.rngtech.client.screen;
 
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.rpg.jewel.JewelColour;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -22,8 +23,8 @@ import java.util.function.BooleanSupplier;
 
 /**
  * Tab strip shared by the tabbed machine screens. Tabs stack down the panel's left edge with icon and name,
- * collapse to an icon rail when the screen has no room for names, and move above the panel when even the rail
- * does not fit (the expanded Mastery tree, or a panel wider than the screen).
+ * collapse to an icon rail when the screen has no room for names (the expanded Mastery tree), and move above the
+ * panel when even the rail does not fit.
  */
 public final class MachineTabs {
     private static final int TAB_HEIGHT = 20;
@@ -38,6 +39,8 @@ public final class MachineTabs {
     private static final int TOP_TAB_HEIGHT = 22;
     private static final int TOP_TAB_STEP = 26;
     private static final int SELECTED_LABEL_MARGIN = 8;
+    /** Space left of the panel that keeps the tabs on the side as an icon rail. */
+    public static final int ICON_RAIL_SPACE = ICON_RAIL_WIDTH + SCREEN_MARGIN;
 
     public enum Mode {
         LABELLED,
@@ -82,7 +85,7 @@ public final class MachineTabs {
         if (railFits && left >= labelledWidth + SCREEN_MARGIN) {
             return Mode.LABELLED;
         }
-        if (railFits && left >= ICON_RAIL_WIDTH + SCREEN_MARGIN) {
+        if (railFits && left >= ICON_RAIL_SPACE) {
             return Mode.ICONS;
         }
         return Mode.TOP;
@@ -283,6 +286,11 @@ public final class MachineTabs {
 
         public Builder mastery(int id) {
             return tab(id, "rngtech.tab.mastery", ModItems.MASTERY_REFUND.get());
+        }
+
+        /** The Jewels tab, hidden until {@code shown} holds: a machine with no socket has nothing to put a jewel in. */
+        public Builder jewels(int id, BooleanSupplier shown) {
+            return tab(id, Component.translatable("rngtech.tab.jewels"), new ItemStack(ModItems.jewel(JewelColour.DRIVE).get()), shown);
         }
 
         /** The Orders tab, hidden until {@code shown} holds, so players who have not found Work Orders do not see it. */

@@ -1,0 +1,6 @@
+{
+  "parent": "rngtech:block/gold_crusher_chassis",
+  "textures": {
+    "lamp": "rngtech:block/crusher/lamp_on"
+  }
+}

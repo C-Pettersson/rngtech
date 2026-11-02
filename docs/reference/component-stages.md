@@ -219,6 +219,7 @@ Machine chassis items define the machine body or class. Chassis stage should des
 | 0 | Wooden Crusher Chassis | `minecraft:planks`, `minecraft:stick` | Primitive Crusher body used as the first assembly step. |
 | 1 | Iron Crusher Chassis | `c:ingots/iron`, `c:ingots/copper` | First powered Crusher body. |
 | 2 | Copper Crusher Chassis | `c:ingots/copper` | Conductive early chassis with better FE transfer. |
+| 3 | Gold Crusher Chassis | `c:ingots/gold` | Copper-tier numbers with one built-in jewel socket. |
 | 3 | Bronze Crusher Chassis | `c:ingots/bronze` | Alloy chassis with better output behavior. |
 | 4 | Steel Crusher Chassis | `c:ingots/steel`, `c:ingots/invar` | Durable midgame chassis with efficiency and buffer strength. |
 | 5 | Aluminum Crusher Chassis | `c:ingots/aluminum`, `c:ingots/sparksteel` | Faster controlled chassis with cleaner energy behavior. |

@@ -11,6 +11,8 @@
     "rngtech:add_ancient_echo_control_board",
     "rngtech:add_bastion_coin_stack_capacitor",
     "rngtech:add_shipwreck_salt_zinc_anode",
-    "rngtech:add_trial_vault_tempered_pawl"
+    "rngtech:add_trial_vault_tempered_pawl",
+    "rngtech:add_jewels_to_common_chests",
+    "rngtech:add_jewels_to_uncommon_chests"
   ]
 }

@@ -90,7 +90,7 @@ public record PassiveTreeDefinition<N extends Enum<N> & PassiveNode>(
                 case TRAVEL -> travels++;
                 case NOTABLE -> notables++;
                 case KEYSTONE -> keystones++;
-                case NODE -> {
+                case NODE, JEWEL_SOCKET -> {
                 }
             }
         }
@@ -257,7 +257,7 @@ public record PassiveTreeDefinition<N extends Enum<N> & PassiveNode>(
             case TRAVEL -> 4;
             case NODE -> 3;
             case NOTABLE -> 2;
-            case KEYSTONE -> 1;
+            case KEYSTONE, JEWEL_SOCKET -> 1;
         };
     }
 

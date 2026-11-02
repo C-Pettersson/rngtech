@@ -4,6 +4,7 @@ import com.rngtech.content.block.IdentifierBlock;
 import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.IdentifierBlockEntity;
 import com.rngtech.content.item.JobChipItem;
+import com.rngtech.content.jewel.JewelSockets;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModMenus;
@@ -43,13 +44,14 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class IdentifierMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu, WorkOrderMenuView {
+public class IdentifierMenu extends AbstractContainerMenu implements MasteryMenuView<MegaPassiveNode>, StatBreakdownMenu, WorkOrderMenuView, JewelMenuView {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
     public static final int TAB_REFINEMENT = 3;
     public static final int TAB_MASTERY = 4;
     public static final int TAB_ORDERS = 5;
+    public static final int TAB_JEWELS = 6;
 
     private static final int DATA_COUNT = IdentifierBlockEntity.DATA_COUNT;
     private static final int PROGRESSION_START = IdentifierBlockEntity.DATA_MACHINE_PROGRESSION_START;
@@ -124,6 +126,11 @@ public class IdentifierMenu extends AbstractContainerMenu implements MasteryMenu
         for (int bay = 0; bay < MachineWorkOrders.SLOTS; bay++) {
             addSlot(new DriveBaySlot(bays, bay, () -> selectedTab == TAB_ORDERS));
         }
+        IItemHandler sockets = playerInventory.player.level().isClientSide ? JewelSockets.client() : new JewelSockets(identifier);
+        for (int index = 0; index < JewelSockets.SLOTS; index++) {
+            int slot = index;
+            addSlot(new JewelSocketSlot(sockets, slot, () -> jewelsTabSelected() && jewelSlotOpen(slot)));
+        }
         addDataSlots(data);
         ordersShown = addDataSlot(WorkOrderDiscovery.shownSlot(playerInventory.player, identifier));
     }
@@ -135,6 +142,7 @@ public class IdentifierMenu extends AbstractContainerMenu implements MasteryMenu
             case TAB_REFINEMENT -> TAB_REFINEMENT;
             case TAB_MASTERY -> TAB_MASTERY;
             case TAB_ORDERS -> TAB_ORDERS;
+            case TAB_JEWELS -> TAB_JEWELS;
             default -> TAB_PROCESSING;
         };
     }
@@ -153,6 +161,19 @@ public class IdentifierMenu extends AbstractContainerMenu implements MasteryMenu
     }
     @Override public ItemStack workOrderChip(int bay) {
         return bay >= 0 && bay < MachineWorkOrders.SLOTS ? getSlot(HOTBAR_END + bay).getItem() : ItemStack.EMPTY;
+    }
+
+    private static final int JEWEL_SLOT_START = HOTBAR_END + MachineWorkOrders.SLOTS;
+
+    @Override public ItemStack jewel(int index) {
+        return index >= 0 && index < JewelSockets.SLOTS ? getSlot(JEWEL_SLOT_START + index).getItem() : ItemStack.EMPTY;
+    }
+    @Override public int jewelTreeCapacity() { return MegaPassiveTree.allocatedSocketCount(masterySnapshot()); }
+    @Override public boolean jewelsTabSelected() { return selectedTab == TAB_JEWELS; }
+    @Override public boolean hasTreeSockets() { return true; }
+    @Override public int jewelBodyCapacity() { return JewelSockets.bodySockets(machineTraits()); }
+    private boolean jewelSlotOpen(int index) {
+        return JewelSocketSlot.isTreeSlot(index) ? index < jewelTreeCapacity() : index - JewelSockets.BODY_START < jewelBodyCapacity();
     }
 
     public float processingProgress() {
@@ -313,7 +334,7 @@ public class IdentifierMenu extends AbstractContainerMenu implements MasteryMenu
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if (id >= WorkOrderMenuSupport.BUTTON_SELECT_TAB && id <= WorkOrderMenuSupport.BUTTON_SELECT_TAB + TAB_ORDERS) {
+        if (id >= WorkOrderMenuSupport.BUTTON_SELECT_TAB && id <= WorkOrderMenuSupport.BUTTON_SELECT_TAB + TAB_JEWELS) {
             selectTab(id - WorkOrderMenuSupport.BUTTON_SELECT_TAB);
             return true;
         }
@@ -365,6 +386,10 @@ public class IdentifierMenu extends AbstractContainerMenu implements MasteryMenu
             }
         } else if (selectedTab == TAB_ORDERS && index >= PLAYER_INVENTORY_START && JobChipItem.isWorkOrder(stack)) {
             if (!moveItemStackTo(stack, HOTBAR_END, HOTBAR_END + MachineWorkOrders.SLOTS, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (selectedTab == TAB_JEWELS && index >= PLAYER_INVENTORY_START && JewelSockets.accepts(stack)) {
+            if (!moveItemStackTo(stack, JEWEL_SLOT_START, JEWEL_SLOT_START + JewelSockets.SLOTS, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (index < PLAYER_INVENTORY_START) {
