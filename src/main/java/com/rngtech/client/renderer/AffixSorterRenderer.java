@@ -4,7 +4,6 @@ import com.rngtech.RNGTech;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.blockentity.AffixSorterBlockEntity;
 import com.rngtech.content.blockentity.AffixSorterBlockEntity.FaceRoute;
-import com.rngtech.content.blockentity.AffixSorterBlockEntity.RelativeFace;
 import com.rngtech.content.blockentity.AffixSorterVisualState;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -12,6 +11,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -23,33 +23,64 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Vector3f;
 
 /**
- * Draws an Affix Sorter's route markings and the item it reads. Each face's port collar is enamelled in its route,
- * green for Pass and red for Reject; input faces keep the bare trim collar of the block model. When an item is sorted,
- * the collars of its route flash bright and fade. The item in the input slot lies on the reader in the roof port and
- * turns slowly while the sorter works. Positions are in model pixels and match tools/blockmodels/affix_sorter.py.
+ * Draws the working parts on an Affix Sorter's front: the item in the input slot, hanging in the reader bay with a
+ * sheet of teal light sweeping up and down over it while it is read; the diverter flap, which swings toward the outlet
+ * of the route an item takes and eases back; and that route's lamp, which flashes. Positions are in model pixels and
+ * match tools/blockmodels/affix_sorter.py.
  */
 public class AffixSorterRenderer implements BlockEntityRenderer<AffixSorterBlockEntity> {
-    private static final ResourceLocation ENAMEL = RNGTech.id("block/affix_sorter/enamel");
+    private static final ResourceLocation BEAM = RNGTech.id("textures/block/resonance_calibrator/fx/beam.png");
+    private static final ResourceLocation FLAP = RNGTech.id("block/affix_sorter/flap");
+    private static final ResourceLocation LED = RNGTech.id("block/crusher/fx/led");
+    // Reader bay between the emitter posts, in front of the reader plate.
+    private static final float BAY_X0 = 4.75F;
+    private static final float BAY_X1 = 11.25F;
+    private static final float BAY_Z0 = 4.6F;
+    private static final float READER_Z = 6.9F;
+    private static final float ITEM_X = 8.0F;
+    private static final float ITEM_Y = 9.5F;
+    private static final float ITEM_Z = 5.6F;
+    private static final float ITEM_SIZE = 3.75F;
+    private static final float BLOCK_ITEM_SIZE = 2.5F;
+    private static final float SCAN_Y0 = 7.6F;
+    private static final float SCAN_Y1 = 11.4F;
+    /** Half a reading, one pass of the scan, kept between a flicker and a crawl. */
+    private static final float MIN_SWEEP_TICKS = 10.0F;
+    private static final float MAX_SWEEP_TICKS = 60.0F;
+    private static final int READ_LIGHT = 12;
+    private static final int SCAN_COLOR = 0x7FE6D2;
+    private static final int SHEET_COLOR = 0x2F6A62;
+    // Diverter flap: its hinge pin, and the plate hanging below it.
+    private static final float FLAP_PIVOT_X = 8.0F;
+    private static final float FLAP_PIVOT_Y = 6.0F;
+    private static final float FLAP_HALF_WIDTH = 0.5F;
+    private static final float FLAP_LENGTH = 3.25F;
+    private static final float FLAP_Z0 = 0.4F;
+    private static final float FLAP_Z1 = 0.8F;
+    private static final float FLAP_TEXTURE_SPAN = 4.0F;
+    private static final float FLAP_DEGREES = 30.0F;
+    /** How long the flap holds toward a route after a sort before it eases back. */
+    private static final float FLAP_HOLD_TICKS = 6.0F;
+    private static final float FLAP_OUT_RATE = 0.5F;
+    private static final float FLAP_BACK_RATE = 0.12F;
+    // Route lamps on the deck top, behind each outlet mouth: Pass on the left (east), Reject on the right (west).
+    private static final float PASS_LAMP_X = 11.375F;
+    private static final float REJECT_LAMP_X = 4.625F;
+    private static final float LAMP_HALF_WIDTH = 0.625F;
+    private static final float LAMP_Y0 = 6.5F;
+    private static final float LAMP_Y1 = 7.1F;
+    private static final float LAMP_Z0 = 2.3F;
+    private static final float LAMP_Z1 = 3.3F;
+    private static final float FLASH_TICKS = 12.0F;
     private static final int PASS = 0x4E8A4A;
     private static final int REJECT = 0xA6473E;
     private static final int PASS_FLASH = 0xA6F09C;
     private static final int REJECT_FLASH = 0xFF9A84;
-    private static final float FLASH_TICKS = 10.0F;
-    // Collar rings as {u0, v0, u1, v1} across a face and {d0, d1} inward from its outer plane.
-    private static final float[] SIDE_RING = {3.5F, 3.25F, 12.5F, 12.25F};
-    private static final float[] SIDE_DEPTH = {0.5F, 1.5F};
-    private static final float[] TOP_RING = {3.5F, 3.5F, 12.5F, 12.5F};
-    private static final float[] TOP_DEPTH = {1.0F, 2.5F};
-    private static final float[] BOTTOM_DEPTH = {-0.1F, 0.0F};
-    private static final float RING_WIDTH = 2.0F;
-    private static final float SURFACE = 0.02F;
-    // The reader floor in the roof port, where the input lies.
-    private static final float READER_Y = 13.6F;
-    private static final float INPUT_SIZE = 4.0F;
-    private static final float TURN_DEGREES_PER_TICK = 2.0F;
-    private static final int READER_LIGHT = 13;
+    private static final float SURFACE = 0.03F;
 
     private final ItemRenderer itemRenderer;
 
@@ -69,106 +100,113 @@ public class AffixSorterRenderer implements BlockEntityRenderer<AffixSorterBlock
         if (blockEntity.getLevel() == null) {
             return;
         }
-        AffixSorterVisualState state = blockEntity.visualState();
+        BlockState blockState = blockEntity.getBlockState();
+        boolean working = blockState.getValue(BaseMachineBlock.ACTIVE);
+        ItemStack input = blockEntity.displayInput();
+        AffixSorterVisualState.Animation animation = blockEntity.animation();
         float time = blockEntity.getLevel().getGameTime() + partialTick;
-        boolean active = blockEntity.getBlockState().getValue(BaseMachineBlock.ACTIVE);
-        Direction facing = blockEntity.getBlockState().getValue(BaseMachineBlock.FACING);
+        float sinceSort = time - blockEntity.flashTime();
+        FaceRoute route = blockEntity.flashRoute();
+        animate(animation, blockEntity.visualState(), working && !input.isEmpty(), route, sinceSort, time);
+
+        Direction facing = blockState.getValue(BaseMachineBlock.FACING);
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.0F, 0.5F);
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - facing.toYRot()));
         poseStack.translate(-0.5F, 0.0F, -0.5F);
-
-        ItemStack input = blockEntity.displayInput();
-        if (!input.isEmpty()) {
-            renderInput(blockEntity, input, active, time, poseStack, bufferSource, packedLight, packedOverlay);
-        }
-
         poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
-        PoseStack.Pose pose = poseStack.last();
+
+        if (!input.isEmpty()) {
+            renderItem(input, animation, time, blockEntity, poseStack, bufferSource, packedLight, packedOverlay);
+        }
+        if (animation.scan > 0.05F) {
+            float across = animation.sweep < 1.0F ? animation.sweep : 2.0F - animation.sweep;
+            float y = Mth.lerp(across, SCAN_Y1, SCAN_Y0);
+            renderScan(bufferSource.getBuffer(RenderType.eyes(BEAM)), poseStack.last(), y, Math.round(255 * animation.scan), packedOverlay);
+        }
         VertexConsumer cutout = bufferSource.getBuffer(Sheets.cutoutBlockSheet());
-        TextureAtlasSprite sprite = FurnaceGlow.sprite(ENAMEL);
-        float flash = Mth.clamp(1.0F - (time - blockEntity.flashTime()) / FLASH_TICKS, 0.0F, 1.0F);
-        for (RelativeFace face : RelativeFace.values()) {
-            FaceRoute route = state.route(face);
-            if (route == FaceRoute.NONE || !state.connected(face)) {
-                continue;
-            }
-            boolean pass = route == FaceRoute.PASS;
-            int color = pass ? PASS : REJECT;
-            int light = packedLight;
-            if (flash > 0.0F && route == blockEntity.flashRoute()) {
-                color = FurnaceGlow.lerpColor(flash, color, pass ? PASS_FLASH : REJECT_FLASH);
-                light = LightTexture.pack(Math.max(LightTexture.block(packedLight), Math.round(15.0F * flash)), LightTexture.sky(packedLight));
-            }
-            renderCollar(cutout, pose, sprite, face, color, light, packedOverlay);
+        renderFlap(cutout, poseStack, animation.flap * FLAP_DEGREES, packedLight, packedOverlay);
+        float flash = route == FaceRoute.NONE ? 0.0F : Mth.clamp(1.0F - sinceSort / FLASH_TICKS, 0.0F, 1.0F);
+        if (flash > 0.0F) {
+            renderLampFlash(cutout, poseStack.last(), route == FaceRoute.PASS, flash, packedOverlay);
         }
         poseStack.popPose();
-    }
-
-    /** The four bars of a face's collar ring, each wrapped in enamel just over the model's trim bar. */
-    private static void renderCollar(
-            VertexConsumer consumer, PoseStack.Pose pose, TextureAtlasSprite sprite, RelativeFace face, int color, int light, int overlay
-    ) {
-        float[] ring = switch (face) {
-            case TOP, BOTTOM -> TOP_RING;
-            default -> SIDE_RING;
-        };
-        float[] depth = switch (face) {
-            case TOP -> TOP_DEPTH;
-            case BOTTOM -> BOTTOM_DEPTH;
-            default -> SIDE_DEPTH;
-        };
-        float u0 = ring[0] - SURFACE;
-        float v0 = ring[1] - SURFACE;
-        float u1 = ring[2] + SURFACE;
-        float v1 = ring[3] + SURFACE;
-        float w = RING_WIDTH + SURFACE * 2.0F;
-        float[][] bars = {
-                {u0, v0, u1, v0 + w},
-                {u0, v1 - w, u1, v1},
-                {u0, v0 + w, u0 + w, v1 - w},
-                {u1 - w, v0 + w, u1, v1 - w},
-        };
-        for (float[] bar : bars) {
-            float[] box = oriented(face, bar[0], bar[1], bar[2], bar[3], depth[0] - SURFACE, depth[1] + SURFACE);
-            FurnaceGlow.cube(consumer, pose, sprite, 16.0F, box[0], box[1], box[2], box[3], box[4], box[5], color, 255, light, overlay);
-        }
     }
 
     /**
-     * A box across a face (u, v) and inward from its outer plane (d), as {x0, y0, z0, x1, y1, z1} in the north-facing
-     * model, where the left face is east and the right face west.
+     * The scan fades in while an item is read and runs at the reading's pace. The flap swings out fast toward the route
+     * of a fresh sort, holds there a moment, and eases back to hang straight.
      */
-    private static float[] oriented(RelativeFace face, float u0, float v0, float u1, float v1, float d0, float d1) {
-        return switch (face) {
-            case FRONT -> new float[] {u0, v0, d0, u1, v1, d1};
-            case BACK -> new float[] {u0, v0, 16.0F - d1, u1, v1, 16.0F - d0};
-            case LEFT -> new float[] {16.0F - d1, v0, u0, 16.0F - d0, v1, u1};
-            case RIGHT -> new float[] {d0, v0, u0, d1, v1, u1};
-            case TOP -> new float[] {u0, 16.0F - d1, v0, u1, 16.0F - d0, v1};
-            case BOTTOM -> new float[] {u0, d0, v0, u1, d1, v1};
-        };
+    private static void animate(
+            AffixSorterVisualState.Animation animation, AffixSorterVisualState state, boolean reading,
+            FaceRoute route, float sinceSort, float time
+    ) {
+        float elapsed = Double.isNaN(animation.lastTime) ? 0.0F : Mth.clamp((float) (time - animation.lastTime), 0.0F, 10.0F);
+        animation.lastTime = time;
+        float scanTarget = reading ? 1.0F : 0.0F;
+        animation.scan += (scanTarget - animation.scan) * Math.min(1.0F, elapsed * 0.15F);
+        float sweepTicks = Mth.clamp(state.cycleTicks() / 2.0F, MIN_SWEEP_TICKS, MAX_SWEEP_TICKS);
+        animation.sweep = (animation.sweep + elapsed / sweepTicks) % 2.0F;
+
+        float flapTarget = 0.0F;
+        if (route != FaceRoute.NONE && sinceSort < FLAP_HOLD_TICKS) {
+            flapTarget = route == FaceRoute.PASS ? 1.0F : -1.0F;
+        }
+        float rate = flapTarget == 0.0F ? FLAP_BACK_RATE : FLAP_OUT_RATE;
+        animation.flap += (flapTarget - animation.flap) * Math.min(1.0F, elapsed * rate);
     }
 
-    /** The input lies on the reader, lit by it and turning while the sorter works; a block item sits as a small cube. */
-    private void renderInput(
-            AffixSorterBlockEntity blockEntity, ItemStack input, boolean active, float time,
+    /** The input hangs in the bay facing out, lit by the reader and swaying while it is read. */
+    private void renderItem(
+            ItemStack stack, AffixSorterVisualState.Animation animation, float time, AffixSorterBlockEntity blockEntity,
             PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay
     ) {
-        boolean block = input.getItem() instanceof BlockItem;
-        float yaw = active ? time * TURN_DEGREES_PER_TICK % 360.0F : 25.0F;
-        int readerLight = active
-                ? LightTexture.pack(Math.max(LightTexture.block(light), READER_LIGHT), LightTexture.sky(light))
-                : light;
+        boolean block = stack.getItem() instanceof BlockItem;
+        float size = block ? BLOCK_ITEM_SIZE : ITEM_SIZE;
+        float sway = Mth.sin(time * 0.1F) * 15.0F * animation.scan;
+        int readLight = LightTexture.pack(
+                Math.max(LightTexture.block(light), Math.round(READ_LIGHT * animation.scan)), LightTexture.sky(light));
         poseStack.pushPose();
-        poseStack.translate(0.5F, (READER_Y + (block ? INPUT_SIZE / 4.0F : 0.2F)) / 16.0F, 0.5F);
-        poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
-        if (!block) {
-            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-        }
-        poseStack.scale(INPUT_SIZE / 16.0F, INPUT_SIZE / 16.0F, INPUT_SIZE / 16.0F);
-        itemRenderer.renderStatic(input, ItemDisplayContext.FIXED, readerLight, overlay, poseStack, bufferSource,
-                blockEntity.getLevel(), (int) blockEntity.getBlockPos().asLong());
+        poseStack.translate(ITEM_X, ITEM_Y, ITEM_Z);
+        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F + sway + (block ? 30.0F : 0.0F)));
+        poseStack.scale(size, size, size);
+        itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, readLight, overlay, poseStack, bufferSource, blockEntity.getLevel(),
+                (int) blockEntity.getBlockPos().asLong());
         poseStack.popPose();
+    }
+
+    /** A sheet of light across the bay at height {@code y}, and the bright line where it meets the reader plate. */
+    private static void renderScan(VertexConsumer consumer, PoseStack.Pose pose, float y, int alpha, int overlay) {
+        int light = LightTexture.FULL_BRIGHT;
+        float z = READER_Z - SURFACE;
+        FurnaceGlow.quad(consumer, pose, new Vector3f(0.0F, 0.0F, -1.0F), SCAN_COLOR, alpha, light, overlay,
+                new float[] {BAY_X0, y - 0.3F, z, 0.0F, 1.0F}, new float[] {BAY_X1, y - 0.3F, z, 1.0F, 1.0F},
+                new float[] {BAY_X1, y + 0.3F, z, 1.0F, 0.0F}, new float[] {BAY_X0, y + 0.3F, z, 0.0F, 0.0F});
+        float[] a = {BAY_X0, y, BAY_Z0, 0.0F, 0.0F};
+        float[] b = {BAY_X1, y, BAY_Z0, 1.0F, 0.0F};
+        float[] c = {BAY_X1, y, z, 1.0F, 1.0F};
+        float[] d = {BAY_X0, y, z, 0.0F, 1.0F};
+        for (float side : new float[] {-1.0F, 1.0F}) {
+            FurnaceGlow.quad(consumer, pose, new Vector3f(0.0F, side, 0.0F), SHEET_COLOR, alpha, light, overlay, a, b, c, d);
+        }
+    }
+
+    /** The flap turned about its hinge pin; a positive angle swings its tip toward the Pass outlet on the left (east). */
+    private static void renderFlap(VertexConsumer consumer, PoseStack poseStack, float degrees, int light, int overlay) {
+        poseStack.pushPose();
+        poseStack.translate(FLAP_PIVOT_X, FLAP_PIVOT_Y, 0.0F);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(degrees));
+        FurnaceGlow.cube(consumer, poseStack.last(), FurnaceGlow.sprite(FLAP), FLAP_TEXTURE_SPAN,
+                -FLAP_HALF_WIDTH, -FLAP_LENGTH, FLAP_Z0, FLAP_HALF_WIDTH, 0.0F, FLAP_Z1, 0xFFFFFF, 255, light, overlay);
+        poseStack.popPose();
+    }
+
+    /** The lamp of the route just taken, bright at the sort and fading back to its dim glass. */
+    private static void renderLampFlash(VertexConsumer consumer, PoseStack.Pose pose, boolean pass, float flash, int overlay) {
+        float x = pass ? PASS_LAMP_X : REJECT_LAMP_X;
+        int color = FurnaceGlow.lerpColor(flash, pass ? PASS : REJECT, pass ? PASS_FLASH : REJECT_FLASH);
+        TextureAtlasSprite sprite = FurnaceGlow.sprite(LED);
+        FurnaceGlow.cube(consumer, pose, sprite, 16.0F, x - LAMP_HALF_WIDTH - SURFACE, LAMP_Y0, LAMP_Z0 - SURFACE,
+                x + LAMP_HALF_WIDTH + SURFACE, LAMP_Y1 + SURFACE, LAMP_Z1, color, 255, LightTexture.FULL_BRIGHT, overlay);
     }
 }

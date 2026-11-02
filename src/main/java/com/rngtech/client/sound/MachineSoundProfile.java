@@ -129,8 +129,7 @@ enum MachineSoundProfile {
                 || block instanceof AlloyFurnaceBlock
                 || block instanceof SolidFuelBurnerBlock
                 || block instanceof BioGeneratorBlock
-                || block instanceof MelterBlock
-                || block instanceof IdentifierBlock) {
+                || block instanceof MelterBlock) {
             return THERMAL;
         }
         if (block instanceof GasChemistryBlock gasChemistry) {
@@ -143,7 +142,8 @@ enum MachineSoundProfile {
                 || block instanceof BatteryAssemblerBlock
                 || block instanceof SolarPanelBlock
                 || block instanceof SolarArrayControllerBlock
-                || block instanceof AmmoniaSynthesizerBlock) {
+                || block instanceof AmmoniaSynthesizerBlock
+                || block instanceof IdentifierBlock) {
             return ELECTRIC;
         }
         if (block instanceof WoodenDehumidifierBlock

@@ -364,5 +364,37 @@
         "pitch": 0.80
       }
     ]
+  },
+  "identifier.identify": {
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.chime",
+        "type": "event",
+        "volume": 0.55,
+        "pitch": 1.35
+      },
+      {
+        "name": "minecraft:block.enchantment_table.use",
+        "type": "event",
+        "volume": 0.12,
+        "pitch": 1.70
+      }
+    ]
+  },
+  "affix_sorter.sort": {
+    "sounds": [
+      {
+        "name": "minecraft:block.copper_trapdoor.close",
+        "type": "event",
+        "volume": 0.30,
+        "pitch": 1.45
+      },
+      {
+        "name": "minecraft:block.crafter.craft",
+        "type": "event",
+        "volume": 0.18,
+        "pitch": 1.20
+      }
+    ]
   }
 }

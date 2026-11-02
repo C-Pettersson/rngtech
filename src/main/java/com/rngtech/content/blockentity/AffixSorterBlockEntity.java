@@ -5,8 +5,6 @@ import com.rngtech.content.affixsorter.SorterMatcher;
 import com.rngtech.content.affixsorter.SorterRule;
 import com.rngtech.content.affixsorter.SorterRules;
 import com.rngtech.content.block.BaseMachineBlock;
-import com.rngtech.content.block.CableBlock;
-import com.rngtech.content.block.UniversalConnectorBlock;
 import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
@@ -14,6 +12,7 @@ import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.menu.AffixSorterMenu;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.content.registry.ModSounds;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineModifier;
@@ -38,6 +37,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -50,7 +50,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -239,6 +238,7 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
     private int lastRoute = -1;
     private AffixSorterVisualState visualState = AffixSorterVisualState.IDLE;
     private AffixSorterVisualState lastSyncedVisual;
+    private final AffixSorterVisualState.Animation animation = new AffixSorterVisualState.Animation();
     private ItemStack displayInput = ItemStack.EMPTY;
     private FaceRoute flashRoute = FaceRoute.NONE;
     private long flashTime = Long.MIN_VALUE;
@@ -312,10 +312,21 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
         lastRule = decision.ruleIndex();
         lastRoute = decision.route().ordinal();
         level.blockEvent(pos, state.getBlock(), EVENT_SORTED, lastRoute);
+        playSortSound(level, decision.route());
         if (decision.pulse()) {
             startPulse(level, pos, state);
         }
         resetCycle();
+    }
+
+    /** The flap's clack as an item is sorted, higher for Pass than for Reject; a Discreet body plays it quieter. */
+    private void playSortSound(Level level, SorterRule.Route route) {
+        float volume = noiseFactor();
+        if (volume <= 0.0F) {
+            return;
+        }
+        float pitch = route == SorterRule.Route.PASS ? 1.15F : 0.9F;
+        level.playSound(null, worldPosition, ModSounds.AFFIX_SORTER_SORT.get(), SoundSource.BLOCKS, volume, pitch);
     }
 
     private boolean insertIntoBuffer(int start, ItemStack item, boolean simulate) {
@@ -381,9 +392,6 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
             if (level != null) {
                 level.invalidateCapabilities(worldPosition);
                 level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
-                if (!level.isClientSide) {
-                    syncVisualState(level);
-                }
             }
             setChanged();
         }
@@ -394,12 +402,17 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
         return visualState;
     }
 
-    /** The input the renderer draws on the reader; client side. */
+    /** Client-side motion of the scan and the diverter flap, kept between frames by the renderer. */
+    public AffixSorterVisualState.Animation animation() {
+        return animation;
+    }
+
+    /** The input the renderer draws in the reader bay; client side. */
     public ItemStack displayInput() {
         return displayInput;
     }
 
-    /** The route the last sorted item took, which flashes on its collars; client side. */
+    /** The route the last sorted item took, toward which the flap swings and whose lamp flashes; client side. */
     public FaceRoute flashRoute() {
         return flashRoute;
     }
@@ -410,33 +423,8 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
     }
 
     public AffixSorterVisualState currentVisualState() {
-        return new AffixSorterVisualState(AffixSorterVisualState.pack(faces), connectedFaces(), inputStack().getItem());
-    }
-
-    /** Faces with something attached: a cable or Universal Connector port turned toward the sorter, or any item handler. */
-    private int connectedFaces() {
-        if (level == null) {
-            return 0;
-        }
-        Direction facing = getBlockState().getValue(BaseMachineBlock.FACING);
-        int connected = 0;
-        for (RelativeFace face : RelativeFace.values()) {
-            Direction side = face.absolute(facing);
-            BlockPos neighbor = worldPosition.relative(side);
-            if (!level.isLoaded(neighbor)) {
-                continue;
-            }
-            BlockState state = level.getBlockState(neighbor);
-            Direction back = side.getOpposite();
-            boolean attached = state.getBlock() instanceof CableBlock
-                    ? state.getValue(CableBlock.connectorProperty(back))
-                    : UniversalConnectorBlock.hasConnector(state, back)
-                            || level.getCapability(Capabilities.ItemHandler.BLOCK, neighbor, back) != null;
-            if (attached) {
-                connected |= 1 << face.ordinal();
-            }
-        }
-        return connected;
+        boolean working = getBlockState().getValue(BaseMachineBlock.ACTIVE);
+        return new AffixSorterVisualState(inputStack().getItem(), working ? processingTicks(effectiveStats()) : 0);
     }
 
     private void syncVisualState(Level level) {
@@ -452,14 +440,11 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
             displayInput = state.input() == Items.AIR ? ItemStack.EMPTY : new ItemStack(state.input());
         }
         visualState = state;
-        for (RelativeFace face : RelativeFace.values()) {
-            faces[face.ordinal()] = state.route(face);
-        }
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return currentVisualState().save();
+        return withNoiseFactor(currentVisualState().save());
     }
 
     @Override
@@ -469,11 +454,13 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
 
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+        readNoiseFactor(tag);
         applyVisualState(AffixSorterVisualState.load(tag));
     }
 
     @Override
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
+        readNoiseFactor(packet.getTag());
         applyVisualState(AffixSorterVisualState.load(packet.getTag()));
     }
 

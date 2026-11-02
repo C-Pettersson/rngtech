@@ -14,8 +14,10 @@ import com.rngtech.content.purge.FluidPurgeRole;
 import com.rngtech.content.purge.FluidPurgeTarget;
 import com.rngtech.content.purge.PurgeableFluidStorage;
 import com.rngtech.content.registry.ModBlockEntities;
+import com.rngtech.content.registry.ModDataComponents;
 import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.registry.ModSounds;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
 import com.rngtech.rpg.MachineModifier;
@@ -50,6 +52,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -368,8 +371,20 @@ public class IdentifierBlockEntity extends BaseMachineBlockEntity
         bulkSpeed.recordProcess(effectiveTraits());
         grantIdentifyXp(stage);
         workOrderWork(new WorkReport(WorkObjectiveType.IDENTIFY, stage, 0, itemId, 1).withTicks(AffixSorterCosts.identifierTicksPerItem()));
+        playIdentifySound(identified);
         resetCycle();
         setChanged();
+    }
+
+    /** A chime as each item is read, higher for a rarer roll; a Discreet body plays it quieter. */
+    private void playIdentifySound(ItemStack identified) {
+        float volume = noiseFactor();
+        if (level == null || volume <= 0.0F) {
+            return;
+        }
+        MachineTraits traits = identified.get(ModDataComponents.MACHINE_TRAITS.get());
+        int rarity = traits == null ? 0 : traits.rarity().ordinal();
+        level.playSound(null, worldPosition, ModSounds.IDENTIFIER_IDENTIFY.get(), SoundSource.BLOCKS, volume, 0.9F + rarity * 0.15F);
     }
 
     private void grantIdentifyXp(int stage) {
