@@ -5,6 +5,8 @@ import com.rngtech.content.affixsorter.SorterMatcher;
 import com.rngtech.content.affixsorter.SorterRule;
 import com.rngtech.content.affixsorter.SorterRules;
 import com.rngtech.content.block.BaseMachineBlock;
+import com.rngtech.content.block.CableBlock;
+import com.rngtech.content.block.UniversalConnectorBlock;
 import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
@@ -48,6 +50,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -407,7 +410,33 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
     }
 
     public AffixSorterVisualState currentVisualState() {
-        return new AffixSorterVisualState(AffixSorterVisualState.pack(faces), inputStack().getItem());
+        return new AffixSorterVisualState(AffixSorterVisualState.pack(faces), connectedFaces(), inputStack().getItem());
+    }
+
+    /** Faces with something attached: a cable or Universal Connector port turned toward the sorter, or any item handler. */
+    private int connectedFaces() {
+        if (level == null) {
+            return 0;
+        }
+        Direction facing = getBlockState().getValue(BaseMachineBlock.FACING);
+        int connected = 0;
+        for (RelativeFace face : RelativeFace.values()) {
+            Direction side = face.absolute(facing);
+            BlockPos neighbor = worldPosition.relative(side);
+            if (!level.isLoaded(neighbor)) {
+                continue;
+            }
+            BlockState state = level.getBlockState(neighbor);
+            Direction back = side.getOpposite();
+            boolean attached = state.getBlock() instanceof CableBlock
+                    ? state.getValue(CableBlock.connectorProperty(back))
+                    : UniversalConnectorBlock.hasConnector(state, back)
+                            || level.getCapability(Capabilities.ItemHandler.BLOCK, neighbor, back) != null;
+            if (attached) {
+                connected |= 1 << face.ordinal();
+            }
+        }
+        return connected;
     }
 
     private void syncVisualState(Level level) {

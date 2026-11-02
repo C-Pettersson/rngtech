@@ -10,15 +10,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
 /**
- * What an Affix Sorter shows in the world: the route of each face, which colours its port collar, and the item in the
- * input slot, which lies on the reader.
+ * What an Affix Sorter shows in the world: the route of each face, which colours its port collar when something is
+ * attached there, and the item in the input slot, which lies on the reader.
  *
- * @param routes each {@link RelativeFace}'s {@link FaceRoute} ordinal, two bits per face in face order
- * @param input  the item waiting to be read, or air
+ * @param routes    each {@link RelativeFace}'s {@link FaceRoute} ordinal, two bits per face in face order
+ * @param connected one bit per {@link RelativeFace}, set when a cable connector or an item handler meets that face
+ * @param input     the item waiting to be read, or air
  */
-public record AffixSorterVisualState(int routes, Item input) {
+public record AffixSorterVisualState(int routes, int connected, Item input) {
     private static final int BITS = 2;
-    public static final AffixSorterVisualState IDLE = new AffixSorterVisualState(0, Items.AIR);
+    public static final AffixSorterVisualState IDLE = new AffixSorterVisualState(0, 0, Items.AIR);
 
     public static int pack(FaceRoute[] faces) {
         int routes = 0;
@@ -33,9 +34,14 @@ public record AffixSorterVisualState(int routes, Item input) {
         return ordinal < FaceRoute.values().length ? FaceRoute.values()[ordinal] : FaceRoute.NONE;
     }
 
+    public boolean connected(RelativeFace face) {
+        return (connected >> face.ordinal() & 1) != 0;
+    }
+
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();
         tag.putInt("Routes", routes);
+        tag.putInt("Connected", connected);
         tag.putString("Input", BuiltInRegistries.ITEM.getKey(input).toString());
         return tag;
     }
@@ -45,6 +51,7 @@ public record AffixSorterVisualState(int routes, Item input) {
             return IDLE;
         }
         ResourceLocation input = ResourceLocation.tryParse(tag.getString("Input"));
-        return new AffixSorterVisualState(tag.getInt("Routes"), input == null ? Items.AIR : BuiltInRegistries.ITEM.get(input));
+        return new AffixSorterVisualState(tag.getInt("Routes"), tag.getInt("Connected"),
+                input == null ? Items.AIR : BuiltInRegistries.ITEM.get(input));
     }
 }

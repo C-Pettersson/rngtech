@@ -90,7 +90,7 @@ public class AffixSorterRenderer implements BlockEntityRenderer<AffixSorterBlock
         float flash = Mth.clamp(1.0F - (time - blockEntity.flashTime()) / FLASH_TICKS, 0.0F, 1.0F);
         for (RelativeFace face : RelativeFace.values()) {
             FaceRoute route = state.route(face);
-            if (route == FaceRoute.NONE) {
+            if (route == FaceRoute.NONE || !state.connected(face)) {
                 continue;
             }
             boolean pass = route == FaceRoute.PASS;
