@@ -72,6 +72,7 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
     public static final int SLOT_SERVO = 2;
     public static final int GEAR_SLOT_COUNT = 3;
     public static final int PULSE_TICKS = 4;
+    private static final float SORT_VOLUME = 0.8F;
     /** Block event sent when an item is sorted; its parameter is the {@link SorterRule.Route} ordinal. */
     public static final int EVENT_SORTED = 1;
     private static final int VISUAL_SYNC_INTERVAL = 5;
@@ -321,7 +322,7 @@ public class AffixSorterBlockEntity extends BaseMachineBlockEntity implements Me
 
     /** The flap's clack as an item is sorted, higher for Pass than for Reject; a Discreet body plays it quieter. */
     private void playSortSound(Level level, SorterRule.Route route) {
-        float volume = noiseFactor();
+        float volume = SORT_VOLUME * noiseFactor();
         if (volume <= 0.0F) {
             return;
         }

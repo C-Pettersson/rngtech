@@ -89,6 +89,8 @@ enum MachineSoundProfile {
     );
 
     private static final float STAGE_VOLUME_STEP = 0.005F;
+    /** The Affix Sorter runs a fifth quieter than the other kinetic machines. */
+    private static final float AFFIX_SORTER_VOLUME = 0.8F;
     private static final float STAGE_PITCH_STEP = 0.025F;
 
     private final DeferredHolder<SoundEvent, SoundEvent> loopSound;
@@ -160,6 +162,11 @@ enum MachineSoundProfile {
             return REACTOR;
         }
         return null;
+    }
+
+    /** A per-machine trim on the loop and its start and stop cues, on top of the profile and the Discreet factor. */
+    static float volumeScale(Block block) {
+        return block instanceof AffixSorterBlock ? AFFIX_SORTER_VOLUME : 1.0F;
     }
 
     SoundEvent loopSound() {
