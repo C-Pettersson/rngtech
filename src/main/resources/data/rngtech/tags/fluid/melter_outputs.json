@@ -5,6 +5,8 @@
     "#rngtech:electrolytes",
     "rngtech:ender_slurry",
     "rngtech:flowing_ender_slurry",
+    "rngtech:identifying_fluid",
+    "rngtech:flowing_identifying_fluid",
     "rngtech:methane",
     "rngtech:flowing_methane",
     "minecraft:lava",

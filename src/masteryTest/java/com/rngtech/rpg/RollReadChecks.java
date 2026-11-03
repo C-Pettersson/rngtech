@@ -1,5 +1,6 @@
 package com.rngtech.rpg;
 
+import com.rngtech.content.affixsorter.RuleCoreMaterial;
 import com.rngtech.content.calibration.CalibrationGearMaterial;
 import com.rngtech.content.energy.CathodeMaterial;
 import com.rngtech.content.energy.CavitationRotorMaterial;
@@ -47,7 +48,7 @@ public final class RollReadChecks {
             MachineStat.ATTACK_SPEED, MachineStat.FE_USAGE, MachineStat.STABILITY, MachineStat.LUCK);
     /** Hosts that add the Control, Drive, and Reserve rolled on their Gear before their Mastery conversions. */
     private static final Set<String> ATTRIBUTE_HOSTS = Set.of("crusher", "furnace", "electric_furnace", "alloy_furnace",
-            "metal_press", "melter", "resonance_calibrator", "forestry_companion");
+            "metal_press", "melter", "resonance_calibrator", "forestry_companion", "identifier");
     private static final Map<String, Set<MachineStat>> READS = new HashMap<>();
     private static final Map<String, Set<MachineBehavior>> BEHAVIOR_READS = new HashMap<>();
     private static int checks;
@@ -74,6 +75,10 @@ public final class RollReadChecks {
                 MachineStat.ENERGY_CAPACITY, MachineStat.CALIBRATION_QUALITY, MachineStat.CALIBRATION_PRECISION, MachineStat.STABILITY,
                 MachineStat.CATALYST_EFFICIENCY, MachineStat.REFINEMENT_POTENTIAL_BONUS, MachineStat.INSTANT_PROCESS_CHANCE,
                 MachineStat.SUPER_OUTPUT_CHANCE);
+        reads("identifier", Set.of(ATTRIBUTES), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY,
+                MachineStat.FLUID_USAGE, MachineStat.FLUID_CAPACITY, MachineStat.FLUID_TRANSFER, MachineStat.INSTANT_PROCESS_CHANCE);
+        reads("affix_sorter", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY,
+                MachineStat.RULE_CAPACITY, MachineStat.INSTANT_PROCESS_CHANCE);
         reads("battery_assembler", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY,
                 MachineStat.FLUID_TRANSFER, MachineStat.FLUID_CAPACITY, MachineStat.INSTANT_PROCESS_CHANCE);
         reads("component_recycler", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY,
@@ -132,7 +137,7 @@ public final class RollReadChecks {
         reads("phase_emitter", Set.of(PhaseArrayRules.LINE_STATS));
         reads("phase_coil", Set.of(PhaseArrayRules.LINE_STATS));
 
-        for (String processor : List.of("crusher", "electric_furnace", "alloy_furnace", "metal_press", "melter", "resonance_calibrator",
+        for (String processor : List.of("crusher", "electric_furnace", "alloy_furnace", "metal_press", "melter", "resonance_calibrator", "identifier",
                 "battery_assembler", "component_recycler", "potential_reactor", "corrosion_cell", "coal_gasifier",
                 "steam_methane_reformer", "ammonia_synthesizer")) {
             BEHAVIOR_READS.computeIfAbsent(processor, id -> EnumSet.noneOf(MachineBehavior.class)).add(MachineBehavior.BULK_SPEED);
@@ -159,7 +164,7 @@ public final class RollReadChecks {
                 "resonance_calibrator", "battery_assembler", "component_recycler", "compressor_tank", "fluid_tank", "coal_gasifier",
                 "steam_methane_reformer", "syngas_combustor", "ammonia_synthesizer", "ammonia_fuel_cell", "solid_fuel_burner",
                 "bio_generator", "solar_array_controller", "potential_reactor", "corrosion_cell",
-                "vacuum_collapse_generator", "cavitation_generator", "battery_chassis")) {
+                "vacuum_collapse_generator", "cavitation_generator", "battery_chassis", "identifier", "affix_sorter")) {
             READS.get(bedazzled).add(MachineStat.JEWEL_SOCKETS);
         }
     }
@@ -278,7 +283,7 @@ public final class RollReadChecks {
                     "alloy_furnace"));
             case SERVO -> each(ServoMaterial.values(), material -> {
                 List<Host> hosts = merged(ComponentBaseStatCatalog.servo(material), "alloy_furnace", "metal_press", "melter",
-                        "cavitation_generator", "coal_gasifier", "syngas_combustor", "steam_methane_reformer");
+                        "cavitation_generator", "coal_gasifier", "syngas_combustor", "steam_methane_reformer", "identifier", "affix_sorter");
                 hosts.add(new Host("compressor_tank", EnumSet.of(MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_USAGE,
                         MachineStat.STABILITY)));
                 return hosts;
@@ -294,7 +299,7 @@ public final class RollReadChecks {
             case DISASSEMBLY_HEAD -> each(DisassemblyHeadMaterial.values(), material -> merged(
                     ComponentBaseStatCatalog.disassemblyHead(material), "component_recycler"));
             case FLUID_PUMP -> each(FluidPumpMaterial.values(), material -> {
-                List<Host> hosts = merged(ComponentBaseStatCatalog.fluidPump(material), "melter", "corrosion_cell");
+                List<Host> hosts = merged(ComponentBaseStatCatalog.fluidPump(material), "melter", "corrosion_cell", "identifier");
                 hosts.add(new Host("bio_generator", EnumSet.of(MachineStat.FLUID_CAPACITY, MachineStat.FLUID_TRANSFER)));
                 hosts.add(new Host("forestry_companion", EnumSet.of(MachineStat.FLUID_CAPACITY, MachineStat.FLUID_TRANSFER,
                         MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE)));
@@ -325,6 +330,7 @@ public final class RollReadChecks {
                     ComponentBaseStatCatalog.controlBoard(material), "resonance_calibrator"));
             case STABILIZER_MATRIX -> each(CalibrationGearMaterial.values(), material -> merged(
                     ComponentBaseStatCatalog.stabilizerMatrix(material), "resonance_calibrator"));
+            case RULE_CORE -> each(RuleCoreMaterial.values(), material -> merged(ComponentBaseStatCatalog.ruleCore(material), "affix_sorter"));
         };
     }
 

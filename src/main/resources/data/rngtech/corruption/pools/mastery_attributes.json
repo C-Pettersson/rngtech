@@ -14,7 +14,8 @@
         "alloy_crucible",
         "resonance_coil",
         "control_board",
-        "stabilizer_matrix"
+        "stabilizer_matrix",
+        "identifier"
     ],
     "blessed": [
         {

@@ -1,5 +1,6 @@
 package com.rngtech.client.sound;
 
+import com.rngtech.content.block.AffixSorterBlock;
 import com.rngtech.content.block.AlgaePhotobioreactorBlock;
 import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.block.AmmoniaFuelCellBlock;
@@ -14,6 +15,7 @@ import com.rngtech.content.block.CorrosionCellBlock;
 import com.rngtech.content.block.CrusherBlock;
 import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.block.GasChemistryBlock;
+import com.rngtech.content.block.IdentifierBlock;
 import com.rngtech.content.block.MelterBlock;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.block.PotentialReactorBlock;
@@ -87,6 +89,8 @@ enum MachineSoundProfile {
     );
 
     private static final float STAGE_VOLUME_STEP = 0.005F;
+    /** The Affix Sorter runs a fifth quieter than the other kinetic machines. */
+    private static final float AFFIX_SORTER_VOLUME = 0.8F;
     private static final float STAGE_PITCH_STEP = 0.025F;
 
     private final DeferredHolder<SoundEvent, SoundEvent> loopSound;
@@ -119,7 +123,8 @@ enum MachineSoundProfile {
         if (block instanceof CrusherBlock
                 || block instanceof ComponentRecyclerBlock
                 || block instanceof MetalPressBlock
-                || block instanceof ResonanceCalibratorBlock) {
+                || block instanceof ResonanceCalibratorBlock
+                || block instanceof AffixSorterBlock) {
             return KINETIC;
         }
         if (block instanceof FurnaceBlock
@@ -139,7 +144,8 @@ enum MachineSoundProfile {
                 || block instanceof BatteryAssemblerBlock
                 || block instanceof SolarPanelBlock
                 || block instanceof SolarArrayControllerBlock
-                || block instanceof AmmoniaSynthesizerBlock) {
+                || block instanceof AmmoniaSynthesizerBlock
+                || block instanceof IdentifierBlock) {
             return ELECTRIC;
         }
         if (block instanceof WoodenDehumidifierBlock
@@ -156,6 +162,11 @@ enum MachineSoundProfile {
             return REACTOR;
         }
         return null;
+    }
+
+    /** A per-machine trim on the loop and its start and stop cues, on top of the profile and the Discreet factor. */
+    static float volumeScale(Block block) {
+        return block instanceof AffixSorterBlock ? AFFIX_SORTER_VOLUME : 1.0F;
     }
 
     SoundEvent loopSound() {

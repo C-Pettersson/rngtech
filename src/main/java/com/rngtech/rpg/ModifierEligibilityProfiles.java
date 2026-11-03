@@ -233,6 +233,16 @@ public final class ModifierEligibilityProfiles {
             ModifierValueRange.fixed(2),
             ModifierValueRange.fixed(2)
     );
+    /** Affix Sorter Rule Capacity: two Tier 7 rolls, one on the machine and one on the Rule Core, add the PRD's +12. */
+    private static final List<ModifierValueRange> RULE_CAPACITY_ADD_RANGES = List.of(
+            ModifierValueRange.fixed(1),
+            ModifierValueRange.fixed(2),
+            new ModifierValueRange(2, 3, true),
+            new ModifierValueRange(3, 4, true),
+            new ModifierValueRange(4, 5, true),
+            ModifierValueRange.fixed(5),
+            ModifierValueRange.fixed(6)
+    );
     private static final List<ModifierValueRange> MOONLIGHT_CONVERSION_RANGES = List.of(
             new ModifierValueRange(10, 20, true),
             new ModifierValueRange(20, 30, true),
@@ -478,6 +488,15 @@ public final class ModifierEligibilityProfiles {
     private static final ModifierDefinition ENERGY_TRANSFER = percent(ModifierSlot.SUFFIX, MachineStat.ENERGY_TRANSFER);
     private static final ModifierDefinition FLUID_TRANSFER = percent(ModifierSlot.SUFFIX, MachineStat.FLUID_TRANSFER);
     private static final ModifierDefinition FLUID_CAPACITY = percent(ModifierSlot.SUFFIX, MachineStat.FLUID_CAPACITY);
+    private static final ModifierDefinition FLUID_USAGE = percent(ModifierSlot.SUFFIX, MachineStat.FLUID_USAGE);
+    private static final ModifierDefinition RULE_CAPACITY = ModifierDefinition.rollable(
+            "rule_capacity",
+            "rule_capacity",
+            ModifierSlot.PREFIX,
+            MachineStat.RULE_CAPACITY,
+            ModifierOperation.ADD,
+            RULE_CAPACITY_ADD_RANGES
+    );
     private static final ModifierDefinition FLUID_CAPACITY_ADD = ModifierDefinition.rollable(
             FLUID_CAPACITY_FLAT_AFFIX_ID,
             FLUID_CAPACITY_FLAT_AFFIX_ID,
@@ -2250,6 +2269,53 @@ public final class ModifierEligibilityProfiles {
             ),
             PROCESSING_MACHINE_BEHAVIORS
     );
+    public static final ModifierEligibilityProfile IDENTIFIER = profile(
+            "identifier",
+            Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
+                    ModifierCapability.HAS_FE_STORAGE,
+                    ModifierCapability.HAS_FE_INPUT,
+                    ModifierCapability.HAS_INPUT_SLOT,
+                    ModifierCapability.HAS_OUTPUT_SLOT,
+                    ModifierCapability.HAS_PROCESSING,
+                    ModifierCapability.HAS_FLUID_STORAGE,
+                    ModifierCapability.HAS_FLUID_INPUT,
+                    ModifierCapability.HAS_FLUID_USE
+            ),
+            poweredProcessingAffixes(
+                    "identifying",
+                    false,
+                    MACHINE_ENERGY_CAPACITY_ADD,
+                    MachineStat.ENERGY_CAPACITY,
+                    MachineStat.ENERGY_USAGE,
+                    MachineStat.PROCESSING_SPEED,
+                    MachineStat.FLUID_USAGE,
+                    MachineStat.FLUID_CAPACITY
+            ),
+            PROCESSING_MACHINE_BEHAVIORS
+    );
+    public static final ModifierEligibilityProfile AFFIX_SORTER = profile(
+            "affix_sorter",
+            Set.of(
+                    ModifierCapability.HAS_JEWEL_SOCKETS,
+                    ModifierCapability.HAS_FE_STORAGE,
+                    ModifierCapability.HAS_FE_INPUT,
+                    ModifierCapability.HAS_INPUT_SLOT,
+                    ModifierCapability.HAS_OUTPUT_SLOT,
+                    ModifierCapability.HAS_PROCESSING,
+                    ModifierCapability.HAS_RULES
+            ),
+            poweredProcessingAffixes(
+                    "sorting",
+                    false,
+                    MACHINE_ENERGY_CAPACITY_ADD,
+                    MachineStat.ENERGY_CAPACITY,
+                    MachineStat.ENERGY_USAGE,
+                    MachineStat.PROCESSING_SPEED,
+                    MachineStat.RULE_CAPACITY
+            )
+    );
     public static final ModifierEligibilityProfile METAL_PRESS = profile(
             "metal_press",
             Set.of(
@@ -3126,6 +3192,20 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.PROCESSING_SPEED
             )
     );
+    public static final ModifierEligibilityProfile RULE_CORE = profile(
+            "rule_core",
+            Set.of(
+                    ModifierCapability.HAS_GEAR_STATS,
+                    ModifierCapability.HAS_PROCESSING,
+                    ModifierCapability.HAS_RULES
+            ),
+            processingAffixes(
+                    "ruling",
+                    false,
+                    MachineStat.PROCESSING_SPEED,
+                    MachineStat.RULE_CAPACITY
+            )
+    );
     public static final ModifierEligibilityProfile FLUID_PUMP = profile(
             "fluid_pump",
             Set.of(
@@ -3245,6 +3325,8 @@ public final class ModifierEligibilityProfiles {
                 COMPONENT_RECYCLER,
                 METAL_PRESS,
                 MELTER,
+                IDENTIFIER,
+                AFFIX_SORTER,
                 BATTERY_ASSEMBLER,
                 COAL_GASIFIER,
                 SYNGAS_COMBUSTOR,
@@ -3284,6 +3366,7 @@ public final class ModifierEligibilityProfiles {
                 COLLAPSE_NOZZLE,
                 DIMENSIONAL_STABILIZER,
                 DISASSEMBLY_HEAD,
+                RULE_CORE,
                 FLUID_PUMP,
                 SOLAR_ARRAY_EXTENDER,
                 RESONANCE_COIL,
@@ -3340,6 +3423,8 @@ public final class ModifierEligibilityProfiles {
             case FORESTRY_COMPANION -> FORESTRY_COMPANION;
             case PHASE_EMITTER -> PHASE_EMITTER;
             case PHASE_COIL -> PHASE_COIL;
+            case IDENTIFIER -> IDENTIFIER;
+            case AFFIX_SORTER -> AFFIX_SORTER;
         };
     }
 
@@ -3401,6 +3486,7 @@ public final class ModifierEligibilityProfiles {
             case RESONANCE_COIL -> RESONANCE_COIL;
             case CONTROL_BOARD -> CONTROL_BOARD;
             case STABILIZER_MATRIX -> STABILIZER_MATRIX;
+            case RULE_CORE -> RULE_CORE;
         };
     }
 
@@ -3828,6 +3914,8 @@ public final class ModifierEligibilityProfiles {
         put(definitions, ModifierCapability.HAS_MACHINE_NOISE, DISCREET);
         put(definitions, ModifierCapability.HAS_TELEMETRY, TELEMETRY_ENERGY, TELEMETRY_PROGRESS, TELEMETRY_OUTPUT, TELEMETRY_HEAT);
         put(definitions, ModifierCapability.HAS_FLUID_INPUT, FLUID_TRANSFER);
+        put(definitions, ModifierCapability.HAS_FLUID_USE, FLUID_USAGE);
+        put(definitions, ModifierCapability.HAS_RULES, RULE_CAPACITY);
         put(definitions, ModifierCapability.HAS_FLUID_OUTPUT, FLUID_TRANSFER);
         put(
                 definitions,
@@ -3941,6 +4029,8 @@ public final class ModifierEligibilityProfiles {
             case ENERGY_TRANSFER -> ENERGY_TRANSFER;
             case FLUID_TRANSFER -> FLUID_TRANSFER;
             case FLUID_CAPACITY -> FLUID_CAPACITY;
+            case FLUID_USAGE -> FLUID_USAGE;
+            case RULE_CAPACITY -> RULE_CAPACITY;
             case FUEL_EFFICIENCY -> FUEL_EFFICIENCY;
             case STABILITY -> STABILITY;
             case TEMPERATURE_STABILITY -> TEMPERATURE_STABILITY;
@@ -4065,6 +4155,7 @@ public final class ModifierEligibilityProfiles {
                 || stat == MachineStat.ORE_BURST_FE_USAGE
                 || stat == MachineStat.IDLE_LOSS
                 || stat == MachineStat.THERMAL_MASS
+                || stat == MachineStat.FLUID_USAGE
                 ? ModifierOperation.DECREASED_PERCENT
                 : ModifierOperation.INCREASED_PERCENT;
     }

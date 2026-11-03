@@ -6,7 +6,8 @@ import java.util.Locale;
 
 public enum MachineMasteryFamily {
     CRUSHER("drive"), FURNACE("drive_reserve"), FORESTRY("control_drive"),
-    ALLOY_FURNACE("drive_reserve"), METAL_PRESS("control"), MELTER("reserve_control"), RESONANCE_CALIBRATOR("control");
+    ALLOY_FURNACE("drive_reserve"), METAL_PRESS("control"), MELTER("reserve_control"), RESONANCE_CALIBRATOR("control"),
+    IDENTIFIER("reserve");
 
     private final String start;
 
@@ -21,7 +22,7 @@ public enum MachineMasteryFamily {
     /** The highest stage any machine of this family reaches, as its ascendancy entry stage reports it. */
     public int topStage() {
         return switch (this) {
-            case CRUSHER, FURNACE -> 8;
+            case CRUSHER, FURNACE, IDENTIFIER -> 8;
             case RESONANCE_CALIBRATOR -> 7;
             case ALLOY_FURNACE, MELTER -> 6;
             case METAL_PRESS, FORESTRY -> 4;
@@ -76,16 +77,17 @@ public enum MachineMasteryFamily {
             case ENERGY_CAPACITY, INSTANT_PROCESS_CHANCE -> this != FORESTRY;
             // The Resonance Calibrator's calibration floor and the Metal Press servo read Stability; elsewhere it is display only.
             case STABILITY -> this == RESONANCE_CALIBRATOR || this == METAL_PRESS;
-            case SUPER_OUTPUT_CHANCE -> this != FORESTRY && this != MELTER;
+            // The Identifier makes no extra items: one in, one identified out.
+            case SUPER_OUTPUT_CHANCE -> this != FORESTRY && this != MELTER && this != IDENTIFIER;
             case ENERGY_CAPACITY_FLAT -> this == CRUSHER || this == FURNACE;
             // Only the Crusher reads Output Amount and its cap; other machines' bonus output is Super Output.
             case OUTPUT_AMOUNT, MAX_OUTPUT_AMOUNT -> this == CRUSHER;
-            case BATCH_SIZE -> this != FORESTRY;
+            case BATCH_SIZE -> this != FORESTRY && this != IDENTIFIER;
             // Every heated machine, the Melter included, runs on the shared heat engine.
             case MAX_TEMPERATURE, HEAT_TRANSFER, THERMAL_CONDUCTIVITY, HEAT_ISOLATION, TEMPERATURE_STABILITY, THERMAL_MASS, COOLING_RATE,
                     OVERHEAT_TOLERANCE -> heatChassis() || this == MELTER;
             case FUEL_DURATION, FUEL_EFFICIENCY -> this == FURNACE;
-            case FLUID_TRANSFER -> this == MELTER;
+            case FLUID_TRANSFER -> this == MELTER || this == IDENTIFIER;
             case CALIBRATION_PRECISION, CATALYST_EFFICIENCY -> this == RESONANCE_CALIBRATOR;
             case PROCESSING_LEVEL, OUTPUT_GUARD_GRACE, NO_BATTERY_OUTPUT_RETENTION,
                     HIGH_HARDNESS_ENERGY_MITIGATION, CRUSHER_INPUT_FILTER, CRUSHER_SALVAGE_CHANCE -> this == CRUSHER;

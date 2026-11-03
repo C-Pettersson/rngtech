@@ -48,7 +48,7 @@ public final class WorkOrderConditions {
     private static final Set<String> ALL = Set.of();
     /** The families whose machines roll Instant Process Chance, so of Hand Feeding costs them something. */
     public static final Set<String> INSTANT_PROCESS = Set.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter",
-            "resonance_calibrator", "component_assembler", "component_recycler");
+            "resonance_calibrator", "component_assembler", "component_recycler", "identifier");
 
     /**
      * One condition: its affix definition, the families that can read it (none listed means every family), the filter a
@@ -77,7 +77,7 @@ public final class WorkOrderConditions {
                     range(0.80, 0.85), range(0.75, 0.80), range(0.70, 0.75)), ALL, null, true, new int[] {15, 22, 30}, 0),
             new Condition(tiered(POWER_SURCHARGE, ModifierSlot.PREFIX, MachineStat.ENERGY_USAGE, ModifierOperation.INCREASED_PERCENT,
                     whole(25, 33), whole(34, 41), whole(42, 50)), Set.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter",
-                    "resonance_calibrator", "component_assembler", "component_recycler"), null, true, new int[] {10, 17, 25}, 0),
+                    "resonance_calibrator", "component_assembler", "component_recycler", "identifier"), null, true, new int[] {10, 17, 25}, 0),
             new Condition(fixed(SHORT_CREW, ModifierSlot.PREFIX, MachineStat.BATCH_SIZE, ModifierOperation.ADD, -1),
                     Set.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter", "resonance_calibrator"), null, true, new int[] {30}, 0),
             new Condition(tiered(COLD_START, ModifierSlot.PREFIX, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.DECREASED_PERCENT,

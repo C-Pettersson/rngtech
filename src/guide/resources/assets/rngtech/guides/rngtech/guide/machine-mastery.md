@@ -33,6 +33,7 @@ A machine earns XP each time it successfully finishes a job that awards Mastery 
 | Metal Press | Finished pressing jobs. |
 | Resonance Calibrator | Finished calibrations, counted per lane on multi-lane chassis. |
 | Melter | Finished melts that land in the output tank. |
+| Identifier | Identified items. Higher-stage items give more XP. |
 | Forestry Companion | Planting, leaf cleanup, and harvesting. |
 
 Failed jobs, idle time, waiting on a full output, and recipes with no XP give nothing.
@@ -49,7 +50,7 @@ The tree has three **attributes**: **Control** (teal), **Drive** (gold), and **R
 |---|---|---|
 | Control | 0.1% increased Stability and 0.02% reduced Energy Usage per point | Furnace, Alloy Furnace, and Metal Press: 0.05% increased Temperature Stability per point. Resonance Calibrator: 0.05% increased Calibration Precision per point. |
 | Drive | 0.15% increased Processing Speed per point | Forestry Companion: +1 Tree Fell Limit per 20 points. |
-| Reserve | 0.25% increased Energy Capacity per point (not the Forestry Companion) | Furnace and Alloy Furnace: 0.1% increased Heat Isolation per point. Melter: 0.1% increased Fluid Transfer per point. Forestry Companion: +1 managed-cell maximum per 4 points. |
+| Reserve | 0.25% increased Energy Capacity per point (not the Forestry Companion) | Furnace and Alloy Furnace: 0.1% increased Heat Isolation per point. Melter: 0.1% increased Fluid Transfer per point. Identifier: 0.05% reduced Fluid Use per point. Forestry Companion: +1 managed-cell maximum per 4 points. |
 
 A bonus only matters where the machine uses that stat. For example, the Stage 0 fuel Furnace has no FE buffer, so Reserve's Energy Capacity does nothing for it.
 

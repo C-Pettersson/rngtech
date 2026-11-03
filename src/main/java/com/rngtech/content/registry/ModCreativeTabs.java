@@ -153,6 +153,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.LUBRICANT_BUCKET.get());
                         output.accept(ModItems.ELECTROLYTE_SOLUTION_BUCKET.get());
                         output.accept(ModItems.ENDER_SLURRY_BUCKET.get());
+                        output.accept(ModItems.IDENTIFYING_FLUID_BUCKET.get());
                         output.accept(ModItems.CARBON_EXHAUST_BUCKET.get());
                         output.accept(ModItems.SYNGAS_BUCKET.get());
                         output.accept(ModItems.METHANE_BUCKET.get());
@@ -321,6 +322,10 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.DISPATCH_TERMINAL.get());
                         output.accept(ModItems.REQUISITION.get());
                         output.accept(ModItems.PHASE_EMITTER.get());
+                        output.accept(ModItems.IDENTIFIER.get());
+                        output.accept(ModItems.AFFIX_SORTER.get());
+                        output.accept(ModItems.EXOTIC_RULE_CORE.get());
+                        output.accept(ModItems.RULE_CARD.get());
                         output.accept(ModItems.PHASE_COIL.get());
                         for (int tier = 1; tier <= PhaseArrayRules.GLYPH_TIERS; tier++) {
                             output.accept(GlyphItem.of(ModItems.GLYPH.get(), tier));

@@ -1,5 +1,6 @@
 package com.rngtech.content.blockentity;
 
+import com.rngtech.content.block.AffixSorterBlock;
 import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.block.AmmoniaFuelCellBlock;
 import com.rngtech.content.block.AmmoniaSynthesizerBlock;
@@ -13,6 +14,7 @@ import com.rngtech.content.block.CorrosionCellBlock;
 import com.rngtech.content.block.CrusherBlock;
 import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.block.GasChemistryBlock;
+import com.rngtech.content.block.IdentifierBlock;
 import com.rngtech.content.block.MelterBlock;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.block.PhaseCoilBlock;
@@ -405,6 +407,10 @@ public abstract class BaseMachineBlockEntity extends BlockEntity implements Refi
         }
         if (block instanceof MelterBlock) {
             return 6;
+        }
+        if (block instanceof IdentifierBlock
+                || block instanceof AffixSorterBlock) {
+            return 8;
         }
         if (block instanceof BatteryAssemblerBlock) {
             return 2;

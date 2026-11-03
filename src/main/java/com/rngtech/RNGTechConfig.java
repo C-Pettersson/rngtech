@@ -225,6 +225,30 @@ public final class RNGTechConfig {
             .comment("Phase Array: the lowest Glyph tier (1 to 5) each Coil position needs, nine entries from the position next to the Emitter outward.")
             .defineList("phaseArray.glyphFloors", List.of(1, 1, 1, 2, 2, 3, 3, 4, 5), element -> element instanceof Integer tier && tier >= 1 && tier <= 5);
 
+    public static final ModConfigSpec.IntValue IDENTIFIER_FE_PER_ITEM = BUILDER
+            .comment("Identifier: FE to identify one Stage 8 item, before affixes. Lower stages pay a share by stage.")
+            .defineInRange("identifier.fePerItem", 16_000, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue IDENTIFIER_FLUID_PER_ITEM = BUILDER
+            .comment("Identifier: mB of Identifying Fluid to identify one Stage 8 item, before affixes. Lower stages pay a share by stage.")
+            .defineInRange("identifier.fluidPerItem", 100, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue IDENTIFIER_TICKS_PER_ITEM = BUILDER
+            .comment("Identifier: ticks to identify one item, before Processing Speed.")
+            .defineInRange("identifier.ticksPerItem", 100, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue AFFIX_SORTER_BASE_FE = BUILDER
+            .comment("Affix Sorter: FE to check one item against one enabled rule. A list of n rules costs this times n^1.5.")
+            .defineInRange("affixSorter.baseFePerItem", 4_000, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue AFFIX_SORTER_TICKS_PER_ITEM = BUILDER
+            .comment("Affix Sorter: ticks to check one item, before Processing Speed.")
+            .defineInRange("affixSorter.ticksPerItem", 20, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue AFFIX_SORTER_BASE_RULE_CAPACITY = BUILDER
+            .comment("Affix Sorter: enabled rules allowed before Rule Capacity affixes.")
+            .defineInRange("affixSorter.baseRuleCapacity", 8, 1, 32);
+
     public static final Map<String, ModConfigSpec.BooleanValue> MATERIALS = defineMaterials();
     private static final OreWorldgenConfig ORE_WORLDGEN_CONFIG = defineOreWorldgen();
     public static final ModConfigSpec.BooleanValue ORE_WORLDGEN_ENABLED = ORE_WORLDGEN_CONFIG.enabled();

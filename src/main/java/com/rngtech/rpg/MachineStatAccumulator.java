@@ -586,6 +586,34 @@ public final class MachineStatAccumulator {
         return stats;
     }
 
+    public static MachineStatAccumulator identifierBase(int energyCapacity, int transferRate, int fluidCapacity) {
+        MachineStatAccumulator stats = new MachineStatAccumulator();
+        applyBaseMachineValues(stats);
+        stats.baseValues.put(MachineStat.INPUT_SLOTS, 1.0);
+        stats.baseValues.put(MachineStat.OUTPUT_SLOTS, 1.0);
+        stats.baseValues.put(MachineStat.ENERGY_CAPACITY, (double) energyCapacity);
+        stats.baseValues.put(MachineStat.ENERGY_TRANSFER, (double) transferRate);
+        stats.baseValues.put(MachineStat.FLUID_TRANSFER, 0.0);
+        stats.baseValues.put(MachineStat.FLUID_CAPACITY, (double) fluidCapacity);
+        stats.baseValues.put(MachineStat.FLUID_USAGE, 1.0);
+        stats.baseValues.put(MachineStat.PROCESSING_SPEED, 1.0);
+        stats.baseValues.put(MachineStat.ENERGY_USAGE, 1.0);
+        return stats;
+    }
+
+    public static MachineStatAccumulator affixSorterBase(int energyCapacity, int transferRate) {
+        MachineStatAccumulator stats = new MachineStatAccumulator();
+        applyBaseMachineValues(stats);
+        stats.baseValues.put(MachineStat.INPUT_SLOTS, 1.0);
+        stats.baseValues.put(MachineStat.OUTPUT_SLOTS, 2.0);
+        stats.baseValues.put(MachineStat.ENERGY_CAPACITY, (double) energyCapacity);
+        stats.baseValues.put(MachineStat.ENERGY_TRANSFER, (double) transferRate);
+        stats.baseValues.put(MachineStat.PROCESSING_SPEED, 1.0);
+        stats.baseValues.put(MachineStat.ENERGY_USAGE, 1.0);
+        stats.baseValues.put(MachineStat.RULE_CAPACITY, 0.0);
+        return stats;
+    }
+
     public static MachineStatAccumulator melterBase(int energyCapacity, int transferRate, int fluidTransferRate) {
         MachineStatAccumulator stats = new MachineStatAccumulator();
         applyBaseMachineValues(stats);

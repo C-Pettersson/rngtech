@@ -1,5 +1,6 @@
 package com.rngtech.rpg;
 
+import com.rngtech.content.affixsorter.RuleCoreMaterial;
 import com.rngtech.content.calibration.CalibrationGearMaterial;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.CathodeMaterial;
@@ -26,6 +27,7 @@ import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.GasChemistryPartItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.PotentialReactorPartItem;
+import com.rngtech.content.item.RuleCoreItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolarArrayExtenderItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
@@ -478,6 +480,9 @@ public final class ComponentBaseStatCatalog {
         if (item instanceof DisassemblyHeadItem head) {
             return disassemblyHead(head.material());
         }
+        if (item instanceof RuleCoreItem core) {
+            return ruleCore(core.material());
+        }
         if (item instanceof ServoItem servo) {
             return servo(servo.material());
         }
@@ -672,6 +677,14 @@ public final class ComponentBaseStatCatalog {
                 .add(MachineStat.PROCESSING_LEVEL, material.stage())
                 .more(MachineStat.PROCESSING_SPEED, material.processingSpeed())
                 .more(MachineStat.STABILITY, material.stability())
+                .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
+                .build();
+    }
+
+    static Profile ruleCore(RuleCoreMaterial material) {
+        return builder()
+                .add(MachineStat.RULE_CAPACITY, material.ruleCapacity())
+                .more(MachineStat.PROCESSING_SPEED, material.processingSpeed())
                 .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
                 .build();
     }

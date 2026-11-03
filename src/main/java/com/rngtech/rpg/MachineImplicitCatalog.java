@@ -1,5 +1,7 @@
 package com.rngtech.rpg;
 
+import com.rngtech.content.affixsorter.RuleCoreMaterial;
+import com.rngtech.content.block.AffixSorterBlock;
 import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.block.AmmoniaFuelCellBlock;
 import com.rngtech.content.block.AmmoniaSynthesizerBlock;
@@ -12,6 +14,7 @@ import com.rngtech.content.block.CorrosionCellBlock;
 import com.rngtech.content.block.CrusherBlock;
 import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.block.GasChemistryBlock;
+import com.rngtech.content.block.IdentifierBlock;
 import com.rngtech.content.block.MelterBlock;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.block.PotentialReactorBlock;
@@ -56,6 +59,7 @@ import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.PotentialReactorBlockItem;
 import com.rngtech.content.item.PotentialReactorPartItem;
 import com.rngtech.content.item.ResonanceCalibratorBlockItem;
+import com.rngtech.content.item.RuleCoreItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolarArrayControllerBlockItem;
 import com.rngtech.content.item.SolarArrayExtenderItem;
@@ -221,6 +225,9 @@ public final class MachineImplicitCatalog {
         if (item instanceof DisassemblyHeadItem head) {
             return disassemblyHead(head.material());
         }
+        if (item instanceof RuleCoreItem core) {
+            return ruleCore(core.material());
+        }
         if (item instanceof ServoItem servo) {
             return servo(servo.material());
         }
@@ -254,6 +261,8 @@ public final class MachineImplicitCatalog {
                 case ALLOY_FURNACE -> alloyFurnace(AlloyFurnaceChassisMaterial.BRONZE);
                 case METAL_PRESS -> metalPress(machine.getBlock());
                 case MELTER -> staticMachine("melter", MachineBehavior.OUTPUT_GUARD);
+                case IDENTIFIER -> staticMachine("identifier");
+                case AFFIX_SORTER -> staticMachine("affix_sorter");
                 case BATTERY_ASSEMBLER -> staticMachine("battery_assembler", MachineBehavior.OUTPUT_GUARD);
                 case COAL_GASIFIER -> staticMachine("coal_gasifier", MachineBehavior.OUTPUT_GUARD);
                 case SYNGAS_COMBUSTOR -> staticMachine("syngas_combustor", MachineBehavior.OUTPUT_GUARD);
@@ -319,6 +328,12 @@ public final class MachineImplicitCatalog {
         }
         if (block instanceof MelterBlock) {
             return staticMachine("melter", MachineBehavior.OUTPUT_GUARD);
+        }
+        if (block instanceof IdentifierBlock) {
+            return staticMachine("identifier");
+        }
+        if (block instanceof AffixSorterBlock) {
+            return staticMachine("affix_sorter");
         }
         if (block instanceof BatteryAssemblerBlock) {
             return staticMachine("battery_assembler", MachineBehavior.OUTPUT_GUARD);
@@ -471,6 +486,10 @@ public final class MachineImplicitCatalog {
 
     public static Identity disassemblyHead(DisassemblyHeadMaterial material) {
         return identity("disassembly_head." + material.getSerializedName(), Rarity.NORMAL, material.refinementPotential(), List.of());
+    }
+
+    public static Identity ruleCore(RuleCoreMaterial material) {
+        return identity("rule_core." + material.getSerializedName(), Rarity.NORMAL, material.refinementPotential(), List.of());
     }
 
     public static Identity servo(ServoMaterial material) {

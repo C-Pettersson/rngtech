@@ -22,6 +22,7 @@ export const FAMILIES = [
     { id: "metal_press", label: "Metal Press", page: "wiki/metal-press.md" },
     { id: "resonance_calibrator", label: "Resonance Calibrator", page: "wiki/resonance-calibrator.md" },
     { id: "melter", label: "Melter", page: "wiki/melter.md" },
+    { id: "identifier", label: "Identifier", page: "wiki/identifier.md" },
     { id: "forestry", label: "Forestry Companion", page: "wiki/forestry-cart-station.md" }
 ];
 

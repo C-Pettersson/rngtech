@@ -286,6 +286,15 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Calibrated-component recycling is the fallback for stability misses: roughly `30-50%` of the attempt and never more than one raw input. Patterns are reusable and catalysts are lost.
 - Crafted machines do not remember calibrated ingredient state, so their calibrated slots return the uncalibrated precursor.
 
+### Identifier and Affix Sorter
+
+- Automation identifies items only through the Identifier. Installing Gear and placing machines identify only for a player (`CraftedTraitOutputs.isPlayerAction`); a new identification path must keep that rule, or it undercuts the Identifier's cost.
+- The Identifier sells automation, not better rolls. It must roll exactly as a crafting grid, keeping seeded Unique rolls and Annealed RP.
+- Identifying Fluid has one sink, so its per-item cost reads directly as the cost of automating identification. Cost scales with the item's stage so early Gear stays cheap to sort.
+- The Affix Sorter's FE grows faster than its rule count (`n^1.5`) so a picky list is a visible energy sink. Rule Capacity limits enabled rules, never stored ones, and the screen refuses to enable a rule past it rather than switching another off.
+- The sorter never pushes, reroutes, voids, or changes an item. A full route buffer stops it. Its rule pulse is a local redstone signal, never a stock count.
+- The Rules tab is the one exception to the low-text screen rule; every other tab follows it.
+
 ### Corrosion Cell
 
 - Anode FE/t stays below the same stage's main generator: the Syngas Combustor at Stage 5, the Fuel Cell at Stage 6, and the Vacuum Collapse Generator at Stage 7 (and its all-Exotic setup at Stage 8).

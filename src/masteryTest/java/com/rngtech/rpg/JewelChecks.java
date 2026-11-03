@@ -49,7 +49,7 @@ public final class JewelChecks {
         Set<String> expected = Set.of("crusher", "furnace", "electric_furnace", "solid_fuel_burner", "bio_generator", "solar_array_controller",
                 "potential_reactor", "corrosion_cell", "vacuum_collapse_generator", "component_recycler", "metal_press", "melter", "battery_assembler",
                 "coal_gasifier", "syngas_combustor", "steam_methane_reformer", "cavitation_generator", "ammonia_synthesizer", "ammonia_fuel_cell",
-                "compressor_tank", "fluid_tank", "alloy_furnace", "resonance_calibrator", "battery_chassis");
+                "compressor_tank", "fluid_tank", "alloy_furnace", "resonance_calibrator", "battery_chassis", "identifier", "affix_sorter");
         Set<String> actual = new java.util.HashSet<>();
         bedazzled.forEach(profile -> actual.add(profile.id()));
         require(actual.equals(expected), "Bedazzling rolls on every machine body with a screen and nowhere else: " + actual);

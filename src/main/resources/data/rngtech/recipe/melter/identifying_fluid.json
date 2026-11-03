@@ -1,0 +1,32 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "naquadah"
+    }
+  ],
+  "type": "rngtech:melter",
+  "group": "melter_identifying_fluid",
+  "primary_ingredient": {
+    "tag": "c:dusts/naquadah"
+  },
+  "secondary_ingredient": {
+    "item": "rngtech:calibrated_diamond_crystal"
+  },
+  "fluid_input": {
+    "ingredient": {
+      "fluid": "rngtech:ender_slurry"
+    },
+    "amount": 1000
+  },
+  "fluid_output": {
+    "id": "rngtech:identifying_fluid",
+    "amount": 1000
+  },
+  "processing_ticks": 400,
+  "heat": 6000,
+  "minimum_temperature": 1500,
+  "required_processing_level": 8,
+  "bonus_output": false,
+  "machine_xp": 8
+}

@@ -15,6 +15,8 @@
         "twin_crucible.json",
         "timber_baron.json",
         "grove_warden.json",
-        "field_hand.json"
+        "field_hand.json",
+        "appraiser.json",
+        "reagent_warden.json"
     ]
 }

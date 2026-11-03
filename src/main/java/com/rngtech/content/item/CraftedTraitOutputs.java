@@ -14,7 +14,11 @@ import com.rngtech.rpg.unique.UniqueItems;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.util.FakePlayer;
+
+import javax.annotation.Nullable;
 
 import java.util.Locale;
 
@@ -65,6 +69,11 @@ public final class CraftedTraitOutputs {
             stack.set(ModDataComponents.IDENTIFY_TRAIT_ROLL_ON_CRAFT.get(), true);
         }
         return stack;
+    }
+
+    /** Placing and installing identify only for a real player, so automation identifies only through the Identifier. */
+    public static boolean isPlayerAction(@Nullable Player player) {
+        return player != null && !(player instanceof FakePlayer);
     }
 
     /** A pending roll, or a Unique with ranged lines and no rolls yet, such as one from a command or quest reward. */

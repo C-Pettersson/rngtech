@@ -41,6 +41,7 @@ final class TreeAuditChecks {
             MachineMasteryFamily.METAL_PRESS, "content/blockentity/MetalPressBlockEntity.java",
             MachineMasteryFamily.MELTER, "content/blockentity/MelterBlockEntity.java",
             MachineMasteryFamily.RESONANCE_CALIBRATOR, "content/blockentity/ResonanceCalibratorBlockEntity.java",
+            MachineMasteryFamily.IDENTIFIER, "content/blockentity/IdentifierBlockEntity.java",
             MachineMasteryFamily.FORESTRY, "content/entity/ForestryCartEntity.java");
     /** Accumulator helpers and the stats they read for the machine that calls them. */
     private static final Map<String, Set<MachineStat>> ACCUMULATOR_HELPERS = Map.of(

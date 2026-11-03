@@ -2,6 +2,7 @@ package com.rngtech.content.gear;
 
 import com.rngtech.RNGTech;
 import com.rngtech.content.blockentity.AffixForgeBlockEntity;
+import com.rngtech.content.blockentity.AffixSorterBlockEntity;
 import com.rngtech.content.blockentity.AlgaePhotobioreactorBlockEntity;
 import com.rngtech.content.blockentity.AlloyFurnaceBlockEntity;
 import com.rngtech.content.blockentity.AmmoniaFuelCellBlockEntity;
@@ -16,6 +17,7 @@ import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
+import com.rngtech.content.blockentity.IdentifierBlockEntity;
 import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.blockentity.PotentialReactorBlockEntity;
@@ -568,6 +570,62 @@ public final class GearSlotCatalog {
                 "metal_press",
                 item(ModItems.METAL_PRESS.get()),
                 metalPressSlots(true)
+        ));
+        specs.add(spec(
+                "identifier",
+                item(ModItems.IDENTIFIER.get()),
+                slot(
+                        "rngtech.gear.battery_cell",
+                        false,
+                        GearSlotArea.GEAR,
+                        IdentifierBlockEntity.SLOT_BATTERY_CELL,
+                        batteryCells(cell -> true),
+                        anyStage()
+                ),
+                slot(
+                        "rngtech.gear.fluid_pump",
+                        true,
+                        GearSlotArea.GEAR,
+                        IdentifierBlockEntity.SLOT_FLUID_PUMP,
+                        fluidPumps(pump -> true),
+                        anyRegistered()
+                ),
+                slot(
+                        "rngtech.gear.servo",
+                        true,
+                        GearSlotArea.GEAR,
+                        IdentifierBlockEntity.SLOT_SERVO,
+                        servos(servo -> true),
+                        anyRegistered()
+                )
+        ));
+        specs.add(spec(
+                "affix_sorter",
+                item(ModItems.AFFIX_SORTER.get()),
+                slot(
+                        "rngtech.gear.battery_cell",
+                        false,
+                        GearSlotArea.GEAR,
+                        AffixSorterBlockEntity.SLOT_BATTERY_CELL,
+                        batteryCells(cell -> true),
+                        anyStage()
+                ),
+                slot(
+                        "rngtech.gear.rule_core",
+                        true,
+                        GearSlotArea.GEAR,
+                        AffixSorterBlockEntity.SLOT_RULE_CORE,
+                        List.of(item(ModItems.EXOTIC_RULE_CORE.get())),
+                        anyRegistered()
+                ),
+                slot(
+                        "rngtech.gear.servo",
+                        false,
+                        GearSlotArea.GEAR,
+                        AffixSorterBlockEntity.SLOT_SERVO,
+                        servos(servo -> true),
+                        anyRegistered()
+                )
         ));
         specs.add(spec(
                 "melter",
