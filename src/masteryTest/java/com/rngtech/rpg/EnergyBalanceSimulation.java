@@ -11,6 +11,7 @@ import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.ReactorChamberMaterial;
 import com.rngtech.content.energy.RecoveryFilterMaterial;
@@ -127,8 +128,17 @@ public final class EnergyBalanceSimulation {
     // Setups
     // ---------------------------------------------------------------------------------------------------------------
 
+    /** A Lava Tap Melter on unrolled Titanium Gear: 540 reference ticks at 2.775 work a tick, 3 x 7,967 heat plus wall loss. */
+    private static final double LAVA_LINE_TICKS = 194.6;
+    private static final double LAVA_LINE_COST = 24_030.0;
+    /** The same Melter without Lava Tap on Methane: 480 reference ticks at 1.85 work a tick, 3 x 7,511 heat plus wall loss. */
+    private static final double METHANE_LINE_TICKS = 259.5;
+    private static final double METHANE_LINE_COST = 24_776.0;
+
     private void defineSetups() throws IOException {
         solidFuelBurners();
+        fuelBurnerFluids("lava", LAVA_LINE_TICKS, LAVA_LINE_COST);
+        fuelBurnerFluids("methane", METHANE_LINE_TICKS, METHANE_LINE_COST);
         bioGenerators();
         bioGeneratorTakeOffs();
         solarPanels();
@@ -139,6 +149,54 @@ public final class EnergyBalanceSimulation {
         cavitationGenerators();
         ammoniaFuelCells();
         vacuumCollapseGenerators();
+    }
+
+    /**
+     * SolidFuelBurnerBlockEntity#tryStartBurningFluid for one fluid fuel. {@code lineNetFet} is one Melter feeding burners
+     * of this setup: 3 melts per cycle from Second Crucible with unrolled Titanium Gear, so it shows how far burner Gear
+     * alone moves the line. {@code lineTicks} and {@code lineCost} are that cycle's length and FE, the recipe's heat plus
+     * wall loss, and Lava Tap applies to the lava line.
+     */
+    private void fuelBurnerFluids(String id, double lineTicks, double lineCost) throws IOException {
+        JsonObject recipe = recipeJson("fluid_fuel", id);
+        Double override = scenario.recipeEnergy("fluid_fuel/" + id);
+        double energy = override != null ? override : recipe.get("energy").getAsDouble();
+        int tier = recipe.get("tier").getAsInt();
+        String form = recipe.get("form").getAsString();
+        ChainCosts.Fuel fuel = chains.fuel("fuel_burner/" + id);
+        for (SolidFuelBurnerChassis chassis : SolidFuelBurnerChassis.values()) {
+            for (HeatCoreMaterial core : HeatCoreMaterial.values()) {
+                if (core.stage() > chassis.maxPartStage() || core.maxFuelTier() < tier) {
+                    continue;
+                }
+                for (FuelTankMaterial tank : FuelTankMaterial.values()) {
+                    if (tank.stage() > chassis.maxPartStage() || !tank.form().getSerializedName().equals(form)) {
+                        continue;
+                    }
+                    int stage = max(chassis.stage(), core.stage(), tank.stage());
+                    add("fuel_burner_" + id, "Fuel Burner (" + id + ")", stage, List.of(
+                            "chassis:" + name(chassis), "heat_core:" + name(core), "fuel_tank:" + name(tank)
+                    ), fuel, roller -> {
+                        MachineStatAccumulator stats = MachineBaseStatCatalog.solidFuelBurner(chassis);
+                        stats.apply(roller.machine(MachineType.SOLID_FUEL_BURNER, chassis.stage()));
+                        part(stats, ComponentBaseStatCatalog.heatCore(core),
+                                roller.part(MachinePartType.HEAT_CORE, MachineType.SOLID_FUEL_BURNER, core.stage(), core.refinementPotential()));
+                        part(stats, ComponentBaseStatCatalog.fuelTank(tank),
+                                roller.part(MachinePartType.FUEL_TANK, MachineType.SOLID_FUEL_BURNER, tank.stage(), tank.refinementPotential()));
+
+                        int generation = Math.max(0, (int) Math.round(stats.value(MachineStat.ENERGY_GENERATION)));
+                        double perBucket = generation <= 0 ? 0.0 : energy
+                                * Math.max(0.1, stats.value(MachineStat.FUEL_EFFICIENCY))
+                                * Math.max(0.1, stats.value(MachineStat.EFFICIENCY))
+                                * Math.max(0.1, stats.value(MachineStat.FUEL_DURATION));
+                        double lineGross = 3.0 * perBucket / lineTicks;
+                        return Outcome.running(generation, generation, perBucket)
+                                .withMetric("lineNetFet", (3.0 * perBucket - lineCost) / lineTicks)
+                                .withMetric("burnersPerMelter", generation <= 0 ? 0.0 : lineGross / generation);
+                    });
+                }
+            }
+        }
     }
 
     /** SolidFuelBurnerBlockEntity#effectiveStats, #tryStartBurningFuel, #effectiveFuelDurationTicks, #applyHeatWaste. */

@@ -184,6 +184,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         protected void onContentsChanged(int slot) {
             if (slot == SLOT_FUEL_BOX && level != null) {
                 level.invalidateCapabilities(worldPosition);
+                dropItemsTheFuelPartHides();
             }
             setChanged();
         }
@@ -191,7 +192,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     private final ItemStackHandler fluidContainerInventory = new ItemStackHandler(1) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return isFluidContainer(stack);
+            return holdsBurnableFluid(stack);
         }
 
         @Override
@@ -577,8 +578,9 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
                 && part.stage() <= block.chassis().maxPartStage();
     }
 
-    public static boolean isFluidContainer(ItemStack stack) {
-        return FluidUtil.getFluidContained(stack).isPresent();
+    /** Whether {@code stack} is a container of fluid the installed part and Heat Core can burn. */
+    public boolean holdsBurnableFluid(ItemStack stack) {
+        return burnsFluid() && FluidUtil.getFluidContained(stack).filter(fluid -> fluidFuelStatus(fluid) == STATUS_READY).isPresent();
     }
 
     /** Whether the installed part burns fluid, so the fuel slots give way to a tank. */
@@ -1014,6 +1016,20 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         return drained;
     }
 
+    /** Each part shows only its own slots, so whatever the new part cannot use comes out where the player can reach it. */
+    private void dropItemsTheFuelPartHides() {
+        if (level == null || level.isClientSide) {
+            return;
+        }
+        if (burnsFluid()) {
+            for (int slot = 0; slot < fuelInventory.getSlots(); slot++) {
+                dropSlot(level, fuelInventory, slot);
+            }
+        } else if (fuelBox() != null) {
+            dropSlot(level, fluidContainerInventory, 0);
+        }
+    }
+
     private void drainFuelContainer() {
         ItemStack stack = fluidContainerInventory.getStackInSlot(0);
         if (stack.isEmpty() || !burnsFluid()) {
@@ -1188,7 +1204,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         }
     }
 
-    /** Fuel slots for a Fuel Box. With a tank or jet it is the one container slot, which gives back only empty containers. */
+    /** Fuel slots for a Fuel Box. With a tank or jet it is the one container slot, which gives back what it cannot burn. */
     private final class FuelItemHandler implements IItemHandler {
         @Override
         public int getSlots() {
@@ -1207,7 +1223,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            if (!burnsFluid() || isFluidContainer(fluidContainerInventory.getStackInSlot(mappedSlot(slot)))) {
+            if (!burnsFluid() || holdsBurnableFluid(fluidContainerInventory.getStackInSlot(mappedSlot(slot)))) {
                 return ItemStack.EMPTY;
             }
             return fluidContainerInventory.extractItem(slot, amount, simulate);

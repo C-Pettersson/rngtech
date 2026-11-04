@@ -412,7 +412,7 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
             if (!moveItemStackTo(stack, FUEL_BOX_SLOT, FUEL_BOX_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (burnsFluid() && SolidFuelBurnerBlockEntity.isFluidContainer(stack)) {
+        } else if (burner.holdsBurnableFluid(stack)) {
             if (!moveItemStackTo(stack, FLUID_CONTAINER_SLOT, FLUID_CONTAINER_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }

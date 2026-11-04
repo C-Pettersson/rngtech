@@ -7,6 +7,18 @@
             "chain_fe": 0,
             "chain": "Mined. Vanilla burn time 1600 ticks; tier 1 item fuel."
         },
+        "fuel_burner/lava": {
+            "input": "1000 mB lava",
+            "chain_fe": 8010,
+            "available_from_stage": 6,
+            "chain": "Melter 7,967 heat plus wall loss at unrolled Titanium Gear, one third of a Lava Tap cycle. Stone and blaze powder carry no FE. World lava collected by bucket costs no FE."
+        },
+        "fuel_burner/methane": {
+            "input": "1000 mB methane",
+            "chain_fe": 8259,
+            "available_from_stage": 6,
+            "chain": "Melter 7,511 heat plus wall loss at unrolled Titanium Gear, one third of a Second Crucible cycle. Algae Biomass and Organic Reagent are not counted."
+        },
         "bio_generator": {
             "input": "1 rich biomass",
             "base_amount": 3200,
