@@ -276,7 +276,7 @@ def wooden_dehumidifier(s, x, nbt=None, fluids=(), items=()):
 
 
 def coal():
-    s = Setup("coal", "Coal S1-4", "Solid Fuel Burner per stage (crude, copper, alloy, steel) on coal; each burns "
+    s = Setup("coal", "Coal S1-4", "Fuel Burner per stage (crude, copper, alloy, steel) on coal; each burns "
                                    "into a Debug Trashcan behind it, so it runs flat out.")
     s.machine(0, "rngtech:debug_chest", debug_chest("minecraft:coal"), items=[iout(0)])
     burners = [

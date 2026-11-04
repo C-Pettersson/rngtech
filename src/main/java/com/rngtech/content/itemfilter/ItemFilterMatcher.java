@@ -12,6 +12,7 @@ import com.rngtech.content.item.CraftedTraitOutputs;
 import com.rngtech.content.item.DisassemblyHeadItem;
 import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.GasChemistryPartItem;
+import com.rngtech.content.item.JewelItem;
 import com.rngtech.content.item.MachineBlockItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.MaterialItem;
@@ -243,10 +244,11 @@ public final class ItemFilterMatcher {
                 || stack.getItem() instanceof BatteryCellItem
                 || stack.getItem() instanceof MinersCompanionItem
                 || stack.getItem() instanceof ToolHeadItem
-                || stack.getItem() instanceof ToolRodItem;
+                || stack.getItem() instanceof ToolRodItem
+                || stack.getItem() instanceof JewelItem;
     }
 
-    private static OptionalInt componentStage(ItemStack stack) {
+    public static OptionalInt componentStage(ItemStack stack) {
         CalibrationState calibration = stack.get(ModDataComponents.CALIBRATION_STATE.get());
         if (calibration != null) {
             return OptionalInt.of(calibration.stage());

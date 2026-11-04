@@ -42,7 +42,7 @@ public final class StatBreakdownText {
                     "rngtech.stat.breakdown.increased",
                     MachineStatDisplay.formatSignedPercentPoints(breakdown.increasedPercent())
             );
-            softCap(lines, breakdown);
+            increasedCap(lines, breakdown);
         } else if (breakdown.increasedPercent() != 0.0) {
             // The converted bucket is listed under the stat it now feeds, not here as well.
             MachineStat target = converted.targetStat();
@@ -79,18 +79,22 @@ public final class StatBreakdownText {
         return lines;
     }
 
-    /** Shows how the soft cap bends a positive increased bucket. */
-    private static void softCap(List<Component> lines, StatBreakdown breakdown) {
-        StatBreakdown.Term cap = breakdown.lowest(StatBreakdown.Kind.SOFT_CAP);
+    /** Shows the cap on a positive increased bucket: how much is over it, or how much headroom is left. */
+    private static void increasedCap(List<Component> lines, StatBreakdown breakdown) {
+        StatBreakdown.Term cap = breakdown.lowest(StatBreakdown.Kind.INCREASED_CAP);
         double increased = breakdown.increasedPercent();
         if (cap == null || increased <= 0.0) {
             return;
         }
-        String bucket = MachineStatDisplay.formatNumber(increased);
-        String limit = MachineStatDisplay.formatNumber(cap.value());
-        String paid = MachineStatDisplay.formatSignedPercentPoints(breakdown.paidIncreasedPercent());
-        lines.add(Component.translatable("rngtech.stat.breakdown.soft_cap", bucket, limit, bucket, limit, paid)
-                .withStyle(ChatFormatting.GRAY));
+        String limit = MachineStatDisplay.formatNumber(cap.value()) + "%";
+        if (increased > cap.value() + EPSILON) {
+            lines.add(Component.translatable("rngtech.stat.breakdown.increased_cap", limit, cap.source(),
+                    MachineStatDisplay.formatSignedPercentPoints(increased),
+                    MachineStatDisplay.formatNumber(increased - cap.value())).withStyle(ChatFormatting.GOLD));
+        } else {
+            lines.add(Component.translatable("rngtech.stat.breakdown.increased_headroom", cap.source(), limit,
+                    MachineStatDisplay.formatNumber(cap.value() - increased)).withStyle(ChatFormatting.GRAY));
+        }
     }
 
     /** Shows the floor when it lifts the value, and how bonus-only factors scale the part above it. */

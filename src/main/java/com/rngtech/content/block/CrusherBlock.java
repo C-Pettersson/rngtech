@@ -108,6 +108,9 @@ public class CrusherBlock extends WorkOrderMachineBlock {
                 stack.set(ModDataComponents.OUTPUT_BANKS.get(), crusher.persistentBanks());
             }
         }
+        if (level.getBlockEntity(pos) instanceof BaseMachineBlockEntity jewelled && !jewelled.jewels().isEmpty()) {
+            stack.set(ModDataComponents.JEWELS.get(), jewelled.jewels());
+        }
         return stack;
     }
 

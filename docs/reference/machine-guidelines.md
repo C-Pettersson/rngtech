@@ -181,6 +181,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Under-level work multiplies processing time and total FE by the same factor, so FE/t stays at the optimal-hardness rate. The penalty is a slower, costlier craft, not a power spike.
 - Yield is anchored to other mods' ore multiplication: Fortune III gives about `2.2` ingots per ore, Create and Immersive Engineering or Thermal about `2`, and Mekanism `2` to `5` through added machines and chemicals. The unrolled Crusher line is already `3x`, so the best yield builds stop slightly above Mekanism's `5x` at Stage 8, and the edge costs cycle time one-for-one. Check changes with `./gradlew processingBalanceSim`.
 - Crush Head yield is not a local multiplier. The head's base yield and its yield rolls join the Crusher's increased bucket, so a strong head and strong Crusher affixes add instead of compounding. Pulverizing's speed penalty stays local, so it scales the head's speed multiplier and hits harder than the same penalty from Crusher Jaws.
+- The yield bucket pays no more than Maximum Bonus Output, like Path of Exile's maximum resistances: 75% is easy to reach from a late head and two yield affixes, and moving the cap is the investment. Sources of Maximum Bonus Output are few and small (+1% or +2% each), and the stat has its own 90% ceiling so stacking sources stays bounded. Yield affix tables stay small because they fill a 75-point budget, not because of diminishing returns. The Cavitation Generator shares the cap, so its Output Amount lines roll on the yield table and no single roll is born over cap.
 - Refiner's Oath trades batching for a flat increased yield bonus that joins the bucket like every other yield source. It does not scale with Batch Size.
 - Crush Head hardness applies only inside Crusher recipes. World ore harvesting uses a separate ore-hardness gate on the Modular Pick and Hammer.
 - Author an explicit `machine_xp_band` when a recipe's training value should follow the processed material rather than its hardness gate.
@@ -211,7 +212,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 
 ### Melter
 
-- The default `1200` heat minimum makes Stage 6 Titanium heat the first working path.
+- The default `1200` heat minimum makes Stage 6 Titanium heat the first working path. Lava is the exception at `600` heat and level `3`: the Melter body still gates it to Stage 6, but the Gear it needs matches lava's Tier 3 fuel rating, so a lava line does not demand Titanium parts. It authors `machine_xp_band` `81`, the same as the level `6` recipes, so its lower gate does not end its XP early on a machine that is Stage 6 anyway.
 - Melter Electrolyte Solution is a bulk supply. Dry electrolyte in the Component Assembler keeps early battery production available before the Melter.
 - Dense Algae Biomass stays a Bio Generator fuel. No Melter recipe accepts it.
 
@@ -226,7 +227,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 ### Fluid and Compressor Tanks
 
 - External automation only ever sees ordinary fluid. There is no custom compressed-fluid type.
-- Missing power never leaks, deletes, or voids stored fluid. Only purging destroys fluid.
+- Missing power never leaks, deletes, or voids stored fluid. Only purging destroys fluid, so the Component Recycler refuses a tank or fuel part that holds fluid.
 - Servo count sets the rate on a fixed curve and Servo quality is averaged, so four rolled Servos never multiply together.
 - Fluid Capacity and Compression Ratio are authored identity, not rollable affixes.
 
@@ -244,24 +245,32 @@ Design intent and balance rules behind shipped machines that the code does not s
 
 - Crushing a potato or carrot into Organic Reagent is deliberately energy-negative (`546 FE` burned minus `600 FE` crushing, against `120 FE` for the raw crop). Organic Reagent is a convenience fuel, not a power gain.
 - Crushing seeds into Compost Feedstock before composting is deliberately energy-positive, to reward the Crusher step.
-- Composted, Rich, and algae biomass are Bio Generator-only fuels. Do not tag them as vanilla furnace, Solid Fuel Burner, or broad modded fuel.
+- Composted, Rich, and algae biomass are Bio Generator-only fuels. Do not tag them as vanilla furnace, Fuel Burner, or broad modded fuel.
 - Specific fuel families beat broader tags for Bio Chamber power bonuses: saplings and seeds use their own stats, not Plant Power.
 - The Bio Generator is a small biogas plant: digester, gas holder, gas engine. Its rated `20`-day retention reproduces the pre-digester burner exactly, with the same FE/t and FE per item for every fuel and stat roll. Fuel tables, JEI values, and the energy balance anchors stay at rated.
 - Retention follows first-order digestion: the share of gas recovered is `kt / (1 + kt)`, with `kt = 3` at rated. Shorter retention trades FE per item for FE/t (`10` days: `1.6x` FE/t, `0.8x` FE per item); longer retention trades the reverse (`40` days: `0.57x` FE/t, `1.14x` FE per item). No setting beats rated on both, and the dial is the only way off rated. There is no automatic penalty such as culture death or souring.
 - The gas holder decouples digestion from the engine. The engine start pressure delays the first FE but never consumes gas, the last gas burns when feed runs out, and a full FE buffer lets the holder fill before digestion waits. Nothing in the process voids fuel.
 - Automation works on every face for compatibility: fuel insertion and FE export on all six. Visually there is one automation port, on the back, sized to the Universal Connector footprint so a connector seated there plugs into a plate. The front stays the machine's window (sight glass, gauge, flywheel), and the top stays the gas holder dome.
-- The Methane take-off gives early Bio Generators a Stage 6 job instead of retirement. It models biogas upgrading: the gas is 60% methane and 40% CO2, so each FE of digested gas holds `1/20 mB` Methane and `1/30 mB` Carbon Exhaust. The rates apply to the gas after retention and rolls. Take-off gas per item leaves Energy Generation out, as the Solid Fuel Burner does: generation only digests faster, so rolls cut the generator count but never the feed per mB, and farm volume stays the take-off's cost. The engine keeps the old valuation, where Energy Generation adds FE per item. A pump going in or out rescales the undigested feed and the holder gas between the two valuations, so swapping Gear cannot carry engine-valued gas into the take-off.
+- The Methane take-off gives early Bio Generators a Stage 6 job instead of retirement. It models biogas upgrading: the gas is 60% methane and 40% CO2, so each FE of digested gas holds `1/20 mB` Methane and `1/30 mB` Carbon Exhaust. The rates apply to the gas after retention and rolls. Take-off gas per item leaves Energy Generation out, as the Fuel Burner does: generation only digests faster, so rolls cut the generator count but never the feed per mB, and farm volume stays the take-off's cost. The engine keeps the old valuation, where Energy Generation adds FE per item. A pump going in or out rescales the undigested feed and the holder gas between the two valuations, so swapping Gear cannot carry engine-valued gas into the take-off.
 - The take-off rate is set against two yardsticks. Through the Reformer and the Ammonia chain a mB of Methane is worth about `192 FE`, so a take-off generator is worth about ten times burning the same gas in place. The Melter must stay far better per item: one Algae Biomass and one Organic Reagent (`946 FE` as fuel) melt into `1,000 mB`, against under `50 mB` through the best take-off. The take-off's cost is farm volume and block count, never heat or light.
 - The two Gas Line slots are flexible and no combination is blocked. A pump starts the take-off at 70% Methane recovery and vents the CO2; a pump and a membrane recover the membrane's share and capture the CO2; a membrane alone changes nothing and says so on the status line; a second pump only adds its own Fluid Capacity and Fluid Transfer. Pumps never change the generator's stats.
 - Biogas Membrane recovery is fixed at assembly from the stability of its Calibrated Storage Component: `85% + 13% x stability / 100`, so calibration is the membrane's only quality and it rolls no affixes. The Component Assembler records the calibrated ingredient only for recipes that set `record_calibration`.
 - A full Methane tank banks gas in the holder and the digester waits, so no fuel is lost. A full Carbon Exhaust tank vents, because the CO2 is a by-product; venting costs nothing and shows as puffs from the stack.
 - No take-off loop prints power: a reform's Carbon Monoxide grown back into algae returns under 2% of its Methane, and captured CO2 grown into algae returns about 13% of its gas. Carbon is already plentiful from Syngas Combustor exhaust. The energy balance simulation does not model the take-off yet.
 
-### Solid Fuel Burner
+### Fuel Burner
 
 - Each fuel item holds a fixed FE (`10 FE` per effective burn tick). Better Heat Cores and Energy Generation spend fuel faster rather than extracting more FE from it. Higher FE/t comes from Syngas at Stage 5, not from better burners.
 - Stoke is the burner's visible trade, set on a 25-100% gauge. Rated (100%) is the unstoked burner: the Heat Core's FE/t and each item's full FE, so the energy balance simulation describes a rated burner. Lower stoke scales FE/t in proportion and raises FE per item linearly to `1.20x` at 25%. Stoke never raises FE/t above the Heat Core's rating, so coal-tier burners still fail on rate. A mid-item change revalues the item's remaining FE at the new economy, so switching neither gains nor loses fuel.
 - Logs burn for a quarter of their vanilla burn time on purpose.
+- The fuel part is a visible trade: the Fuel Feed slot holds one Fuel Box, Fuel Tank, or Gas Jet, and the part's form belongs to its material and never rolls. There is no generator Mastery, so this choice does what a keystone would.
+- Fluid fuels are `rngtech:fluid_fuel` recipes, so packs can change them. Fluid burns in lots of up to `100 mB`, each treated as one fuel item, so stoke, Quick Feed, Fuel Governor, and heat leak need no fluid rules. Fluid stays on the part, because only purging destroys fluid.
+- Lava has two roles, sized separately. Before the Melter it is a manual, tactical fuel: world lava is not renewable, so a bucket is worth a lot, `100,000 FE` or 6.25 Coal, while hand-filling keeps it below a stack of Coal. Later it is a chain of Melter and blaze farm that gives players a reason to keep old burners, so needing many burners is the point, not a cost to reduce. The Melter's `250 mB` per melt sets that chain's strength without touching the bucket's value.
+- Sized on a Steel Heat Core and Steel Fuel Tank, one Lava Tap Melter on unrolled Titanium Gear (3 melts in about 195 ticks for about `24,030 FE`, about 18.5 blaze powder a minute) nets about `364 FE/t` across about 5 burners. The energy balance simulation's `fuel_burner_lava` rows put freshly crafted burners at a median of about `467 FE/t`, below the Stage 6 band, and fully refined ones at about `883 FE/t`, inside it.
+- Methane is worth `15,000 FE`, so a Gas Jet does not turn the Bio Generator's take-off into free power: each FE of digested gas holds `1/20 mB` Methane, which burns back for about `0.95 FE` on Steel Gear (`0.66 FE` with a pump alone). Rolls can pass the engine, but the Reformer and Ammonia chain stays worth about ten times the engine. A Melter on Methane nets about `124 FE/t` unrolled. It fills Tier 4, and the Gas Jet is a Stage 4 part whose recipe needs Titanium, so it arrives with Methane.
+- Syngas, Carbon Monoxide, Hydrogen, and Ammonia get no default burner entry. They have generators, and Syngas in a burner would skip the Carbon Exhaust that feeds the Algae Photobioreactor.
+- RNGTech has no way to pump world lava, so collecting it stays a hand job. Other mods' pumps can make it free, which the modpack page warns about. Each burner stays capped at its FE/t, but a player can then add burners with no fuel cost.
+- A burner body's Input Slots roll adds `1,000 mB` of Fluid Capacity per slot with a tank or jet, so the roll still changes a visible number.
 - Chassis accept lower-stage Gear so mixed setups can trade speed, efficiency, fuel queue size, and behavior.
 - Fuel Governor pauses only when the buffer cannot hold more generated FE. It never blocks export, and it never changes fuel cost, duration, or generation while there is room.
 - Quick Feed is the Copper identity: load following. It holds the set stoke up to a half-full cell, then eases it linearly to 25% at a full cell, rechecked once a second. The gauge stays the ceiling, and the eased stoke is ordinary stoke, so it revalues the burning item like a manual change and never leaves the stoke's FE/t and `1.20x` bounds. It is QoL with no downside: under steady load the fire settles where FE/t meets demand, and the draught slots and the gauge bar show the running stoke.
@@ -284,6 +293,15 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Returns are an explicit, lossy subset of the source recipe. The recycler never reverse-crafts arbitrary recipes, and first-pass returns are deliberately punishing.
 - Calibrated-component recycling is the fallback for stability misses: roughly `30-50%` of the attempt and never more than one raw input. Patterns are reusable and catalysts are lost.
 - Crafted machines do not remember calibrated ingredient state, so their calibrated slots return the uncalibrated precursor.
+
+### Identifier and Affix Sorter
+
+- Automation identifies items only through the Identifier. Installing Gear and placing machines identify only for a player (`CraftedTraitOutputs.isPlayerAction`); a new identification path must keep that rule, or it undercuts the Identifier's cost.
+- The Identifier sells automation, not better rolls. It must roll exactly as a crafting grid, keeping seeded Unique rolls and Annealed RP.
+- Identifying Fluid has one sink, so its per-item cost reads directly as the cost of automating identification. Cost scales with the item's stage so early Gear stays cheap to sort.
+- The Affix Sorter's FE grows faster than its rule count (`n^1.5`) so a picky list is a visible energy sink. Rule Capacity limits enabled rules, never stored ones, and the screen refuses to enable a rule past it rather than switching another off.
+- The sorter never pushes, reroutes, voids, or changes an item. A full route buffer stops it. Its rule pulse is a local redstone signal, never a stock count.
+- The Rules tab is the one exception to the low-text screen rule; every other tab follows it.
 
 ### Corrosion Cell
 

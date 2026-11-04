@@ -45,6 +45,12 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     private static final int FUEL_FORM_ICON_X = 95;
     private static final int GEAR_INFO_ICON_Y = 78;
     private static final int ICON_SIZE = 12;
+    private static final int FUEL_TANK_METER_X = 51;
+    private static final int FUEL_TANK_METER_Y = 27;
+    private static final int FUEL_TANK_METER_WIDTH = 16;
+    private static final int FUEL_TANK_METER_HEIGHT = 52;
+    private static final int FLUID_CONTAINER_SLOT_X = 71;
+    private static final int FLUID_CONTAINER_SLOT_Y = 61;
     private static final int STOKE_X = 110;
     private static final int STOKE_Y = 65;
     private static final int STOKE_WIDTH = 58;
@@ -92,6 +98,7 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
                 .gear(SolidFuelBurnerMenu.TAB_GEAR)
                 .stats(SolidFuelBurnerMenu.TAB_STATS)
                 .refinement(SolidFuelBurnerMenu.TAB_REFINEMENT)
+                .jewels(SolidFuelBurnerMenu.TAB_JEWELS, menu::jewelsShown)
                 .build();
     }
 
@@ -105,6 +112,12 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
         tabs.renderTooltip(guiGraphics, mouseX, mouseY);
+        if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_JEWELS) {
+            List<Component> jewelTooltip = JewelsTab.tooltip(this);
+            if (!jewelTooltip.isEmpty()) {
+                guiGraphics.renderComponentTooltip(font, jewelTooltip, mouseX, mouseY);
+            }
+        }
         renderValueTooltips(guiGraphics, mouseX, mouseY);
         renderStatTooltips(guiGraphics, mouseX, mouseY);
         RefinementScreenStyle.renderTooltips(guiGraphics, font, leftPos, topPos, mouseX, mouseY, menu.selectedTab() == RefinementScreenStyle.REFINEMENT_TAB_INDEX, menu.machineTraits(), menu);
@@ -115,6 +128,9 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         renderPanel(guiGraphics);
         tabs.render(guiGraphics, mouseX, mouseY, menu.selectedTab());
+        if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_JEWELS) {
+            JewelsTab.render(guiGraphics, font, menu, leftPos, topPos, TEXT, TEXT_MUTED, (x, y) -> renderSlotFrame(guiGraphics, x, y));
+        }
         renderSlotFrames(guiGraphics);
         if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_PROCESSING) {
             renderProcessing(guiGraphics);
@@ -155,6 +171,11 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
             }
             if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_REFINEMENT
                     && RefinementScreenStyle.handleApplyClick(this, menu, mouseX, mouseY)) {
+                return true;
+            }
+            if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_PROCESSING
+                    && menu.burnsFluid()
+                    && FluidPurgeButton.handleClick(menu, leftPos, topPos, mouseX, mouseY, FUEL_TANK_METER_X + 3, FUEL_TANK_METER_Y + 2, SolidFuelBurnerBlockEntity.PURGE_FUEL_TANK)) {
                 return true;
             }
             if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_PROCESSING && isOverStokeGauge(mouseX, mouseY)) {
@@ -209,6 +230,9 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
             for (int slot = 0; slot < menu.activeFuelSlots(); slot++) {
                 renderSlotFrame(guiGraphics, 50 + slot * 22, 54);
             }
+            if (menu.burnsFluid()) {
+                renderSlotFrame(guiGraphics, FLUID_CONTAINER_SLOT_X, FLUID_CONTAINER_SLOT_Y);
+            }
         } else if (menu.selectedTab() == SolidFuelBurnerMenu.TAB_GEAR) {
             renderSlotFrame(guiGraphics, 43, 47);
             renderSlotFrame(guiGraphics, 79, 47);
@@ -253,6 +277,20 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
         );
         renderProcessingIcons(guiGraphics);
         renderStokeGauge(guiGraphics);
+        if (menu.burnsFluid()) {
+            renderFuelTank(guiGraphics);
+        }
+    }
+
+    private void renderFuelTank(GuiGraphics guiGraphics) {
+        int left = leftPos + FUEL_TANK_METER_X;
+        int top = topPos + FUEL_TANK_METER_Y;
+        int right = left + FUEL_TANK_METER_WIDTH;
+        int bottom = top + FUEL_TANK_METER_HEIGHT;
+        guiGraphics.fill(left, top, right, bottom, 0xFF5F5F5F);
+        int fluidHeight = Math.round((FUEL_TANK_METER_HEIGHT - 4) * menu.fuelTankProgress());
+        FluidBarRenderer.fill(guiGraphics, menu.fuelTankFluid(), left + 2, bottom - 2 - fluidHeight, right - 2, bottom - 2, FUEL);
+        FluidPurgeButton.render(guiGraphics, leftPos, topPos, FUEL_TANK_METER_X + 3, FUEL_TANK_METER_Y + 2, menu.fuelTankAmount() > 0);
     }
 
     /** Stoke from a banked fire to rated. The bar fills to the running stoke; the pointer marks the set stoke. */
@@ -335,7 +373,7 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
     }
 
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
-        guiGraphics.drawString(font, Component.translatable("rngtech.processing.fuel"), 51, 43, TEXT_MUTED, false);
+        guiGraphics.drawString(font, Component.translatable("rngtech.processing.fuel"), 51, menu.burnsFluid() ? 17 : 43, TEXT_MUTED, false);
     }
 
     private void drawGearLabels(GuiGraphics guiGraphics) {
@@ -394,6 +432,8 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
             case 1 -> Component.translatable("rngtech.fuel_form.items");
             case 2 -> Component.translatable("rngtech.fuel_form.blocks");
             case 3 -> Component.translatable("rngtech.fuel_form.items_blocks");
+            case SolidFuelBurnerBlockEntity.FUEL_FORM_LIQUIDS -> Component.translatable("rngtech.fuel_form.liquid");
+            case SolidFuelBurnerBlockEntity.FUEL_FORM_GASES -> Component.translatable("rngtech.fuel_form.gas");
             default -> Component.literal("--");
         };
     }
@@ -438,6 +478,37 @@ public class SolidFuelBurnerScreen extends AbstractContainerScreen<SolidFuelBurn
         if (isOverStokeGauge(mouseX, mouseY)) {
             guiGraphics.renderComponentTooltip(font, stokeTooltip(), mouseX, mouseY);
             return;
+        }
+        if (menu.burnsFluid()) {
+            if (FluidPurgeButton.renderTooltip(
+                    guiGraphics,
+                    font,
+                    leftPos,
+                    topPos,
+                    mouseX,
+                    mouseY,
+                    FUEL_TANK_METER_X + 3,
+                    FUEL_TANK_METER_Y + 2,
+                    Component.translatable("rngtech.purge.target.fuel_tank"),
+                    menu.fuelTankFluidName(),
+                    menu.fuelTankAmount(),
+                    menu.fuelTankCapacity()
+            )) {
+                return;
+            }
+            CompactValueText.renderTooltipIfHovered(
+                    guiGraphics,
+                    font,
+                    leftPos,
+                    topPos,
+                    mouseX,
+                    mouseY,
+                    FUEL_TANK_METER_X,
+                    FUEL_TANK_METER_Y,
+                    FUEL_TANK_METER_WIDTH,
+                    FUEL_TANK_METER_HEIGHT,
+                    FluidMeterTooltips.amount(menu.fuelTankFluidName(), menu.fuelTankAmount(), menu.fuelTankCapacity())
+            );
         }
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,

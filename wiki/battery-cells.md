@@ -62,7 +62,7 @@ Most powered machines have one Battery Cell slot on their Gear tab. An unidentif
 
 The cell's rates still apply inside a machine. It accepts at most its Input rate each tick and hands over at most its Output rate each tick. When a machine is running on stored power alone, a low-tier cell can limit how fast it works.
 
-Solid Fuel Burners are the exception: they write the FE they generate straight into the cell, and the cell's rates do not limit their output.
+Fuel Burners are the exception: they write the FE they generate straight into the cell, and the cell's rates do not limit their output.
 
 ### Running without a cell
 
@@ -88,7 +88,7 @@ Most slots take any cell. These machines limit the stage:
 
 | Machine | Cell slot |
 |---|---|
-| [Solid Fuel Burner](solid-fuel-burner.md) | Required. Up to the burner's stage: Stage 1 on the Crude burner, up to Stage 4 on the Steel burner. |
+| [Fuel Burner](fuel-burner.md) | Required. Up to the burner's stage: Stage 1 on the Crude burner, up to Stage 4 on the Steel burner. |
 | [Bio Generator](bio-generator.md) | Optional, Stage 0–3. |
 | [Coal Gasifier](coal-gasifier.md), [Syngas Combustor](syngas-combustor.md) | Optional, Stage 5 or higher. |
 | [Steam Methane Reformer](steam-methane-reformer.md) | Optional, Stage 6 or higher. |

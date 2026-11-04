@@ -49,7 +49,9 @@ Crafted machines, Gear parts, tool parts, and Battery Cells come out **unidentif
 
 - Put a single unidentified item alone in a crafting grid and take the result. Repeat for each item in a stack.
 - Or place an unidentified machine block. Only the placed block is identified; the rest of the stack stays unidentified.
-- Or install the item. A Gear part or Battery Cell is identified when it goes into its slot. A Tool Head, Tool Rod, or cell is identified when you build it into a tool at the [Tool Bench](tool-bench.md).
+- Or install the item. A Gear part or Battery Cell is identified when you put it into its slot. A Tool Head, Tool Rod, or cell is identified when you build it into a tool at the [Tool Bench](tool-bench.md).
+
+Cables and hoppers do not identify items. At Stage 8, an [Identifier](identifier.md) identifies items for automation.
 
 ## Start: tools
 
@@ -71,7 +73,7 @@ RNGTech ores have a **hardness** from 1 to 8, separate from vanilla mining tiers
 Your first factory goal is to get more than one ingot per ore. Early machines pass power to whatever they touch, so you can build this without cables.
 
 1. Craft a {{ item('rngtech:machine_frame') }} and an {{ item('rngtech:iron_battery_cell') }}. Battery Cells go in a machine's Gear tab.
-2. Build a {{ item('rngtech:crude_solid_fuel_burner') }} and install an {{ item('rngtech:iron_heat_core') }}, an {{ item('rngtech:iron_fuel_box') }}, and a Battery Cell. It burns coal, charcoal, and wood and pushes FE into neighbouring machines. See [Solid Fuel Burner](solid-fuel-burner.md).
+2. Build a {{ item('rngtech:crude_solid_fuel_burner') }} and install an {{ item('rngtech:iron_heat_core') }}, an {{ item('rngtech:iron_fuel_box') }}, and a Battery Cell. It burns coal, charcoal, and wood and pushes FE into neighbouring machines. See [Fuel Burner](fuel-burner.md).
 3. Build an {{ item('rngtech:iron_crusher_chassis') }} with an {{ item('rngtech:iron_crush_head') }} and a Battery Cell, and place it next to the burner. See [Crusher](crusher.md).
 4. Crush raw metal before you smelt it. One raw metal gives 2 crushed, and a Silk Touch ore block gives 3. Crush the crushed material again into dust for faster, cheaper smelting. See [Stages](stages.md#from-ore-to-ingot) for the whole chain.
 5. Build the {{ item('rngtech:furnace') }}. It burns ordinary furnace fuel and reaches the heat that crushed ore and dust need. Electric Furnaces come later, once you can make circuits. See [Furnace](furnace.md).
@@ -139,7 +141,7 @@ Typical generators by stage, before rolls and Gear bonuses:
 
 | Stage | Generator | Output |
 |---:|---|---|
-| 1–4 | [Solid Fuel Burner](solid-fuel-burner.md) | 24, 40, 64, or 96 FE/t, depending on the Heat Core |
+| 1–4 | [Fuel Burner](fuel-burner.md) | 24, 40, 64, or 96 FE/t, depending on the Heat Core |
 | 1–5 | [Solar Panel](solar-panel.md) | 4 to 20 FE/t per panel on a clear day |
 | 2 | [Bio Generator](bio-generator.md) | About 8 FE/t |
 | 4+ | [Corrosion Cell](corrosion-cell.md) | Depends on the plate or Anode |

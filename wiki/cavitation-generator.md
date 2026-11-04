@@ -101,7 +101,7 @@ The {{ item('rngtech:aethergold_cavitation_rotor') }} is a Stage 7 sidegrade. It
 
 Cavitation Rotors can roll flat and percent Durability affixes.
 
-**Bonus Output** from the generator, rotor, or nozzle gets the same FE from less Water: each cycle draws 1,000 mB divided by Bonus Output, so +55% draws 646 mB. With Nitrogen Gear it adds Nitrogen instead, on top of the Energy Generation bonus. **Fluid Transfer** only matters with Nitrogen Gear, where it limits how fast Nitrogen drains out, so the Stats tab only shows it then.
+**Bonus Output** from the generator, rotor, or nozzle gets the same FE from less Water: each cycle draws 1,000 mB divided by Bonus Output, so +55% draws 646 mB. Like the Crusher, it stops at [Maximum Bonus Output](machine-stats.md#processing), 75% unless raised. With Nitrogen Gear it adds Nitrogen instead, on top of the Energy Generation bonus. **Fluid Transfer** only matters with Nitrogen Gear, where it limits how fast Nitrogen drains out, so the Stats tab only shows it then.
 
 On the Gear tab, the tooltip of an installed Heat Core or Servo dims the lines this generator does not use, such as Cooling Rate, Heat Isolation, Thermal Mass, and the Heat Core's own Energy Generation.
 

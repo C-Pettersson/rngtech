@@ -33,5 +33,7 @@ public enum MachineType {
     MINERS_COMPANION,
     FORESTRY_COMPANION,
     PHASE_EMITTER,
-    PHASE_COIL
+    PHASE_COIL,
+    IDENTIFIER,
+    AFFIX_SORTER
 }

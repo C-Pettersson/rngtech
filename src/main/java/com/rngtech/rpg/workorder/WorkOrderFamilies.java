@@ -56,7 +56,7 @@ public final class WorkOrderFamilies {
      */
     private static final Map<String, Integer> WORK_TICKS = Map.of(
             "crusher", 120, "furnace", 200, "alloy_furnace", 600, "metal_press", 240, "resonance_calibrator", 300,
-            COMPONENT_ASSEMBLER, 240, COMPONENT_RECYCLER, 144);
+            COMPONENT_ASSEMBLER, 240, COMPONENT_RECYCLER, 144, "identifier", 100);
 
     /**
      * A good build's throughput at each tier's stage, in hundredths of base recipe speed: the Rush clock is set from it,
@@ -75,13 +75,14 @@ public final class WorkOrderFamilies {
             "metal_press", new int[] {200, 200, 200, 200, 200},
             "resonance_calibrator", new int[] {460, 460, 510, 800, 800},
             COMPONENT_ASSEMBLER, new int[] {400, 400, 400, 400, 400},
-            COMPONENT_RECYCLER, new int[] {470, 600, 720, 720, 870});
+            COMPONENT_RECYCLER, new int[] {470, 600, 720, 720, 870},
+            "identifier", new int[] {460, 460, 480, 480, 500});
 
     /**
      * Families whose jobs are sized by the materials the work eats, such as catalysts, cell materials, or parts to
      * recycle, rather than by machine time. Their counts are set by hand; the speed table sets only their Rush clock.
      */
-    private static final Set<String> MATERIAL_BOUND = Set.of("resonance_calibrator", COMPONENT_ASSEMBLER, COMPONENT_RECYCLER);
+    private static final Set<String> MATERIAL_BOUND = Set.of("resonance_calibrator", COMPONENT_ASSEMBLER, COMPONENT_RECYCLER, "identifier");
 
     private WorkOrderFamilies() { }
 

@@ -5,7 +5,7 @@ import com.rngtech.content.machine.CrushHeadMaterial;
 import java.util.List;
 import java.util.Map;
 
-/** Crusher yield: one soft-capped Output Amount bucket, the Crush Head merge, the yield affixes, and Energy Usage reductions. */
+/** Crusher yield: one capped Output Amount bucket, the Crush Head merge, the yield affixes, and Energy Usage reductions. */
 public final class CrusherYieldChecks {
     private static int checks;
 
@@ -14,7 +14,7 @@ public final class CrusherYieldChecks {
 
     public static int run() {
         checks = 0;
-        softCapBendsTheYieldBucket();
+        maximumBonusOutputCapsTheYieldBucket();
         crushHeadJoinsTheIncreasedBucket();
         yieldTiersStaySmall();
         yieldPrefixesCostProcessingSpeed();
@@ -24,23 +24,37 @@ public final class CrusherYieldChecks {
         return checks;
     }
 
-    private static void softCapBendsTheYieldBucket() {
+    private static void maximumBonusOutputCapsTheYieldBucket() {
         MachineStatAccumulator exotic = crusher(1.2);
         near(exotic.value(MachineStat.OUTPUT_AMOUNT), 1.2, "an empty bucket leaves the chassis base");
-        increase(exotic, MachineStat.OUTPUT_AMOUNT, 100);
+        near(exotic.value(MachineStat.MAX_OUTPUT_AMOUNT), MachineStatAccumulator.BASE_MAX_OUTPUT_AMOUNT, "Maximum Bonus Output starts at 75%");
+        increase(exotic, MachineStat.OUTPUT_AMOUNT, 50);
+        near(exotic.effectiveIncreasedPercent(MachineStat.OUTPUT_AMOUNT, 0), 50, "a bucket under the cap pays every percent");
+        increase(exotic, MachineStat.OUTPUT_AMOUNT, 50);
         near(exotic.increasedPercent(MachineStat.OUTPUT_AMOUNT), 100, "the raw bucket keeps every percent");
-        near(exotic.effectiveIncreasedPercent(MachineStat.OUTPUT_AMOUNT, 0), 50, "+100% increased pays +50%");
-        near(exotic.value(MachineStat.OUTPUT_AMOUNT), 1.8, "only the chassis base multiplies the soft-capped bucket");
+        near(exotic.effectiveIncreasedPercent(MachineStat.OUTPUT_AMOUNT, 0), 75, "+100% increased pays the 75% maximum");
+        near(exotic.value(MachineStat.OUTPUT_AMOUNT), 1.2 * 1.75, "only the chassis base multiplies the capped bucket");
+        exotic.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.MAX_OUTPUT_AMOUNT, ModifierOperation.ADD, 5));
+        near(exotic.effectiveIncreasedPercent(MachineStat.OUTPUT_AMOUNT, 0), 80, "+5% Maximum Bonus Output raises the cap to 80%");
+        exotic.apply(new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.MAX_OUTPUT_AMOUNT, ModifierOperation.ADD, 100));
+        near(exotic.value(MachineStat.MAX_OUTPUT_AMOUNT), MachineStatAccumulator.MAX_OUTPUT_AMOUNT_CEILING, "Maximum Bonus Output stops at 90%");
         increase(exotic, MachineStat.OUTPUT_AMOUNT, 100_000);
-        require(exotic.value(MachineStat.OUTPUT_AMOUNT) < 2.4, "the bonus never passes +100%");
+        near(exotic.value(MachineStat.OUTPUT_AMOUNT), 1.2 * 1.9, "the bonus never passes the 90% ceiling");
 
         MachineStatAccumulator atLevel = crusher(1.0);
-        increase(atLevel, MachineStat.OUTPUT_AMOUNT, 80);
-        near(atLevel.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, 20), 1.5, "At-Level Output joins the bucket before the soft cap");
+        increase(atLevel, MachineStat.OUTPUT_AMOUNT, 60);
+        near(atLevel.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, 20), 1.75, "At-Level Output joins the bucket before the cap");
+
+        MachineStatAccumulator reduced = crusher(1.0);
+        increase(reduced, MachineStat.OUTPUT_AMOUNT, 100);
+        increase(reduced, MachineStat.OUTPUT_AMOUNT, -40);
+        near(reduced.effectiveIncreasedPercent(MachineStat.OUTPUT_AMOUNT, 0), 60, "reductions subtract before the cap");
 
         MachineStatAccumulator furnace = MachineStatAccumulator.componentBase(Map.of(MachineStat.OUTPUT_AMOUNT, 1.0));
         increase(furnace, MachineStat.OUTPUT_AMOUNT, 100);
-        near(furnace.value(MachineStat.OUTPUT_AMOUNT), 2.0, "other machines keep a linear Output Amount bucket");
+        near(furnace.value(MachineStat.OUTPUT_AMOUNT), 2.0, "machines without the cap keep a linear Output Amount bucket");
+        near(MachineBaseStatCatalog.cavitationGenerator().value(MachineStat.MAX_OUTPUT_AMOUNT), MachineStatAccumulator.BASE_MAX_OUTPUT_AMOUNT,
+                "the Cavitation Generator shares the cap");
     }
 
     private static void crushHeadJoinsTheIncreasedBucket() {
@@ -49,7 +63,7 @@ public final class CrusherYieldChecks {
         MachineStatAccumulator crusher = crusher(1.2);
         ComponentBaseStatCatalog.applyContribution(crusher, ComponentBaseStatCatalog.crushHead(CrushHeadMaterial.EXOTIC), pulverizing);
         near(crusher.increasedPercent(MachineStat.OUTPUT_AMOUNT), 45, "the Exotic head's 25% and Pulverizing's 20% add to the bucket");
-        near(crusher.value(MachineStat.OUTPUT_AMOUNT), 1.2 * (1 + 0.45 / 1.45), "the head is no longer a separate more multiplier");
+        near(crusher.value(MachineStat.OUTPUT_AMOUNT), 1.2 * 1.45, "the head is no longer a separate more multiplier");
         near(crusher.value(MachineStat.PROCESSING_SPEED), 1.35 * (1 - 0.26), "Pulverizing's speed penalty stays local to the head");
 
         MachineTraits suffix = traits(head, "output_amount", 6);
@@ -80,11 +94,13 @@ public final class CrusherYieldChecks {
             near(suffix.rangeForTier(6).max(), 5, "the clean suffix tops out at 5% on T6");
             require(!suffix.modGroup().equals(definition(crusher, "crusher_jaws").modGroup()), "the clean suffix can sit beside a yield prefix");
         }
-        require(ModifierEligibilityProfiles.allProfiles().stream()
+        List<ModifierDefinition> others = ModifierEligibilityProfiles.allProfiles().stream()
                 .filter(profile -> profile != crusher && profile != head)
                 .flatMap(profile -> profile.definitions().stream())
-                .anyMatch(definition -> definition.id().equals("output_amount") && definition.rangeForTier(6).max() == 100),
-                "other machines keep the shared percent table");
+                .filter(definition -> definition.id().equals("output_amount"))
+                .toList();
+        require(!others.isEmpty() && others.stream().allMatch(definition -> definition.rangeForTier(7).max() <= 25 && definition.effects().size() == 1),
+                "other machines' Output Amount uses the yield table without a penalty, so no roll is born over the cap");
     }
 
     private static void yieldPrefixesCostProcessingSpeed() {
@@ -133,8 +149,8 @@ public final class CrusherYieldChecks {
         noBattery.scaleBonus(MachineStat.OUTPUT_AMOUNT, 0.75);
         near(noBattery.value(MachineStat.OUTPUT_AMOUNT), 1.0, "the no-battery penalty takes nothing from a 1x Crusher");
         increase(noBattery, MachineStat.OUTPUT_AMOUNT, 80);
-        near(noBattery.value(MachineStat.OUTPUT_AMOUNT), 1 + 0.75 * (0.8 / 1.8), "the no-battery penalty scales only the bonus");
-        near(noBattery.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, 20), 1.375, "At-Level Output joins the bonus before the penalty");
+        near(noBattery.value(MachineStat.OUTPUT_AMOUNT), 1 + 0.75 * 0.75, "the no-battery penalty scales only the capped bonus");
+        near(noBattery.valueWithIncreased(MachineStat.OUTPUT_AMOUNT, -20), 1 + 0.75 * 0.6, "At-Level Output joins the bonus before the penalty");
     }
 
     private static MachineStatAccumulator crusher(double outputAmount) {

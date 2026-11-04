@@ -11,6 +11,7 @@ import com.rngtech.rpg.BatchProcessing;
 import com.rngtech.rpg.CodecRoundTripChecks;
 import com.rngtech.rpg.CorruptionChecks;
 import com.rngtech.rpg.CrusherYieldChecks;
+import com.rngtech.rpg.JewelChecks;
 import com.rngtech.rpg.MachineModifier;
 import com.rngtech.rpg.MachineModifierEffect;
 import com.rngtech.rpg.MachineStat;
@@ -61,6 +62,8 @@ public final class MasteryChecks {
         checks += SoulTransferChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderStorageChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderRuleChecks.run();
+        checks += com.rngtech.content.affixsorter.AffixSorterChecks.run();
+        checks += com.rngtech.compat.jei.JeiSearchChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderTemplateChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderConditionChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderRefinementChecks.run();
@@ -72,6 +75,7 @@ public final class MasteryChecks {
         checks += com.rngtech.rpg.AnnealingChecks.run();
         checks += com.rngtech.rpg.RarityRollChecks.run();
         checks += CrusherYieldChecks.run();
+        checks += JewelChecks.run();
         checks += com.rngtech.content.energy.CorrosionCellLoadChecks.run();
         checks += RefinementChecks.run();
         checks += CorruptionChecks.run();
@@ -211,7 +215,7 @@ public final class MasteryChecks {
     }
 
     private static void graphAndBuilds() {
-        require(MegaPassiveTree.TREE.nodes().size() == 1368, "full shared catalog");
+        require(MegaPassiveTree.TREE.nodes().size() == 1387, "full shared catalog");
         for (MegaPassiveNode root : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.STARTER).toList()) {
             require(root.links().size() == 3, "three exits per starter");
             for (MegaPassiveNode key : MegaPassiveTree.TREE.nodes().stream().filter(n -> n.kind() == PassiveNodeKind.KEYSTONE).toList()) {

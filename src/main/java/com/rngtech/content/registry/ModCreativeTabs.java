@@ -14,6 +14,7 @@ import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.ReactorChamberMaterial;
 import com.rngtech.content.energy.RecoveryFilterMaterial;
@@ -44,6 +45,7 @@ import com.rngtech.content.tool.ToolHeadFamily;
 import com.rngtech.content.tool.ToolHeadMaterial;
 import com.rngtech.content.tool.ToolRodMaterial;
 import com.rngtech.rpg.PhaseArrayRules;
+import com.rngtech.rpg.jewel.JewelColour;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -152,6 +154,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.LUBRICANT_BUCKET.get());
                         output.accept(ModItems.ELECTROLYTE_SOLUTION_BUCKET.get());
                         output.accept(ModItems.ENDER_SLURRY_BUCKET.get());
+                        output.accept(ModItems.IDENTIFYING_FLUID_BUCKET.get());
                         output.accept(ModItems.CARBON_EXHAUST_BUCKET.get());
                         output.accept(ModItems.SYNGAS_BUCKET.get());
                         output.accept(ModItems.METHANE_BUCKET.get());
@@ -235,6 +238,9 @@ public final class ModCreativeTabs {
                         for (FuelBoxMaterial material : FuelBoxMaterial.values()) {
                             output.accept(ModItems.fuelBox(material).get());
                         }
+                        for (FuelTankMaterial material : FuelTankMaterial.values()) {
+                            output.accept(ModItems.fuelTank(material).get());
+                        }
                         for (ReactorChamberMaterial material : ReactorChamberMaterial.values()) {
                             output.accept(ModItems.reactorChamber(material).get());
                         }
@@ -282,6 +288,10 @@ public final class ModCreativeTabs {
                         }
                         output.accept(ModItems.CALIBRATED_DIAMOND_CRYSTAL.get());
                         output.accept(ModItems.CAVITATION_ROTOR_HUB.get());
+                        output.accept(ModItems.JEWEL_BLANK.get());
+                        for (JewelColour colour : JewelColour.values()) {
+                            output.accept(ModItems.jewel(colour).get());
+                        }
                         output.accept(ModItems.PLATE_MOLD.get());
                         output.accept(ModItems.CASING_MOLD.get());
                         output.accept(ModItems.GEAR_MOLD.get());
@@ -316,6 +326,10 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.DISPATCH_TERMINAL.get());
                         output.accept(ModItems.REQUISITION.get());
                         output.accept(ModItems.PHASE_EMITTER.get());
+                        output.accept(ModItems.IDENTIFIER.get());
+                        output.accept(ModItems.AFFIX_SORTER.get());
+                        output.accept(ModItems.EXOTIC_RULE_CORE.get());
+                        output.accept(ModItems.RULE_CARD.get());
                         output.accept(ModItems.PHASE_COIL.get());
                         for (int tier = 1; tier <= PhaseArrayRules.GLYPH_TIERS; tier++) {
                             output.accept(GlyphItem.of(ModItems.GLYPH.get(), tier));

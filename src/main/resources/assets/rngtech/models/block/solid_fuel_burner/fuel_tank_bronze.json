@@ -1,0 +1,161 @@
+{
+  "textures": {
+    "particle": "#tank",
+    "tank": "rngtech:block/solid_fuel_burner/fuel_tank/bronze",
+    "glass": "rngtech:block/solid_fuel_burner/fuel_tank/glass",
+    "valve": "rngtech:block/solid_fuel_burner/pipe"
+  },
+  "elements": [
+    {
+      "from": [
+        0.75,
+        5.5,
+        2.5
+      ],
+      "to": [
+        2.75,
+        12.0,
+        8.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tank"
+        },
+        "south": {
+          "texture": "#tank"
+        },
+        "east": {
+          "texture": "#tank"
+        },
+        "west": {
+          "texture": "#tank"
+        },
+        "up": {
+          "texture": "#tank"
+        },
+        "down": {
+          "texture": "#tank"
+        }
+      }
+    },
+    {
+      "from": [
+        1.0,
+        5.0,
+        3.0
+      ],
+      "to": [
+        2.5,
+        5.5,
+        7.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tank"
+        },
+        "south": {
+          "texture": "#tank"
+        },
+        "east": {
+          "texture": "#tank"
+        },
+        "west": {
+          "texture": "#tank"
+        },
+        "down": {
+          "texture": "#tank"
+        }
+      }
+    },
+    {
+      "from": [
+        1.0,
+        12.0,
+        3.0
+      ],
+      "to": [
+        2.5,
+        12.5,
+        7.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tank"
+        },
+        "south": {
+          "texture": "#tank"
+        },
+        "east": {
+          "texture": "#tank"
+        },
+        "west": {
+          "texture": "#tank"
+        },
+        "up": {
+          "texture": "#tank"
+        }
+      }
+    },
+    {
+      "from": [
+        2.75,
+        6.5,
+        4.75
+      ],
+      "to": [
+        3.0,
+        7.5,
+        5.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tank"
+        },
+        "south": {
+          "texture": "#tank"
+        },
+        "up": {
+          "texture": "#tank"
+        },
+        "down": {
+          "texture": "#tank"
+        }
+      }
+    },
+    {
+      "from": [
+        0.5,
+        6.25,
+        4.25
+      ],
+      "to": [
+        0.75,
+        11.25,
+        6.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glass"
+        },
+        "south": {
+          "texture": "#glass"
+        },
+        "west": {
+          "texture": "#glass",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#glass"
+        },
+        "down": {
+          "texture": "#glass"
+        }
+      }
+    }
+  ]
+}

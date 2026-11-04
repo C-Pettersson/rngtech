@@ -7,12 +7,18 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierEligibilityProfile;
 import com.rngtech.rpg.ModifierEligibilityProfiles;
+import com.rngtech.rpg.jewel.JewelAffixes;
+import com.rngtech.rpg.jewel.JewelColour;
 import com.rngtech.rpg.unique.UniqueDefinition;
 import com.rngtech.rpg.unique.UniqueItems;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.util.FakePlayer;
+
+import javax.annotation.Nullable;
 
 import java.util.Locale;
 
@@ -65,6 +71,11 @@ public final class CraftedTraitOutputs {
         return stack;
     }
 
+    /** Placing and installing identify only for a real player, so automation identifies only through the Identifier. */
+    public static boolean isPlayerAction(@Nullable Player player) {
+        return player != null && !(player instanceof FakePlayer);
+    }
+
     /** A pending roll, or a Unique with ranged lines and no rolls yet, such as one from a command or quest reward. */
     public static boolean isUnidentified(ItemStack stack) {
         if (stack.isEmpty() || stack.has(ModDataComponents.MACHINE_TRAITS.get())) {
@@ -92,7 +103,8 @@ public final class CraftedTraitOutputs {
                 || stack.getItem() instanceof MinersCompanionItem
                 || stack.getItem() instanceof ForestryCartItem
                 || stack.getItem() instanceof ToolHeadItem
-                || stack.getItem() instanceof ToolRodItem;
+                || stack.getItem() instanceof ToolRodItem
+                || stack.getItem() instanceof JewelItem;
     }
 
     public static ItemStack unidentifiedVariant(ItemStack stack) {
@@ -196,6 +208,17 @@ public final class CraftedTraitOutputs {
             );
             return true;
         }
+        if (stack.getItem() instanceof JewelItem jewel) {
+            // A jewel's Refinement Potential follows its cut, not its stage: Annealed luck has nothing to improve.
+            MachineTraits rolled = rollTraits(false, ModifierEligibilityProfiles.forJewel(jewel.colour()), JewelColour.COMPONENT_STAGE, random);
+            Integer stability = JewelItem.cutStability(stack);
+            int potential = stability == null ? JewelAffixes.uncutRefinementPotential(random) : JewelAffixes.refinementPotential(stability);
+            stack.set(
+                    ModDataComponents.MACHINE_TRAITS.get(),
+                    new MachineTraits(rolled.rarity(), potential, rolled.modifiers(), rolled.behaviors())
+            );
+            return true;
+        }
         return false;
     }
 
@@ -228,6 +251,9 @@ public final class CraftedTraitOutputs {
         if (stack.getItem() instanceof ToolRodItem rod) {
             return rod.material().stage();
         }
+        if (stack.getItem() instanceof JewelItem) {
+            return JewelColour.COMPONENT_STAGE;
+        }
         return 0;
     }
 
@@ -256,6 +282,9 @@ public final class CraftedTraitOutputs {
         }
         if (stack.getItem() instanceof ToolRodItem) {
             return key(MachineType.TOOL_ROD.name());
+        }
+        if (stack.getItem() instanceof JewelItem jewel) {
+            return jewel.colour().profileId();
         }
         return "";
     }

@@ -27,6 +27,8 @@ Titanium and higher Servos need Lubricant and can also be made in the [Component
 | [Metal Press](rngtech:metal-press.md) | Required on the Metal Press, optional on the Crude Metal Press. Any stage. |
 | [Alloy Furnace](rngtech:alloy-furnace.md) | Optional, up to the chassis stage. |
 | [Melter](rngtech:melter.md) | Optional, any stage. |
+| [Identifier](rngtech:identifier.md) | Required, any stage. Sets the speed. |
+| [Affix Sorter](rngtech:affix-sorter.md) | Optional, any stage. |
 | [Coal Gasifier](rngtech:coal-gasifier.md), [Syngas Combustor](rngtech:syngas-combustor.md), [Steam Methane Reformer](rngtech:steam-methane-reformer.md) | Optional, Stage 4 or higher. |
 | [Compressor Tank](rngtech:compressor-tank.md) (Steel and higher) | Four slots, at least one required, up to the tank's stage. |
 | [Cavitation Generator](rngtech:cavitation-generator.md) | Optional, Stage 6 or higher. |

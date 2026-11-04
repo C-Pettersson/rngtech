@@ -25,6 +25,7 @@ import com.rngtech.client.screen.VacuumCollapseGeneratorScreen;
 import com.rngtech.client.screen.WoodenComposterScreen;
 import com.rngtech.client.screen.WoodenDehumidifierScreen;
 import com.rngtech.content.calibration.ResonanceCalibratorChassis;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.SolidFuelBurnerChassis;
 import com.rngtech.content.gear.GearMachineSpec;
 import com.rngtech.content.gear.GearSlotCatalog;
@@ -91,10 +92,12 @@ import com.rngtech.rpg.unique.UniqueStatReaders;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.handlers.IGuiClickableArea;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.recipe.IFocusFactory;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
+import mezz.jei.api.registration.IIngredientAliasRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -131,12 +134,20 @@ public final class RNGTechJeiPlugin implements IModPlugin {
     }
 
     @Override
+    public void registerIngredientAliases(IIngredientAliasRegistration registration) {
+        Map<String, List<ItemStack>> terms = JeiSearchTerms.all();
+        terms.forEach((term, stacks) -> registration.addAliases(VanillaTypes.ITEM_STACK, stacks, term));
+        JeiSearchQuery.setPhrases(terms.keySet());
+    }
+
+    @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(
                 new MachineGearRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new AffixForgeRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new PhaseArrayRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new SolidFuelBurnerRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
+                new FluidFuelRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new BioGeneratorRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new WoodenComposterRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
                 new OreWorldgenRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
@@ -286,6 +297,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         List<RecipeHolder<CoalGasificationRecipe>> coalGasificationRecipes =
                 level.getRecipeManager().getAllRecipesFor(ModRecipes.COAL_GASIFICATION_TYPE.get());
         registration.addRecipes(JeiRecipeTypes.COAL_GASIFICATION, coalGasificationRecipes);
+        registration.addRecipes(JeiRecipeTypes.FLUID_FUEL, level.getRecipeManager().getAllRecipesFor(ModRecipes.FLUID_FUEL_TYPE.get()));
         List<RecipeHolder<GasCombustionRecipe>> gasCombustionRecipes =
                 level.getRecipeManager().getAllRecipesFor(ModRecipes.GAS_COMBUSTION_TYPE.get());
         registration.addRecipes(JeiRecipeTypes.GAS_COMBUSTION, gasCombustionRecipes);
@@ -330,7 +342,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         registration.addRecipeCatalyst(ModItems.AFFIX_FORGE.get(), JeiRecipeTypes.AFFIX_FORGE);
         registration.addRecipeCatalyst(ModItems.EXOTIC_AFFIX_FORGE.get(), JeiRecipeTypes.PHASE_ARRAY);
         for (SolidFuelBurnerChassis chassis : SolidFuelBurnerChassis.values()) {
-            registration.addRecipeCatalyst(ModItems.solidFuelBurner(chassis).get(), JeiRecipeTypes.SOLID_FUEL_BURNING);
+            registration.addRecipeCatalyst(ModItems.solidFuelBurner(chassis).get(), JeiRecipeTypes.SOLID_FUEL_BURNING, JeiRecipeTypes.FLUID_FUEL);
         }
         registration.addRecipeCatalyst(ModItems.BIO_GENERATOR.get(), JeiRecipeTypes.BIO_GENERATOR);
         registration.addRecipeCatalyst(ModItems.WOODEN_COMPOSTER.get(), JeiRecipeTypes.WOODEN_COMPOSTER);
@@ -354,6 +366,9 @@ public final class RNGTechJeiPlugin implements IModPlugin {
         registration.addRecipeCatalyst(ModItems.MELTER.get(), JeiRecipeTypes.MELTER);
         registration.addRecipeCatalyst(ModItems.BATTERY_ASSEMBLER.get(), JeiRecipeTypes.BATTERY_ASSEMBLY);
         registration.addRecipeCatalyst(ModItems.COAL_GASIFIER.get(), JeiRecipeTypes.COAL_GASIFICATION);
+        for (FuelTankMaterial material : FuelTankMaterial.values()) {
+            registration.addRecipeCatalyst(ModItems.fuelTank(material).get(), JeiRecipeTypes.FLUID_FUEL);
+        }
         registration.addRecipeCatalyst(ModItems.SYNGAS_COMBUSTOR.get(), JeiRecipeTypes.GAS_COMBUSTION);
         registration.addRecipeCatalyst(ModItems.STEAM_METHANE_REFORMER.get(), JeiRecipeTypes.GAS_REFORMING);
         registration.addRecipeCatalyst(ModItems.AMMONIA_SYNTHESIZER.get(), JeiRecipeTypes.AMMONIA_SYNTHESIS);
@@ -380,7 +395,8 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 52,
                 58,
                 7,
-                JeiRecipeTypes.SOLID_FUEL_BURNING
+                JeiRecipeTypes.SOLID_FUEL_BURNING,
+                JeiRecipeTypes.FLUID_FUEL
         );
         registerProcessRecipeLineClickArea(
                 registration,
@@ -619,9 +635,9 @@ public final class RNGTechJeiPlugin implements IModPlugin {
             int y,
             int width,
             int height,
-            mezz.jei.api.recipe.RecipeType<?> recipeType
+            mezz.jei.api.recipe.RecipeType<?>... recipeTypes
     ) {
-        IGuiClickableArea clickArea = recipeLineClickArea(x, y, width, height, recipeType);
+        IGuiClickableArea clickArea = recipeLineClickArea(x, y, width, height, recipeTypes);
         registration.addGuiContainerHandler(
                 screenClass,
                 new IGuiContainerHandler<T>() {
@@ -645,7 +661,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
             int y,
             int width,
             int height,
-            mezz.jei.api.recipe.RecipeType<?> recipeType
+            mezz.jei.api.recipe.RecipeType<?>... recipeTypes
     ) {
         return new IGuiClickableArea() {
             private final Rect2i area = new Rect2i(x, y, width, height);
@@ -662,7 +678,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
 
             @Override
             public void onClick(IFocusFactory focusFactory, IRecipesGui recipesGui) {
-                recipesGui.showTypes(List.of(recipeType));
+                recipesGui.showTypes(List.of(recipeTypes));
             }
         };
     }

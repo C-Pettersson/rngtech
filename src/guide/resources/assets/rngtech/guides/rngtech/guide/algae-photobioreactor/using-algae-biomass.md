@@ -12,7 +12,7 @@ navigation:
 - Craft four into one **Dense Algae Biomass**, worth 2,400 FE base in the Bio Generator instead of 1,600 FE for the four pieces burned separately.
 - Melt it with Organic Reagent and water in the [Melter](rngtech:melter.md) to make methane.
 
-Neither algae item burns in a vanilla furnace or a [Solid Fuel Burner](rngtech:solid-fuel-burner.md).
+Neither algae item burns in a vanilla furnace or a [Fuel Burner](rngtech:fuel-burner.md).
 
 <RecipesFor id="rngtech:dense_algae_biomass" />
 

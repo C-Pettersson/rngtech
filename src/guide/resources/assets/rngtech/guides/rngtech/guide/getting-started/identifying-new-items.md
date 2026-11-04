@@ -12,4 +12,6 @@ Crafted machines, Gear parts, tool parts, and Battery Cells come out **unidentif
 
 - Put a single unidentified item alone in a crafting grid and take the result. Repeat for each item in a stack.
 - Or place an unidentified machine block. Only the placed block is identified; the rest of the stack stays unidentified.
-- Or install the item. A Gear part or Battery Cell is identified when it goes into its slot. A Tool Head, Tool Rod, or cell is identified when you build it into a tool at the [Tool Bench](rngtech:tool-bench.md).
+- Or install the item. A Gear part or Battery Cell is identified when you put it into its slot. A Tool Head, Tool Rod, or cell is identified when you build it into a tool at the [Tool Bench](rngtech:tool-bench.md).
+
+Cables and hoppers do not identify items. At Stage 8, an [Identifier](rngtech:identifier.md) identifies items for automation.

@@ -5,8 +5,8 @@ import com.rngtech.content.energy.SolidFuelBurnerStoke;
 import net.minecraft.nbt.CompoundTag;
 
 /**
- * What a Solid Fuel Burner shows in the world: the fire, the installed Heat Core and Fuel Box, the fuel in each hopper
- * bin, and the Battery Cell charge. Fractions run 0 to 1; {@code charge} is negative without a Battery Cell, and the
+ * What a Fuel Burner shows in the world: the fire, the installed Heat Core and fuel part, the fuel in each hopper bin
+ * or the tank's sight glass, and the Battery Cell charge. Fractions run 0 to 1; {@code charge} is negative without a Battery Cell, and the
  * part keys are empty when the slot is empty.
  *
  * @param burning   whether fuel burned this tick; a paused burner keeps its {@code burn} as a banked fire
@@ -14,6 +14,9 @@ import net.minecraft.nbt.CompoundTag;
  * @param rate      FE/t against a Steel Heat Core, so a stronger core burns visibly hotter
  * @param fuelTints colours for the fuel in each bin, as 0xRRGGBB
  * @param stoke     the stoke setting, which opens the ash-pit draught slots
+ * @param fuelTank  the installed Fuel Tank or Gas Jet material, empty for a Fuel Box
+ * @param tankFill  how full the tank is
+ * @param tankFluid the fluid id in the tank, empty when it holds none
  */
 public record SolidFuelBurnerVisualState(
         boolean burning,
@@ -27,10 +30,13 @@ public record SolidFuelBurnerVisualState(
         int fuelTint0,
         int fuelTint1,
         float charge,
-        int stoke
+        int stoke,
+        String fuelTank,
+        float tankFill,
+        String tankFluid
 ) {
     public static final SolidFuelBurnerVisualState IDLE =
-            new SolidFuelBurnerVisualState(false, 0.0F, 0.0F, "", "", 0, 0.0F, 0.0F, 0, 0, -1.0F, SolidFuelBurnerStoke.RATED_STOKE);
+            new SolidFuelBurnerVisualState(false, 0.0F, 0.0F, "", "", 0, 0.0F, 0.0F, 0, 0, -1.0F, SolidFuelBurnerStoke.RATED_STOKE, "", 0.0F, "");
     public static final int CHARGE_SEGMENTS = 8;
 
     public float fuel(int bin) {
@@ -60,7 +66,10 @@ public record SolidFuelBurnerVisualState(
                 fuelTint0,
                 fuelTint1,
                 charge < 0.0F ? -1 : chargeSegments(),
-                stoke
+                stoke,
+                fuelTank,
+                Math.round(tankFill * 32.0F),
+                tankFluid
         );
     }
 
@@ -78,6 +87,9 @@ public record SolidFuelBurnerVisualState(
         tag.putInt("FuelTint1", fuelTint1);
         tag.putFloat("Charge", charge);
         tag.putInt("Stoke", stoke);
+        tag.putString("FuelTank", fuelTank);
+        tag.putFloat("TankFill", tankFill);
+        tag.putString("TankFluid", tankFluid);
         return tag;
     }
 
@@ -97,7 +109,10 @@ public record SolidFuelBurnerVisualState(
                 tag.getInt("FuelTint0"),
                 tag.getInt("FuelTint1"),
                 tag.getFloat("Charge"),
-                tag.contains("Stoke") ? tag.getInt("Stoke") : SolidFuelBurnerStoke.RATED_STOKE
+                tag.contains("Stoke") ? tag.getInt("Stoke") : SolidFuelBurnerStoke.RATED_STOKE,
+                tag.getString("FuelTank"),
+                tag.getFloat("TankFill"),
+                tag.getString("TankFluid")
         );
     }
 
@@ -113,7 +128,10 @@ public record SolidFuelBurnerVisualState(
             int fuelTint0,
             int fuelTint1,
             int charge,
-            int stoke
+            int stoke,
+            String fuelTank,
+            int tankFill,
+            String tankFluid
     ) {
     }
 

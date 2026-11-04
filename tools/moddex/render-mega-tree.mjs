@@ -21,7 +21,7 @@ const svg = [
     ...tree.links.map(([first, second]) => { const a = lookup.get(first), b = lookup.get(second); return `<path d="M${a.x},${a.y} L${b.x},${b.y}"/>`; }),
     '</g>',
     ...tree.nodes.map(node => {
-        const color = node.kind === "KEYSTONE" ? "#c79dea" : node.kind === "NOTABLE" ? "#f1dcc1" : colors[node.effects[0]?.stat] ?? "#9fadb9";
+        const color = node.kind === "KEYSTONE" ? "#c79dea" : node.kind === "NOTABLE" ? "#f1dcc1" : node.kind === "JEWEL_SOCKET" ? "#e8be4a" : colors[node.effects[0]?.stat] ?? "#9fadb9";
         const radius = diameters[node.kind] / 2;
         return `<circle cx="${node.x}" cy="${node.y}" r="${radius}" fill="${color}" stroke="#111820" stroke-width="3"><title>${escape(node.name)} (${escape(node.id)})</title></circle>`;
     }),

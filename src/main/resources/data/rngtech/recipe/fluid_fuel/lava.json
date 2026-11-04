@@ -1,0 +1,10 @@
+{
+  "type": "rngtech:fluid_fuel",
+  "group": "fluid_fuel",
+  "fuel": {
+    "fluid": "minecraft:lava"
+  },
+  "form": "liquid",
+  "tier": 3,
+  "energy": 100000
+}

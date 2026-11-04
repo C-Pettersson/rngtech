@@ -14,7 +14,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public final class ModNetworking {
-    private static final String VERSION = "5";
+    private static final String VERSION = "6";
 
     private ModNetworking() {
     }
@@ -27,6 +27,9 @@ public final class ModNetworking {
         registrar.playToServer(com.rngtech.content.network.WorkOrderActionPayload.TYPE,
                 com.rngtech.content.network.WorkOrderActionPayload.STREAM_CODEC,
                 com.rngtech.content.network.WorkOrderActionPayload::handle);
+        registrar.playToServer(com.rngtech.content.network.SorterRulesPayload.TYPE,
+                com.rngtech.content.network.SorterRulesPayload.STREAM_CODEC,
+                com.rngtech.content.network.SorterRulesPayload::handle);
         registrar.playToServer(
                 WrenchOverlayRequestPayload.TYPE,
                 WrenchOverlayRequestPayload.STREAM_CODEC,

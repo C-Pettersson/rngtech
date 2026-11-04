@@ -6,6 +6,7 @@ import com.rngtech.client.MinersCompanionLampClient;
 import com.rngtech.client.PlacementPreviewClient;
 import com.rngtech.client.configurator.ConfiguratorClient;
 import com.rngtech.client.renderer.AffixForgeRenderer;
+import com.rngtech.client.renderer.AffixSorterRenderer;
 import com.rngtech.client.renderer.AlgaePhotobioreactorRenderer;
 import com.rngtech.client.renderer.AlloyFurnaceRenderer;
 import com.rngtech.client.renderer.AmmoniaFuelCellRenderer;
@@ -22,6 +23,7 @@ import com.rngtech.client.renderer.DerelictCartRenderer;
 import com.rngtech.client.renderer.ForestryCartRenderer;
 import com.rngtech.client.renderer.FurnaceRenderer;
 import com.rngtech.client.renderer.GasChemistryRenderer;
+import com.rngtech.client.renderer.IdentifierRenderer;
 import com.rngtech.client.renderer.MelterRenderer;
 import com.rngtech.client.renderer.MetalPressRenderer;
 import com.rngtech.client.renderer.MirroredItemModels;
@@ -37,6 +39,7 @@ import com.rngtech.client.renderer.ToolBenchRenderer;
 import com.rngtech.client.renderer.VacuumCollapseGeneratorRenderer;
 import com.rngtech.client.screen.AdvancedItemFilterScreen;
 import com.rngtech.client.screen.AffixForgeScreen;
+import com.rngtech.client.screen.AffixSorterScreen;
 import com.rngtech.client.screen.AlgaePhotobioreactorScreen;
 import com.rngtech.client.screen.AlloyFurnaceScreen;
 import com.rngtech.client.screen.AmmoniaFuelCellScreen;
@@ -62,6 +65,7 @@ import com.rngtech.client.screen.ForestryCartScreen;
 import com.rngtech.client.screen.ForestryCartStationScreen;
 import com.rngtech.client.screen.FurnaceScreen;
 import com.rngtech.client.screen.GasChemistryScreen;
+import com.rngtech.client.screen.IdentifierScreen;
 import com.rngtech.client.screen.MelterScreen;
 import com.rngtech.client.screen.MetalPressScreen;
 import com.rngtech.client.screen.MinersCompanionScreen;
@@ -196,6 +200,8 @@ public final class RNGTechClient {
         event.register(ModMenus.RESONANCE_CALIBRATOR.get(), ResonanceCalibratorScreen::new);
         event.register(ModMenus.COMPONENT_RECYCLER.get(), ComponentRecyclerScreen::new);
         event.register(ModMenus.MELTER.get(), MelterScreen::new);
+        event.register(ModMenus.IDENTIFIER.get(), IdentifierScreen::new);
+        event.register(ModMenus.AFFIX_SORTER.get(), AffixSorterScreen::new);
         event.register(ModMenus.BATTERY_ASSEMBLER.get(), BatteryAssemblerScreen::new);
         event.register(ModMenus.GAS_CHEMISTRY.get(), GasChemistryScreen::new);
         event.register(ModMenus.AMMONIA_SYNTHESIZER.get(), AmmoniaSynthesizerScreen::new);
@@ -231,6 +237,8 @@ public final class RNGTechClient {
         event.registerBlockEntityRenderer(ModBlockEntities.BATTERY_ASSEMBLER.get(), BatteryAssemblerRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.RESONANCE_CALIBRATOR.get(), ResonanceCalibratorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.AFFIX_FORGE.get(), AffixForgeRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.AFFIX_SORTER.get(), AffixSorterRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.IDENTIFIER.get(), IdentifierRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.FORESTRY_CART.get(), ForestryCartRenderer::new);
         event.registerEntityRenderer(ModEntityTypes.DERELICT_CART.get(), DerelictCartRenderer::new);
     }
@@ -298,6 +306,22 @@ public final class RNGTechClient {
                 return 0xFF4A2A78;
             }
         }, ModFluids.ENDER_SLURRY_TYPE.get());
+        event.registerFluidType(new IClientFluidTypeExtensions() {
+            @Override
+            public ResourceLocation getStillTexture() {
+                return LUBRICANT_STILL_TEXTURE;
+            }
+
+            @Override
+            public ResourceLocation getFlowingTexture() {
+                return LUBRICANT_FLOWING_TEXTURE;
+            }
+
+            @Override
+            public int getTintColor() {
+                return 0xFFB8F2E6;
+            }
+        }, ModFluids.IDENTIFYING_FLUID_TYPE.get());
         event.registerFluidType(new IClientFluidTypeExtensions() {
             @Override
             public ResourceLocation getStillTexture() {

@@ -1,0 +1,207 @@
+{
+    "id": "reagent_warden",
+    "family": "identifier",
+    "nodes": [
+        {
+            "id": "measured_dose",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "FLUID_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 30
+                },
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "LESS",
+                    "value": 0.8
+                }
+            ]
+        },
+        {
+            "id": "fine_dropper",
+            "kind": "SMALL",
+            "parent": "measured_dose",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "FLUID_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "thin_film",
+            "kind": "NOTABLE",
+            "parent": "fine_dropper",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "FLUID_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "cool_coils",
+            "kind": "SMALL",
+            "parent": "measured_dose",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "cold_reading",
+            "kind": "NOTABLE",
+            "parent": "cool_coils",
+            "x": -1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 20
+                }
+            ]
+        },
+        {
+            "id": "deep_well",
+            "kind": "SMALL",
+            "parent": "measured_dose",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 25
+                }
+            ]
+        },
+        {
+            "id": "reservoir",
+            "kind": "NOTABLE",
+            "parent": "deep_well",
+            "x": 1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 150
+                }
+            ]
+        },
+        {
+            "id": "open_valve",
+            "kind": "SMALL",
+            "parent": "measured_dose",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "FLUID_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "steady_line",
+            "kind": "NOTABLE",
+            "parent": "open_valve",
+            "x": 2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "FLUID_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 40
+                },
+                {
+                    "stat": "ENERGY_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 25
+                }
+            ]
+        },
+        {
+            "id": "last_drop_feed",
+            "kind": "SMALL",
+            "parent": "thin_film",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "FLUID_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "last_drop",
+            "kind": "NOTABLE",
+            "parent": "last_drop_feed",
+            "x": -2,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "FLUID_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 25
+                },
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "LESS",
+                    "value": 0.85
+                }
+            ]
+        },
+        {
+            "id": "idle_coils",
+            "kind": "SMALL",
+            "parent": "cold_reading",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "trickle_charge",
+            "kind": "NOTABLE",
+            "parent": "idle_coils",
+            "x": -1,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 25
+                },
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "LESS",
+                    "value": 0.9
+                }
+            ]
+        }
+    ]
+}

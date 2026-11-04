@@ -4,6 +4,7 @@ import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.gear.GearSlotArea;
 import com.rngtech.content.gear.GearSlotCatalog;
 import com.rngtech.content.gear.GearSlotSpec;
+import com.rngtech.content.menu.AffixSorterMenu;
 import com.rngtech.content.menu.AlgaePhotobioreactorMenu;
 import com.rngtech.content.menu.AlloyFurnaceMenu;
 import com.rngtech.content.menu.AmmoniaFuelCellMenu;
@@ -19,6 +20,7 @@ import com.rngtech.content.menu.ForestryCartMenu;
 import com.rngtech.content.menu.ForestryCartStationMenu;
 import com.rngtech.content.menu.FurnaceMenu;
 import com.rngtech.content.menu.GasChemistryMenu;
+import com.rngtech.content.menu.IdentifierMenu;
 import com.rngtech.content.menu.MelterMenu;
 import com.rngtech.content.menu.MetalPressMenu;
 import com.rngtech.content.menu.MinersCompanionMenu;
@@ -174,6 +176,12 @@ final class GearSlotTooltips {
         if (menu instanceof MelterMenu melter) {
             return melter.getSlot(melter.refinementTargetSlot()).getItem();
         }
+        if (menu instanceof IdentifierMenu identifier) {
+            return identifier.getSlot(identifier.refinementTargetSlot()).getItem();
+        }
+        if (menu instanceof AffixSorterMenu sorter) {
+            return sorter.getSlot(sorter.refinementTargetSlot()).getItem();
+        }
         if (menu instanceof CompressorTankMenu compressorTank) {
             return compressorTank.getSlot(compressorTank.refinementTargetSlot()).getItem();
         }
@@ -246,6 +254,12 @@ final class GearSlotTooltips {
         }
         if (menu instanceof ResonanceCalibratorMenu calibrator) {
             return calibrator.selectedTab() == ResonanceCalibratorMenu.TAB_GEAR;
+        }
+        if (menu instanceof IdentifierMenu identifier) {
+            return identifier.selectedTab() == IdentifierMenu.TAB_GEAR;
+        }
+        if (menu instanceof AffixSorterMenu sorter) {
+            return sorter.selectedTab() == AffixSorterMenu.TAB_GEAR;
         }
         if (menu instanceof MelterMenu melter) {
             return melter.selectedTab() == MelterMenu.TAB_GEAR;

@@ -1,0 +1,197 @@
+{
+    "id": "appraiser",
+    "family": "identifier",
+    "nodes": [
+        {
+            "id": "quick_glance",
+            "kind": "ROOT",
+            "x": 0,
+            "y": 0,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 40
+                },
+                {
+                    "stat": "FLUID_USAGE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 25
+                }
+            ]
+        },
+        {
+            "id": "steady_feed",
+            "kind": "SMALL",
+            "parent": "quick_glance",
+            "x": -2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "rapid_assay",
+            "kind": "NOTABLE",
+            "parent": "steady_feed",
+            "x": -2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 25
+                }
+            ]
+        },
+        {
+            "id": "spark_reserve",
+            "kind": "SMALL",
+            "parent": "quick_glance",
+            "x": -1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "flash_read",
+            "kind": "NOTABLE",
+            "parent": "spark_reserve",
+            "x": -1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "INSTANT_PROCESS_CHANCE",
+                    "operation": "ADD",
+                    "value": 4
+                }
+            ]
+        },
+        {
+            "id": "wide_intake",
+            "kind": "SMALL",
+            "parent": "quick_glance",
+            "x": 1,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "FLUID_TRANSFER",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "buffered_vial",
+            "kind": "NOTABLE",
+            "parent": "wide_intake",
+            "x": 1,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "FLUID_CAPACITY",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 100
+                }
+            ]
+        },
+        {
+            "id": "lean_draw",
+            "kind": "SMALL",
+            "parent": "quick_glance",
+            "x": 2,
+            "y": 1,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 5
+                }
+            ]
+        },
+        {
+            "id": "tuned_lens",
+            "kind": "NOTABLE",
+            "parent": "lean_draw",
+            "x": 2,
+            "y": 2,
+            "effects": [
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "DECREASED_PERCENT",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "overclocked_feed",
+            "kind": "SMALL",
+            "parent": "rapid_assay",
+            "x": -2,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "snap_judgement",
+            "kind": "NOTABLE",
+            "parent": "overclocked_feed",
+            "x": -2,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "PROCESSING_SPEED",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 50
+                },
+                {
+                    "stat": "ENERGY_USAGE",
+                    "operation": "INCREASED_PERCENT",
+                    "value": 30
+                }
+            ]
+        },
+        {
+            "id": "flash_bank",
+            "kind": "SMALL",
+            "parent": "flash_read",
+            "x": -1,
+            "y": 3,
+            "effects": [
+                {
+                    "stat": "INSTANT_PROCESS_CHANCE",
+                    "operation": "ADD",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "id": "second_look",
+            "kind": "NOTABLE",
+            "parent": "flash_bank",
+            "x": -1,
+            "y": 4,
+            "effects": [
+                {
+                    "stat": "INSTANT_PROCESS_CHANCE",
+                    "operation": "ADD",
+                    "value": 6
+                }
+            ]
+        }
+    ]
+}

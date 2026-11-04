@@ -73,7 +73,7 @@ A job's tier, I to V, sets the job's size, the chassis stage it needs, and the r
 | IV | 7 | About 30 minutes on a good Stage 7 build |
 | V | 8 | About 30 minutes on a good Stage 8 build |
 
-A strong build finishes a job much faster than this, and a weak one takes longer. Resonance Calibrator, Component Assembler, and Component Recycler jobs are smaller, because their materials limit them more than machine time does.
+A strong build finishes a job much faster than this, and a weak one takes longer. Resonance Calibrator, Component Assembler, Component Recycler, and Identifier jobs are smaller, because their materials limit them more than machine time does.
 
 | Machine | Top stage |
 |---|---:|
@@ -82,6 +82,7 @@ A strong build finishes a job much faster than this, and a weak one takes longer
 | [Alloy Furnace](alloy-furnace.md) | 6 |
 | [Melter](melter.md) | 6 |
 | [Resonance Calibrator](resonance-calibrator.md) | 7 |
+| [Identifier](identifier.md) | 8 |
 
 The [Component Assembler](component-assembler.md) has no chassis stages, so its chips need none.
 
@@ -122,6 +123,7 @@ Jobs by machine:
 | [Forestry Companion](forestry-cart-station.md) | Logs. Crops. Logs cut with a cutting head of a stage. |
 | [Component Assembler](component-assembler.md) | Any assemblies. Battery Cells of a stage. Named outputs. |
 | [Component Recycler](component-recycler.md) | Any parts. Parts of a stage. |
+| [Identifier](identifier.md) | Any identified items. |
 
 These do not take chips: generators, the [Battery Chassis](battery-chassis.md), the [Miner's Companion](miners-companion.md), and the Crude Component Recycler.
 

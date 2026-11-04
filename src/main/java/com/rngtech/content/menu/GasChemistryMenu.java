@@ -4,6 +4,7 @@ import com.rngtech.content.blockentity.BaseMachineBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
 import com.rngtech.content.chemistry.GasChemistryMachine;
 import com.rngtech.content.energy.CombustionMixture;
+import com.rngtech.content.jewel.JewelSockets;
 import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModMenus;
@@ -25,16 +26,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
-public class GasChemistryMenu extends AbstractContainerMenu implements StatBreakdownMenu {
+public class GasChemistryMenu extends AbstractContainerMenu implements StatBreakdownMenu, JewelMenuView {
     public static final int TAB_PROCESSING = 0;
     public static final int TAB_GEAR = 1;
     public static final int TAB_STATS = 2;
     public static final int TAB_REFINEMENT = 3;
+    public static final int TAB_JEWELS = 4;
     private static final int DATA_PROGRESS = 0;
     private static final int DATA_PROCESSING_TICKS = 1;
     private static final int DATA_ENERGY = 2;
@@ -106,15 +109,36 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
         addSlot(new TabbedSlot(gasChemistry.getGearInventory(), GasChemistryBlockEntity.SLOT_CATALYST_BED, 154, 48, () -> selectedTab == TAB_GEAR && hasCatalystSlot()));
         addSlot(RefinementMenuSupport.consumableSlot(gasChemistry.getRefinementInventory(), 0, RefinementMenuSupport.REFINEMENT_CONSUMABLE_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
         addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
+        jewelInventoryStart = slots.size();
         addPlayerInventory(playerInventory);
+        jewelSlotStart = slots.size();
+        IItemHandler sockets = playerInventory.player.level().isClientSide ? JewelSockets.client() : new JewelSockets(gasChemistry);
+        for (int index = 0; index < JewelSockets.SLOTS; index++) {
+            int slot = index;
+            addSlot(new JewelSocketSlot(sockets, slot, () -> jewelsTabSelected() && jewelSlotOpen(slot)));
+        }
         addDataSlots(data);
     }
+    private int jewelInventoryStart;
+    private int jewelSlotStart;
+
+    @Override public ItemStack jewel(int index) {
+        return index >= 0 && index < JewelSockets.SLOTS ? getSlot(jewelSlotStart + index).getItem() : ItemStack.EMPTY;
+    }
+    @Override public int jewelTreeCapacity() { return 0; }
+    @Override public int jewelBodyCapacity() { return JewelSockets.bodySockets(machineTraits()); }
+    @Override public boolean jewelsTabSelected() { return selectedTab == TAB_JEWELS; }
+    private boolean jewelSlotOpen(int index) {
+        return !JewelSocketSlot.isTreeSlot(index) && index - JewelSockets.BODY_START < jewelBodyCapacity();
+    }
+
 
     public void selectTab(int tab) {
         selectedTab = switch (tab) {
             case TAB_GEAR -> TAB_GEAR;
             case TAB_STATS -> TAB_STATS;
             case TAB_REFINEMENT -> TAB_REFINEMENT;
+            case TAB_JEWELS -> TAB_JEWELS;
             default -> TAB_PROCESSING;
         };
     }
@@ -342,6 +366,34 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
+        Slot jewelSlot = slots.get(index);
+        if (index >= jewelSlotStart && index < jewelSlotStart + JewelSockets.SLOTS) {
+            ItemStack jewel = jewelSlot.getItem();
+            ItemStack taken = jewel.copy();
+            if (!moveItemStackTo(jewel, jewelInventoryStart, jewelInventoryStart + 36, true)) {
+                return ItemStack.EMPTY;
+            }
+            if (jewel.isEmpty()) {
+                jewelSlot.setByPlayer(ItemStack.EMPTY);
+            } else {
+                jewelSlot.setChanged();
+            }
+            return taken;
+        }
+        if (index >= jewelInventoryStart && index < jewelInventoryStart + 36 && JewelSockets.accepts(jewelSlot.getItem()) && jewelBodyCapacity() > 0) {
+            ItemStack jewel = jewelSlot.getItem();
+            ItemStack placed = jewel.copy();
+            int first = jewelSlotStart + JewelSockets.BODY_START;
+            if (!moveItemStackTo(jewel, first, first + jewelBodyCapacity(), false)) {
+                return ItemStack.EMPTY;
+            }
+            if (jewel.isEmpty()) {
+                jewelSlot.setByPlayer(ItemStack.EMPTY);
+            } else {
+                jewelSlot.setChanged();
+            }
+            return placed;
+        }
         ItemStack moved = ItemStack.EMPTY;
         Slot slot = slots.get(index);
         if (slot == null || !slot.hasItem()) {

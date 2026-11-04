@@ -1,0 +1,132 @@
+{
+  "textures": {
+    "particle": "#tank",
+    "tank": "rngtech:block/solid_fuel_burner/fuel_tank/gas_jet",
+    "glass": "rngtech:block/solid_fuel_burner/fuel_tank/glass",
+    "valve": "rngtech:block/solid_fuel_burner/pipe"
+  },
+  "elements": [
+    {
+      "from": [
+        0.75,
+        5.5,
+        3.25
+      ],
+      "to": [
+        2.5,
+        11.5,
+        7.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tank"
+        },
+        "south": {
+          "texture": "#tank"
+        },
+        "east": {
+          "texture": "#tank"
+        },
+        "west": {
+          "texture": "#tank"
+        },
+        "up": {
+          "texture": "#tank"
+        },
+        "down": {
+          "texture": "#tank"
+        }
+      }
+    },
+    {
+      "from": [
+        1.25,
+        11.5,
+        4.75
+      ],
+      "to": [
+        2.0,
+        12.5,
+        5.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#valve"
+        },
+        "south": {
+          "texture": "#valve"
+        },
+        "east": {
+          "texture": "#valve"
+        },
+        "west": {
+          "texture": "#valve"
+        },
+        "up": {
+          "texture": "#valve"
+        }
+      }
+    },
+    {
+      "from": [
+        2.5,
+        6.5,
+        4.75
+      ],
+      "to": [
+        3.0,
+        7.5,
+        5.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#valve"
+        },
+        "south": {
+          "texture": "#valve"
+        },
+        "up": {
+          "texture": "#valve"
+        },
+        "down": {
+          "texture": "#valve"
+        }
+      }
+    },
+    {
+      "from": [
+        0.5,
+        6.25,
+        4.25
+      ],
+      "to": [
+        0.75,
+        11.25,
+        6.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glass"
+        },
+        "south": {
+          "texture": "#glass"
+        },
+        "west": {
+          "texture": "#glass",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#glass"
+        },
+        "down": {
+          "texture": "#glass"
+        }
+      }
+    }
+  ]
+}

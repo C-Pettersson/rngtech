@@ -101,7 +101,7 @@ public final class WorkOrderTemplateChecks {
 
     /** The terminal's listing: random objectives only while random jobs are on, plus pooled templates by weight. */
     private static void pools(List<WorkObjectiveEntry> shipped) {
-        WorkOrderTemplate pooledThree = parse("pooled_three", "{\"objective\": \"rngtech:furnace_heat\", \"tier\": 3, \"weight\": 2}");
+        WorkOrderTemplate pooledThree = parse("pooled_three", "{\"objective\": \"rngtech:furnace_heat\", \"tier\": 3, \"weight\": 20}");
         WorkOrderTemplate questOnly = parse("quest_only", "{\"objective\": \"rngtech:crusher_any\"}");
         require(WorkOrderRules.roll(shipped, false, List.of(questOnly), 0, new SplittableRandom(1L), item -> true) == null,
                 "with random jobs off and no pooled template, nothing lists");

@@ -2,6 +2,7 @@ package com.rngtech.content.registry;
 
 import com.rngtech.RNGTech;
 import com.rngtech.content.block.AffixForgeBlock;
+import com.rngtech.content.block.AffixSorterBlock;
 import com.rngtech.content.block.AlgaePhotobioreactorBlock;
 import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.block.AmmoniaFuelCellBlock;
@@ -26,6 +27,7 @@ import com.rngtech.content.block.ForestryCartStationBlock;
 import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.block.GasChemistryBlock;
 import com.rngtech.content.block.HandCrankBlock;
+import com.rngtech.content.block.IdentifierBlock;
 import com.rngtech.content.block.MelterBlock;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.block.PhaseCoilBlock;
@@ -361,6 +363,24 @@ public final class ModBlocks {
                     .noOcclusion()
     );
 
+    public static final DeferredBlock<IdentifierBlock> IDENTIFIER = BLOCKS.registerBlock(
+            "identifier",
+            IdentifierBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(3.5F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+    );
+    public static final DeferredBlock<AffixSorterBlock> AFFIX_SORTER = BLOCKS.registerBlock(
+            "affix_sorter",
+            AffixSorterBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(3.5F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+    );
     public static final DeferredBlock<MelterBlock> MELTER = BLOCKS.registerBlock(
             "melter",
             MelterBlock::new,
@@ -441,6 +461,11 @@ public final class ModBlocks {
             "ender_slurry",
             properties -> new LiquidBlock(ModFluids.ENDER_SLURRY_SOURCE.get(), properties),
             BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()
+    );
+    public static final DeferredBlock<LiquidBlock> IDENTIFYING_FLUID_BLOCK = BLOCKS.registerBlock(
+            "identifying_fluid",
+            properties -> new LiquidBlock(ModFluids.IDENTIFYING_FLUID_SOURCE.get(), properties),
+            BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable().lightLevel(state -> 6)
     );
     public static final DeferredBlock<LiquidBlock> CARBON_EXHAUST_BLOCK = BLOCKS.registerBlock(
             "carbon_exhaust",

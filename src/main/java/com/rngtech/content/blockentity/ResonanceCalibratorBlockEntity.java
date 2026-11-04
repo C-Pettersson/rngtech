@@ -37,6 +37,7 @@ import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierOperation;
 import com.rngtech.rpg.ModifierSlot;
+import com.rngtech.rpg.jewel.JewelEffects;
 import com.rngtech.rpg.progression.AscendancyFormulas;
 import com.rngtech.rpg.progression.MachineMasteryFamily;
 import com.rngtech.rpg.progression.MachineMasteryHost;
@@ -590,10 +591,12 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         MachineStatAccumulator stats = MachineBaseStatCatalog.resonanceCalibrator(chassis);
         stats.apply(effectiveTraits());
         MegaPassiveTree.applyNodeStats(stats, machineProgression(), masteryFamily());
+        JewelEffects.applyLines(stats, this, machineProgression(), masteryFamily());
         applyGearStats(stats, resonanceCoilStack());
         applyGearStats(stats, controlBoardStack());
         applyGearStats(stats, stabilizerMatrixStack());
         MegaPassiveTree.applyAttributeStats(stats, machineProgression(), masteryFamily());
+        JewelEffects.applyThresholds(stats, this, machineProgression(), masteryFamily());
         WorkOrderConditions.apply(stats, workOrders().activeOrder());
         if (!hasBatteryCell()) {
             stats.apply(MachineStatAccumulator.NO_BATTERY_SOURCE, new MachineModifier(
@@ -885,6 +888,8 @@ public class ResonanceCalibratorBlockEntity extends BaseMachineBlockEntity
         int rp = currentRefinementPotentialRange(recipe, stats).roll(level.random);
         ItemStack result = recipeResult.stackWithState(recipe.family(), stability, rp);
         result.setCount(Math.min(result.getMaxStackSize(), result.getCount() * operations));
+        // An output that rolls traits, such as a cut jewel, leaves the Calibrator Unidentified like a crafted part.
+        CraftedTraitOutputs.seedIfMissing(result, level.random);
         return result;
     }
 

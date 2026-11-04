@@ -48,6 +48,7 @@ public final class CorruptionCatalog {
     /** Stats that multiply items or fluid, or save inputs. A 2.0 pool must not grant them. */
     private static final Set<MachineStat> YIELD_STATS = EnumSet.of(
             MachineStat.OUTPUT_AMOUNT,
+            MachineStat.MAX_OUTPUT_AMOUNT,
             MachineStat.SUPER_OUTPUT_CHANCE,
             MachineStat.MAGIC_FIND,
             MachineStat.CRUSHER_SALVAGE_CHANCE,

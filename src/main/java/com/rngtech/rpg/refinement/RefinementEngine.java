@@ -703,7 +703,7 @@ public final class RefinementEngine {
         if (!lensTags.isEmpty() && candidates.stream().noneMatch(candidate -> candidate.definition().matchesLensTags(lensTags))) {
             return RefinementResult.failure(traits, "rngtech.refinement.failure.no_matching_lens_affix");
         }
-        ModifierRollCandidate rolledCandidate = weightedCandidate(candidates, lensTags, random);
+        ModifierRollCandidate rolledCandidate = weightedCandidate(profile, candidates, lensTags, random);
         ModifierDefinition definition = rolledCandidate.definition();
         int tier = MachineTraitRoller.rollModifierTier(
                 definition,
@@ -1547,7 +1547,7 @@ public final class RefinementEngine {
             return null;
         }
 
-        ModifierDefinition definition = lensWeightedDefinition(definitions, lensTags, random);
+        ModifierDefinition definition = lensWeightedDefinition(profile, definitions, lensTags, random);
         int tier = MachineTraitRoller.rollModifierTier(
                 definition,
                 profile,
@@ -1587,24 +1587,26 @@ public final class RefinementEngine {
     }
 
     private static ModifierRollCandidate weightedCandidate(
+            ModifierEligibilityProfile profile,
             List<ModifierRollCandidate> candidates,
             Set<ModifierLensTag> lensTags,
             RandomSource random
     ) {
         List<ModifierDefinition> definitions = candidates.stream().map(ModifierRollCandidate::definition).toList();
-        return new ModifierRollCandidate(lensWeightedDefinition(definitions, lensTags, random));
+        return new ModifierRollCandidate(lensWeightedDefinition(profile, definitions, lensTags, random));
     }
 
     private static ModifierDefinition lensWeightedDefinition(
+            ModifierEligibilityProfile profile,
             List<ModifierDefinition> definitions,
             Set<ModifierLensTag> lensTags,
             RandomSource random
     ) {
         if (lensTags.isEmpty()) {
-            return MachineTraitRoller.weightedDefinition(definitions, random);
+            return MachineTraitRoller.weightedDefinition(profile, definitions, random);
         }
         int totalWeight = definitions.stream()
-                .mapToInt(definition -> lensAdjustedWeight(definition, lensTags))
+                .mapToInt(definition -> lensAdjustedWeight(profile, definition, lensTags))
                 .sum();
         if (totalWeight <= 0) {
             return definitions.get(random.nextInt(definitions.size()));
@@ -1612,7 +1614,7 @@ public final class RefinementEngine {
         int roll = random.nextInt(totalWeight);
         int cursor = 0;
         for (ModifierDefinition definition : definitions) {
-            cursor += lensAdjustedWeight(definition, lensTags);
+            cursor += lensAdjustedWeight(profile, definition, lensTags);
             if (roll < cursor) {
                 return definition;
             }
@@ -1666,7 +1668,7 @@ public final class RefinementEngine {
             RandomSource random
     ) {
         int totalWeight = modifiers.stream()
-                .mapToInt(modifier -> lensAdjustedWeight(definitionFor(profile, modifier), lensTags))
+                .mapToInt(modifier -> lensAdjustedWeight(profile, definitionFor(profile, modifier), lensTags))
                 .sum();
         if (totalWeight <= 0) {
             return modifiers.get(random.nextInt(modifiers.size()));
@@ -1674,7 +1676,7 @@ public final class RefinementEngine {
         int roll = random.nextInt(totalWeight);
         int cursor = 0;
         for (MachineModifier modifier : modifiers) {
-            cursor += lensAdjustedWeight(definitionFor(profile, modifier), lensTags);
+            cursor += lensAdjustedWeight(profile, definitionFor(profile, modifier), lensTags);
             if (roll < cursor) {
                 return modifier;
             }
@@ -1682,11 +1684,11 @@ public final class RefinementEngine {
         return modifiers.getLast();
     }
 
-    private static int lensAdjustedWeight(ModifierDefinition definition, Set<ModifierLensTag> lensTags) {
+    private static int lensAdjustedWeight(ModifierEligibilityProfile profile, ModifierDefinition definition, Set<ModifierLensTag> lensTags) {
         if (definition == null) {
             return 0;
         }
-        int baseWeight = definition.rollWeight();
+        int baseWeight = MachineTraitRoller.rollWeight(profile, definition);
         return definition.matchesLensTags(lensTags) ? baseWeight * LENS_WEIGHT_MULTIPLIER : baseWeight;
     }
 

@@ -927,6 +927,9 @@ async function knownComponentStageEntries() {
     await appendEnumStages(entries, path.join(ENERGY_SRC, "FuelBoxMaterial.java"), (entry) => [
         stageEntry(`${entry.name}_fuel_box`, javaNumber(entry.args[0]), "FuelBoxMaterial")
     ]);
+    await appendEnumStages(entries, path.join(ENERGY_SRC, "FuelTankMaterial.java"), (entry) => [
+        stageEntry(entry.args[0].replaceAll('"', ""), javaNumber(entry.args[1]), "FuelTankMaterial")
+    ]);
     await appendEnumStages(entries, path.join(ENERGY_SRC, "ReactorChamberMaterial.java"), (entry) => [
         stageEntry(`${entry.name}_reactor_chamber`, javaNumber(entry.args[0]), "ReactorChamberMaterial")
     ]);
@@ -1091,6 +1094,9 @@ function staticStageEntries() {
         stageEntry("potential_reactor", 4, "static stage catalog"),
         stageEntry("metal_press", 4, "static stage catalog"),
         stageEntry("melter", 6, "static stage catalog"),
+        stageEntry("identifier", 8, "static stage catalog"),
+        stageEntry("affix_sorter", 8, "static stage catalog"),
+        stageEntry("exotic_rule_core", 8, "static stage catalog"),
         stageEntry("phase_emitter", 8, "static stage catalog"),
         stageEntry("phase_coil", 8, "static stage catalog"),
         stageEntry("glyph", 8, "static stage catalog"),
@@ -1710,7 +1716,7 @@ function stageItemCategory(id, materialItemIds) {
     if (materialItemIds.has(id)) {
         return "material";
     }
-    if (/(?:^|_)(crusher|furnace|melter|press|reactor|generator|calibrator|recycler|solar_panel|solar_array_controller|battery_chassis|solid_fuel_burner|tool_bench|affix_forge|wooden_composter|compressor_tank|phase_emitter|phase_coil)$/.test(local)
+    if (/(?:^|_)(crusher|furnace|melter|press|reactor|generator|calibrator|recycler|solar_panel|solar_array_controller|battery_chassis|solid_fuel_burner|tool_bench|affix_forge|wooden_composter|compressor_tank|phase_emitter|phase_coil|identifier|affix_sorter)$/.test(local)
             || local.endsWith("_chassis")
             || local.endsWith("_compressor_tank")
             || local.endsWith("_component_recycler")
@@ -1728,9 +1734,12 @@ function stageItemCategory(id, materialItemIds) {
     }
     if (local.endsWith("_crush_head")
             || local.endsWith("_disassembly_head")
+            || local.endsWith("_rule_core")
             || local.endsWith("_battery_cell")
             || local.endsWith("_heat_core")
             || local.endsWith("_fuel_box")
+            || local.endsWith("_fuel_tank")
+            || local === "steel_gas_jet"
             || local.endsWith("_reactor_chamber")
             || local.endsWith("_recovery_filter")
             || local.endsWith("_containment_lining")
@@ -1843,6 +1852,12 @@ function modifierProfileIdForItem(id) {
     if (local === "melter") {
         return "melter";
     }
+    if (local === "identifier") {
+        return "identifier";
+    }
+    if (local === "affix_sorter") {
+        return "affix_sorter";
+    }
     if (local === "cavitation_generator") {
         return "cavitation_generator";
     }
@@ -1895,6 +1910,9 @@ function modifierProfileIdForItem(id) {
     if (local.endsWith("_fuel_box")) {
         return "fuel_box";
     }
+    if (local.endsWith("_fuel_tank") || local === "steel_gas_jet") {
+        return "fuel_tank";
+    }
     if (local === "bio_chamber") {
         return "bio_chamber";
     }
@@ -1924,6 +1942,9 @@ function modifierProfileIdForItem(id) {
     }
     if (local.endsWith("_dimensional_stabilizer")) {
         return "dimensional_stabilizer";
+    }
+    if (local.endsWith("_rule_core")) {
+        return "rule_core";
     }
     if (local.endsWith("_disassembly_head")) {
         return "disassembly_head";
@@ -3539,7 +3560,7 @@ function addLensTags(tags, stat) {
     if ([
         "EFFICIENCY", "ENERGY_USAGE", "FUEL_EFFICIENCY", "IDLE_LOSS", "HIGH_HARDNESS_ENERGY_MITIGATION",
         "NO_BATTERY_OUTPUT_RETENTION", "DURABILITY", "SELF_REPAIR", "FE_USAGE", "VEIN_MINE_FE_USAGE",
-        "ORE_BURST_FE_USAGE", "CONTROL"
+        "ORE_BURST_FE_USAGE", "CONTROL", "FLUID_USAGE"
     ].includes(stat)) {
         tags.add("EFFICIENCY");
     }
@@ -3884,7 +3905,9 @@ function definitionForStat(stat, definitions) {
         PEAK_SOLAR_GENERATION: "PEAK_SOLAR",
         INSTANT_PROCESS_CHANCE: "INSTANT_PROCESS",
         SUPER_OUTPUT_CHANCE: "SUPER_OUTPUT",
-        BATTERY_SLOTS: "BATTERY_CHASSIS_BATTERY_SLOTS"
+        BATTERY_SLOTS: "BATTERY_CHASSIS_BATTERY_SLOTS",
+        FLUID_USAGE: "FLUID_USAGE",
+        RULE_CAPACITY: "RULE_CAPACITY"
     };
     const definitionId = definitionIds[stat];
     if (!definitionId) {

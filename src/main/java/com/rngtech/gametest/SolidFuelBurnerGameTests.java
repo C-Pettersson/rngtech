@@ -4,35 +4,49 @@ import static com.rngtech.gametest.MachineTestSupport.check;
 
 import com.rngtech.RNGTech;
 import com.rngtech.RNGTechConfig;
+import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
 import com.rngtech.content.blockentity.MachineInfoSnapshot;
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.blockentity.SolidFuelBurnerVisualState;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.SolidFuelBurnerChassis;
 import com.rngtech.content.energy.SolidFuelBurnerStoke;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.FuelTankContents;
+import com.rngtech.content.item.TankContents;
+import com.rngtech.content.machine.CompressorTankMaterial;
 import com.rngtech.content.menu.SolidFuelBurnerMenu;
+import com.rngtech.content.recycling.ComponentRecyclerChassis;
 import com.rngtech.content.registry.ModBlocks;
+import com.rngtech.content.registry.ModDataComponents;
+import com.rngtech.content.registry.ModFluids;
 import com.rngtech.content.registry.ModItems;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 /**
- * The world view of a Solid Fuel Burner (installed Gear, fuel, fire, and charge reach the synced visual state) and its
- * stoke, which trades FE/t for FE per fuel item.
+ * The world view of a Fuel Burner (installed Gear, fuel, fire, and charge reach the synced visual state), its stoke, which
+ * trades FE/t for FE per fuel item, and its Fuel Tank and Gas Jet, which burn fluid.
  */
 @GameTestHolder(RNGTech.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -329,6 +343,175 @@ public final class SolidFuelBurnerGameTests {
 
     private static void tick(GameTestHelper helper, SolidFuelBurnerBlockEntity burner) {
         SolidFuelBurnerBlockEntity.serverTick(helper.getLevel(), burner.getBlockPos(), burner.getBlockState(), burner);
+    }
+
+    /** A Lava Bucket drains into the tank and leaves the empty bucket for automation, then the lava burns a lot at a time. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void fuelTankBurnsLavaInLots(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity burner = fluidBurner(helper, new BlockPos(2, 1, 2), SolidFuelBurnerChassis.ALLOY, HeatCoreMaterial.BRONZE, FuelTankMaterial.BRONZE);
+        check(burner.getItemHandler(null).getSlots() == 1, "A tank swaps the fuel slots for one container slot");
+        check(burner.getItemHandler(null).insertItem(0, new ItemStack(Items.LAVA_BUCKET), false).isEmpty(), "Automation should insert a Lava Bucket");
+        check(burner.getItemHandler(null).extractItem(0, 1, true).isEmpty(), "Automation should not take back a full bucket");
+
+        tick(helper, burner);
+
+        check(burner.getFluidContainerInventory().getStackInSlot(0).is(Items.BUCKET), "The bucket should be empty after it drains");
+        check(!burner.getItemHandler(null).extractItem(0, 1, false).isEmpty(), "Automation should take the empty bucket");
+        check(tankAmount(burner) == 1_000 - SolidFuelBurnerBlockEntity.FLUID_FUEL_LOT, "The first lot should leave the tank: " + tankAmount(burner));
+        SolidFuelBurnerVisualState state = burner.currentVisualState();
+        check(state.bins() == 0 && state.fuelTank().equals("bronze") && state.fuelBox().isEmpty(), "Wrong part shown: " + state);
+        check(state.tankFill() == 0.225F && state.tankFluid().equals("minecraft:lava"), "Wrong sight glass: " + state);
+        check(SolidFuelBurnerVisualState.load(state.save()).equals(state), "The visual state should survive syncing: " + state);
+
+        // A 100 mB lot of 100,000 FE lava holds 10,000 FE, which a Bronze Heat Core burns at 64 FE/t.
+        for (int i = 0; i < 155; i++) {
+            tick(helper, burner);
+        }
+        check(tankAmount(burner) == 900, "The first lot should still be burning: " + tankAmount(burner));
+        check(cellEnergy(burner) == 9_984, "A lot should make FE at the core's rate: " + cellEnergy(burner));
+        fillCell(burner, 0.0);
+        tick(helper, burner);
+        tick(helper, burner);
+        check(tankAmount(burner) == 800, "The next lot should start: " + tankAmount(burner));
+        helper.succeed();
+    }
+
+    /** A short tank burns what it has, for its share of the FE, so no fluid is stranded. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void fuelTankBurnsItsLastPartialLot(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity burner = fluidBurner(helper, new BlockPos(2, 1, 2), SolidFuelBurnerChassis.ALLOY, HeatCoreMaterial.BRONZE, FuelTankMaterial.BRONZE);
+        fill(burner, new FluidStack(Fluids.LAVA, 25));
+        for (int i = 0; i < 40; i++) {
+            tick(helper, burner);
+        }
+        check(tankAmount(burner) == 0, "The last 25 mB should burn: " + tankAmount(burner));
+        check(cellEnergy(burner) == 2_500, "25 mB of lava holds 2,500 FE: " + cellEnergy(burner));
+        check(burner.machineInfo().state() != MachineInfoSnapshot.WorkState.RUNNING, "An empty tank should stop the burner");
+        helper.succeed();
+    }
+
+    /** The part's form and the Heat Core's tier decide what a tank takes, like the checks on fuel items. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void fuelPartsTakeOnlyTheirOwnFuel(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity tank = fluidBurner(helper, new BlockPos(1, 1, 2), SolidFuelBurnerChassis.STEEL, HeatCoreMaterial.STEEL, FuelTankMaterial.STEEL);
+        check(fill(tank, new FluidStack(Fluids.WATER, 1_000)) == 0, "Water is not a fuel");
+        check(fill(tank, new FluidStack(ModFluids.METHANE_SOURCE.get(), 1_000)) == 0, "A Fuel Tank should refuse a gas");
+        check(fill(tank, new FluidStack(Fluids.LAVA, 1_000)) == 1_000, "A Fuel Tank should take lava");
+        check(fill(tank, new FluidStack(Fluids.LAVA, 9_000)) == 7_000, "An 8,000 mB tank should fill to its capacity");
+
+        SolidFuelBurnerBlockEntity jet = fluidBurner(helper, new BlockPos(3, 1, 2), SolidFuelBurnerChassis.STEEL, HeatCoreMaterial.STEEL, FuelTankMaterial.GAS_JET);
+        check(fill(jet, new FluidStack(Fluids.LAVA, 1_000)) == 0, "A Gas Jet should refuse a liquid");
+        check(fill(jet, new FluidStack(ModFluids.METHANE_SOURCE.get(), 1_000)) == 1_000, "A Gas Jet should take Methane");
+
+        SolidFuelBurnerBlockEntity weakCore = fluidBurner(helper, new BlockPos(1, 1, 4), SolidFuelBurnerChassis.STEEL, HeatCoreMaterial.COPPER, FuelTankMaterial.STEEL);
+        check(fill(weakCore, new FluidStack(Fluids.LAVA, 1_000)) == 0, "Lava is Tier 3, above a Copper Heat Core");
+
+        SolidFuelBurnerBlockEntity box = burner(helper, new BlockPos(3, 1, 4), SolidFuelBurnerChassis.STEEL, HeatCoreMaterial.STEEL, FuelBoxMaterial.STEEL, ItemStack.EMPTY);
+        check(box.getFluidHandler(null) == null, "A Fuel Box exposes no fluid input");
+        check(!box.isAcceptedFuel(new ItemStack(Items.LAVA_BUCKET)), "A Fuel Box should still refuse a Lava Bucket");
+        helper.succeed();
+    }
+
+    /** Fluid stays on the part, and fuel the new part cannot use comes out instead of hiding in a closed slot. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void swappingTheFuelPartLosesNothing(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity burner = burner(helper, new BlockPos(2, 1, 2), SolidFuelBurnerChassis.STEEL, HeatCoreMaterial.STEEL, FuelBoxMaterial.STEEL, new ItemStack(Items.COAL, 8));
+        ItemStack box = burner.getGearInventory().getStackInSlot(SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX);
+        burner.getGearInventory().setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX, new ItemStack(ModItems.fuelTank(FuelTankMaterial.STEEL).get()));
+        check(fill(burner, new FluidStack(Fluids.LAVA, 2_000)) == 2_000, "The tank should take lava");
+        check(burner.getFuelInventory().getStackInSlot(SolidFuelBurnerBlockEntity.SLOT_FUEL_0).isEmpty(), "The Coal should leave its hidden slot");
+        check(droppedCount(helper, burner, Items.COAL) == 8, "The Coal should drop where the player can reach it");
+
+        ItemStack tank = burner.getGearInventory().getStackInSlot(SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX);
+        check(burner.getItemHandler(null).insertItem(0, new ItemStack(Items.LAVA_BUCKET), false).isEmpty(), "The tank should take a Lava Bucket");
+        burner.getGearInventory().setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX, box);
+        check(FuelTankContents.fluid(tank).getAmount() == 2_000, "The removed tank should keep its lava");
+        check(burner.getFluidContainerInventory().getStackInSlot(0).isEmpty(), "The bucket should leave the hidden container slot");
+        check(droppedCount(helper, burner, Items.LAVA_BUCKET) == 1, "The bucket should drop where the player can reach it");
+
+        burner.getGearInventory().setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX, tank);
+        check(tankAmount(burner) == 2_000, "The reinstalled tank should still hold its lava");
+        check(burner.purgeFluid(SolidFuelBurnerBlockEntity.PURGE_FUEL_TANK, 1_000).success(), "Purging should work on the part's tank");
+        check(tankAmount(burner) == 1_000, "Purging should remove 1,000 mB");
+        helper.succeed();
+    }
+
+    /** The container slot takes only fuel, and gives back what stops being burnable, so it can never jam a feed line. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void containerSlotTakesOnlyFuelAndNeverJams(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity burner = fluidBurner(helper, new BlockPos(2, 1, 2), SolidFuelBurnerChassis.STEEL, HeatCoreMaterial.STEEL, FuelTankMaterial.STEEL);
+        check(burner.getItemHandler(null).insertItem(0, new ItemStack(Items.WATER_BUCKET), false).is(Items.WATER_BUCKET), "A Water Bucket should stay out");
+        check(burner.getItemHandler(null).insertItem(0, new ItemStack(Items.BUCKET), false).is(Items.BUCKET), "An empty bucket should stay out");
+
+        fill(burner, new FluidStack(Fluids.LAVA, 8_000));
+        check(burner.getItemHandler(null).insertItem(0, new ItemStack(Items.LAVA_BUCKET), false).isEmpty(), "A Lava Bucket should wait for room");
+        check(burner.getItemHandler(null).extractItem(0, 1, true).isEmpty(), "A bucket waiting for room should stay");
+
+        burner.getGearInventory().setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_HEAT_CORE, new ItemStack(ModItems.heatCore(HeatCoreMaterial.COPPER).get()));
+        check(burner.getItemHandler(null).extractItem(0, 1, true).is(Items.LAVA_BUCKET), "A weaker Heat Core should let automation take the bucket back");
+        helper.succeed();
+    }
+
+    /** A filled tank or fuel part cannot be recycled, because only purging destroys fluid. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void recyclerRefusesPartsHoldingFluid(GameTestHelper helper) {
+        ComponentRecyclerBlockEntity recycler = MachineTestSupport.place(helper, new BlockPos(2, 1, 2),
+                ModBlocks.componentRecycler(ComponentRecyclerChassis.STEEL).get(), ComponentRecyclerBlockEntity.class);
+        ItemStack tank = new ItemStack(ModItems.fuelTank(FuelTankMaterial.STEEL).get());
+        check(recycler.isKnownInput(tank), "An empty Fuel Tank should recycle");
+        FuelTankContents.set(tank, new FluidStack(Fluids.LAVA, 100));
+        check(!recycler.isKnownInput(tank), "A Fuel Tank holding lava should not recycle");
+        FuelTankContents.set(tank, FluidStack.EMPTY);
+        check(recycler.isKnownInput(tank), "An emptied Fuel Tank should recycle again");
+
+        ItemStack compressor = new ItemStack(ModItems.compressorTank(CompressorTankMaterial.STEEL).get());
+        check(recycler.isKnownInput(compressor), "An empty Compressor Tank should recycle");
+        compressor.set(ModDataComponents.TANK_CONTENTS.get(), TankContents.of(new FluidStack(Fluids.WATER, 1_000), FluidStack.EMPTY));
+        check(!recycler.isKnownInput(compressor), "A filled Compressor Tank should not recycle");
+        helper.succeed();
+    }
+
+    /** A paused burner holds its lot, and pipes cannot pull fuel back out. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void fuelGovernorHoldsALotAndTanksAreInputOnly(GameTestHelper helper) {
+        SolidFuelBurnerBlockEntity burner = fluidBurner(helper, new BlockPos(2, 1, 2), SolidFuelBurnerChassis.ALLOY, HeatCoreMaterial.BRONZE, FuelTankMaterial.BRONZE);
+        fill(burner, new FluidStack(Fluids.LAVA, 500));
+        check(burner.getFluidHandler(null).drain(100, IFluidHandler.FluidAction.EXECUTE).isEmpty(), "Pipes should not drain a Fuel Tank");
+        tick(helper, burner);
+        check(tankAmount(burner) == 400, "The first lot should start: " + tankAmount(burner));
+        fillCell(burner, 1.0);
+        for (int i = 0; i < 200; i++) {
+            tick(helper, burner);
+        }
+        check(tankAmount(burner) == 400, "A full cell should pause the burn: " + tankAmount(burner));
+        helper.succeed();
+    }
+
+    private static int droppedCount(GameTestHelper helper, SolidFuelBurnerBlockEntity burner, Item item) {
+        return helper.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(burner.getBlockPos()).inflate(2.0)).stream()
+                .filter(entity -> entity.getItem().is(item))
+                .mapToInt(entity -> entity.getItem().getCount())
+                .sum();
+    }
+
+    private static int tankAmount(SolidFuelBurnerBlockEntity burner) {
+        return burner.getFluidHandler(null).getFluidInTank(0).getAmount();
+    }
+
+    private static int fill(SolidFuelBurnerBlockEntity burner, FluidStack fluid) {
+        return burner.getFluidHandler(null).fill(fluid, IFluidHandler.FluidAction.EXECUTE);
+    }
+
+    private static int cellEnergy(SolidFuelBurnerBlockEntity burner) {
+        return BatteryCellItem.energyStored(burner.getGearInventory().getStackInSlot(SolidFuelBurnerBlockEntity.SLOT_BATTERY_CELL));
+    }
+
+    private static SolidFuelBurnerBlockEntity fluidBurner(
+            GameTestHelper helper, BlockPos pos, SolidFuelBurnerChassis chassis, HeatCoreMaterial core, FuelTankMaterial tank
+    ) {
+        SolidFuelBurnerBlockEntity burner = burner(helper, pos, chassis, core, FuelBoxMaterial.IRON, ItemStack.EMPTY);
+        burner.getGearInventory().setStackInSlot(SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX, new ItemStack(ModItems.fuelTank(tank).get()));
+        return burner;
     }
 
     private static SolidFuelBurnerBlockEntity burner(
