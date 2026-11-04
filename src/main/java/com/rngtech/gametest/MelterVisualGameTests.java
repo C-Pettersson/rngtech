@@ -101,6 +101,7 @@ public final class MelterVisualGameTests {
         MachineTestSupport.powerEachTick(helper, melter.getEnergyStorage(null));
         helper.succeedWhen(() -> {
             check(melter.currentVisualState().outputFluid().equals("minecraft:lava"), "Waiting for Bronze Gear to melt lava");
+            check(melter.getOutputTank().getFluidAmount() == 250, "A melt should make 250 mB of lava: " + melter.getOutputTank().getFluidAmount());
             check(melter.machineProgression().xp() > 0, "A finished lava melt should earn Mastery XP");
         });
     }

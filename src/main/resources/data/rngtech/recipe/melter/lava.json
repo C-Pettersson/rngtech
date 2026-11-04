@@ -15,7 +15,7 @@
   },
   "fluid_output": {
     "id": "minecraft:lava",
-    "amount": 1000
+    "amount": 250
   },
   "processing_ticks": 360,
   "heat": 7967,

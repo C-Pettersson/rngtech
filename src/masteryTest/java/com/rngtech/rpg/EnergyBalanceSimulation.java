@@ -129,16 +129,18 @@ public final class EnergyBalanceSimulation {
     // ---------------------------------------------------------------------------------------------------------------
 
     /** A Lava Tap Melter on unrolled Titanium Gear: 540 reference ticks at 2.775 work a tick, 3 x 7,967 heat plus wall loss. */
+    private static final double LAVA_LINE_BUCKETS = 0.75;
     private static final double LAVA_LINE_TICKS = 194.6;
     private static final double LAVA_LINE_COST = 24_030.0;
     /** The same Melter without Lava Tap on Methane: 480 reference ticks at 1.85 work a tick, 3 x 7,511 heat plus wall loss. */
+    private static final double METHANE_LINE_BUCKETS = 3.0;
     private static final double METHANE_LINE_TICKS = 259.5;
     private static final double METHANE_LINE_COST = 24_776.0;
 
     private void defineSetups() throws IOException {
         solidFuelBurners();
-        fuelBurnerFluids("lava", LAVA_LINE_TICKS, LAVA_LINE_COST);
-        fuelBurnerFluids("methane", METHANE_LINE_TICKS, METHANE_LINE_COST);
+        fuelBurnerFluids("lava", LAVA_LINE_BUCKETS, LAVA_LINE_TICKS, LAVA_LINE_COST);
+        fuelBurnerFluids("methane", METHANE_LINE_BUCKETS, METHANE_LINE_TICKS, METHANE_LINE_COST);
         bioGenerators();
         bioGeneratorTakeOffs();
         solarPanels();
@@ -154,10 +156,10 @@ public final class EnergyBalanceSimulation {
     /**
      * SolidFuelBurnerBlockEntity#tryStartBurningFluid for one fluid fuel. {@code lineNetFet} is one Melter feeding burners
      * of this setup: 3 melts per cycle from Second Crucible with unrolled Titanium Gear, so it shows how far burner Gear
-     * alone moves the line. {@code lineTicks} and {@code lineCost} are that cycle's length and FE, the recipe's heat plus
-     * wall loss, and Lava Tap applies to the lava line.
+     * alone moves the line. {@code lineBuckets}, {@code lineTicks}, and {@code lineCost} are that cycle's output in
+     * 1,000 mB units, its length, and its FE, the recipe's heat plus wall loss. Lava Tap applies to the lava line.
      */
-    private void fuelBurnerFluids(String id, double lineTicks, double lineCost) throws IOException {
+    private void fuelBurnerFluids(String id, double lineBuckets, double lineTicks, double lineCost) throws IOException {
         JsonObject recipe = recipeJson("fluid_fuel", id);
         Double override = scenario.recipeEnergy("fluid_fuel/" + id);
         double energy = override != null ? override : recipe.get("energy").getAsDouble();
@@ -189,9 +191,9 @@ public final class EnergyBalanceSimulation {
                                 * Math.max(0.1, stats.value(MachineStat.FUEL_EFFICIENCY))
                                 * Math.max(0.1, stats.value(MachineStat.EFFICIENCY))
                                 * Math.max(0.1, stats.value(MachineStat.FUEL_DURATION));
-                        double lineGross = 3.0 * perBucket / lineTicks;
+                        double lineGross = lineBuckets * perBucket / lineTicks;
                         return Outcome.running(generation, generation, perBucket)
-                                .withMetric("lineNetFet", (3.0 * perBucket - lineCost) / lineTicks)
+                                .withMetric("lineNetFet", (lineBuckets * perBucket - lineCost) / lineTicks)
                                 .withMetric("burnersPerMelter", generation <= 0 ? 0.0 : lineGross / generation);
                     });
                 }

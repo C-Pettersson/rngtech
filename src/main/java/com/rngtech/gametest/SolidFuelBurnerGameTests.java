@@ -363,12 +363,13 @@ public final class SolidFuelBurnerGameTests {
         check(state.tankFill() == 0.225F && state.tankFluid().equals("minecraft:lava"), "Wrong sight glass: " + state);
         check(SolidFuelBurnerVisualState.load(state.save()).equals(state), "The visual state should survive syncing: " + state);
 
-        // A 100 mB lot of 25,000 FE lava holds 2,500 FE, which a Bronze Heat Core burns at 64 FE/t.
-        for (int i = 0; i < 38; i++) {
+        // A 100 mB lot of 100,000 FE lava holds 10,000 FE, which a Bronze Heat Core burns at 64 FE/t.
+        for (int i = 0; i < 155; i++) {
             tick(helper, burner);
         }
         check(tankAmount(burner) == 900, "The first lot should still be burning: " + tankAmount(burner));
-        check(cellEnergy(burner) == 2_496, "A lot should make FE at the core's rate: " + cellEnergy(burner));
+        check(cellEnergy(burner) == 9_984, "A lot should make FE at the core's rate: " + cellEnergy(burner));
+        fillCell(burner, 0.0);
         tick(helper, burner);
         tick(helper, burner);
         check(tankAmount(burner) == 800, "The next lot should start: " + tankAmount(burner));
@@ -384,8 +385,7 @@ public final class SolidFuelBurnerGameTests {
             tick(helper, burner);
         }
         check(tankAmount(burner) == 0, "The last 25 mB should burn: " + tankAmount(burner));
-        // 25 mB holds 625 FE, which rounds down to whole burn ticks of 10 FE.
-        check(cellEnergy(burner) == 620, "25 mB of lava should burn for its share of the FE: " + cellEnergy(burner));
+        check(cellEnergy(burner) == 2_500, "25 mB of lava holds 2,500 FE: " + cellEnergy(burner));
         check(burner.machineInfo().state() != MachineInfoSnapshot.WorkState.RUNNING, "An empty tank should stop the burner");
         helper.succeed();
     }

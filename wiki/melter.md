@@ -40,7 +40,7 @@ Mine a placed Melter with a pickaxe. It drops itself and keeps its rolled traits
 
 ### Melting
 
-Fill the input tank with the recipe's fluid, put the two recipe items in the input slots, and supply FE. The two items can go in either slot, and a recipe that needs two of the same item takes both from one slot. Each melt uses 1,000 mB of fluid and puts 1,000 mB of the product into the output tank, except Ender Slurry from Collapse Residue, which makes 2,000 mB. Ender Slurry dissolves its items in [Ammonia](ammonia-synthesizer.md); every other default recipe uses water.
+Fill the input tank with the recipe's fluid, put the two recipe items in the input slots, and supply FE. The two items can go in either slot, and a recipe that needs two of the same item takes both from one slot. Each melt uses 1,000 mB of fluid and puts 1,000 mB of the product into the output tank, except lava, which makes 250 mB, and Ender Slurry from Collapse Residue, which makes 2,000 mB. Ender Slurry dissolves its items in [Ammonia](ammonia-synthesizer.md); every other default recipe uses water.
 
 Some ingredients leave an item behind, such as the Glass Bottle from a {{ item('minecraft:honey_bottle') }}. A leftover the Melter cannot use goes into an empty output container slot if it can hold the product, and otherwise into the inventory directly below the Melter, such as a hopper or chest, or onto the ground if there is none. It never blocks the input slots; see [Automation](automation.md#ingredient-leftovers).
 
