@@ -24,7 +24,7 @@ const SHAPELESS = new Set(["minecraft:crafting_shapeless", "rngtech:tool_damage_
 /** Recipe types whose `energy` is generated rather than consumed. */
 const FE_PRODUCERS = new Set([
     "rngtech:potential_reactor", "rngtech:corrosion_cell", "rngtech:cavitation",
-    "rngtech:gas_combustion", "rngtech:ammonia_power_cycle", "rngtech:vacuum_collapse"
+    "rngtech:gas_combustion", "rngtech:ammonia_power_cycle", "rngtech:vacuum_collapse", "rngtech:fluid_fuel"
 ]);
 const FE_CONSUMERS = new Set([
     "rngtech:crusher", "rngtech:furnace", "rngtech:alloy_furnace", "rngtech:metal_press", "rngtech:melter",

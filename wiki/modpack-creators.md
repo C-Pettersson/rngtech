@@ -40,10 +40,10 @@ These numbers use freshly crafted parts and no Mastery. Rolled affixes and Maste
 
 | Stage | Main generator | Generator FE/t | Typical machine draw |
 |---:|---|---:|---:|
-| 1 | [Solid Fuel Burner](solid-fuel-burner.md), Iron Heat Core | 24 | 24–48 FE/t |
-| 2 | Solid Fuel Burner, Copper Heat Core | 40 | 24–64 FE/t |
-| 3 | Solid Fuel Burner, Bronze Heat Core | 64 | 48–96 FE/t |
-| 4 | Solid Fuel Burner, Steel Heat Core | 96 | about 96 FE/t |
+| 1 | [Fuel Burner](fuel-burner.md), Iron Heat Core | 24 | 24–48 FE/t |
+| 2 | Fuel Burner, Copper Heat Core | 40 | 24–64 FE/t |
+| 3 | Fuel Burner, Bronze Heat Core | 64 | 48–96 FE/t |
+| 4 | Fuel Burner, Steel Heat Core | 96 | about 96 FE/t |
 | 5 | [Syngas Combustor](syngas-combustor.md) | 240 | 128–384 FE/t |
 | 6 | [Fuel Cell](ammonia-fuel-cell.md) | 600 | 160–512 FE/t |
 | 7 | [Vacuum Collapse Generator](vacuum-collapse-generator.md) | about 1,057 | 512–3,072 FE/t |
@@ -82,7 +82,7 @@ A generator's stage comes from the part that sets its output:
 
 | Generator | Stage |
 |---|---|
-| [Solid Fuel Burner](solid-fuel-burner.md) | Its Heat Core. An Iron Heat Core is Stage 1 and a Steel Heat Core is Stage 4. |
+| [Fuel Burner](fuel-burner.md) | Its Heat Core. An Iron Heat Core is Stage 1 and a Steel Heat Core is Stage 4. |
 | [Vacuum Collapse Generator](vacuum-collapse-generator.md) | Its Collapse Nozzle. |
 | [Cavitation Generator](cavitation-generator.md) | Its rotor. |
 | [Solar Panel](solar-panel.md) and Solar Array Controller | Each panel's own stage. |
@@ -95,11 +95,12 @@ RNGTech has no multiplier for machine FE costs. To make the whole mod cheaper or
 | You want to change | How |
 |---|---|
 | FE cost of a machine recipe | Override the recipe in a datapack and change `energy` (total FE per craft) or `processing_ticks`. |
-| FE output of all RNGTech generators | `energy.generationMultiplier`. It also changes Solid Fuel Burner FE per item, Solar Panel FE/t, and Bio Generator FE per item. |
+| FE output of all RNGTech generators | `energy.generationMultiplier`. It also changes Fuel Burner FE per item, Solar Panel FE/t, and Bio Generator FE per item. |
 | FE output of one stage's generators | `energy.stageGenerationMultiplier.stage1` to `stage8`. |
 | FE output of one fuel generator | Override its recipe and change `energy`: `gas_combustion` (Syngas), `ammonia_power_cycle` (Ammonia and Hydrogen in the Fuel Cell), `vacuum_collapse`, `cavitation`, `corrosion_cell`, `potential_reactor`. |
-| Solid Fuel Burner FE per item | Each fuel gives 10 FE per burn tick (Coal: 16,000 FE). Change the burn time in NeoForge's `furnace_fuels` data map. This also changes vanilla furnaces. |
-| Other mods' fuels in the Solid Fuel Burner | Add the item to a tier tag `rngtech:solid_fuel/tier_1` to `tier_4`, plus `rngtech:solid_fuel/item_fuels` or `block_fuels`. |
+| Fuel Burner FE per item | Each fuel gives 10 FE per burn tick (Coal: 16,000 FE). Change the burn time in NeoForge's `furnace_fuels` data map. This also changes vanilla furnaces. |
+| Other mods' fuels in the Fuel Burner | Add the item to a tier tag `rngtech:solid_fuel/tier_1` to `tier_4`, plus `rngtech:solid_fuel/item_fuels` or `block_fuels`. |
+| Fluid fuels in the Fuel Burner | Add or override a `rngtech:fluid_fuel` recipe. Set the fluid in `fuel`, `form` to `liquid` or `gas`, `tier` from 1 to 4, and `energy` to the FE per 1,000 mB. |
 | Bio Generator fuels | Add the item to a `rngtech:bio_generator/*` tag. It gives that category's fixed FE, such as `potato_fuels` (120 FE). |
 | Surcharge on the hardest ores | `crusher.highHardnessEnergyMultiplier` (default 2.0). Heated recipes carry their own `heat` in heat units instead; a datapack recipe that still sets `energy` in FE loads with 0.6 heat per FE. |
 | Resonance Calibrator cost | `calibration.energyMultiplier` and `calibration.timeMultiplier`. |
@@ -111,6 +112,9 @@ You cannot change these one at a time without code: connector caps, Battery Cell
     - If `energy` holds an invalid value, such as `0` or a negative number, most recipe types fall back to their default without an error. RNGTech ignores misspelled fields. Check the value in JEI after `/reload`.
     - A craft in progress keeps its old FE cost until it finishes.
     - Melter and Alloy Furnace recipes are shapeless: slot order does not matter, and a Melter recipe whose `primary_ingredient` and `secondary_ingredient` both match one item takes two of it from one slot. Component Assembler `ingredients` are ordered, one input slot per entry.
+
+!!! warning "Check other mods for free lava"
+    RNGTech cannot pump lava from the world. If another mod in your pack pumps lava or supplies it without limit, that lava can give an unfair advantage to a Fuel Burner with a Fuel Tank.
 
 ## Water
 

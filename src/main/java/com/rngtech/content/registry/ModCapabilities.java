@@ -113,6 +113,11 @@ public final class ModCapabilities {
                 SolidFuelBurnerBlockEntity::getEnergyStorage
         );
         event.registerBlockEntity(
+                Capabilities.FluidHandler.BLOCK,
+                ModBlockEntities.SOLID_FUEL_BURNER.get(),
+                SolidFuelBurnerBlockEntity::getFluidHandler
+        );
+        event.registerBlockEntity(
                 Capabilities.ItemHandler.BLOCK,
                 ModBlockEntities.BIO_GENERATOR.get(),
                 BioGeneratorBlockEntity::getItemHandler

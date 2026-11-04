@@ -1,6 +1,7 @@
 {
     "hosts": [
-        "fuel_box"
+        "fuel_box",
+        "fuel_tank"
     ],
     "blessed": [
         {

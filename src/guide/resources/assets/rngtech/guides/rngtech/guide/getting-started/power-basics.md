@@ -19,7 +19,7 @@ Typical generators by stage, before rolls and Gear bonuses:
 
 | Stage | Generator | Output |
 |---:|---|---|
-| 1–4 | [Solid Fuel Burner](rngtech:solid-fuel-burner.md) | 24, 40, 64, or 96 FE/t, depending on the Heat Core |
+| 1–4 | [Fuel Burner](rngtech:fuel-burner.md) | 24, 40, 64, or 96 FE/t, depending on the Heat Core |
 | 1–5 | [Solar Panel](rngtech:solar-panel.md) | 4 to 20 FE/t per panel on a clear day |
 | 2 | [Bio Generator](rngtech:bio-generator.md) | About 8 FE/t |
 | 4+ | [Corrosion Cell](rngtech:corrosion-cell.md) | Depends on the plate or Anode |

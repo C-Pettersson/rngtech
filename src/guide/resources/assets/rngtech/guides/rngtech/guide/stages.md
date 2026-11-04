@@ -154,13 +154,13 @@ A machine's chassis stage is the highest stage of Gear it accepts. A Stage 4 Ste
 This cap applies to a machine's main processing Gear:
 
 - Crush Heads in the [Crusher](rngtech:crusher.md).
-- Heat Cores in the [Furnace](rngtech:furnace.md), [Alloy Furnace](rngtech:alloy-furnace.md), and [Solid Fuel Burner](rngtech:solid-fuel-burner.md).
+- Heat Cores in the [Furnace](rngtech:furnace.md), [Alloy Furnace](rngtech:alloy-furnace.md), and [Fuel Burner](rngtech:fuel-burner.md).
 - Alloy Crucibles and Servos in the Alloy Furnace.
-- Fuel Boxes in the Solid Fuel Burner.
+- Fuel Boxes, Fuel Tanks, and Gas Jets in the Fuel Burner.
 - Disassembly Heads and Recovery Filters in the [Component Recycler](rngtech:component-recycler.md).
 - Battery Cells and Servos in [Compressor Tanks](rngtech:compressor-tank.md).
 
-Battery Cells fit most machines at any stage. A few machines limit them, for example the Solid Fuel Burner takes cells up to its own stage, and some gas machines need a minimum cell or Heat Core stage instead. Each machine's Gear section lists its limits, and the [Gear](rngtech:gear.md) page explains the slots.
+Battery Cells fit most machines at any stage. A few machines limit them, for example the Fuel Burner takes cells up to its own stage, and some gas machines need a minimum cell or Heat Core stage instead. Each machine's Gear section lists its limits, and the [Gear](rngtech:gear.md) page explains the slots.
 
 Two other systems read the chassis stage:
 

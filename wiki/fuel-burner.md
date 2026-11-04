@@ -9,7 +9,7 @@ wiki:
     - rngtech:steel_solid_fuel_burner
 ---
 
-# Solid Fuel Burner
+# Fuel Burner
 
 {{ infobox(
     variants=[
@@ -21,13 +21,13 @@ wiki:
     fields={
         "Type": "Generator",
         "Stages": "1–4",
-        "Power": "Burns solid fuel, generates FE",
-        "Gear": "{{ item('rngtech:iron_heat_core', 'Heat Core') }}, {{ item('rngtech:iron_fuel_box', 'Fuel Box') }}, {{ item('rngtech:iron_battery_cell', 'Battery Cell') }}",
+        "Power": "Burns fuel, generates FE",
+        "Gear": "{{ item('rngtech:iron_heat_core', 'Heat Core') }}, {{ item('rngtech:iron_fuel_box', 'Fuel Box') }} or {{ item('rngtech:bronze_fuel_tank', 'Fuel Tank') }}, {{ item('rngtech:iron_battery_cell', 'Battery Cell') }}",
         "Mastery": "No",
     },
 ) }}
 
-The **Solid Fuel Burner** is RNGTech's first real generator. It burns coal, charcoal, wood, and other furnace fuels and turns them into FE. The chassis decides which Gear you can install, and the Gear decides how fast it generates, which fuels it accepts, and how carefully it spends them. See [Power Chains](power-chains.md#coal) for where it fits and what replaces it.
+The **Fuel Burner** is RNGTech's first real generator. It burns coal, charcoal, wood, and other furnace fuels and turns them into FE. With a [Fuel Tank or Gas Jet](#fluid-fuels), it burns lava or Methane. The chassis decides which Gear you can install, and the Gear decides how fast it generates, which fuels it accepts, and how carefully it spends them. See [Power Chains](power-chains.md#coal) for where it fits and what replaces it.
 
 Each burner you craft rolls its own [rarity and affixes](rarity-and-affixes.md). Burners do not have Machine Mastery.
 
@@ -49,7 +49,7 @@ Mine a placed burner with a pickaxe. It drops itself and keeps its rolled traits
 
 ### Generating power
 
-A burner needs all three Gear parts before it burns anything: a **Heat Core**, a **Fuel Box**, and a **Battery Cell**. Install them on the Gear tab, then put fuel in the fuel slot on the Process tab.
+A burner needs all three Gear parts before it burns anything: a **Heat Core**, a **Fuel Feed**, and a **Battery Cell**. The Fuel Feed slot holds a Fuel Box, a Fuel Tank, or a Gas Jet. Install the parts on the Gear tab, then put fuel in the fuel slot on the Process tab.
 
 The burner writes generated FE straight into the installed Battery Cell and pushes it out to adjacent blocks that accept FE, such as a [Universal Cable](universal-cable.md) or a [Battery Chassis](battery-chassis.md). The burner does not limit its own output, so the receiver or cable tier decides how much FE moves each tick. It never accepts FE from outside.
 
@@ -106,7 +106,26 @@ Compact block fuels, which only a Steel Fuel Box accepts:
 
 {{ tag("rngtech:solid_fuel/block_fuels") }}
 
-With JEI installed, click the fuel line on the Process tab to open the Solid Fuel Burning category, which groups fuels by tier and form.
+With JEI installed, click the fuel line on the Process tab to open the fuel categories, which group fuels by tier and form.
+
+### Fluid fuels
+
+A **Fuel Tank** burns liquids. A **Gas Jet** burns gases. Install one in the Fuel Feed slot in place of a Fuel Box.
+
+| Fuel | Tier | FE per 1,000 mB | Part | Requires |
+|---|---:|---:|---|---|
+| Lava | 3 | 40,000 | Fuel Tank | Bronze Heat Core or better |
+| Methane | 4 | 40,000 | Gas Jet | Steel Heat Core |
+
+These FE values are before Gear. Fuel efficiency, fuel duration, and stoke change them as they do for item fuels.
+
+The [Melter](melter.md) makes lava and Methane. You can also fill a Fuel Tank with a Lava Bucket from the world.
+
+The burner uses fluid in lots of up to 100 mB. Each lot burns like one fuel item. Stoke, Quick Feed, and Fuel Governor work as usual. The last lot can be smaller, and it gives FE for its size.
+
+The choice of part is a trade. A burner with a tank or jet cannot burn items, and a burner with a Fuel Box cannot burn fluid. Syngas, Carbon Monoxide, Hydrogen, and Ammonia do not burn here. They have their own generators. Modpacks can add fluid fuels.
+
+The fluid stays in the part. Remove a tank and the item keeps its fluid. Install it again and the fluid returns. Items in the fuel slots stay there and burn again when a Fuel Box returns.
 
 ### Stages
 
@@ -143,7 +162,15 @@ Heat isolation below 1.00x leaks heat: part of each fuel item's burn time is los
 | {{ item('rngtech:bronze_fuel_box') }} | 2 | 1.00x | Item fuels | Fuel Governor, Fuel Reserve |
 | {{ item('rngtech:steel_fuel_box') }} | 2 | 1.10x | Item and block fuels | Fuel Governor, Block Feed |
 
-The Heat Core's and Fuel Box's fuel efficiency multiply together.
+| Fluid part | Stage | Capacity | Fuel efficiency | Burns | Behaviors |
+|---|---:|---:|---:|---|---|
+| {{ item('rngtech:bronze_fuel_tank') }} | 3 | 4,000 mB | 1.00x | Liquids | Fuel Governor |
+| {{ item('rngtech:steel_fuel_tank') }} | 4 | 8,000 mB | 1.10x | Liquids | Fuel Governor |
+| {{ item('rngtech:steel_gas_jet') }} | 4 | 4,000 mB | 1.10x | Gases | Fuel Governor |
+
+The Heat Core's fuel efficiency and the fuel part's fuel efficiency multiply together.
+
+With a tank or jet, each Input Slot on the burner adds 1,000 mB of Fluid Capacity. Fuel Reserve and Block Feed have no effect.
 
 What the behaviors do:
 
@@ -157,16 +184,17 @@ What the behaviors do:
 | Side | Behavior |
 |---|---|
 | Any | Inserts fuel into the Fuel Box fuel slots. |
+| Any | With a Fuel Tank or Gas Jet, takes fluid fuel from pipes and filled containers. Gives back empty containers. Pipes cannot drain the fuel. |
 | Any | Exports FE to adjacent receivers. Does not accept FE. |
 
-Heat Cores, Fuel Boxes, and Battery Cells are installed by hand. Automation cannot reach the Gear slots. The back of the burner has a port plate sized for a Universal Connector, the tidiest place to attach one.
+Heat Cores, fuel parts, and Battery Cells are installed by hand. Automation cannot reach the Gear slots. The back of the burner has a port plate sized for a Universal Connector, the tidiest place to attach one.
 
 ## Screen
 
 The burner screen has four tabs:
 
-- **Process**: fuel slots, burn progress, the stoke gauge, stored FE, and FE/t. Hover for exact values.
-- **Gear**: Heat Core, Fuel Box, and Battery Cell slots.
+- **Process**: fuel slots, or a tank meter and a container slot with a Fuel Tank or Gas Jet, burn progress, the stoke gauge, stored FE, and FE/t. Hover for exact values.
+- **Gear**: Heat Core, Fuel Feed, and Battery Cell slots.
 - **Stats**: the burner's current stats, including traits and installed Gear.
 - **Refinement**: refine the placed burner's traits with a catalyst.
 

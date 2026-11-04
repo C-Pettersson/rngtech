@@ -87,7 +87,7 @@ The catalog refuses a file that:
 | Host | Stages | Base profiles | Machines |
 |---|---|---|---|
 | `crush_head` | 0–8 | flint, iron, copper, bronze, steel, aluminum, titanium, tungstensteel, exotic | Crusher, Melter, Miner's Companion |
-| `heat_core` | 1–8 | iron, copper, bronze, steel, aluminum, sparksteel, titanium, exotic | Furnace, Alloy Furnace, Metal Press, Melter, Solid Fuel Burner, Cavitation Generator, gas chemistry machines |
+| `heat_core` | 1–8 | iron, copper, bronze, steel, aluminum, sparksteel, titanium, exotic | Furnace, Alloy Furnace, Metal Press, Melter, Fuel Burner, Cavitation Generator, gas chemistry machines |
 | `alloy_crucible` | 3–6 | bronze, steel, titanium | Alloy Furnace |
 | `servo` | 4–8 | steel, titanium, tungstensteel, nullite, exotic | Metal Press, Alloy Furnace, Melter, Cavitation Generator, gas chemistry machines, Compressor Tank |
 | `fluid_pump` | 5–8 | osmium, titanium, tungstensteel, exotic | Melter, Corrosion Cell, Forestry Companion |

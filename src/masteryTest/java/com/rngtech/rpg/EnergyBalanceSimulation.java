@@ -154,7 +154,7 @@ public final class EnergyBalanceSimulation {
                         continue;
                     }
                     int stage = max(chassis.stage(), core.stage(), box.stage());
-                    add("solid_fuel_burner", "Solid Fuel Burner", stage, List.of(
+                    add("solid_fuel_burner", "Fuel Burner", stage, List.of(
                             "chassis:" + name(chassis), "heat_core:" + name(core), "fuel_box:" + name(box)
                     ), coal, roller -> {
                         MachineStatAccumulator stats = MachineBaseStatCatalog.solidFuelBurner(chassis);

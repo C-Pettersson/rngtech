@@ -15,7 +15,7 @@ Burning crops directly is the simplest setup, but prepared fuels are worth much 
 - **Algae Biomass** grows in the [Algae Photobioreactor](rngtech:algae-photobioreactor.md). Craft four into Dense Algae Biomass for a better fuel.
 - **Organic Reagent** comes from crushing potatoes, carrots, and plant biomass. Crushing a potato costs 600 FE and the reagent gives 546 FE, so this path loses a little power unless your Bio Chamber boosts reagent fuel.
 
-Composted Biomass and Rich Biomass are fuel only for the Bio Generator. They are not furnace fuel and do not burn in the [Solid Fuel Burner](rngtech:solid-fuel-burner.md).
+Composted Biomass and Rich Biomass are fuel only for the Bio Generator. They are not furnace fuel and do not burn in the [Fuel Burner](rngtech:fuel-burner.md).
 
 <RecipesFor id="rngtech:rich_biomass" />
 

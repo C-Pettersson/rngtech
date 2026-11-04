@@ -40,6 +40,7 @@ import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.ReactorChamberMaterial;
 import com.rngtech.content.energy.RecoveryFilterMaterial;
@@ -79,6 +80,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public final class GearSlotCatalog {
     public static List<GearMachineSpec> all() {
@@ -257,7 +259,7 @@ public final class GearSlotCatalog {
                             true,
                             GearSlotArea.GEAR,
                             SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX,
-                            fuelBoxes(box -> box.stage() <= maxPartStage),
+                            fuelParts(maxPartStage),
                             maxStage(maxPartStage)
                     )
             ));
@@ -1068,11 +1070,15 @@ public final class GearSlotCatalog {
                 .toList(), UniqueHost.HEAT_CORE, filter);
     }
 
-    private static List<ItemStack> fuelBoxes(Predicate<FuelBoxMaterial> filter) {
-        return Arrays.stream(FuelBoxMaterial.values())
-                .filter(filter)
-                .map(material -> item(ModItems.fuelBox(material).get()))
-                .toList();
+    private static List<ItemStack> fuelParts(int maxPartStage) {
+        return Stream.concat(
+                Arrays.stream(FuelBoxMaterial.values())
+                        .filter(box -> box.stage() <= maxPartStage)
+                        .map(material -> item(ModItems.fuelBox(material).get())),
+                Arrays.stream(FuelTankMaterial.values())
+                        .filter(tank -> tank.stage() <= maxPartStage)
+                        .map(material -> item(ModItems.fuelTank(material).get()))
+        ).toList();
     }
 
     private static List<ItemStack> reactorChambers(Predicate<ReactorChamberMaterial> filter) {

@@ -19,6 +19,8 @@
   },
   "processing_ticks": 360,
   "heat": 7967,
-  "minimum_temperature": 1200,
-  "required_processing_level": 6
+  "minimum_temperature": 600,
+  "required_processing_level": 3,
+  "machine_xp": 5,
+  "machine_xp_band": 81
 }

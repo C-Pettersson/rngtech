@@ -8,7 +8,7 @@ navigation:
 
 # Heat Cores
 
-Heat Cores set heat. In heated processors they decide maximum temperature, how fast the machine warms up, and how steady the heat is. In solid fuel burners they set FE/t output and the highest fuel tier you can burn.
+Heat Cores set heat. In heated processors they decide maximum temperature, how fast the machine warms up, and how steady the heat is. In Fuel Burners they set FE/t output and the highest fuel tier you can burn.
 
 | Heat Core | Stage | Notes |
 |---|---:|---|
@@ -27,14 +27,14 @@ Heat Cores set heat. In heated processors they decide maximum temperature, how f
 |---|---|
 | Electric [Furnace](rngtech:furnace.md) | Required, up to the chassis stage. The Lead Furnace has four, one per lane. |
 | [Alloy Furnace](rngtech:alloy-furnace.md) | Required, up to the chassis stage. |
-| [Solid Fuel Burner](rngtech:solid-fuel-burner.md) | Required, up to the burner's stage. |
+| [Fuel Burner](rngtech:fuel-burner.md) | Required, up to the burner's stage. |
 | [Metal Press](rngtech:metal-press.md) | Required, up to Stage 6. |
 | [Melter](rngtech:melter.md) | Required, up to Stage 6. |
 | [Coal Gasifier](rngtech:coal-gasifier.md) | Required, Stage 5 or higher. |
 | [Steam Methane Reformer](rngtech:steam-methane-reformer.md) | Required, Stage 6 or higher. |
 | [Cavitation Generator](rngtech:cavitation-generator.md) | Optional, any stage. |
 
-The [Furnace](rngtech:furnace.md) page lists the temperature each core reaches, and the [Solid Fuel Burner](rngtech:solid-fuel-burner.md) page lists each core's FE/t and fuel tier.
+The [Furnace](rngtech:furnace.md) page lists the temperature each core reaches, and the [Fuel Burner](rngtech:fuel-burner.md) page lists each core's FE/t and fuel tier.
 
 <RecipesFor id="rngtech:iron_heat_core" />
 

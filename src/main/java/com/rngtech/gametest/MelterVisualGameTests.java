@@ -88,6 +88,23 @@ public final class MelterVisualGameTests {
         });
     }
 
+    /** Lava needs only Stage 3 Gear in the Melter: a Bronze Crush Head for its level and a Bronze Heat Core for its heat. */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 2400)
+    public static void lavaMeltsWithBronzeGear(GameTestHelper helper) {
+        MelterBlockEntity melter = melter(helper);
+        melter.getGearInventory().setStackInSlot(MelterBlockEntity.SLOT_HEAT_CORE, new ItemStack(ModItems.heatCore(HeatCoreMaterial.BRONZE).get()));
+        melter.getGearInventory().setStackInSlot(MelterBlockEntity.SLOT_CRUSH_HEAD, new ItemStack(ModItems.crushHead(CrushHeadMaterial.BRONZE).get()));
+        melter.getGearInventory().setStackInSlot(MelterBlockEntity.SLOT_FLUID_PUMP, new ItemStack(ModItems.fluidPump(FluidPumpMaterial.OSMIUM).get()));
+        melter.getProcessInventory().setStackInSlot(MelterBlockEntity.SLOT_PRIMARY_INPUT, new ItemStack(Items.STONE));
+        melter.getProcessInventory().setStackInSlot(MelterBlockEntity.SLOT_SECONDARY_INPUT, new ItemStack(Items.BLAZE_POWDER));
+        melter.getInputTank().fill(new FluidStack(Fluids.WATER, 1000), IFluidHandler.FluidAction.EXECUTE);
+        MachineTestSupport.powerEachTick(helper, melter.getEnergyStorage(null));
+        helper.succeedWhen(() -> {
+            check(melter.currentVisualState().outputFluid().equals("minecraft:lava"), "Waiting for Bronze Gear to melt lava");
+            check(melter.machineProgression().xp() > 0, "A finished lava melt should earn Mastery XP");
+        });
+    }
+
     private static MelterBlockEntity melter(GameTestHelper helper) {
         return MachineTestSupport.place(helper, POS, ModBlocks.MELTER.get(), MelterBlockEntity.class);
     }

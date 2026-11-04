@@ -10,7 +10,7 @@ A strong Unique comes from one exact place in the world, solves one odd build pr
 
 - Uniques use `UNIQUE` rarity and 0 Refinement Potential. Their stat lines are fixed or ranged, and each copy rolls its ranged lines when identified, so copies can be well or poorly rolled. Uniques cannot be crafted, refined, or recycled. [Corruption](../prds/corruption.md) is the only way to change one.
 - Each Unique targets one Gear slot type and names a slot stage, which drives stage gates such as Crush Head ≤ chassis stage and the Metal Press and Melter Heat Core cap of 6.
-- Every stat on a Unique, including its drawback, must be read by at least one host it fits. The catalog enforces this at load from the stat-reader table in `UniqueStatReaders`, so a new host stat needs a table entry first. For example, `STABILITY` is not read by the Solid Fuel Burner, Battery Chassis, or Component Recycler, and `OUTPUT_AMOUNT` is read only by the Crusher and Cavitation Generator.
+- Every stat on a Unique, including its drawback, must be read by at least one host it fits. The catalog enforces this at load from the stat-reader table in `UniqueStatReaders`, so a new host stat needs a table entry first. For example, `STABILITY` is not read by the Fuel Burner, Battery Chassis, or Component Recycler, and `OUTPUT_AMOUNT` is read only by the Crusher and Cavitation Generator.
 - A Unique should have one signature: a stat no normal part of its type provides, a behavior normal parts get only at a later stage, or a new `MachineBehavior`.
 - A Unique may grant an ascendancy stat as a build-around hook. Its tooltip names the ascendancy it needs.
 - No yield stats in 2.0. A Unique that adds Output Amount, Super Output, salvage, Fluid Yield, Ledger Rate, or residue needs loop-audit coverage first (see the [ascendancy loop rules](../prds/machine-ascendancies.md#loop-prevention)).
@@ -25,7 +25,7 @@ These eight are implemented and specified, with their ranges, in the [Unique Ite
 
 | Unique | Host | Slot stage | Source | Signature | Drawback |
 |---|---|---:|---|---|---|
-| Fortress Heater Element | Heat Core | 4 | Nether fortress chest | Sparksteel-class Maximum Temperature, 60–80% less Thermal Mass, Overdrive Margin hook | More Energy Usage, less Overheat Tolerance, poor Solid Fuel Burner fuel efficiency |
+| Fortress Heater Element | Heat Core | 4 | Nether fortress chest | Sparksteel-class Maximum Temperature, 60–80% less Thermal Mass, Overdrive Margin hook | More Energy Usage, less Overheat Tolerance, poor Fuel Burner fuel efficiency |
 | Igloo Basement Thermostat | Heat Core | 2 | Igloo basement chest | Top Temperature Stability and Overheat Tolerance, early `POWER_GRACE`, Heat Window hook | Bronze-class Maximum Temperature cap, less Heat Transfer |
 | Mineshaft Worn Pick-Jaw | Crush Head | 2 | Mineshaft minecart chest | +1 Processing Level over slot stage, +1 to +2 Batch Size, Jam Recovery hook | Jam Chance on every cycle, more Energy Usage |
 | Crying Crucible | Alloy Crucible | 3 | Ruined portal chest | Blend Speed and Blend Heat Reduction without Blendwright | More Energy Usage, less Stability |
@@ -73,7 +73,7 @@ Redesigned 2026-10-04 against current stats and Gear slots. Each entry lists wha
 | Mansion Escapement Servo | Became the Trial Vault Escapement | Trial chambers fit a clockwork part. The mansion now hosts the Heartwood Splitter. |
 | Witch-Bottle Reflux Pump (lubricant handling) | Became a capacity and Sprinkler pump | Lubricant handling does not exist, and the Metal Press has no pump slot. |
 | Ruined Portal Crying Regulator (Stabilizer Matrix) | Became the Crying Crucible | Calibration has no heat, so overheat protection had nothing to protect. |
-| Blaze Cage Igniter `STABILITY` drawback | Replaced with a fuel whitelist and one fuel slot | The Solid Fuel Burner does not read `STABILITY`. |
+| Blaze Cage Igniter `STABILITY` drawback | Replaced with a fuel whitelist and one fuel slot | The Fuel Burner does not read `STABILITY`. |
 | Ancient Echo Control Board "no catalyst preservation" | Replaced with no Refinement Potential Bonus | Catalyst preservation is `CATALYST_EFFICIENCY`, which belongs to the Stabilizer Matrix. |
 
 ## Source Guidelines

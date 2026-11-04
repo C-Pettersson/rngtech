@@ -1,14 +1,14 @@
 ---
 navigation:
   title: "Generating power"
-  parent: solid-fuel-burner.md
+  parent: fuel-burner.md
   position: 0
   icon: rngtech:crude_solid_fuel_burner
 ---
 
 # Generating power
 
-A burner needs all three Gear parts before it burns anything: a **Heat Core**, a **Fuel Box**, and a **Battery Cell**. Install them on the Gear tab, then put fuel in the fuel slot on the Process tab.
+A burner needs all three Gear parts before it burns anything: a **Heat Core**, a **Fuel Feed**, and a **Battery Cell**. The Fuel Feed slot holds a Fuel Box, a Fuel Tank, or a Gas Jet. Install the parts on the Gear tab, then put fuel in the fuel slot on the Process tab.
 
 The burner writes generated FE straight into the installed Battery Cell and pushes it out to adjacent blocks that accept FE, such as a [Universal Cable](rngtech:universal-cable.md) or a [Battery Chassis](rngtech:battery-chassis.md). The burner does not limit its own output, so the receiver or cable tier decides how much FE moves each tick. It never accepts FE from outside.
 

@@ -1,5 +1,8 @@
 package com.rngtech.content.energy;
 
+import com.rngtech.content.recipe.FluidFuelRecipe;
+import com.rngtech.content.recipe.FluidFuelRecipeInput;
+import com.rngtech.content.registry.ModRecipes;
 import com.rngtech.content.registry.ModTags;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -8,7 +11,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.fluids.FluidStack;
+
+import java.util.Optional;
 
 public final class SolidFuelBurnerFuelRules {
     private static final String VANILLA_NAMESPACE = "minecraft";
@@ -49,6 +57,16 @@ public final class SolidFuelBurnerFuelRules {
             return 1;
         }
         return isVanillaFallbackItemFuel(stack) ? 1 : 0;
+    }
+
+    /** The fluid fuel recipe for {@code fluid}, if it burns at all. */
+    public static Optional<FluidFuelRecipe> fluidFuel(Level level, FluidStack fluid) {
+        if (level == null || fluid.isEmpty()) {
+            return Optional.empty();
+        }
+        return level.getRecipeManager()
+                .getRecipeFor(ModRecipes.FLUID_FUEL_TYPE.get(), new FluidFuelRecipeInput(fluid), level)
+                .map(RecipeHolder::value);
     }
 
     private static boolean isVanillaFallbackItemFuel(ItemStack stack) {

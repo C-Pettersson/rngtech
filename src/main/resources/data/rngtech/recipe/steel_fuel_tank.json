@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "steel"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "ITI",
+    "GFG",
+    "IBI"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bucket"
+    },
+    "F": {
+      "item": "rngtech:fuel_chamber"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "I": {
+      "tag": "rngtech:ingots/steel"
+    },
+    "T": {
+      "item": "rngtech:tank_frame"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:steel_fuel_tank"
+  }
+}

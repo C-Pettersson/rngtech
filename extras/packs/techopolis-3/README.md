@@ -93,7 +93,7 @@ misses most of them, so the scripts rewrite the recipe JSON and register it agai
 | Techopolis tier | Materials it adds | RNGTech stage | RNGTech power |
 |---|---|---:|---|
 | Basic | Cobblestone, Coal, Copper | 0 | None. The Basic quests have no FE generator either. |
-| Advanced | Iron, Tin, Aluminum, Redstone, Lapis | 1-4 | Solid Fuel Burner, 24-96 FE/t |
+| Advanced | Iron, Tin, Aluminum, Redstone, Lapis | 1-4 | Fuel Burner, 24-96 FE/t |
 | Elite | Gold, Diamond, Nether Quartz | 5-6 | Syngas Combustor 240 FE/t, Fuel Cell 600 FE/t |
 | Ultimate | Ender Pearls, Emeralds, Uranium reactors | 7 | Vacuum Collapse Generator, about 1,050 FE/t |
 | Hellish | Blaze, Netherite | 8 | Exotic Vacuum Collapse, about 3,000 FE/t |
@@ -109,10 +109,10 @@ from a bill of materials over the 25,894 recipes loaded at runtime.
 
 | Generator | Tier | FE/t | FE per fuel | Build cost (approximate) |
 |---|---|---:|---:|---|
-| RNGTech Crude Solid Fuel Burner + Iron Heat Core | Advanced | 24 | 16,000 per Coal | 12 iron, 2 copper, 28 redstone |
+| RNGTech Crude Fuel Burner + Iron Heat Core | Advanced | 24 | 16,000 per Coal | 12 iron, 2 copper, 28 redstone |
 | Immersive Engineering Kinetic Dynamo + Water Wheel | Advanced | not measured | free | 5 copper, 3 iron, 1 steel, 20 treated wood |
 | Actually Additions Oil Generator | Advanced | 40-120 | 4,000-48,000 per 50 mB oil | 9 lead, 3 nickel, 6 Basic Technium Nuggets |
-| RNGTech Steel Solid Fuel Burner + Steel Heat Core | Advanced | 96 | 16,000 per Coal | 18 steel, 12 iron, 32 redstone, an Ignition Catalyst |
+| RNGTech Steel Fuel Burner + Steel Heat Core | Advanced | 96 | 16,000 per Coal | 18 steel, 12 iron, 32 redstone, an Ignition Catalyst |
 | Actually Additions Coal Generator | Elite | 20 | 32,000 per Coal | 12 Elite Technium Nuggets |
 | RNGTech Coal Gasifier + Syngas Combustor | Elite | 240 | about 40,000 per Coal | 15 aluminum, 15 iron, 54 redstone, quartz, a Stage 5 Heat Core |
 | Techopolis Bio Generator | Elite | 640-1,280 | 512,000 per Bio Fuel | 6 Bio Fuel, 2 Infused Alloy, an Advanced Technium frame |

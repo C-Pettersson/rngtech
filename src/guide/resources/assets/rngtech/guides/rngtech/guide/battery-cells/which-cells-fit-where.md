@@ -14,7 +14,7 @@ Most slots take any cell. These machines limit the stage:
 
 | Machine | Cell slot |
 |---|---|
-| [Solid Fuel Burner](rngtech:solid-fuel-burner.md) | Required. Up to the burner's stage: Stage 1 on the Crude burner, up to Stage 4 on the Steel burner. |
+| [Fuel Burner](rngtech:fuel-burner.md) | Required. Up to the burner's stage: Stage 1 on the Crude burner, up to Stage 4 on the Steel burner. |
 | [Bio Generator](rngtech:bio-generator.md) | Optional, Stage 0–3. |
 | [Coal Gasifier](rngtech:coal-gasifier.md), [Syngas Combustor](rngtech:syngas-combustor.md) | Optional, Stage 5 or higher. |
 | [Steam Methane Reformer](rngtech:steam-methane-reformer.md) | Optional, Stage 6 or higher. |

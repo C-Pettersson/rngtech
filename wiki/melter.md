@@ -18,7 +18,7 @@ wiki:
     },
 ) }}
 
-The **Melter** is a Stage 6 machine that turns two items and a fluid, usually water, into a new fluid. Its main job is making Lubricant, which later Servo and frame recipes need. It also makes Electrolyte Solution in bulk for the [Component Assembler](component-assembler.md), methane from algae for gas chemistry, lava, and Ender Slurry for the [Vacuum Collapse Generator](vacuum-collapse-generator.md)'s Void Catalyst.
+The **Melter** is a Stage 6 machine that turns two items and a fluid, usually water, into a new fluid. Its main job is making Lubricant, which later Servo and frame recipes need. It also makes Electrolyte Solution in bulk for the [Component Assembler](component-assembler.md), methane from algae for gas chemistry, lava for the [Fuel Burner](fuel-burner.md#fluid-fuels), and Ender Slurry for the [Vacuum Collapse Generator](vacuum-collapse-generator.md)'s Void Catalyst.
 
 The Melter runs on FE and needs a Heat Core, a Crush Head, and a Fluid Pump installed. Like every RNGTech machine, each Melter you craft rolls its own [rarity and affixes](rarity-and-affixes.md), and it can level up through [Machine Mastery](machine-mastery.md).
 
@@ -44,7 +44,7 @@ Fill the input tank with the recipe's fluid, put the two recipe items in the inp
 
 Some ingredients leave an item behind, such as the Glass Bottle from a {{ item('minecraft:honey_bottle') }}. A leftover the Melter cannot use goes into an empty output container slot if it can hold the product, and otherwise into the inventory directly below the Melter, such as a hopper or chest, or onto the ground if there is none. It never blocks the input slots; see [Automation](automation.md#ingredient-leftovers).
 
-The crucible heats up like the other heated machines and melts once it reaches the recipe's temperature; see [Heat](heat.md). Every default recipe needs at least 1,200 heat (methane needs 1,400, and Ender Slurry from Collapse Residue needs 1,600) and hardness level 6, so you need a hot enough Heat Core and a Titanium or better Crush Head. Unlike the [Crusher](crusher.md), the Melter does not run recipes above its hardness at all.
+The crucible heats up like the other heated machines and melts once it reaches the recipe's temperature; see [Heat](heat.md). Lava needs 600 heat and hardness level 3, so a Bronze Heat Core and a Bronze Crush Head work. Every other default recipe needs at least 1,200 heat (methane needs 1,400, and Ender Slurry from Collapse Residue needs 1,600) and hardness level 6, so you need a hot enough Heat Core and a Titanium or better Crush Head. Unlike the [Crusher](crusher.md), the Melter does not run recipes above its hardness at all.
 
 Methane takes plain {{ item('rngtech:algae_biomass') }}. {{ item('rngtech:dense_algae_biomass') }} does not work in the Melter; burn it in a [Bio Generator](bio-generator.md) instead.
 
@@ -82,7 +82,7 @@ Gear slots and the Refinement slot cannot be filled by automation.
 
 ### Mastery and Ascendancies
 
-Each completed melt earns Melter Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. The lava recipe earns none, and nothing is earned while the Melter is missing Gear, too cold, blocked by a full tank, or out of power. Melters choose between the **Pressure Vessel** and **Twin Crucible** [ascendancies](machine-mastery.md#ascendancies).
+Each completed melt earns Melter Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. Nothing is earned while the Melter is missing Gear, too cold, blocked by a full tank, or out of power. Melters choose between the **Pressure Vessel** and **Twin Crucible** [ascendancies](machine-mastery.md#ascendancies).
 
 A melt whose whole output a Nullite Servo voids earns no XP. Changing your Mastery allocation restarts the current melt, but keeps items, tanks, and Gear.
 

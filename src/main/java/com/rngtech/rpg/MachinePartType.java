@@ -7,6 +7,7 @@ public enum MachinePartType {
     ALLOY_CRUCIBLE,
     SERVO,
     FUEL_BOX,
+    FUEL_TANK,
     REACTOR_CHAMBER,
     RECOVERY_FILTER,
     CONTAINMENT_LINING,

@@ -3,17 +3,24 @@ package com.rngtech.content.blockentity;
 import com.rngtech.RNGTechConfig;
 import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.block.SolidFuelBurnerBlock;
+import com.rngtech.content.energy.FluidFuelForm;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.SolidFuelBurnerFuelRules;
 import com.rngtech.content.energy.SolidFuelBurnerStoke;
 import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.FuelTankContents;
 import com.rngtech.content.item.GearParts;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.item.UniquePartItem;
 import com.rngtech.content.menu.GenerationMenuSupport;
 import com.rngtech.content.menu.SolidFuelBurnerMenu;
+import com.rngtech.content.purge.FluidPurgeRole;
+import com.rngtech.content.purge.FluidPurgeTarget;
+import com.rngtech.content.purge.PurgeableFluidStorage;
+import com.rngtech.content.recipe.FluidFuelRecipe;
 import com.rngtech.content.registry.ModBlockEntities;
 import com.rngtech.rpg.ComponentBaseStatCatalog;
 import com.rngtech.rpg.MachineBaseStatCatalog;
@@ -29,6 +36,7 @@ import com.rngtech.rpg.MachineType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -50,10 +58,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.FluidActionResult;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider {
+import java.util.List;
+import java.util.Optional;
+
+public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implements MenuProvider, MachineInfoProvider, PurgeableFluidStorage {
     private final EnergyExportTargets exportTargets = new EnergyExportTargets(this);
     public static final int SLOT_FUEL_0 = 0;
     public static final int SLOT_FUEL_1 = 1;
@@ -62,6 +78,13 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     public static final int SLOT_BATTERY_CELL = 1;
     public static final int SLOT_FUEL_BOX = 2;
     public static final int GEAR_SLOT_COUNT = 3;
+    public static final int FUEL_FORM_LIQUIDS = 4;
+    public static final int FUEL_FORM_GASES = 8;
+    public static final int PURGE_FUEL_TANK = 0;
+    /** Fluid burns in lots of up to this many mB; each lot behaves like one fuel item. */
+    public static final int FLUID_FUEL_LOT = 100;
+    /** Each Input Slot a burner body rolled adds this much tank, since a Fuel Tank has no fuel slots to widen. */
+    public static final int FLUID_CAPACITY_PER_INPUT_SLOT = 1_000;
 
     public static final int STATUS_READY = 0;
     public static final int STATUS_MISSING_HEAT_CORE = 1;
@@ -100,7 +123,10 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
     private static final int DATA_RATED_GENERATION = 21;
     private static final int DATA_PACK_GENERATION_MULTIPLIER = 22;
     private static final int DATA_RUNNING_STOKE = 23;
-    private static final int DATA_COUNT = 24;
+    private static final int DATA_FUEL_TANK_AMOUNT = 24;
+    private static final int DATA_FUEL_TANK_CAPACITY = 25;
+    private static final int DATA_FUEL_TANK_FLUID_ID = 26;
+    private static final int DATA_COUNT = 27;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
     public static final int QUICK_FEED_INTERVAL = 20;
@@ -136,7 +162,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
             return switch (slot) {
                 case SLOT_HEAT_CORE -> isHeatCore(stack);
                 case SLOT_BATTERY_CELL -> isBatteryCell(stack);
-                case SLOT_FUEL_BOX -> isFuelBox(stack);
+                case SLOT_FUEL_BOX -> isFuelPart(stack);
                 default -> false;
             };
         }
@@ -156,9 +182,29 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
 
         @Override
         protected void onContentsChanged(int slot) {
+            if (slot == SLOT_FUEL_BOX && level != null) {
+                level.invalidateCapabilities(worldPosition);
+            }
             setChanged();
         }
     };
+    private final ItemStackHandler fluidContainerInventory = new ItemStackHandler(1) {
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return isFluidContainer(stack);
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
+
+        @Override
+        protected void onContentsChanged(int slot) {
+            setChanged();
+        }
+    };
+    private final IFluidHandler fuelTankHandler = new FuelTankHandler();
     private final IItemHandler sidedFuelHandler = new FuelItemHandler();
     private final IEnergyStorage energyStorage = new BurnerEnergyStorage();
     private final InstalledBatteryCell batteryCell = new InstalledBatteryCell(this::cellStack);
@@ -191,6 +237,9 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
                 case DATA_RATED_GENERATION -> ratedGeneration(stats);
                 case DATA_PACK_GENERATION_MULTIPLIER -> GenerationMenuSupport.packMultiplierData(generatorStage());
                 case DATA_RUNNING_STOKE -> runningStoke;
+                case DATA_FUEL_TANK_AMOUNT -> tankFluid().getAmount();
+                case DATA_FUEL_TANK_CAPACITY -> tankCapacity();
+                case DATA_FUEL_TANK_FLUID_ID -> BuiltInRegistries.FLUID.getId(tankFluid().getFluid());
                 default -> 0;
             };
         }
@@ -234,6 +283,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         if (level.getGameTime() % QUICK_FEED_INTERVAL == 0) {
             burner.followDemand();
         }
+        burner.drainFuelContainer();
         boolean generated = burner.tickFuel();
         boolean exported = burner.exportEnergy(level, pos);
         BaseMachineBlock.setActive(level, pos, state, generated);
@@ -351,6 +401,9 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         ItemStack fuel0 = bins > 0 ? fuelInventory.getStackInSlot(SLOT_FUEL_0) : ItemStack.EMPTY;
         ItemStack fuel1 = bins > 1 ? fuelInventory.getStackInSlot(SLOT_FUEL_1) : ItemStack.EMPTY;
         SolidFuelBurnerPartItem box = fuelBox();
+        FuelTankMaterial tank = fuelTank();
+        FluidStack tankFluid = tankFluid();
+        int capacity = tankCapacity();
         return new SolidFuelBurnerVisualState(
                 getBlockState().getValue(BaseMachineBlock.ACTIVE),
                 hasBurnTime() && totalBurnTime > 0 ? Mth.clamp(burnTime / (float) totalBurnTime, 0.0F, 1.0F) : 0.0F,
@@ -363,7 +416,10 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
                 fuelTint(fuel0),
                 fuelTint(fuel1),
                 cellStack().isEmpty() || energyCapacity() <= 0 ? -1.0F : energyStored() / (float) energyCapacity(),
-                runningStoke
+                runningStoke,
+                tank == null ? "" : tank.getSerializedName(),
+                capacity <= 0 ? 0.0F : Mth.clamp(tankFluid.getAmount() / (float) capacity, 0.0F, 1.0F),
+                tankFluid.isEmpty() ? "" : BuiltInRegistries.FLUID.getKey(tankFluid.getFluid()).toString()
         );
     }
 
@@ -399,6 +455,10 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         return fuelInventory;
     }
 
+    public ItemStackHandler getFluidContainerInventory() {
+        return fluidContainerInventory;
+    }
+
     public ItemStackHandler getGearInventory() {
         return gearInventory;
     }
@@ -413,6 +473,26 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
 
     public IEnergyStorage getEnergyStorage(Direction side) {
         return energyStorage;
+    }
+
+    /** The installed Fuel Tank or Gas Jet's fuel input, or nothing while the slot holds neither. */
+    public IFluidHandler getFluidHandler(Direction side) {
+        return fuelTank() == null ? null : fuelTankHandler;
+    }
+
+    @Override
+    public List<FluidPurgeTarget> fluidPurgeTargets() {
+        if (fuelTank() == null) {
+            return List.of();
+        }
+        return List.of(FluidPurgeTarget.of(
+                PURGE_FUEL_TANK,
+                Component.translatable("rngtech.purge.target.fuel_tank"),
+                FluidPurgeRole.INPUT,
+                this::tankFluid,
+                this::drainTank,
+                this::setChanged
+        ).withCapacity(this::tankCapacity));
     }
 
     @Override
@@ -478,6 +558,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         for (int slot = 0; slot < gearInventory.getSlots(); slot++) {
             dropSlot(level, gearInventory, slot);
         }
+        dropSlot(level, fluidContainerInventory, 0);
         dropRefinementInventory(level);
     }
 
@@ -489,10 +570,20 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         return GearParts.is(stack, MachinePartType.HEAT_CORE, block.chassis().maxPartStage());
     }
 
-    public boolean isFuelBox(ItemStack stack) {
+    /** A Fuel Box, Fuel Tank, or Gas Jet this chassis can take. */
+    public boolean isFuelPart(ItemStack stack) {
         return stack.getItem() instanceof SolidFuelBurnerPartItem part
-                && part.partType() == MachinePartType.FUEL_BOX
+                && (part.partType() == MachinePartType.FUEL_BOX || part.partType() == MachinePartType.FUEL_TANK)
                 && part.stage() <= block.chassis().maxPartStage();
+    }
+
+    public static boolean isFluidContainer(ItemStack stack) {
+        return FluidUtil.getFluidContained(stack).isPresent();
+    }
+
+    /** Whether the installed part burns fluid, so the fuel slots give way to a tank. */
+    public boolean burnsFluid() {
+        return fuelTank() != null;
     }
 
     public boolean isBatteryCell(ItemStack stack) {
@@ -526,6 +617,7 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         super.saveAdditional(tag, registries);
         tag.put("FuelInventory", fuelInventory.serializeNBT(registries));
         tag.put("GearInventory", gearInventory.serializeNBT(registries));
+        tag.put("FluidContainerInventory", fluidContainerInventory.serializeNBT(registries));
         tag.putInt("BurnTime", burnTime);
         tag.putInt("TotalBurnTime", totalBurnTime);
         tag.putDouble("RemainingFuelEnergy", remainingFuelEnergy);
@@ -540,6 +632,9 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         super.loadAdditional(tag, registries);
         fuelInventory.deserializeNBT(registries, tag.getCompound("FuelInventory"));
         gearInventory.deserializeNBT(registries, tag.getCompound("GearInventory"));
+        if (tag.contains("FluidContainerInventory")) {
+            fluidContainerInventory.deserializeNBT(registries, tag.getCompound("FluidContainerInventory"));
+        }
         burnTime = tag.getInt("BurnTime");
         totalBurnTime = tag.getInt("TotalBurnTime");
         remainingFuelEnergy = tag.getDouble("RemainingFuelEnergy");
@@ -606,12 +701,13 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
             return false;
         }
 
+        if (burnsFluid()) {
+            return tryStartBurningFluid(stats);
+        }
+
         int slot = nextFuelSlot();
         if (slot < 0) {
-            totalBurnTime = 0;
-            remainingFuelEnergy = 0.0;
-            generationCarry = 0.0;
-            heatWasteCarry = 0.0;
+            clearBurnState();
             return false;
         }
 
@@ -631,6 +727,31 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
             }
         }
 
+        return beginBurn(fuelBurnTime, stats);
+    }
+
+    /** Takes the next lot from the tank. A tank short of a full lot burns what it has, for its share of the FE. */
+    private boolean tryStartBurningFluid(MachineStatAccumulator stats) {
+        FluidStack fuel = tankFluid();
+        if (fluidFuelStatus(fuel) != STATUS_READY) {
+            clearBurnState();
+            return false;
+        }
+        long energy = SolidFuelBurnerFuelRules.fluidFuel(level, fuel).map(FluidFuelRecipe::energy).orElse(0L);
+        int lot = Math.min(FLUID_FUEL_LOT, fuel.getAmount());
+        drainTank(lot, IFluidHandler.FluidAction.EXECUTE);
+        int burnTicks = (int) Math.max(1L, energy * lot / FluidType.BUCKET_VOLUME / FUEL_ENERGY_PER_BURN_TICK);
+        return beginBurn(burnTicks, stats);
+    }
+
+    private void clearBurnState() {
+        totalBurnTime = 0;
+        remainingFuelEnergy = 0.0;
+        generationCarry = 0.0;
+        heatWasteCarry = 0.0;
+    }
+
+    private boolean beginBurn(int fuelBurnTime, MachineStatAccumulator stats) {
         int generation = effectiveGeneration(stats);
         double fuelEnergy = RNGTechConfig.generatedEnergy(effectiveFuelDurationTicks(fuelBurnTime, stats) * (double) FUEL_ENERGY_PER_BURN_TICK
                 * SolidFuelBurnerStoke.fuelEconomy(runningStoke), generatorStage());
@@ -861,11 +982,74 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         return Mth.clamp(effectiveStats().intValue(MachineStat.INPUT_SLOTS), 0, FUEL_SLOT_COUNT);
     }
 
+    private FuelTankMaterial fuelTank() {
+        return fuelBoxStack().getItem() instanceof SolidFuelBurnerPartItem part ? part.fuelTankMaterial() : null;
+    }
+
+    private FluidStack tankFluid() {
+        return fuelTank() == null ? FluidStack.EMPTY : FuelTankContents.fluid(fuelBoxStack());
+    }
+
+    private int tankCapacity() {
+        FuelTankMaterial tank = fuelTank();
+        if (tank == null) {
+            return 0;
+        }
+        MachineStatAccumulator stats = effectiveStats();
+        int rolled = (int) Math.round(stats.value(MachineStat.FLUID_CAPACITY))
+                + stats.intValue(MachineStat.INPUT_SLOTS) * FLUID_CAPACITY_PER_INPUT_SLOT;
+        return Math.max(tank.capacity(), rolled);
+    }
+
+    private FluidStack drainTank(int amount, IFluidHandler.FluidAction action) {
+        FluidStack held = tankFluid();
+        if (amount <= 0 || held.isEmpty()) {
+            return FluidStack.EMPTY;
+        }
+        FluidStack drained = held.copyWithAmount(Math.min(amount, held.getAmount()));
+        if (action.execute()) {
+            FuelTankContents.set(fuelBoxStack(), held.copyWithAmount(held.getAmount() - drained.getAmount()));
+            setChanged();
+        }
+        return drained;
+    }
+
+    private void drainFuelContainer() {
+        ItemStack stack = fluidContainerInventory.getStackInSlot(0);
+        if (stack.isEmpty() || !burnsFluid()) {
+            return;
+        }
+        FluidActionResult result = FluidUtil.tryEmptyContainer(stack, fuelTankHandler, Integer.MAX_VALUE, null, true);
+        if (result.isSuccess()) {
+            fluidContainerInventory.setStackInSlot(0, result.getResult());
+        }
+    }
+
+    /** Whether {@code fluid} can burn on the installed part and Heat Core, as the fuel item checks do for items. */
+    private int fluidFuelStatus(FluidStack fluid) {
+        if (fluid.isEmpty()) {
+            return STATUS_NO_FUEL;
+        }
+        Optional<FluidFuelRecipe> recipe = SolidFuelBurnerFuelRules.fluidFuel(level, fluid);
+        if (recipe.isEmpty()) {
+            return STATUS_NOT_BURNABLE;
+        }
+        FuelTankMaterial tank = fuelTank();
+        if (tank == null || recipe.get().form() != tank.form()) {
+            return STATUS_BLOCKED_FORM;
+        }
+        return recipe.get().tier() > maxFuelTier() ? STATUS_BLOCKED_TIER : STATUS_READY;
+    }
+
     private int maxFuelTier() {
         return GearParts.heatCoreFuelTier(heatCoreStack());
     }
 
     private int fuelFormsCode() {
+        FuelTankMaterial tank = fuelTank();
+        if (tank != null) {
+            return tank.form() == FluidFuelForm.GAS ? FUEL_FORM_GASES : FUEL_FORM_LIQUIDS;
+        }
         SolidFuelBurnerPartItem box = fuelBox();
         if (box == null) {
             return 0;
@@ -892,6 +1076,9 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         }
         if (fuelGovernorActive() && isBufferFull()) {
             return STATUS_FULL_GOVERNED;
+        }
+        if (burnsFluid() && !tankFluid().isEmpty()) {
+            return fluidFuelStatus(tankFluid());
         }
         for (int slot = 0; slot < activeFuelSlots(); slot++) {
             ItemStack stack = fuelInventory.getStackInSlot(slot);
@@ -1001,42 +1188,100 @@ public class SolidFuelBurnerBlockEntity extends BaseMachineBlockEntity implement
         }
     }
 
+    /** Fuel slots for a Fuel Box. With a tank or jet it is the one container slot, which gives back only empty containers. */
     private final class FuelItemHandler implements IItemHandler {
         @Override
         public int getSlots() {
-            return activeFuelSlots();
+            return burnsFluid() ? 1 : activeFuelSlots();
         }
 
         @Override
         public ItemStack getStackInSlot(int slot) {
-            return fuelInventory.getStackInSlot(mappedSlot(slot));
+            return inventory().getStackInSlot(mappedSlot(slot));
         }
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            return fuelInventory.insertItem(mappedSlot(slot), stack, simulate);
+            return inventory().insertItem(mappedSlot(slot), stack, simulate);
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return ItemStack.EMPTY;
+            if (!burnsFluid() || isFluidContainer(fluidContainerInventory.getStackInSlot(mappedSlot(slot)))) {
+                return ItemStack.EMPTY;
+            }
+            return fluidContainerInventory.extractItem(slot, amount, simulate);
         }
 
         @Override
         public int getSlotLimit(int slot) {
-            return fuelInventory.getSlotLimit(mappedSlot(slot));
+            return inventory().getSlotLimit(mappedSlot(slot));
         }
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return fuelInventory.isItemValid(mappedSlot(slot), stack);
+            return inventory().isItemValid(mappedSlot(slot), stack);
+        }
+
+        private ItemStackHandler inventory() {
+            return burnsFluid() ? fluidContainerInventory : fuelInventory;
         }
 
         private int mappedSlot(int slot) {
-            if (slot < 0 || slot >= activeFuelSlots()) {
-                throw new RuntimeException("Slot " + slot + " not in valid range - [0," + activeFuelSlots() + ")");
+            if (slot < 0 || slot >= getSlots()) {
+                throw new RuntimeException("Slot " + slot + " not in valid range - [0," + getSlots() + ")");
             }
             return slot;
+        }
+    }
+
+    /** Input only: pipes and containers fill the part's tank, and nothing but purging takes fuel back out. */
+    private final class FuelTankHandler implements IFluidHandler {
+        @Override
+        public int getTanks() {
+            return 1;
+        }
+
+        @Override
+        public FluidStack getFluidInTank(int tank) {
+            return tankFluid();
+        }
+
+        @Override
+        public int getTankCapacity(int tank) {
+            return tankCapacity();
+        }
+
+        @Override
+        public boolean isFluidValid(int tank, FluidStack stack) {
+            return fluidFuelStatus(stack) == STATUS_READY;
+        }
+
+        @Override
+        public int fill(FluidStack resource, FluidAction action) {
+            if (resource.isEmpty() || !isFluidValid(0, resource)) {
+                return 0;
+            }
+            FluidStack held = tankFluid();
+            if (!held.isEmpty() && !FluidStack.isSameFluidSameComponents(held, resource)) {
+                return 0;
+            }
+            int filled = Math.min(resource.getAmount(), Math.max(0, tankCapacity() - held.getAmount()));
+            if (filled > 0 && action.execute()) {
+                FuelTankContents.set(fuelBoxStack(), resource.copyWithAmount(held.getAmount() + filled));
+                setChanged();
+            }
+            return filled;
+        }
+
+        @Override
+        public FluidStack drain(FluidStack resource, FluidAction action) {
+            return FluidStack.EMPTY;
+        }
+
+        @Override
+        public FluidStack drain(int maxDrain, FluidAction action) {
+            return FluidStack.EMPTY;
         }
     }
 

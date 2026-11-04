@@ -7,6 +7,7 @@ import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.ReactorChamberMaterial;
 import com.rngtech.content.energy.RecoveryFilterMaterial;
@@ -97,7 +98,7 @@ public final class RollReadChecks {
         reads("ammonia_fuel_cell", Set.of(), MachineStat.PROCESSING_SPEED, MachineStat.ENERGY_CAPACITY, MachineStat.ENERGY_GENERATION,
                 MachineStat.EFFICIENCY, MachineStat.FLUID_CAPACITY);
         reads("solid_fuel_burner", Set.of(), MachineStat.ENERGY_GENERATION, MachineStat.EFFICIENCY, MachineStat.FUEL_EFFICIENCY,
-                MachineStat.FUEL_DURATION, MachineStat.HEAT_ISOLATION, MachineStat.INPUT_SLOTS);
+                MachineStat.FUEL_DURATION, MachineStat.HEAT_ISOLATION, MachineStat.INPUT_SLOTS, MachineStat.FLUID_CAPACITY);
         reads("bio_generator", Set.of(), MachineStat.ENERGY_GENERATION, MachineStat.EFFICIENCY, MachineStat.FUEL_EFFICIENCY,
                 MachineStat.FUEL_DURATION, MachineStat.ENERGY_CAPACITY, MachineStat.POTATO_POWER, MachineStat.CARROT_POWER,
                 MachineStat.BREAD_POWER, MachineStat.SAPLING_POWER, MachineStat.SEED_POWER, MachineStat.PLANT_POWER,
@@ -289,6 +290,8 @@ public final class RollReadChecks {
                 return hosts;
             });
             case FUEL_BOX -> each(FuelBoxMaterial.values(), material -> merged(ComponentBaseStatCatalog.fuelBox(material),
+                    "solid_fuel_burner"));
+            case FUEL_TANK -> each(FuelTankMaterial.values(), material -> merged(ComponentBaseStatCatalog.fuelTank(material),
                     "solid_fuel_burner"));
             case REACTOR_CHAMBER -> each(ReactorChamberMaterial.values(), material -> merged(
                     ComponentBaseStatCatalog.reactorChamber(material), "potential_reactor"));

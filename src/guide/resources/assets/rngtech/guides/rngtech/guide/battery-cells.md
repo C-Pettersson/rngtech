@@ -55,7 +55,7 @@ Most powered machines have one Battery Cell slot on their Gear tab. An unidentif
 
 The cell's rates still apply inside a machine. It accepts at most its Input rate each tick and hands over at most its Output rate each tick. When a machine is running on stored power alone, a low-tier cell can limit how fast it works.
 
-Solid Fuel Burners are the exception: they write the FE they generate straight into the cell, and the cell's rates do not limit their output.
+Fuel Burners are the exception: they write the FE they generate straight into the cell, and the cell's rates do not limit their output.
 
 - [Running without a cell](rngtech:battery-cells/running-without-a-cell.md)
 - [Which cells fit where](rngtech:battery-cells/which-cells-fit-where.md)

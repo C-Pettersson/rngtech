@@ -164,7 +164,7 @@ The Flint Crush Head is cheap starter tooling with slower processing.
 
 ### Heat Cores
 
-Heat Cores set heat. In heated processors they decide maximum temperature, how fast the machine warms up, and how steady the heat is. In solid fuel burners they set FE/t output and the highest fuel tier you can burn.
+Heat Cores set heat. In heated processors they decide maximum temperature, how fast the machine warms up, and how steady the heat is. In Fuel Burners they set FE/t output and the highest fuel tier you can burn.
 
 | Heat Core | Stage | Notes |
 |---|---:|---|
@@ -183,14 +183,14 @@ Heat Cores set heat. In heated processors they decide maximum temperature, how f
 |---|---|
 | Electric [Furnace](furnace.md) | Required, up to the chassis stage. The Lead Furnace has four, one per lane. |
 | [Alloy Furnace](alloy-furnace.md) | Required, up to the chassis stage. |
-| [Solid Fuel Burner](solid-fuel-burner.md) | Required, up to the burner's stage. |
+| [Fuel Burner](fuel-burner.md) | Required, up to the burner's stage. |
 | [Metal Press](metal-press.md) | Required, up to Stage 6. |
 | [Melter](melter.md) | Required, up to Stage 6. |
 | [Coal Gasifier](coal-gasifier.md) | Required, Stage 5 or higher. |
 | [Steam Methane Reformer](steam-methane-reformer.md) | Required, Stage 6 or higher. |
 | [Cavitation Generator](cavitation-generator.md) | Optional, any stage. |
 
-The [Furnace](furnace.md) page lists the temperature each core reaches, and the [Solid Fuel Burner](solid-fuel-burner.md) page lists each core's FE/t and fuel tier.
+The [Furnace](furnace.md) page lists the temperature each core reaches, and the [Fuel Burner](fuel-burner.md) page lists each core's FE/t and fuel tier.
 
 {{ crafting('rngtech:iron_heat_core') }}
 
@@ -210,7 +210,7 @@ The crucible sets how many input slots an [Alloy Furnace](alloy-furnace.md) has 
 
 ### Fuel Boxes
 
-The Fuel Box sets a burner's fuel slots, which fuel forms it burns, and fuel behaviors such as the Fuel Governor.
+The Fuel Box sets a burner's fuel slots, which fuel forms it burns, and fuel behaviors such as the Fuel Governor. A burner can use a [Fuel Tank or Gas Jet](fuel-burner.md#fluid-fuels) in its place to burn fluid.
 
 | Fuel Box | Stage | Fuel slots | Fuel forms |
 |---|---:|---:|---|
@@ -219,7 +219,7 @@ The Fuel Box sets a burner's fuel slots, which fuel forms it burns, and fuel beh
 | {{ item('rngtech:bronze_fuel_box') }} | 3 | 2 | Items |
 | {{ item('rngtech:steel_fuel_box') }} | 4 | 2 | Items and compact fuel blocks |
 
-**Used in:** [Solid Fuel Burner](solid-fuel-burner.md) (required, up to the burner's stage). That page explains each box's behaviors.
+**Used in:** [Fuel Burner](fuel-burner.md) (required, up to the burner's stage). That page explains each box's behaviors.
 
 ### Bio Chamber
 

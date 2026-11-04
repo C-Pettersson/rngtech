@@ -106,7 +106,7 @@ Stage is not the same as affix **tier**. Tier describes how strong one affix is;
 | Stage | Name | Main materials | What opens up |
 |---:|---|---|---|
 | 0 | Primitive | Wood, flint, stone | [Tool Bench](tool-bench.md) and flint tools, the Wooden Crusher, the fuel-burning [Furnace](furnace.md), Potato Battery Cells. |
-| 1 | Iron | Iron | The first powered machines: [Solid Fuel Burner](solid-fuel-burner.md), Iron [Crusher](crusher.md), Iron [Battery Chassis](battery-chassis.md), Iron [Resonance Calibrator](resonance-calibrator.md), [Solar Panels](solar-panel.md). |
+| 1 | Iron | Iron | The first powered machines: [Fuel Burner](fuel-burner.md), Iron [Crusher](crusher.md), Iron [Battery Chassis](battery-chassis.md), Iron [Resonance Calibrator](resonance-calibrator.md), [Solar Panels](solar-panel.md). |
 | 2 | Copper | Copper | Faster energy transfer and heat. Copper machine sets, the [Wooden Dehumidifier](wooden-dehumidifier.md). |
 | 3 | Bronze | Bronze, tin, zinc, gold | The first alloy. Basic Electric Circuits, the Crude [Metal Press](metal-press.md), the Bronze [Alloy Furnace](alloy-furnace.md), the Gold [Crusher](crusher.md#stages) and [Furnace](furnace.md#stages) bodies, and the first [jewels](jewels.md). |
 | 4 | Steel | Steel, invar, nickel, lead, silver | Stable midgame machines, the Steel Metal Press, the Lead Furnace, the [Corrosion Cell](corrosion-cell.md). The first recoverable processing failures. |
@@ -222,13 +222,13 @@ A machine's chassis stage is the highest stage of Gear it accepts. A Stage 4 Ste
 This cap applies to a machine's main processing Gear:
 
 - Crush Heads in the [Crusher](crusher.md).
-- Heat Cores in the [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), and [Solid Fuel Burner](solid-fuel-burner.md).
+- Heat Cores in the [Furnace](furnace.md), [Alloy Furnace](alloy-furnace.md), and [Fuel Burner](fuel-burner.md).
 - Alloy Crucibles and Servos in the Alloy Furnace.
-- Fuel Boxes in the Solid Fuel Burner.
+- Fuel Boxes, Fuel Tanks, and Gas Jets in the Fuel Burner.
 - Disassembly Heads and Recovery Filters in the [Component Recycler](component-recycler.md).
 - Battery Cells and Servos in [Compressor Tanks](compressor-tank.md).
 
-Battery Cells fit most machines at any stage. A few machines limit them, for example the Solid Fuel Burner takes cells up to its own stage, and some gas machines need a minimum cell or Heat Core stage instead. Each machine's Gear section lists its limits, and the [Gear](gear.md) page explains the slots.
+Battery Cells fit most machines at any stage. A few machines limit them, for example the Fuel Burner takes cells up to its own stage, and some gas machines need a minimum cell or Heat Core stage instead. Each machine's Gear section lists its limits, and the [Gear](gear.md) page explains the slots.
 
 Two other systems read the chassis stage:
 

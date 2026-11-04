@@ -3,12 +3,14 @@ package com.rngtech.content.menu;
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.energy.SolidFuelBurnerStoke;
 import com.rngtech.content.jewel.JewelSockets;
+import com.rngtech.content.purge.FluidPurgeSupport;
 import com.rngtech.content.registry.ModMenus;
 import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -19,6 +21,7 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
@@ -56,14 +59,18 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
     private static final int DATA_RATED_GENERATION = 21;
     private static final int DATA_PACK_GENERATION_MULTIPLIER = 22;
     private static final int DATA_RUNNING_STOKE = 23;
-    private static final int DATA_COUNT = 24;
+    private static final int DATA_FUEL_TANK_AMOUNT = 24;
+    private static final int DATA_FUEL_TANK_CAPACITY = 25;
+    private static final int DATA_FUEL_TANK_FLUID_ID = 26;
+    private static final int DATA_COUNT = 27;
     private static final int BUTTON_STOKE_BASE = 8000;
     private static final int STAT_SCALE = 100;
     private static final int FUEL_SLOT_START = 0;
     private static final int HEAT_CORE_SLOT = FUEL_SLOT_START + SolidFuelBurnerBlockEntity.FUEL_SLOT_COUNT;
     private static final int BATTERY_CELL_SLOT = HEAT_CORE_SLOT + 1;
     private static final int FUEL_BOX_SLOT = BATTERY_CELL_SLOT + 1;
-    private static final int REFINEMENT_CONSUMABLE_SLOT = FUEL_BOX_SLOT + 1;
+    private static final int FLUID_CONTAINER_SLOT = FUEL_BOX_SLOT + 1;
+    private static final int REFINEMENT_CONSUMABLE_SLOT = FLUID_CONTAINER_SLOT + 1;
     private static final int REFINEMENT_TARGET_SLOT = REFINEMENT_CONSUMABLE_SLOT + 1;
     private static final int PLAYER_INVENTORY_START = REFINEMENT_TARGET_SLOT + 1;
     private static final int HOTBAR_END = PLAYER_INVENTORY_START + 36;
@@ -110,6 +117,7 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
         addSlot(new TabbedSlot(gearInventory, SolidFuelBurnerBlockEntity.SLOT_HEAT_CORE, 44, 48, () -> selectedTab == TAB_GEAR));
         addSlot(new TabbedSlot(gearInventory, SolidFuelBurnerBlockEntity.SLOT_BATTERY_CELL, 80, 48, () -> selectedTab == TAB_GEAR));
         addSlot(new TabbedSlot(gearInventory, SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX, 116, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new TabbedSlot(burner.getFluidContainerInventory(), 0, 72, 62, () -> selectedTab == TAB_PROCESSING && burnsFluid()));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 burner.getRefinementInventory(),
@@ -225,6 +233,32 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
         return slot >= 0 && slot < activeFuelSlots();
     }
 
+    /** Whether the installed part is a Fuel Tank or Gas Jet, which swaps the fuel slots for a tank meter. */
+    public boolean burnsFluid() {
+        return fuelTankCapacity() > 0;
+    }
+
+    public int fuelTankAmount() {
+        return data.get(DATA_FUEL_TANK_AMOUNT);
+    }
+
+    public int fuelTankCapacity() {
+        return data.get(DATA_FUEL_TANK_CAPACITY);
+    }
+
+    public float fuelTankProgress() {
+        int capacity = fuelTankCapacity();
+        return capacity <= 0 ? 0.0F : Mth.clamp(fuelTankAmount() / (float) capacity, 0.0F, 1.0F);
+    }
+
+    public Fluid fuelTankFluid() {
+        return FluidMenuSupport.fluid(data.get(DATA_FUEL_TANK_FLUID_ID));
+    }
+
+    public Component fuelTankFluidName() {
+        return FluidMenuSupport.fluidName(data.get(DATA_FUEL_TANK_FLUID_ID), Component.translatable("rngtech.processing.fuel"));
+    }
+
     public int maxFuelTier() {
         return data.get(DATA_MAX_FUEL_TIER);
     }
@@ -290,6 +324,9 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (FluidPurgeSupport.handleMenuButton(player, burner, id)) {
+            return true;
+        }
         int stoke = id - BUTTON_STOKE_BASE;
         if (stoke >= SolidFuelBurnerStoke.MIN_STOKE && stoke <= SolidFuelBurnerStoke.MAX_STOKE) {
             if (!player.level().isClientSide) {
@@ -371,8 +408,12 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
             if (!moveItemStackTo(stack, BATTERY_CELL_SLOT, BATTERY_CELL_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (burner.isFuelBox(stack)) {
+        } else if (burner.isFuelPart(stack)) {
             if (!moveItemStackTo(stack, FUEL_BOX_SLOT, FUEL_BOX_SLOT + 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (burnsFluid() && SolidFuelBurnerBlockEntity.isFluidContainer(stack)) {
+            if (!moveItemStackTo(stack, FLUID_CONTAINER_SLOT, FLUID_CONTAINER_SLOT + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (burner.isAcceptedFuel(stack)) {
