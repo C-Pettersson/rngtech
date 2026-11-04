@@ -289,6 +289,7 @@ public final class UniqueCatalog {
             case ALLOY_FURNACE -> UniqueStatReaders.Reader.ALLOY_FURNACE;
             case METAL_PRESS -> UniqueStatReaders.Reader.METAL_PRESS;
             case MELTER -> UniqueStatReaders.Reader.MELTER;
+            case IDENTIFIER -> UniqueStatReaders.Reader.IDENTIFIER;
             case RESONANCE_CALIBRATOR -> UniqueStatReaders.Reader.RESONANCE_CALIBRATOR;
             case FORESTRY -> UniqueStatReaders.Reader.FORESTRY_CART;
         };

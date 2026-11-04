@@ -679,7 +679,7 @@ public enum CrusherPassiveNode implements StringRepresentable, PassiveNode {
             case KEYSTONE -> keystone;
             case NOTABLE -> notable;
             case NODE -> node;
-            case STARTER, TRAVEL -> travel;
+            case STARTER, TRAVEL, JEWEL_SOCKET -> travel;
         };
     }
 

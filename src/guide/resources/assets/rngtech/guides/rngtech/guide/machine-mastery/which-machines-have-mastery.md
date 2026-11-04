@@ -18,6 +18,7 @@ Seven machine families have a **Mastery** tab:
 | Metal Press | Crude Metal Press and Metal Press ([Metal Press](rngtech:metal-press.md)) | Control |
 | Resonance Calibrator | Every [Resonance Calibrator](rngtech:resonance-calibrator.md) chassis | Control |
 | Melter | [Melter](rngtech:melter.md) | Reserve / Control |
+| Identifier | [Identifier](rngtech:identifier.md) | Reserve |
 | Forestry Companion | The Forestry Companion cart ([Forestry Cart Station](rngtech:forestry-cart-station.md)) | Control / Drive |
 
 Other machines, Gear, and cables do not level up.

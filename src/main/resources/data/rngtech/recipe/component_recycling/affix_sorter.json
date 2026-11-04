@@ -1,0 +1,25 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:affix_sorter"
+    },
+    "minimum_processing_level": 8,
+    "processing_ticks": 240,
+    "energy": 4800,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:ultimate_electric_circuit",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:advanced_item_filter",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

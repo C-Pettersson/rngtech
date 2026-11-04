@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "rngtech:material_enabled",
+      "material": "titanium"
+    }
+  ],
+  "type": "rngtech:trait_shaped",
+  "category": "redstone",
+  "pattern": [
+    "ITI",
+    "GFG",
+    "IBI"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bucket"
+    },
+    "F": {
+      "item": "rngtech:fuel_chamber"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "I": {
+      "item": "rngtech:titanium_ingot"
+    },
+    "T": {
+      "item": "rngtech:pressure_tank_frame"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "rngtech:steel_gas_jet"
+  }
+}

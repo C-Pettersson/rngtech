@@ -1,5 +1,7 @@
 package com.rngtech.rpg;
 
+import com.rngtech.content.affixsorter.RuleCoreMaterial;
+import com.rngtech.content.block.AffixSorterBlock;
 import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.block.AmmoniaFuelCellBlock;
 import com.rngtech.content.block.AmmoniaSynthesizerBlock;
@@ -12,6 +14,7 @@ import com.rngtech.content.block.CorrosionCellBlock;
 import com.rngtech.content.block.CrusherBlock;
 import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.block.GasChemistryBlock;
+import com.rngtech.content.block.IdentifierBlock;
 import com.rngtech.content.block.MelterBlock;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.block.PotentialReactorBlock;
@@ -29,6 +32,7 @@ import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.ReactorChamberMaterial;
 import com.rngtech.content.energy.RecoveryFilterMaterial;
@@ -56,6 +60,7 @@ import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.PotentialReactorBlockItem;
 import com.rngtech.content.item.PotentialReactorPartItem;
 import com.rngtech.content.item.ResonanceCalibratorBlockItem;
+import com.rngtech.content.item.RuleCoreItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolarArrayControllerBlockItem;
 import com.rngtech.content.item.SolarArrayExtenderItem;
@@ -191,7 +196,11 @@ public final class MachineImplicitCatalog {
             return alloyCrucible(crucible.material());
         }
         if (item instanceof SolidFuelBurnerPartItem part) {
-            return part.partType() == MachinePartType.HEAT_CORE ? heatCore(part.heatCoreMaterial()) : fuelBox(part.fuelBoxMaterial());
+            return switch (part.partType()) {
+                case HEAT_CORE -> heatCore(part.heatCoreMaterial());
+                case FUEL_TANK -> fuelTank(part.fuelTankMaterial());
+                default -> fuelBox(part.fuelBoxMaterial());
+            };
         }
         if (item instanceof MachinePartItem part
                 && part.partType() == MachinePartType.BIO_CHAMBER
@@ -220,6 +229,9 @@ public final class MachineImplicitCatalog {
         }
         if (item instanceof DisassemblyHeadItem head) {
             return disassemblyHead(head.material());
+        }
+        if (item instanceof RuleCoreItem core) {
+            return ruleCore(core.material());
         }
         if (item instanceof ServoItem servo) {
             return servo(servo.material());
@@ -254,6 +266,8 @@ public final class MachineImplicitCatalog {
                 case ALLOY_FURNACE -> alloyFurnace(AlloyFurnaceChassisMaterial.BRONZE);
                 case METAL_PRESS -> metalPress(machine.getBlock());
                 case MELTER -> staticMachine("melter", MachineBehavior.OUTPUT_GUARD);
+                case IDENTIFIER -> staticMachine("identifier");
+                case AFFIX_SORTER -> staticMachine("affix_sorter");
                 case BATTERY_ASSEMBLER -> staticMachine("battery_assembler", MachineBehavior.OUTPUT_GUARD);
                 case COAL_GASIFIER -> staticMachine("coal_gasifier", MachineBehavior.OUTPUT_GUARD);
                 case SYNGAS_COMBUSTOR -> staticMachine("syngas_combustor", MachineBehavior.OUTPUT_GUARD);
@@ -319,6 +333,12 @@ public final class MachineImplicitCatalog {
         }
         if (block instanceof MelterBlock) {
             return staticMachine("melter", MachineBehavior.OUTPUT_GUARD);
+        }
+        if (block instanceof IdentifierBlock) {
+            return staticMachine("identifier");
+        }
+        if (block instanceof AffixSorterBlock) {
+            return staticMachine("affix_sorter");
         }
         if (block instanceof BatteryAssemblerBlock) {
             return staticMachine("battery_assembler", MachineBehavior.OUTPUT_GUARD);
@@ -406,6 +426,16 @@ public final class MachineImplicitCatalog {
         );
     }
 
+    public static Identity fuelTank(FuelTankMaterial material) {
+        return identity(
+                "fuel_tank." + material.getSerializedName(),
+                Rarity.NORMAL,
+                material.refinementPotential(),
+                List.of(),
+                MachineBehavior.FUEL_GOVERNOR
+        );
+    }
+
     public static Identity reactorChamber(ReactorChamberMaterial material) {
         MachineBehavior[] behaviors = material == ReactorChamberMaterial.STEEL
                 ? new MachineBehavior[] {MachineBehavior.THERMAL_BUFFER}
@@ -473,6 +503,10 @@ public final class MachineImplicitCatalog {
         return identity("disassembly_head." + material.getSerializedName(), Rarity.NORMAL, material.refinementPotential(), List.of());
     }
 
+    public static Identity ruleCore(RuleCoreMaterial material) {
+        return identity("rule_core." + material.getSerializedName(), Rarity.NORMAL, material.refinementPotential(), List.of());
+    }
+
     public static Identity servo(ServoMaterial material) {
         List<MachineBehavior> behaviors = new ArrayList<>();
         if (material.stage() >= 6) {
@@ -516,12 +550,17 @@ public final class MachineImplicitCatalog {
         return identity("stabilizer_matrix." + material.getSerializedName(), Rarity.NORMAL, material.refinementPotential(), List.of());
     }
 
+    /** A Gold body's setting: one jewel socket, the only stat an identity carries. */
+    private static final MachineModifier JEWEL_SETTING =
+            new MachineModifier(ModifierSlot.IMPLICIT, MachineStat.JEWEL_SOCKETS, ModifierOperation.ADD, 1.0);
+
     private static Identity crusher(CrusherChassisMaterial material) {
         MachineBehavior[] behaviors = switch (material) {
             case STEEL, TITANIUM, TUNGSTENSTEEL, EXOTIC -> new MachineBehavior[] {MachineBehavior.OUTPUT_GUARD};
             default -> new MachineBehavior[0];
         };
-        return identity("crusher." + material.getSerializedName(), Rarity.NORMAL, 0, List.of(), behaviors);
+        List<MachineModifier> modifiers = material == CrusherChassisMaterial.GOLD ? List.of(JEWEL_SETTING) : List.of();
+        return identity("crusher." + material.getSerializedName(), Rarity.NORMAL, 0, modifiers, behaviors);
     }
 
     private static Identity furnace(FurnaceChassisMaterial material) {
@@ -531,7 +570,8 @@ public final class MachineImplicitCatalog {
             case TITANIUM, TUNGSTENSTEEL, EXOTIC -> new MachineBehavior[] {MachineBehavior.THERMAL_BUFFER, MachineBehavior.OUTPUT_GUARD};
             default -> new MachineBehavior[0];
         };
-        return identity("furnace." + material.getSerializedName(), Rarity.NORMAL, 0, List.of(), behaviors);
+        List<MachineModifier> modifiers = material == FurnaceChassisMaterial.GOLD ? List.of(JEWEL_SETTING) : List.of();
+        return identity("furnace." + material.getSerializedName(), Rarity.NORMAL, 0, modifiers, behaviors);
     }
 
     private static Identity alloyFurnace(AlloyFurnaceChassisMaterial material) {
@@ -556,7 +596,8 @@ public final class MachineImplicitCatalog {
             };
             default -> new MachineBehavior[0];
         };
-        return identity("battery_chassis." + material.getSerializedName(), Rarity.NORMAL, 0, List.of(), behaviors);
+        List<MachineModifier> modifiers = material == BatteryChassisMaterial.GOLD ? List.of(JEWEL_SETTING) : List.of();
+        return identity("battery_chassis." + material.getSerializedName(), Rarity.NORMAL, 0, modifiers, behaviors);
     }
 
     private static Identity batteryCell(BatteryCellMaterial material) {

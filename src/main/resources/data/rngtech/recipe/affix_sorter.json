@@ -1,0 +1,39 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "naquadah"
+        }
+    ],
+    "type": "rngtech:trait_shaped",
+    "category": "misc",
+    "pattern": [
+        "LCL",
+        "AFA",
+        "GIG"
+    ],
+    "key": {
+        "L": {
+            "item": "rngtech:calibrated_diamond_crystal"
+        },
+        "C": {
+            "tag": "rngtech:circuits/ultimate"
+        },
+        "A": {
+            "item": "rngtech:ascension_matrix"
+        },
+        "F": {
+            "tag": "rngtech:machine_frames/exotic"
+        },
+        "G": {
+            "tag": "rngtech:materials/exotic/gears"
+        },
+        "I": {
+            "item": "rngtech:advanced_item_filter"
+        }
+    },
+    "result": {
+        "count": 1,
+        "id": "rngtech:affix_sorter"
+    }
+}

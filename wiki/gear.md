@@ -114,6 +114,7 @@ Machines that take Gear have a **Gear** tab in their screen. Each slot accepts o
 - **Optional** slots add stats or unlock extra behavior.
 - Hover an empty slot to see what it accepts. Hold Shift for example items.
 - With JEI installed, the **Machine Gear** category lists every machine's slots, and looking up a part's uses shows which machines take it.
+- With JEI installed, type `@rngtech gear crusher` in the search bar to list the parts that fit a Crusher. This also works for other machines. The list includes parts for every tier of the machine, so add a stage to narrow it: `@rngtech gear crusher stage 3`. The list also includes [jewels](jewels.md) if the machine has a Jewels tab.
 
 You install Gear by hand. Pipes, hoppers, and connectors cannot reach Gear slots, with one exception: Crushers and electric Furnaces accept Battery Cells from their sides.
 
@@ -132,7 +133,7 @@ A few slots work differently:
 
 ## Rolls and refinement
 
-Each crafted part rolls its own rarity and affixes, and you can refine it in the [Affix Forge](affix-forge.md). Parts do not stack. An unidentified part rolls when you install it, so you do not have to [identify](rarity-and-affixes.md#identification) it first. A part's affixes are **local**: they scale that part's own stats, and the result is then added to the machine. Holding Shift on a tooltip marks these rolls "(Local)". Rolls without the mark, such as a Fluid Pump's Fluid Capacity, apply to the machine as they are.
+Each crafted part rolls its own rarity and affixes, and you can refine it in the [Affix Forge](affix-forge.md). Parts do not stack. An unidentified part rolls when you install it by hand, so you do not have to [identify](rarity-and-affixes.md#identification) it first. A part's affixes are **local**: they scale that part's own stats, and the result is then added to the machine. Holding Shift on a tooltip marks these rolls "(Local)". Rolls without the mark, such as a Fluid Pump's Fluid Capacity, apply to the machine as they are.
 
 Higher-stage parts are crafted from fresh materials, not from the previous part. You can keep a well-rolled part in service and craft the next stage separately. The {{ item('rngtech:nullite_servo') }} is the one part that upgrades from an older part, the {{ item('rngtech:titanium_servo') }}. It rolls fresh traits: the Titanium Servo's affixes and RP are lost.
 
@@ -164,7 +165,7 @@ The Flint Crush Head is cheap starter tooling with slower processing.
 
 ### Heat Cores
 
-Heat Cores set heat. In heated processors they decide maximum temperature, how fast the machine warms up, and how steady the heat is. In solid fuel burners they set FE/t output and the highest fuel tier you can burn.
+Heat Cores set heat. In heated processors they decide maximum temperature, how fast the machine warms up, and how steady the heat is. In Fuel Burners they set FE/t output and the highest fuel tier you can burn.
 
 | Heat Core | Stage | Notes |
 |---|---:|---|
@@ -183,14 +184,14 @@ Heat Cores set heat. In heated processors they decide maximum temperature, how f
 |---|---|
 | Electric [Furnace](furnace.md) | Required, up to the chassis stage. The Lead Furnace has four, one per lane. |
 | [Alloy Furnace](alloy-furnace.md) | Required, up to the chassis stage. |
-| [Solid Fuel Burner](solid-fuel-burner.md) | Required, up to the burner's stage. |
+| [Fuel Burner](fuel-burner.md) | Required, up to the burner's stage. |
 | [Metal Press](metal-press.md) | Required, up to Stage 6. |
 | [Melter](melter.md) | Required, up to Stage 6. |
 | [Coal Gasifier](coal-gasifier.md) | Required, Stage 5 or higher. |
 | [Steam Methane Reformer](steam-methane-reformer.md) | Required, Stage 6 or higher. |
 | [Cavitation Generator](cavitation-generator.md) | Optional, any stage. |
 
-The [Furnace](furnace.md) page lists the temperature each core reaches, and the [Solid Fuel Burner](solid-fuel-burner.md) page lists each core's FE/t and fuel tier.
+The [Furnace](furnace.md) page lists the temperature each core reaches, and the [Fuel Burner](fuel-burner.md) page lists each core's FE/t and fuel tier.
 
 {{ crafting('rngtech:iron_heat_core') }}
 
@@ -210,7 +211,7 @@ The crucible sets how many input slots an [Alloy Furnace](alloy-furnace.md) has 
 
 ### Fuel Boxes
 
-The Fuel Box sets a burner's fuel slots, which fuel forms it burns, and fuel behaviors such as the Fuel Governor.
+The Fuel Box sets a burner's fuel slots, which fuel forms it burns, and fuel behaviors such as the Fuel Governor. A burner can use a [Fuel Tank or Gas Jet](fuel-burner.md#fluid-fuels) in its place to burn fluid.
 
 | Fuel Box | Stage | Fuel slots | Fuel forms |
 |---|---:|---:|---|
@@ -219,7 +220,7 @@ The Fuel Box sets a burner's fuel slots, which fuel forms it burns, and fuel beh
 | {{ item('rngtech:bronze_fuel_box') }} | 3 | 2 | Items |
 | {{ item('rngtech:steel_fuel_box') }} | 4 | 2 | Items and compact fuel blocks |
 
-**Used in:** [Solid Fuel Burner](solid-fuel-burner.md) (required, up to the burner's stage). That page explains each box's behaviors.
+**Used in:** [Fuel Burner](fuel-burner.md) (required, up to the burner's stage). That page explains each box's behaviors.
 
 ### Bio Chamber
 
@@ -282,6 +283,8 @@ Titanium and higher Servos need Lubricant and can also be made in the [Component
 | [Metal Press](metal-press.md) | Required on the Metal Press, optional on the Crude Metal Press. Any stage. |
 | [Alloy Furnace](alloy-furnace.md) | Optional, up to the chassis stage. |
 | [Melter](melter.md) | Optional, any stage. |
+| [Identifier](identifier.md) | Required, any stage. Sets the speed. |
+| [Affix Sorter](affix-sorter.md) | Optional, any stage. |
 | [Coal Gasifier](coal-gasifier.md), [Syngas Combustor](syngas-combustor.md), [Steam Methane Reformer](steam-methane-reformer.md) | Optional, Stage 4 or higher. |
 | [Compressor Tank](compressor-tank.md) (Steel and higher) | Four slots, at least one required, up to the tank's stage. |
 | [Cavitation Generator](cavitation-generator.md) | Optional, Stage 6 or higher. |
@@ -299,7 +302,7 @@ Fluid Pumps move fluid out of, or into, a machine. Their transfer rate before af
 | {{ item('rngtech:tungstensteel_fluid_pump') }} | 7 | 500 mB/t |
 | {{ item('rngtech:exotic_fluid_pump') }} | 8 | 1,000 mB/t |
 
-**Used in:** [Melter](melter.md) (required, lets it fill containers and pipe out fluid), [Corrosion Cell](corrosion-cell.md) (optional, lets it fill with Electrolyte Solution from the side), [Bio Generator](bio-generator.md#methane-take-off) (optional, exports its gas as Methane), and the Forestry Companion cart (optional, used by the Field Hand sprinkler; see [Machine Mastery](machine-mastery.md#ascendancies)). Any stage fits.
+**Used in:** [Melter](melter.md) (required, lets it fill containers and pipe out fluid), [Identifier](identifier.md) (required, lets Identifying Fluid in through every face), [Corrosion Cell](corrosion-cell.md) (optional, lets it fill with Electrolyte Solution from the side), [Bio Generator](bio-generator.md#methane-take-off) (optional, exports its gas as Methane), and the Forestry Companion cart (optional, used by the Field Hand sprinkler; see [Machine Mastery](machine-mastery.md#ascendancies)). Any stage fits.
 
 {{ crafting('rngtech:osmium_fluid_pump') }}
 
@@ -380,6 +383,10 @@ The [Vacuum Collapse Generator](vacuum-collapse-generator.md) needs both. The **
 | 8 | {{ item('rngtech:exotic_void_chamber') }} | {{ item('rngtech:exotic_dimensional_stabilizer') }} |
 
 **Used in:** [Vacuum Collapse Generator](vacuum-collapse-generator.md) (both required).
+
+### Rule Core
+
+The {{ item('rngtech:exotic_rule_core') }} is the required part of the [Affix Sorter](affix-sorter.md). It sets how many rules the sorter can run at once. It is Stage 8 and rolls Rule Capacity, Processing Speed, and Instant Process.
 
 ### Catalyst Beds and membranes
 

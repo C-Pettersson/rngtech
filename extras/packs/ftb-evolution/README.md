@@ -91,10 +91,10 @@ converted.
 
 | Generator | FE/t | FE per Coal | Build cost (approximate) |
 |---|---:|---:|---|
-| RNGTech Crude Solid Fuel Burner + Iron Heat Core | 24 | 16,000 | 12 iron, 2 copper, 28 redstone |
+| RNGTech Crude Fuel Burner + Iron Heat Core | 24 | 16,000 | 12 iron, 2 copper, 28 redstone |
 | Powah Starter Furnator | 20 | 48,000 | 6 iron, 2 redstone |
 | Mekanism Heat Generator | 80 | about 128,000 | 3 iron, 2 copper, 1 osmium |
-| RNGTech Steel Solid Fuel Burner + Steel Heat Core | 96 | 16,000 | 18 steel, 12 iron, 32 redstone, 2 blaze rods |
+| RNGTech Steel Fuel Burner + Steel Heat Core | 96 | 16,000 | 18 steel, 12 iron, 32 redstone, 2 blaze rods |
 | Powah Hardened Furnator | 200 | 48,000 | 28 iron, 4.5 gold, 11 redstone |
 | RNGTech Coal Gasifier + Syngas Combustor | 240 | about 40,000 | 15 aluminum, 15 iron, 2 steel, 53 redstone, plus a Stage 5 Heat Core |
 | Powah Blazing Furnator | 800 | 48,000 | 35 iron, 9 blaze rods, 4.5 gold |

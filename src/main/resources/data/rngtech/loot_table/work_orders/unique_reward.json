@@ -251,6 +251,10 @@
                 {
                   "condition": "rngtech:machine_family",
                   "family": "melter"
+                },
+                {
+                  "condition": "rngtech:machine_family",
+                  "family": "identifier"
                 }
               ]
             }
@@ -296,6 +300,10 @@
                 {
                   "condition": "rngtech:machine_family",
                   "family": "forestry"
+                },
+                {
+                  "condition": "rngtech:machine_family",
+                  "family": "identifier"
                 }
               ]
             }

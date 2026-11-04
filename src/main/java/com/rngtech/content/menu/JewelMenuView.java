@@ -1,0 +1,40 @@
+package com.rngtech.content.menu;
+
+import com.rngtech.content.jewel.JewelSockets;
+
+import net.minecraft.world.item.ItemStack;
+
+/** What a Jewels tab shows: how many sockets of each row are open and the jewel in each slot. */
+public interface JewelMenuView {
+    /** Open tree jewel slots: the machine's allocated Jewel Sockets. */
+    int jewelTreeCapacity();
+
+    /** Open body jewel slots, from the body's socket affix and implicit. */
+    default int jewelBodyCapacity() {
+        return 0;
+    }
+
+    /** The jewel in slot {@code index} of the combined tree-then-body row, or empty. */
+    ItemStack jewel(int index);
+
+    /** Whether the Jewels tab is the open one, for its slots and renderer. */
+    boolean jewelsTabSelected();
+
+    /** Whether this machine has a Mastery tree, and so a tree row at all. */
+    default boolean hasTreeSockets() {
+        return false;
+    }
+
+    /** Whether the Jewels tab is worth showing: an open socket of either kind, or a jewel still stored in a closed one. */
+    default boolean jewelsShown() {
+        if (jewelTreeCapacity() > 0 || jewelBodyCapacity() > 0) {
+            return true;
+        }
+        for (int index = 0; index < JewelSockets.SLOTS; index++) {
+            if (!jewel(index).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+}

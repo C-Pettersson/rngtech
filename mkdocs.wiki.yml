@@ -1,4 +1,4 @@
-site_name: RNGTech Wiki
+﻿site_name: RNGTech Wiki
 site_description: Player guide to RNGTech's machines, Gear, rarity, and progression.
 site_url: https://c-pettersson.github.io/rngtech/
 repo_name: RNGTech
@@ -54,6 +54,7 @@ nav:
       - Getting Started: getting-started.md
       - Stages: stages.md
       - Rarity and Affixes: rarity-and-affixes.md
+      - Jewels: jewels.md
       - Machine Mastery: machine-mastery.md
       - Work Orders: work-orders.md
       - Dormant Machines: dormant-machines.md
@@ -82,7 +83,7 @@ nav:
       - Corrosion Cell: corrosion-cell.md
       - Potential Reactor: potential-reactor.md
       - Solar Panel: solar-panel.md
-      - Solid Fuel Burner: solid-fuel-burner.md
+      - Fuel Burner: fuel-burner.md
       - Syngas Combustor: syngas-combustor.md
       - Vacuum Collapse Generator: vacuum-collapse-generator.md
   - Energy storage:
@@ -97,6 +98,8 @@ nav:
       - Wooden Dehumidifier: wooden-dehumidifier.md
   - Refinement:
       - Affix Forge: affix-forge.md
+      - Affix Sorter: affix-sorter.md
+      - Identifier: identifier.md
       - Phase Array: phase-array.md
   - Logistics:
       - Universal Cable: universal-cable.md

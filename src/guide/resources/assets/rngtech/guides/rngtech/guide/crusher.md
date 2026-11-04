@@ -9,6 +9,7 @@ item_ids:
   - rngtech:wooden_crusher_chassis
   - rngtech:iron_crusher_chassis
   - rngtech:copper_crusher_chassis
+  - rngtech:gold_crusher_chassis
   - rngtech:bronze_crusher_chassis
   - rngtech:steel_crusher_chassis
   - rngtech:aluminum_crusher_chassis
@@ -26,6 +27,7 @@ item_ids:
   <ItemImage id="rngtech:wooden_crusher_chassis" scale="2" />
   <ItemImage id="rngtech:iron_crusher_chassis" scale="2" />
   <ItemImage id="rngtech:copper_crusher_chassis" scale="2" />
+  <ItemImage id="rngtech:gold_crusher_chassis" scale="2" />
   <ItemImage id="rngtech:bronze_crusher_chassis" scale="2" />
   <ItemImage id="rngtech:steel_crusher_chassis" scale="2" />
   <ItemImage id="rngtech:aluminum_crusher_chassis" scale="2" />

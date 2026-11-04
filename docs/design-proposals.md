@@ -12,7 +12,9 @@ These pages describe proposed systems or requirements beyond the implemented fea
 - [Work Orders requirements](prds/work-orders.md): draft loop of random, readable Job Chips from a Dispatch Terminal, loaded into machine drive bays and paid out through a challenge loot table.
 - [Phase Array requirements](prds/phase-array.md): accepted design for the crafting-bench multiblock whose operations are datapack recipes paid in FE, Strain, Glyphs, and a little Refinement Potential, which replaced the Exotic Affix Forge.
 - [Energy Storage Ladder requirements](prds/energy-storage.md): accepted rebalance that ties Battery Cell capacity to each stage's main generator, turns Lead into a slow long-term storage cell, doubles the cell flat capacity affix, and adds a pack storage multiplier.
+- [Identifier and Affix Sorter requirements](prds/affix-sorter.md): Stage 8 chain, implemented, that identifies automatically crafted Gear with Identifying Fluid and sorts it with ordered, Last Epoch-style rules whose FE cost grows faster than the rule count. Automation identifies only through this chain.
 - [Tree Farm Automation requirements](prds/tree-farm-automation.md): design record; consult [Tree Farm Automation](https://c-pettersson.github.io/rngtech/forestry-cart-station/) for current cart and station behavior.
+- [Jewels and the Bonus Output Cap requirements](prds/jewels.md): accepted design for socketable jewels with one machine-agnostic pool, Jewel Socket nodes on the shared tree, body sockets from a suffix and from Gold bodies, and a 75% Bonus Output cap raised by a new Maximum Bonus Output stat.
 
 ## Planned Extensions to Shipped Machines
 

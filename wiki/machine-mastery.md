@@ -30,6 +30,7 @@ Seven machine families have a **Mastery** tab:
 | Metal Press | Crude Metal Press and Metal Press ([Metal Press](metal-press.md)) | Control |
 | Resonance Calibrator | Every [Resonance Calibrator](resonance-calibrator.md) chassis | Control |
 | Melter | [Melter](melter.md) | Reserve / Control |
+| Identifier | [Identifier](identifier.md) | Reserve |
 | Forestry Companion | The Forestry Companion cart ([Forestry Cart Station](forestry-cart-station.md)) | Control / Drive |
 
 Other machines, Gear, and cables do not level up.
@@ -48,6 +49,7 @@ A machine earns XP each time it successfully finishes a job that awards Mastery 
 | Metal Press | Finished pressing jobs. |
 | Resonance Calibrator | Finished calibrations, counted per lane on multi-lane chassis. |
 | Melter | Finished melts that land in the output tank. |
+| Identifier | Identified items. Higher-stage items give more XP. |
 | Forestry Companion | Planting, leaf cleanup, and harvesting. |
 
 Failed jobs, idle time, waiting on a full output, and recipes with no XP give nothing.
@@ -94,7 +96,7 @@ The tree has three **attributes**: **Control** (teal), **Drive** (gold), and **R
 |---|---|---|
 | Control | 0.1% increased Stability and 0.02% reduced Energy Usage per point | Furnace, Alloy Furnace, and Metal Press: 0.05% increased Temperature Stability per point. Resonance Calibrator: 0.05% increased Calibration Precision per point. |
 | Drive | 0.15% increased Processing Speed per point | Forestry Companion: +1 Tree Fell Limit per 20 points. |
-| Reserve | 0.25% increased Energy Capacity per point (not the Forestry Companion) | Furnace and Alloy Furnace: 0.1% increased Heat Isolation per point. Melter: 0.1% increased Fluid Transfer per point. Forestry Companion: +1 managed-cell maximum per 4 points. |
+| Reserve | 0.25% increased Energy Capacity per point (not the Forestry Companion) | Furnace and Alloy Furnace: 0.1% increased Heat Isolation per point. Melter: 0.1% increased Fluid Transfer per point. Identifier: 0.05% reduced Fluid Use per point. Forestry Companion: +1 managed-cell maximum per 4 points. |
 
 A bonus only matters where the machine uses that stat. For example, the Stage 0 fuel Furnace has no FE buffer, so Reserve's Energy Capacity does nothing for it.
 
@@ -119,6 +121,7 @@ Hold Shift while hovering an attribute total, on your start node or in the Bonus
 
 - **Travel nodes** sit along the roads and grant attribute points.
 - **Ordinary nodes** and **notables** branch off the roads into reward clusters. Notables are the stronger nodes at the end or center of a cluster, at least three points in from the road.
+- **Jewel Sockets** hold one [jewel](jewels.md) each. A socket grants nothing itself. Allocate it to open a jewel slot on the machine's Jewels tab. There are nine: one at the end of a short arm in each home region, and three on the outer roads.
 - **Keystones** are big commitments, at least 10 points from every start. Most are trade-offs: **Steady State** gives 50% more Stability but 15% less Processing Speed, **Single Pass** turns off bonus output for 30% more Processing Speed, and **Dense Batching** adds 3 Batch Size but makes a machine wait for a full batch before it starts a cycle. The path leading to Dense Batching lowers Batch Overhead, and its notable **Even Loading** adds 1 Batch Size. A few only change how the machine works, and cost nothing but the points to reach them: **Silent Operation** mutes the machine, **Even Feed** makes automation fill a [Furnace](furnace.md#automation)'s input lanes evenly, and two keystones on the same node 10 points from the Drive/Reserve start set how a heated machine runs its heat: **Blast Draft** lets the [overheat slider](heat.md#the-overheat-slider) go past the safe maximum, and **Cool Headed** cools the chamber to the recipe target before every new input.
 
 Every node is visible to every family. A node can have no effect on your machine: a Crusher can take a heat node and gain nothing from it. Any penalty on that node still applies, and the tooltip marks which effects are inactive. Some keystone payoffs only work on the machines that actually pay their cost; the tooltip lists which machines those are. For example, **Flash Annealing** caps Max Temperature, so its payoff works only on the [Furnace](furnace.md#mastery-and-ascendancies), [Alloy Furnace](alloy-furnace.md#mastery-and-ascendancies), and [Metal Press](metal-press.md#mastery-and-ascendancies). **Low Heat Specialist**'s cap is below most alloy and press recipes, so its payoff works only on the Furnace. Use **Highlight relevant** in the **Menu** to highlight nodes that matter for your machine.
@@ -247,6 +250,8 @@ Ascendancy bonuses show on the machine's Stats tab and in the Bonus Summary, and
 | | Mass Tuner | Spends one catalyst per cycle however many lanes run, at a lower stability ceiling. |
 | [Melter](melter.md) | Pressure Vessel | Much bigger tanks and more fluid per melt, at 20% less speed. |
 | | Twin Crucible | Melts several sets per cycle, at 15% more energy use. |
+| [Identifier](identifier.md) | Appraiser | Identifies faster and can identify instantly, at 25% more Identifying Fluid. |
+| | Reagent Warden | Uses much less Identifying Fluid and FE, at 20% less speed. |
 | [Forestry Companion](forestry-cart-station.md) | Timber Baron | The logger: banks part of each harvested log and pays it out as extra logs. |
 | | Grove Warden | The grower: spends bone meal and FE on growth pulses that push managed saplings along. |
 | | Field Hand | The farmer: plants, harvests, and replants crops on farmland instead of trees. Its Sprinkler node waters the rows using a Fluid Pump. |

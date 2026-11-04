@@ -46,6 +46,9 @@ public class MachineBlockItem extends BlockItem {
         if (RecyclingData.isStripped(stack)) {
             return InteractionResult.FAIL;
         }
+        if (CraftedTraitOutputs.isUnidentified(stack) && !CraftedTraitOutputs.isPlayerAction(context.getPlayer())) {
+            return InteractionResult.FAIL;
+        }
         boolean temporaryPlacementRoll = !level.isClientSide && !stack.has(ModDataComponents.MACHINE_TRAITS.get());
         UnidentifiedTraitRoll unidentifiedRoll = stack.get(ModDataComponents.UNIDENTIFIED_TRAIT_ROLL.get());
         boolean annealed = CraftedTraitOutputs.isAnnealed(stack);

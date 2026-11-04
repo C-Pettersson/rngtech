@@ -102,6 +102,9 @@ public class ForestryCartItem extends Item {
         if (RecyclingData.isStripped(stack)) {
             return InteractionResult.FAIL;
         }
+        if (CraftedTraitOutputs.isUnidentified(stack) && !CraftedTraitOutputs.isPlayerAction(context.getPlayer())) {
+            return InteractionResult.FAIL;
+        }
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }

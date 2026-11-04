@@ -57,6 +57,20 @@ public final class ModFluids {
             FLUIDS.register("ender_slurry", () -> new BaseFlowingFluid.Source(enderSlurryProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> ENDER_SLURRY_FLOWING =
             FLUIDS.register("flowing_ender_slurry", () -> new BaseFlowingFluid.Flowing(enderSlurryProperties()));
+    public static final DeferredHolder<FluidType, FluidType> IDENTIFYING_FLUID_TYPE =
+            FLUID_TYPES.register("identifying_fluid", () -> new FluidType(FluidType.Properties.create()
+                    .descriptionId("fluid.rngtech.identifying_fluid")
+                    .density(1100)
+                    .viscosity(1600)
+                    .temperature(300)
+                    .lightLevel(6)
+                    .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
+                    .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)
+            ));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> IDENTIFYING_FLUID_SOURCE =
+            FLUIDS.register("identifying_fluid", () -> new BaseFlowingFluid.Source(identifyingFluidProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> IDENTIFYING_FLUID_FLOWING =
+            FLUIDS.register("flowing_identifying_fluid", () -> new BaseFlowingFluid.Flowing(identifyingFluidProperties()));
     public static final DeferredHolder<FluidType, FluidType> CARBON_EXHAUST_TYPE =
             FLUID_TYPES.register("carbon_exhaust", () -> gasType("fluid.rngtech.carbon_exhaust", 900, 300));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> CARBON_EXHAUST_SOURCE =
@@ -125,6 +139,15 @@ public final class ModFluids {
                 .slopeFindDistance(3)
                 .levelDecreasePerBlock(2)
                 .tickRate(8);
+    }
+
+    private static BaseFlowingFluid.Properties identifyingFluidProperties() {
+        return new BaseFlowingFluid.Properties(IDENTIFYING_FLUID_TYPE, IDENTIFYING_FLUID_SOURCE, IDENTIFYING_FLUID_FLOWING)
+                .bucket(ModItems.IDENTIFYING_FLUID_BUCKET)
+                .block(ModBlocks.IDENTIFYING_FLUID_BLOCK)
+                .slopeFindDistance(2)
+                .levelDecreasePerBlock(2)
+                .tickRate(15);
     }
 
     private static BaseFlowingFluid.Properties enderSlurryProperties() {

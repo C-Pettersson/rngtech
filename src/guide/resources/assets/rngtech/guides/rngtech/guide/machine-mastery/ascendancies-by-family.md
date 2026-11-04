@@ -22,6 +22,8 @@ navigation:
 | | Mass Tuner | Spends one catalyst per cycle however many lanes run, at a lower stability ceiling. |
 | [Melter](rngtech:melter.md) | Pressure Vessel | Much bigger tanks and more fluid per melt, at 20% less speed. |
 | | Twin Crucible | Melts several sets per cycle, at 15% more energy use. |
+| [Identifier](rngtech:identifier.md) | Appraiser | Identifies faster and can identify instantly, at 25% more Identifying Fluid. |
+| | Reagent Warden | Uses much less Identifying Fluid and FE, at 20% less speed. |
 | [Forestry Companion](rngtech:forestry-cart-station.md) | Timber Baron | The logger: banks part of each harvested log and pays it out as extra logs. |
 | | Grove Warden | The grower: spends bone meal and FE on growth pulses that push managed saplings along. |
 | | Field Hand | The farmer: plants, harvests, and replants crops on farmland instead of trees. Its Sprinkler node waters the rows using a Fluid Pump. |

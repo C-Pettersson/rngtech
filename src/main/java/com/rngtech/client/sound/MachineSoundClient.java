@@ -131,7 +131,7 @@ public final class MachineSoundClient {
         }
 
         activePositions.add(key);
-        float noiseFactor = machine.noiseFactor();
+        float noiseFactor = machine.noiseFactor() * MachineSoundProfile.volumeScale(state.getBlock());
         MachineLoopSound current = ACTIVE_LOOPS.get(key);
         if (current != null && (current.profile() != profile || current.isStopping() || current.noiseFactor() != noiseFactor)) {
             current.stopNow();

@@ -1,6 +1,7 @@
 package com.rngtech.content.registry;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.blockentity.AffixSorterBlockEntity;
 import com.rngtech.content.blockentity.AlgaePhotobioreactorBlockEntity;
 import com.rngtech.content.blockentity.AlloyFurnaceBlockEntity;
 import com.rngtech.content.blockentity.AmmoniaFuelCellBlockEntity;
@@ -22,6 +23,7 @@ import com.rngtech.content.blockentity.DormantMachineBlockEntity;
 import com.rngtech.content.blockentity.ForestryCartStationBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
 import com.rngtech.content.blockentity.GasChemistryBlockEntity;
+import com.rngtech.content.blockentity.IdentifierBlockEntity;
 import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.blockentity.PhaseCradleBlockEntity;
@@ -109,6 +111,11 @@ public final class ModCapabilities {
                 Capabilities.EnergyStorage.BLOCK,
                 ModBlockEntities.SOLID_FUEL_BURNER.get(),
                 SolidFuelBurnerBlockEntity::getEnergyStorage
+        );
+        event.registerBlockEntity(
+                Capabilities.FluidHandler.BLOCK,
+                ModBlockEntities.SOLID_FUEL_BURNER.get(),
+                SolidFuelBurnerBlockEntity::getFluidHandler
         );
         event.registerBlockEntity(
                 Capabilities.ItemHandler.BLOCK,
@@ -322,6 +329,31 @@ public final class ModCapabilities {
                 Capabilities.FluidHandler.BLOCK,
                 ModBlockEntities.MELTER.get(),
                 MelterBlockEntity::getFluidHandler
+        );
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.IDENTIFIER.get(),
+                IdentifierBlockEntity::getItemHandler
+        );
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.IDENTIFIER.get(),
+                IdentifierBlockEntity::getEnergyStorage
+        );
+        event.registerBlockEntity(
+                Capabilities.FluidHandler.BLOCK,
+                ModBlockEntities.IDENTIFIER.get(),
+                IdentifierBlockEntity::getFluidHandler
+        );
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlockEntities.AFFIX_SORTER.get(),
+                AffixSorterBlockEntity::getItemHandler
+        );
+        event.registerBlockEntity(
+                Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.AFFIX_SORTER.get(),
+                AffixSorterBlockEntity::getEnergyStorage
         );
         event.registerBlockEntity(
                 Capabilities.ItemHandler.BLOCK,

@@ -73,6 +73,23 @@ public final class MegaPassiveTree {
         return behaviors(state).contains(behavior);
     }
 
+    /** Allocated Jewel Sockets: how many tree jewel slots the machine reads. */
+    public static int allocatedSocketCount(MachineProgressionState state) {
+        int count = 0;
+        for (String id : state.allocatedNodes()) {
+            MegaPassiveNode node = node(id);
+            if (node != null && node.kind() == PassiveNodeKind.JEWEL_SOCKET) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /** Every Jewel Socket in the catalog. */
+    public static List<MegaPassiveNode> socketNodes() {
+        return TREE.nodes().stream().filter(node -> node.kind() == PassiveNodeKind.JEWEL_SOCKET).toList();
+    }
+
     private static Map<MachineStat, Double> noBonusOutputCeilings() {
         Map<MachineStat, Double> ceilings = new LinkedHashMap<>();
         ceilings.put(MachineStat.OUTPUT_AMOUNT, 1.0);
@@ -220,6 +237,7 @@ public final class MegaPassiveTree {
             case FORESTRY -> new double[] {10, 10, 0};
             case METAL_PRESS, RESONANCE_CALIBRATOR -> new double[] {20, 0, 0};
             case MELTER -> new double[] {10, 0, 10};
+            case IDENTIFIER -> new double[] {0, 0, 20};
         };
         MachineStat[] attributes = {MachineStat.CONTROL, MachineStat.DRIVE, MachineStat.RESERVE};
         Ascendancy chosen = AscendancyCatalog.get(state.ascendancy());
@@ -362,6 +380,7 @@ public final class MegaPassiveTree {
             }
             case METAL_PRESS -> conversions.add(conversion(MachineStat.CONTROL, MachineStat.TEMPERATURE_STABILITY, ModifierOperation.INCREASED_PERCENT, control * 0.05));
             case MELTER -> conversions.add(conversion(MachineStat.RESERVE, MachineStat.FLUID_TRANSFER, ModifierOperation.INCREASED_PERCENT, reserve * 0.1));
+            case IDENTIFIER -> conversions.add(conversion(MachineStat.RESERVE, MachineStat.FLUID_USAGE, ModifierOperation.DECREASED_PERCENT, reserve * 0.05));
             case RESONANCE_CALIBRATOR -> conversions.add(conversion(MachineStat.CONTROL, MachineStat.CALIBRATION_PRECISION, ModifierOperation.INCREASED_PERCENT, control * 0.05));
             default -> { }
         }

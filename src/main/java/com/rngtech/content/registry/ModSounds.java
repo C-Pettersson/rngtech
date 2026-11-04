@@ -67,6 +67,10 @@ public final class ModSounds {
             register("forestry_companion.transfer");
     public static final DeferredHolder<SoundEvent, SoundEvent> FORESTRY_COMPANION_BLOCKED =
             register("forestry_companion.blocked");
+    public static final DeferredHolder<SoundEvent, SoundEvent> IDENTIFIER_IDENTIFY =
+            register("identifier.identify");
+    public static final DeferredHolder<SoundEvent, SoundEvent> AFFIX_SORTER_SORT =
+            register("affix_sorter.sort");
 
     private ModSounds() {
     }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the Solid Fuel Burner block models, part models, item models, and owned textures.
+"""Generate the Fuel Burner block models, part models, item models, and owned textures.
 
 The design is a small firebox generator: fuel drops from a side hopper (the Fuel Box) onto a
 grate inside a firebrick-lined firebox behind a front grille. The firebox crown carries the
@@ -83,6 +83,13 @@ FUEL_BOXES = {
     "bronze": (176, 116, 52),
     "steel": (112, 120, 124),
 }
+# Fuel Tank and Gas Jet materials: the base colour of the vessel.
+FUEL_TANKS = {
+    "bronze": (176, 116, 52),
+    "steel": (112, 120, 124),
+    "gas_jet": (92, 112, 132),
+}
+ITEM_TEXTURES = ROOT / "src/main/resources/assets/rngtech/textures/item/parts/fuel_tank"
 
 
 def r(value: float) -> float:
@@ -223,6 +230,29 @@ def divider_elements(texture="box"):
                 faces=("north", "south", "up"))]
 
 
+def fuel_tank_elements(texture="tank"):
+    """A Fuel Tank in the hopper's place: a banded vessel, a feed pipe, and a sight glass on its west face."""
+    return [
+        box((0.75, 5.5, 2.5), (2.75, 12.0, 8.0), texture),
+        box((1.0, 5.0, 3.0), (2.5, 5.5, 7.5), texture, faces=("north", "south", "east", "west", "down")),
+        box((1.0, 12.0, 3.0), (2.5, 12.5, 7.5), texture, faces=("north", "south", "east", "west", "up")),
+        box((2.75, 6.5, 4.75), (3.0, 7.5, 5.75), texture, faces=("north", "south", "up", "down")),
+        box((0.5, 6.25, 4.25), (0.75, 11.25, 6.25), "glass", faces=("north", "south", "west", "up", "down"),
+            uv={"west": [0, 0, 16, 16]}),
+    ]
+
+
+def gas_jet_elements(texture="tank"):
+    """A Gas Jet: a slim pressure bottle with a valve, a feed line to the burner, and the same sight glass."""
+    return [
+        box((0.75, 5.5, 3.25), (2.5, 11.5, 7.25), texture),
+        box((1.25, 11.5, 4.75), (2.0, 12.5, 5.75), "valve", faces=("north", "south", "east", "west", "up")),
+        box((2.5, 6.5, 4.75), (3.0, 7.5, 5.75), "valve", faces=("north", "south", "up", "down")),
+        box((0.5, 6.25, 4.25), (0.75, 11.25, 6.25), "glass", faces=("north", "south", "west", "up", "down"),
+            uv={"west": [0, 0, 16, 16]}),
+    ]
+
+
 def item_fuel_elements():
     """Static coal for the item model: a full hopper and an unlit charge on the grate."""
     (x0, _, z0), (x1, y1, z1) = HOPPER
@@ -308,6 +338,16 @@ def write_models() -> None:
                 "parent": f"{MODEL}/{part}",
                 "textures": {"box": TEX + f"fuel_box/{material}"},
             })
+    for material in FUEL_TANKS:
+        write_json(parts / f"fuel_tank_{material}.json", {
+            "textures": {
+                "particle": "#tank",
+                "tank": TEX + f"fuel_tank/{material}",
+                "glass": TEX + "fuel_tank/glass",
+                "valve": TEX + "pipe",
+            },
+            "elements": gas_jet_elements() if material == "gas_jet" else fuel_tank_elements(),
+        })
 
 
 # ---------------------------------------------------------------- textures
@@ -456,6 +496,48 @@ def write_part_textures() -> None:
                 elif (x % 16 == 2 or y % 16 == 2) and (x + y) % 4 == 0:
                     pixels[x, y] = (*shade(pixels[x, y], 30), 255)
         save(sheet, f"fuel_box/{material}")
+
+    # Fuel Tank vessel: brushed sheet with a darker band every 16 texels.
+    for material, color in FUEL_TANKS.items():
+        sheet = noisy(64, color, f"tank_{material}", amount=5, streak=3)
+        pixels = sheet.load()
+        for y in range(64):
+            for x in range(64):
+                if y % 16 in (0, 1):
+                    pixels[x, y] = (*shade(pixels[x, y], -28), 255)
+                elif y % 16 == 2:
+                    pixels[x, y] = (*shade(pixels[x, y], 20), 255)
+        save(sheet, f"fuel_tank/{material}")
+
+    # Sight glass: a steel frame around a dark window; the renderer draws the fluid level over it.
+    glass = Image.new("RGBA", (16, 16), (*shade(STEEL, 10), 255))
+    ImageDraw.Draw(glass).rectangle([3, 1, 12, 14], fill=(22, 26, 32, 255))
+    save(glass, "fuel_tank/glass")
+
+
+def write_item_textures() -> None:
+    """Inventory icons: a banded upright tank with a sight glass, or a slim bottle with a valve for the Gas Jet."""
+    ITEM_TEXTURES.mkdir(parents=True, exist_ok=True)
+    for material, color in FUEL_TANKS.items():
+        icon = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(icon)
+        outline = (*shade(color, -70), 255)
+        body = (*color, 255)
+        light = (*shade(color, 34), 255)
+        if material == "gas_jet":
+            draw.rectangle([7, 0, 8, 2], fill=(*STEEL, 255))
+            draw.rectangle([5, 1, 10, 1], fill=(*shade(STEEL, 30), 255))
+            draw.rounded_rectangle([4, 3, 11, 15], radius=2, fill=body, outline=outline)
+            draw.line([(5, 5), (5, 13)], fill=light)
+            draw.rectangle([8, 6, 9, 12], fill=(70, 120, 210, 255))
+        else:
+            draw.rounded_rectangle([2, 1, 13, 15], radius=2, fill=body, outline=outline)
+            draw.line([(3, 4), (12, 4)], fill=outline)
+            draw.line([(3, 12), (12, 12)], fill=outline)
+            draw.line([(4, 5), (4, 11)], fill=light)
+            draw.rectangle([9, 5, 11, 11], fill=(24, 22, 22, 255))
+            draw.rectangle([9, 8, 11, 11], fill=(232, 112, 36, 255))
+        icon.save(ITEM_TEXTURES / f"{material}.png")
 
 
 def write_textures() -> None:
@@ -624,6 +706,7 @@ def write_textures() -> None:
 
     write_chassis_textures()
     write_part_textures()
+    write_item_textures()
     write_fx_textures()
 
 
@@ -669,6 +752,15 @@ def write_fx_textures() -> None:
             pixels[x, y] = (clamp(255 * min(1.0, heat * 1.6)), clamp(210 * heat ** 1.4), clamp(90 * heat ** 3), 255)
     save(flame, "fx/flame")
 
+    # Gas Jet flame: the same tongue in blue, with a pale core.
+    gas_flame = Image.new("RGBA", (32, 32))
+    pixels = gas_flame.load()
+    for y in range(32):
+        for x in range(32):
+            red, green, blue, alpha = flame.getpixel((x, y))
+            pixels[x, y] = (clamp(blue * 0.9), clamp(green * 0.7), clamp(red * 1.0), alpha)
+    save(gas_flame, "fx/gas_flame")
+
     # Firelight on the cavity walls: a soft orange radial gradient.
     glow = Image.new("RGBA", (16, 16))
     pixels = glow.load()
@@ -678,6 +770,15 @@ def write_fx_textures() -> None:
             strength = (1.0 - distance) ** 1.4
             pixels[x, y] = (clamp(255 * strength), clamp(120 * strength), clamp(30 * strength), 255)
     save(glow, "fx/glow")
+
+    gas_glow = Image.new("RGBA", (16, 16))
+    pixels = gas_glow.load()
+    for y in range(16):
+        for x in range(16):
+            distance = min(1.0, math.hypot(x + 0.5 - 8, y + 0.5 - 8) / 8)
+            strength = (1.0 - distance) ** 1.4
+            pixels[x, y] = (clamp(30 * strength), clamp(90 * strength), clamp(255 * strength), 255)
+    save(gas_glow, "fx/gas_glow")
 
     led = Image.new("RGBA", (16, 16), (236, 236, 236, 255))
     draw = ImageDraw.Draw(led)

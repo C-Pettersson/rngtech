@@ -205,7 +205,22 @@ const EXTRAS = [
     // pockets beside its start and a larger Actuation pocket further out.
     { id: "press_actuation", angle: -158, radius: 1450, shapes: ["chain", "fork", "diamond"], theme: "actuation" },
     { id: "press_heat_flow", angle: -140, radius: 1500, shapes: ["fork", "diamond", "chain"], theme: "heatFlow" },
-    { id: "press_actuation_outer", angle: -145, radius: 2200, shapes: ["wheel", "chain", "fork"], theme: "actuation" }
+    { id: "press_actuation_outer", angle: -145, radius: 2200, shapes: ["wheel", "chain", "fork"], theme: "actuation" },
+    // The Overflow Gate sits in the Drive region's outer field, among the Crusher's Recovery pockets: three Recovery
+    // smalls lead to the one tree source of Maximum Bonus Output, which raises the Bonus Output cap by 2%.
+    { id: "headroom", angle: -22, radius: 2750, shapes: ["diamond"], theme: "recovery",
+        notables: [{ name: "Overflow Gate", effects: [effect("MAX_OUTPUT_AMOUNT", 2, "ADD"), effect("OUTPUT_AMOUNT", 1.5)] }] },
+    // Nine Jewel Sockets: one per home region at the end of a one-node arm in the region's own theme, and three hung
+    // directly off outer roads, one in each third of the tree. A socket grants nothing itself; it holds one jewel.
+    { id: "socket_control", angle: -162, radius: 1650, shapes: ["socketArm"], theme: "precision", socket: true },
+    { id: "socket_control_drive", angle: -78, radius: 1700, shapes: ["socketArm"], theme: "actuation", socket: true },
+    { id: "socket_drive", angle: -42, radius: 1650, shapes: ["socketArm"], theme: "momentum", socket: true },
+    { id: "socket_drive_reserve", angle: 18, radius: 1700, shapes: ["socketArm"], theme: "heatFlow", socket: true },
+    { id: "socket_reserve", angle: 102, radius: 1650, shapes: ["socketArm"], theme: "reserves", socket: true },
+    { id: "socket_reserve_control", angle: 138, radius: 1700, shapes: ["socketArm"], theme: "conservation", socket: true },
+    { id: "socket_outer_north", angle: -100, radius: 3250, shapes: ["socketDirect"], theme: "actuation", socket: true },
+    { id: "socket_outer_east", angle: 20, radius: 3200, shapes: ["socketDirect"], theme: "heatFlow", socket: true },
+    { id: "socket_outer_west", angle: 140, radius: 3250, shapes: ["socketDirect"], theme: "conservation", socket: true }
 ];
 
 const regionAt = angle => {
@@ -314,6 +329,7 @@ export function createMegaTree() {
 
     // Notables and keystones take IDs from their names; ordinary pocket nodes follow their pocket's first notable.
     const rename = new Map(), nodes = [], keystoneNodes = [];
+    let sockets = 0;
     const build = (layoutId, id, fields, target = nodes) => {
         const { x, y, group } = byId.get(layoutId);
         rename.set(layoutId, id);
@@ -327,11 +343,13 @@ export function createMegaTree() {
         const t = THEMES[pocket.theme];
         const entries = new Map(pocket.nodes.filter(id => byId.get(id).kind === "NOTABLE").map(id => [id,
             special.get(id) ?? { name: nextName(pocket.theme), effects: [effect(t.primary[0], t.notable, t.primary[1]), t.secondary] }]));
-        const base = entries.size ? slug([...entries.values()][0].name) : null;
+        // A socket pocket has no notable, so its arm node takes the extra's id and its socket a catalog-wide number.
+        const base = entries.size ? slug([...entries.values()][0].name) : pocket.extra ?? null;
         let small = 0;
         for (const id of pocket.nodes) {
             const kind = byId.get(id).kind;
             if (kind === "NODE") build(id, `${base}_${++small}`, { name: t.name, kind, effects: [effect(t.primary[0], t.small, t.primary[1])] });
+            if (kind === "JEWEL_SOCKET") build(id, `jewel_socket_${++sockets}`, { name: "Jewel Socket", kind });
             if (kind === "NOTABLE") build(id, slug(entries.get(id).name), { kind, ...entries.get(id) });
             if (kind === "KEYSTONE") {
                 const { id: keystoneId, layer, extra, ...keystone } = keystoneFor.get(id);

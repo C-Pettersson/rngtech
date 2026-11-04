@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "include": [
+                "rngtech:machine_traits",
+                "rngtech:jewels",
+                "rngtech:mirrored",
+                "rngtech:sorter_rules"
+              ],
+              "source": "block_entity"
+            }
+          ],
+          "name": "rngtech:affix_sorter"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "rngtech:blocks/affix_sorter"
+}

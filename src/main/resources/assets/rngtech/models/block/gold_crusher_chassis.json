@@ -1,0 +1,11 @@
+{
+  "parent": "rngtech:block/crusher",
+  "textures": {
+    "particle": "rngtech:block/crusher/shell/gold",
+    "shell": "rngtech:block/crusher/shell/gold",
+    "trim": "rngtech:block/crusher/trim/gold",
+    "rim": "rngtech:block/crusher/rim/gold",
+    "plinth_top": "rngtech:block/crusher/stone_top",
+    "plinth_side": "rngtech:block/crusher/stone_side"
+  }
+}

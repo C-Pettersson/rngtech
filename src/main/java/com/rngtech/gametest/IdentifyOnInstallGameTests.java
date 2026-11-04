@@ -22,16 +22,23 @@ import com.rngtech.content.tool.ToolRodMaterial;
 import com.rngtech.rpg.MachineTraits;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
-/** Unidentified Gear, Battery Cells, and tool parts roll their traits when they are installed. */
+/** Unidentified Gear, Battery Cells, and tool parts roll their traits when a player installs them. */
 @GameTestHolder(RNGTech.MOD_ID)
 @PrefixGameTestTemplate(false)
 public final class IdentifyOnInstallGameTests {
@@ -40,21 +47,23 @@ public final class IdentifyOnInstallGameTests {
     private IdentifyOnInstallGameTests() {
     }
 
-    /** Inserting one item of an unidentified stack identifies the installed copy and leaves the rest unidentified. */
+    /** Automation inserts leave Gear unidentified; a player putting it in a slot identifies the installed copy. */
     @GameTest(template = MachineTestSupport.EMPTY)
-    public static void insertedGearIdentifies(GameTestHelper helper) {
+    public static void onlyPlayerInstallIdentifies(GameTestHelper helper) {
         MelterBlockEntity melter = MachineTestSupport.place(helper, MACHINE, ModBlocks.MELTER.get(), MelterBlockEntity.class);
         ItemStackHandler gear = melter.getGearInventory();
         ItemStack heatCores = unidentified(new ItemStack(ModItems.heatCore(HeatCoreMaterial.TITANIUM).get()), 2);
 
-        gear.insertItem(MelterBlockEntity.SLOT_HEAT_CORE, heatCores, true);
-        check(gear.getStackInSlot(MelterBlockEntity.SLOT_HEAT_CORE).isEmpty(), "A simulated insert should install nothing");
-        check(CraftedTraitOutputs.isUnidentified(heatCores), "A simulated insert should not identify the offered stack");
-
         ItemStack rest = gear.insertItem(MelterBlockEntity.SLOT_HEAT_CORE, heatCores, false);
-        ItemStack installed = gear.getStackInSlot(MelterBlockEntity.SLOT_HEAT_CORE);
-        check(installed.getCount() == 1 && identified(installed), "The installed Heat Core should be identified");
+        ItemStack inserted = gear.getStackInSlot(MelterBlockEntity.SLOT_HEAT_CORE);
+        check(inserted.getCount() == 1 && CraftedTraitOutputs.isUnidentified(inserted),
+                "A Heat Core inserted by automation should stay unidentified");
         check(rest.getCount() == 1 && CraftedTraitOutputs.isUnidentified(rest), "The Heat Core left over should stay unidentified");
+
+        gear.setStackInSlot(MelterBlockEntity.SLOT_HEAT_CORE, ItemStack.EMPTY);
+        gear.setStackInSlot(MelterBlockEntity.SLOT_HEAT_CORE, inserted);
+        ItemStack installed = gear.getStackInSlot(MelterBlockEntity.SLOT_HEAT_CORE);
+        check(identified(installed), "A Heat Core a player puts in the slot should be identified");
 
         MachineTraits rolled = installed.get(ModDataComponents.MACHINE_TRAITS.get());
         gear.setStackInSlot(MelterBlockEntity.SLOT_HEAT_CORE, ItemStack.EMPTY);
@@ -104,6 +113,28 @@ public final class IdentifyOnInstallGameTests {
         check(identified(assembly.head()), "The stored Tool Head should be identified");
         check(identified(assembly.rod()), "The stored Tool Rod should be identified");
         check(identified(assembly.batteryCell()), "The stored Battery Cell should be identified");
+        helper.succeed();
+    }
+
+    /** A machine placed without a player, as a dispenser or block placer would, is refused while it is unidentified. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void automatedPlacementRefusesUnidentified(GameTestHelper helper) {
+        ItemStack chassis = unidentified(new ItemStack(ModBlocks.crusherChassis(CrusherChassisMaterial.IRON).get()), 1);
+        BlockPos target = helper.absolutePos(MACHINE);
+        // Clicking the empty target space places the chassis there, as a click on a replaceable block does.
+        BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(target), Direction.UP, target, false);
+
+        InteractionResult automated = ((BlockItem) chassis.getItem()).place(
+                new BlockPlaceContext(helper.getLevel(), null, InteractionHand.MAIN_HAND, chassis, hit));
+        check(automated == InteractionResult.FAIL, "Placing without a player should be refused, got " + automated);
+        check(helper.getLevel().getBlockState(target).isAir(), "Nothing should be placed without a player");
+        check(chassis.getCount() == 1 && CraftedTraitOutputs.isUnidentified(chassis), "The refused chassis should stay unidentified");
+
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        InteractionResult placed = ((BlockItem) chassis.getItem()).place(
+                new BlockPlaceContext(helper.getLevel(), player, InteractionHand.MAIN_HAND, chassis, hit));
+        check(placed.consumesAction(), "A player should place the chassis, got " + placed);
+        check(helper.getLevel().getBlockEntity(target) instanceof CrusherBlockEntity, "The player should place a Crusher");
         helper.succeed();
     }
 

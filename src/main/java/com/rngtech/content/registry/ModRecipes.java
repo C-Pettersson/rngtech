@@ -15,6 +15,7 @@ import com.rngtech.content.recipe.ComponentRecyclingRecipe;
 import com.rngtech.content.recipe.CorrosionCellRecipe;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.DesiccantAbsorptionRecipe;
+import com.rngtech.content.recipe.FluidFuelRecipe;
 import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.recipe.GasCombustionRecipe;
 import com.rngtech.content.recipe.GasReformingRecipe;
@@ -111,6 +112,10 @@ public final class ModRecipes {
             RECIPE_SERIALIZERS.register("gas_combustion", GasCombustionRecipe.Serializer::new);
     public static final DeferredHolder<RecipeType<?>, RecipeType<GasCombustionRecipe>> GAS_COMBUSTION_TYPE =
             RECIPE_TYPES.register("gas_combustion", () -> RecipeType.simple(RNGTech.id("gas_combustion")));
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<FluidFuelRecipe>> FLUID_FUEL_SERIALIZER =
+            RECIPE_SERIALIZERS.register("fluid_fuel", FluidFuelRecipe.Serializer::new);
+    public static final DeferredHolder<RecipeType<?>, RecipeType<FluidFuelRecipe>> FLUID_FUEL_TYPE =
+            RECIPE_TYPES.register("fluid_fuel", () -> RecipeType.simple(RNGTech.id("fluid_fuel")));
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<GasReformingRecipe>> GAS_REFORMING_SERIALIZER =
             RECIPE_SERIALIZERS.register("gas_reforming", GasReformingRecipe.Serializer::new);
     public static final DeferredHolder<RecipeType<?>, RecipeType<GasReformingRecipe>> GAS_REFORMING_TYPE =

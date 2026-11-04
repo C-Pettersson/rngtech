@@ -13,6 +13,7 @@ import com.rngtech.content.recipe.ComponentRecyclingRecipe;
 import com.rngtech.content.recipe.CorrosionCellRecipe;
 import com.rngtech.content.recipe.CrusherRecipe;
 import com.rngtech.content.recipe.DesiccantAbsorptionRecipe;
+import com.rngtech.content.recipe.FluidFuelRecipe;
 import com.rngtech.content.recipe.FurnaceRecipe;
 import com.rngtech.content.recipe.GasCombustionRecipe;
 import com.rngtech.content.recipe.GasReformingRecipe;
@@ -35,6 +36,8 @@ final class JeiRecipeTypes {
             RecipeType.create(RNGTech.MOD_ID, "affix_forge", AffixForgeJeiRecipe.class);
     static final RecipeType<SolidFuelBurnerJeiFuel> SOLID_FUEL_BURNING =
             RecipeType.create(RNGTech.MOD_ID, "solid_fuel_burning", SolidFuelBurnerJeiFuel.class);
+    static final RecipeType<RecipeHolder<FluidFuelRecipe>> FLUID_FUEL =
+            RecipeType.createRecipeHolderType(RNGTech.id("fluid_fuel"));
     static final RecipeType<BioGeneratorJeiFuel> BIO_GENERATOR =
             RecipeType.create(RNGTech.MOD_ID, "bio_generator", BioGeneratorJeiFuel.class);
     static final RecipeType<WoodenComposterJeiRecipe> WOODEN_COMPOSTER =

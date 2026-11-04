@@ -5,6 +5,7 @@ import com.rngtech.content.block.BaseMachineBlock;
 import com.rngtech.content.blockentity.SolidFuelBurnerBlockEntity;
 import com.rngtech.content.blockentity.SolidFuelBurnerVisualState;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.SolidFuelBurnerStoke;
 
@@ -23,10 +24,14 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import org.joml.Vector3f;
 
@@ -34,8 +39,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Draws the working parts of a Solid Fuel Burner: the installed Heat Core fins and Fuel Box hopper in their materials,
- * the fuel in each hopper bin, the fuel bed and flames in the firebox with firelight on the brick, the ash-pit draught
+ * Draws the working parts of a Fuel Burner: the installed Heat Core fins and fuel part in their materials, the fuel in
+ * each hopper bin or the level in a tank's sight glass, the fuel bed and flames in the firebox with firelight on the brick, the ash-pit draught
  * shutters set by stoke, and the Battery Cell charge meter. The flames stand taller at a higher FE/t, from a stronger
  * Heat Core or a higher stoke. Positions are in model pixels and match tools/blockmodels/solid_fuel_burner.py.
  */
@@ -43,12 +48,22 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
     private static final Map<String, ModelResourceLocation> HEAT_CORE_MODELS = new HashMap<>();
     private static final Map<String, ModelResourceLocation> FUEL_BOX_MODELS = new HashMap<>();
     private static final Map<String, ModelResourceLocation> DIVIDER_MODELS = new HashMap<>();
+    private static final Map<String, ModelResourceLocation> FUEL_TANK_MODELS = new HashMap<>();
     private static final ResourceLocation FUEL = RNGTech.id("block/solid_fuel_burner/fx/fuel");
     private static final ResourceLocation EMBERS = RNGTech.id("block/solid_fuel_burner/fx/embers");
     private static final ResourceLocation LED = RNGTech.id("block/solid_fuel_burner/fx/led");
     private static final ResourceLocation SHUTTER = RNGTech.id("block/solid_fuel_burner/grille");
     private static final ResourceLocation FLAME = RNGTech.id("textures/block/solid_fuel_burner/fx/flame.png");
     private static final ResourceLocation GLOW = RNGTech.id("textures/block/solid_fuel_burner/fx/glow.png");
+    private static final ResourceLocation GAS_FLAME = RNGTech.id("textures/block/solid_fuel_burner/fx/gas_flame.png");
+    private static final ResourceLocation GAS_GLOW = RNGTech.id("textures/block/solid_fuel_burner/fx/gas_glow.png");
+    private static final String GAS_JET = FuelTankMaterial.GAS_JET.getSerializedName();
+    // Sight glass on the west face of a Fuel Tank or Gas Jet.
+    private static final float GLASS_X = 0.5F;
+    private static final float GLASS_Z0 = 4.5F;
+    private static final float GLASS_Z1 = 6.0F;
+    private static final float GLASS_Y0 = 6.5F;
+    private static final float GLASS_Y1 = 11.0F;
     // Hopper bins inside the Fuel Box walls.
     private static final float BIN_X0 = 0.875F;
     private static final float BIN_X1 = 2.625F;
@@ -102,6 +117,9 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
             FUEL_BOX_MODELS.put(material.getSerializedName(), part("fuel_box_" + material.getSerializedName()));
             DIVIDER_MODELS.put(material.getSerializedName(), part("fuel_box_divider_" + material.getSerializedName()));
         }
+        for (FuelTankMaterial material : FuelTankMaterial.values()) {
+            FUEL_TANK_MODELS.put(material.getSerializedName(), part("fuel_tank_" + material.getSerializedName()));
+        }
     }
 
     private final ModelBlockRenderer modelRenderer;
@@ -114,6 +132,7 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
         HEAT_CORE_MODELS.values().forEach(event::register);
         FUEL_BOX_MODELS.values().forEach(event::register);
         DIVIDER_MODELS.values().forEach(event::register);
+        FUEL_TANK_MODELS.values().forEach(event::register);
     }
 
     private static ModelResourceLocation part(String name) {
@@ -148,13 +167,16 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
         if (state.bins() > 1) {
             renderPart(poseStack, cutout, DIVIDER_MODELS.get(state.fuelBox()), packedLight, packedOverlay);
         }
+        renderPart(poseStack, cutout, FUEL_TANK_MODELS.get(state.fuelTank()), packedLight, packedOverlay);
 
         poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
         PoseStack.Pose pose = poseStack.last();
         if (FUEL_BOX_MODELS.containsKey(state.fuelBox())) {
             renderFuel(cutout, pose, state, packedLight, packedOverlay);
         }
-        if (state.burn() > 0.001F) {
+        boolean gas = GAS_JET.equals(state.fuelTank());
+        renderSightGlass(cutout, pose, state, packedLight, packedOverlay);
+        if (state.burn() > 0.001F && !gas) {
             renderBed(cutout, pose, state, animation, time, packedOverlay);
         }
         if (state.charge() >= 0.0F) {
@@ -162,8 +184,8 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
         }
         renderDraught(cutout, pose, state.stoke(), packedLight, packedOverlay);
         if (animation.fire > 0.01F) {
-            renderFirelight(bufferSource.getBuffer(RenderType.eyes(GLOW)), pose, animation, time, packedOverlay);
-            renderFlames(bufferSource.getBuffer(RenderType.eyes(FLAME)), pose, state, animation, time, packedOverlay);
+            renderFirelight(bufferSource.getBuffer(RenderType.eyes(gas ? GAS_GLOW : GLOW)), pose, animation, time, packedOverlay);
+            renderFlames(bufferSource.getBuffer(RenderType.eyes(gas ? GAS_FLAME : FLAME)), pose, state, animation, time, packedOverlay);
         }
         poseStack.popPose();
     }
@@ -202,6 +224,30 @@ public class SolidFuelBurnerRenderer implements BlockEntityRenderer<SolidFuelBur
                     new float[] {BIN_X1, y1, z1, sprite.getU1(), sprite.getV1()},
                     new float[] {BIN_X0, y1, z1, sprite.getU0(), sprite.getV1()});
         }
+    }
+
+    /** The level in a tank's sight glass, in the fluid's own colour. Lava lights itself. */
+    private static void renderSightGlass(VertexConsumer consumer, PoseStack.Pose pose, SolidFuelBurnerVisualState state, int light, int overlay) {
+        float fill = Mth.clamp(state.tankFill(), 0.0F, 1.0F);
+        ResourceLocation id = ResourceLocation.tryParse(state.tankFluid());
+        if (fill <= 0.001F || id == null) {
+            return;
+        }
+        Fluid fluid = BuiltInRegistries.FLUID.get(id);
+        if (fluid == Fluids.EMPTY) {
+            return;
+        }
+        IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(fluid);
+        TextureAtlasSprite sprite = sprite(extensions.getStillTexture());
+        float y1 = GLASS_Y0 + (GLASS_Y1 - GLASS_Y0) * fill;
+        float v1 = sprite.getV0() + (sprite.getV1() - sprite.getV0()) * fill;
+        int shown = fluid.getFluidType().getLightLevel() > 0 ? LightTexture.FULL_BRIGHT : light;
+        float x = GLASS_X - SURFACE;
+        quad(consumer, pose, new Vector3f(-1.0F, 0.0F, 0.0F), extensions.getTintColor() & 0xFFFFFF, 255, shown, overlay,
+                new float[] {x, GLASS_Y0, GLASS_Z0, sprite.getU0(), v1},
+                new float[] {x, GLASS_Y0, GLASS_Z1, sprite.getU1(), v1},
+                new float[] {x, y1, GLASS_Z1, sprite.getU1(), sprite.getV0()},
+                new float[] {x, y1, GLASS_Z0, sprite.getU0(), sprite.getV0()});
     }
 
     /** The fuel item on the grate: glowing while it burns, dull and banked while a Fuel Governor holds it. */

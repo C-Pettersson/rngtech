@@ -1,5 +1,6 @@
 package com.rngtech.rpg;
 
+import com.rngtech.content.block.AffixSorterBlock;
 import com.rngtech.content.block.AlloyFurnaceBlock;
 import com.rngtech.content.block.AmmoniaFuelCellBlock;
 import com.rngtech.content.block.AmmoniaSynthesizerBlock;
@@ -13,6 +14,7 @@ import com.rngtech.content.block.CorrosionCellBlock;
 import com.rngtech.content.block.CrusherBlock;
 import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.block.GasChemistryBlock;
+import com.rngtech.content.block.IdentifierBlock;
 import com.rngtech.content.block.MelterBlock;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.block.PhaseCoilBlock;
@@ -68,6 +70,12 @@ public final class MachineBaseStatCatalog {
     public static final int CAVITATION_GENERATOR_ENERGY_TRANSFER = 160;
     public static final int METAL_PRESS_ENERGY_CAPACITY = 1000;
     public static final int METAL_PRESS_ENERGY_TRANSFER = 128;
+    public static final int IDENTIFIER_ENERGY_CAPACITY = 32_000;
+    public static final int IDENTIFIER_ENERGY_TRANSFER = 1_000;
+    public static final int IDENTIFIER_FLUID_CAPACITY = 8_000;
+    /** Holds one item's FE at a full 20-rule list, so a long list waits for power instead of stalling mid-item. */
+    public static final int AFFIX_SORTER_ENERGY_CAPACITY = 400_000;
+    public static final int AFFIX_SORTER_ENERGY_TRANSFER = 4_000;
     public static final int MELTER_ENERGY_CAPACITY = 2400;
     public static final int MELTER_ENERGY_TRANSFER = 160;
     public static final int MELTER_FLUID_TRANSFER = 0;
@@ -141,6 +149,8 @@ public final class MachineBaseStatCatalog {
                 case ALLOY_FURNACE -> alloyFurnace(AlloyFurnaceChassisMaterial.BRONZE);
                 case METAL_PRESS -> metalPress();
                 case MELTER -> melter();
+                case IDENTIFIER -> identifier();
+                case AFFIX_SORTER -> affixSorter();
                 case BATTERY_ASSEMBLER -> batteryAssembler();
                 case COAL_GASIFIER -> coalGasifier();
                 case SYNGAS_COMBUSTOR -> syngasCombustor();
@@ -212,6 +222,12 @@ public final class MachineBaseStatCatalog {
         }
         if (block instanceof MelterBlock) {
             return melter();
+        }
+        if (block instanceof IdentifierBlock) {
+            return identifier();
+        }
+        if (block instanceof AffixSorterBlock) {
+            return affixSorter();
         }
         if (block instanceof BatteryAssemblerBlock) {
             return batteryAssembler();
@@ -321,6 +337,14 @@ public final class MachineBaseStatCatalog {
         return MachineStatAccumulator.metalPressBase(METAL_PRESS_ENERGY_CAPACITY, METAL_PRESS_ENERGY_TRANSFER);
     }
 
+    public static MachineStatAccumulator identifier() {
+        return MachineStatAccumulator.identifierBase(IDENTIFIER_ENERGY_CAPACITY, IDENTIFIER_ENERGY_TRANSFER, IDENTIFIER_FLUID_CAPACITY);
+    }
+
+    public static MachineStatAccumulator affixSorter() {
+        return MachineStatAccumulator.affixSorterBase(AFFIX_SORTER_ENERGY_CAPACITY, AFFIX_SORTER_ENERGY_TRANSFER);
+    }
+
     public static MachineStatAccumulator melter() {
         return MachineStatAccumulator.melterBase(MELTER_ENERGY_CAPACITY, MELTER_ENERGY_TRANSFER, MELTER_FLUID_TRANSFER);
     }
@@ -371,11 +395,12 @@ public final class MachineBaseStatCatalog {
         );
     }
 
+    /** The Cavitation Generator reads Output Amount for its Water saving and Nitrogen yield, so it shares the Bonus Output cap. */
     public static MachineStatAccumulator cavitationGenerator() {
         return MachineStatAccumulator.fluidHeatGeneratorBase(
                 CAVITATION_GENERATOR_ENERGY_CAPACITY,
                 CAVITATION_GENERATOR_ENERGY_TRANSFER
-        );
+        ).withOutputCap();
     }
 
     public static MachineStatAccumulator compressorTank(CompressorTankMaterial material) {
@@ -535,6 +560,19 @@ public final class MachineBaseStatCatalog {
                         MachineStat.ENERGY_USAGE,
                         MachineStat.HEAT_TRANSFER,
                         MachineStat.FLUID_TRANSFER
+                );
+                case IDENTIFIER -> List.of(
+                        MachineStat.ENERGY_CAPACITY,
+                        MachineStat.PROCESSING_SPEED,
+                        MachineStat.ENERGY_USAGE,
+                        MachineStat.FLUID_USAGE,
+                        MachineStat.FLUID_CAPACITY
+                );
+                case AFFIX_SORTER -> List.of(
+                        MachineStat.ENERGY_CAPACITY,
+                        MachineStat.PROCESSING_SPEED,
+                        MachineStat.ENERGY_USAGE,
+                        MachineStat.RULE_CAPACITY
                 );
                 case BATTERY_ASSEMBLER -> List.of(
                         MachineStat.ENERGY_CAPACITY,

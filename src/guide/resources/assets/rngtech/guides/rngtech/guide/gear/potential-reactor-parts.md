@@ -2,7 +2,7 @@
 navigation:
   title: "Potential Reactor parts"
   parent: gear.md
-  position: 6
+  position: 7
   icon: rngtech:iron_heat_core
 ---
 

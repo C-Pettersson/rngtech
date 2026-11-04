@@ -32,7 +32,8 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
         MORE,
         FIXED,
         CEILING,
-        SOFT_CAP,
+        /** The most the increased bucket pays: another stat's final value, such as Maximum Bonus Output. */
+        INCREASED_CAP,
         FLOOR,
         BONUS_MORE,
         /** The increased and reduced bucket is converted into another stat and no longer scales this one. */
@@ -114,7 +115,7 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
         return MachineStatAccumulator.floored(ordinary(), floor(), bonusMore());
     }
 
-    /** What the increased bucket multiplies by, after any soft cap or dividing reductions. */
+    /** What the increased bucket multiplies by, after any cap or dividing reductions. */
     public double increasedScale() {
         if (dividesReductions()) {
             return MachineStatAccumulator.dividedScale(increasesPercent(), reductionsPercent());
@@ -122,11 +123,11 @@ public record StatBreakdown(MachineStat stat, List<Term> terms, double finalValu
         return Math.max(0.0, 1.0 + paidIncreasedPercent() / 100.0);
     }
 
-    /** The increased bucket after this stat's soft cap, or the bucket itself when it has none. */
+    /** The increased bucket after this stat's cap, or the bucket itself when it has none. */
     public double paidIncreasedPercent() {
         double increased = terms(Kind.CONVERTED).isEmpty() ? increasedPercent() : 0.0;
-        Term cap = lowest(Kind.SOFT_CAP);
-        return cap == null ? increased : MachineStatAccumulator.softCapped(increased, cap.value());
+        Term cap = lowest(Kind.INCREASED_CAP);
+        return cap == null ? increased : MachineStatAccumulator.capped(increased, cap.value());
     }
 
     public boolean dividesReductions() {

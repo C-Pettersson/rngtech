@@ -33,7 +33,10 @@ To identify an item, put it **alone** in a crafting grid and take the result. Th
 
 - **Placing** an unidentified machine rolls its traits as it goes down.
 - **Installing** an unidentified part rolls its traits as it goes into its slot. This applies to [Gear](gear.md) in a machine or companion, to Battery Cells in a [Battery Chassis](battery-chassis.md) or a socket, and to the head, rod, and cell you build into a tool at the [Tool Bench](tool-bench.md).
+- An [Identifier](identifier.md) identifies items for FE and Identifying Fluid.
 - Battery Cells made in a [Component Assembler](component-assembler.md) come out already identified.
+
+Placing and installing identify an item only when you do it yourself. A part that a cable or hopper inserts stays unidentified. A dispenser or a block placer from another mod cannot place an unidentified machine. Automation identifies items only through an Identifier.
 
 An item you put in a machine to process stays unidentified. For example, a part in a [Component Recycler](component-recycler.md) input slot does not roll.
 
@@ -82,7 +85,7 @@ An item can only roll affixes that its machine actually uses, so a Solar Panel n
 Rolled affixes sit on top of the item's own identity, which never changes:
 
 - **Base stats** come from the item's material and stage. A Titanium Heat Core is always hotter than an Iron one.
-- **Fixed traits** are built-in behaviors listed under Behaviors in the tooltip. For example, the Bronze Furnace speeds up alloy blends, and Copper, Bronze, and Steel Fuel Boxes have [Fuel Governor](#fuel-governor).
+- **Fixed traits** are built-in behaviors listed under Behaviors in the tooltip. For example, the Bronze Furnace speeds up alloy blends, and Copper, Bronze, and Steel Fuel Boxes, Fuel Tanks, and the Gas Jet have [Fuel Governor](#fuel-governor).
 
 Base stats and fixed traits do not use affix slots, and refinement can never remove them.
 
@@ -111,7 +114,7 @@ Most affixes have a **tier** from 1 to 7. The tier sets the range, and the affix
 | 6 | 80–100% |
 | 7 | 110–140% |
 
-Crusher yield affixes use smaller tables, because they all feed the Crusher's [Output Amount](crusher.md#output-amount) total, which already has diminishing returns.
+Crusher yield affixes use smaller tables, because they all feed the Crusher's [Output Amount](crusher.md#output-amount) total, which stops at Maximum Bonus Output. The Cavitation Generator and its Gear roll Bonus Output on the Jaws table below, without the speed penalty.
 
 - **Crusher Jaws** and **Crush Head Pulverizing** (prefixes) give the most Bonus Output, but also roll reduced Processing Speed. The speed penalty rolls on its own, wider range, so a light penalty is a lucky roll.
 - The **Output Amount** suffix on Crushers and Crush Heads is small and has no penalty. It can sit beside Jaws or Pulverizing.
@@ -159,7 +162,7 @@ Machine affixes, together with [Machine Mastery](machine-mastery.md) passives, a
 
 Machines with [Machine Mastery](machine-mastery.md) and the Gear they take can roll **+Control** (of Command), **+Drive** (of Impetus), and **+Reserve** (of Reserves). Each is a flat number of points, from 3–5 at Tier 1 to 36–45 at Tier 7. Unlike other part affixes, these points count for the whole machine, and they feed the attribute bonuses and attribute scaling exactly like points from the tree. Each attribute is its own group, so one item can roll both +Control and +Drive but never two +Drive.
 
-They roll on the Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, and Forestry Companion, and on Crush Heads, Heat Cores, Servos, Fluid Pumps, Alloy Crucibles, Resonance Coils, Control Boards, and Stabilizer Matrices. A part that sits in a machine without Mastery, such as a Heat Core in a Solid Fuel Burner, gets nothing from them.
+They roll on the Crusher, Furnace, Alloy Furnace, Metal Press, Melter, Resonance Calibrator, and Forestry Companion, and on Crush Heads, Heat Cores, Servos, Fluid Pumps, Alloy Crucibles, Resonance Coils, Control Boards, and Stabilizer Matrices. A part that sits in a machine without Mastery, such as a Heat Core in a Fuel Burner, gets nothing from them.
 
 The same machines and parts can roll **Studious** (of Study): increased Mastery XP gain, from 5–8% at Tier 1 to 33–45% at Tier 5. It also counts for the whole machine, and Studious rolls on the machine and its Gear add together. The machine levels faster. It gets no extra passive points.
 
@@ -181,7 +184,7 @@ A Battery Chassis prefix, shown as **Balanced**. The chassis fills and drains al
 
 ### Fuel Governor
 
-A fixed trait of the Copper, Bronze, and Steel Fuel Boxes in a [Solid Fuel Burner](solid-fuel-burner.md). While the burner's storage is full, it pauses the fuel burn instead of wasting it, and keeps exporting stored FE. It is not a rolled affix.
+A fixed trait of the Copper, Bronze, and Steel Fuel Boxes, the Fuel Tanks, and the Gas Jet in a [Fuel Burner](fuel-burner.md). While the burner's storage is full, it pauses the fuel burn instead of wasting it, and keeps exporting stored FE. It is not a rolled affix.
 
 ### Power Grace
 
@@ -195,6 +198,7 @@ These affixes roll only on the machine block, never on Gear. They have no downsi
 |---|---|
 | Glow (of Glow) | The machine gives light at level 4, 7, 10, or 13. The light comes on when the FE buffer is at least 10% full. It goes off when the buffer falls below 5%. Each change stays for at least 5 seconds, so the light does not flash between crafts. A fuel Furnace has no buffer, so it lights when it is hot. The light stops mob spawns like a torch. A dark machine has no power. Fluid Tanks cannot roll Glow. |
 | Discreet | The machine sound is 25% to 85% quieter. The machine also makes fewer particles. Machines with [Machine Mastery](machine-mastery.md) cannot roll it. Use the Silent Operation keystone on those machines. |
+| Bedazzling (of Bedazzling) | The machine body gets 1 jewel socket at Tier 1 to 3, 2 at Tier 4 to 6, and 3 at Tier 7. Every machine with a screen can roll it. See [Jewels](jewels.md). |
 | Telemetry (of Telemetry) | A Redstone Comparator reads one gauge instead of the work state. The tooltip names the gauge: FE buffer, craft progress, output slots, or temperature. An empty gauge gives 0 and a full gauge gives 15. The comparator updates within one second. A machine only rolls the gauges it has. |
 
 ### Other named affixes

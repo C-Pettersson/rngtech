@@ -1,0 +1,18 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:exotic_rule_core"
+    },
+    "minimum_processing_level": 8,
+    "processing_ticks": 200,
+    "energy": 3600,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:ultimate_electric_circuit",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

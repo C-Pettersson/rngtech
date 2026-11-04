@@ -13,6 +13,7 @@ navigation:
 | 0 | <ItemLink id="rngtech:furnace" /> | Burns standard furnace fuel. Slow, and reaches 800 heat. |
 | 1 | <ItemLink id="rngtech:iron_furnace_chassis" /> | First electric Furnace. |
 | 2 | <ItemLink id="rngtech:copper_furnace_chassis" /> | Better early heat throughput and energy use. |
+| 3 | <ItemLink id="rngtech:gold_furnace_chassis" /> | Copper numbers with one built-in [jewel socket](rngtech:jewels.md#body-sockets). |
 | 3 | <ItemLink id="rngtech:bronze_furnace_chassis" /> | Smelts Bronze Blend and Steel Blend faster. |
 | 4 | <ItemLink id="rngtech:steel_furnace_chassis" /> | More efficient midgame chassis. |
 | 4 | <ItemLink id="rngtech:lead_furnace_chassis" /> | Four smelting lanes sharing one Heat Core, at half the base speed. |

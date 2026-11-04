@@ -37,7 +37,7 @@ Glow, Discreet, and Telemetry from this tier have shipped.
 | Field | Value |
 |---|---|
 | Slot and group | Prefix, `ambient_warmth` |
-| Rolls on | Furnace, electric Furnace, Alloy Furnace, Metal Press, Melter, Coal Gasifier, Steam Methane Reformer, Solid Fuel Burner, Syngas Combustor |
+| Rolls on | Furnace, electric Furnace, Alloy Furnace, Metal Press, Melter, Coal Gasifier, Steam Methane Reformer, Fuel Burner, Syngas Combustor |
 | Tiers | Radius 2, 3, 5, 7 |
 | Weight | `60` |
 | Hook | New. A throttled server check every 40 ticks removes snow layers and powder snow in the cube and resets freeze ticks on players inside it. Never touches ice, so it cannot flood a base. |

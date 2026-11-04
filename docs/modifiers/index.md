@@ -77,7 +77,7 @@ Named behavioral modifiers are documented as pages once they become concrete des
 | Catalyst Saver | Deferred | Eligibility matrix only |
 | Energy category modifiers | Implemented | See code-backed stat modifiers above |
 | Fuel Governor | Implemented fixed behavior; never rolled | [Fuel Governor](https://c-pettersson.github.io/rngtech/rarity-and-affixes/#fuel-governor) |
-| Fuel Reserve | Implemented fixed behavior; never rolled | [Solid Fuel Burner](https://c-pettersson.github.io/rngtech/solid-fuel-burner/#gear) |
+| Fuel Reserve | Implemented fixed behavior; never rolled | [Fuel Burner](https://c-pettersson.github.io/rngtech/fuel-burner/#gear) |
 | Graceful Progress | Planned | Eligibility matrix only |
 | Input Filter | Planned | Eligibility matrix only |
 | Input Pairing | Planned | Eligibility matrix only |

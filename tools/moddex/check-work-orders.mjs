@@ -31,6 +31,9 @@ const REWARD_ITEMS = new Set([
     "rngtech:volatile_catalyst",
     "rngtech:ascension_matrix",
     "rngtech:mirror_catalyst",
+    "rngtech:control_jewel",
+    "rngtech:drive_jewel",
+    "rngtech:reserve_jewel",
 ]);
 
 // The Work Order families whose machines have a Gear slot for each Unique host. Battery Cells power every machine, so they
@@ -39,8 +42,8 @@ const HOST_FAMILIES = {
     crush_head: ["crusher", "melter"],
     heat_core: ["alloy_furnace", "furnace", "melter", "metal_press"],
     alloy_crucible: ["alloy_furnace"],
-    servo: ["alloy_furnace", "melter", "metal_press"],
-    fluid_pump: ["forestry", "melter"],
+    servo: ["alloy_furnace", "identifier", "melter", "metal_press"],
+    fluid_pump: ["forestry", "identifier", "melter"],
     control_board: ["resonance_calibrator"],
     disassembly_head: ["component_recycler"],
     battery_cell: [],

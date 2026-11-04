@@ -72,7 +72,7 @@ Hover a slot to see its name, fluid amount, tag, role, or requirement. A yellow 
 - Every edge is checked: the `from` machine's recipe types must output the resource, and the `to` machine's recipe types must take it. A failed check is a build warning, so `mkdocs build --strict` fails and the diagram cannot drift from the recipes.
 - Labels show the amount per run and the rate at base speed, from the recipe's amounts and `processing_ticks`. When a machine has several matching recipes, the one that matches most of that machine's other edges in the chain wins. A fourth element `{"from": recipe, "to": recipe}` pins either side to one recipe id.
 
-`MACHINES` in `tools/rngwiki/chains.py` maps each machine to its recipe types. It also lists what a machine's code handles without recipe JSON: fuel tags (Solid Fuel Burner, Bio Generator, Wooden Composter), inputs (Electrolyte Solution in the Corrosion Cell), and outputs (water from the Wooden Dehumidifier, Composted Biomass). Add a machine there before using it in a chain, and update it when a machine's code starts taking or making something new.
+`MACHINES` in `tools/rngwiki/chains.py` maps each machine to its recipe types. It also lists what a machine's code handles without recipe JSON: fuel tags (Fuel Burner, Bio Generator, Wooden Composter), inputs (Electrolyte Solution in the Corrosion Cell), and outputs (water from the Wooden Dehumidifier, Composted Biomass). Add a machine there before using it in a chain, and update it when a machine's code starts taking or making something new.
 
 The chain model in `chains.py` (nodes, edges, checked flows, and the layered layout) holds no HTML, so another exporter can draw the same chains.
 

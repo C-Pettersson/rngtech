@@ -43,5 +43,6 @@ Jobs by machine:
 | [Forestry Companion](rngtech:forestry-cart-station.md) | Logs. Crops. Logs cut with a cutting head of a stage. |
 | [Component Assembler](rngtech:component-assembler.md) | Any assemblies. Battery Cells of a stage. Named outputs. |
 | [Component Recycler](rngtech:component-recycler.md) | Any parts. Parts of a stage. |
+| [Identifier](rngtech:identifier.md) | Any identified items. |
 
 These do not take chips: generators, the [Battery Chassis](rngtech:battery-chassis.md), the [Miner's Companion](rngtech:miners-companion.md), and the Crude Component Recycler.

@@ -161,7 +161,7 @@ public final class WorkOrderConditionChecks {
     private static void handFeeding() {
         WorkOrderConditions.Condition feeding = WorkOrderConditions.get(WorkOrderConditions.HAND_FEEDING);
         require(feeding.families().equals(Set.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter", "resonance_calibrator",
-                "component_assembler", "component_recycler")), "of Hand Feeding rolls on every machine with Instant Process: " + feeding.families());
+                "component_assembler", "component_recycler", "identifier")), "of Hand Feeding rolls on every machine with Instant Process: " + feeding.families());
         require(!feeding.families().contains("forestry"), "the Forestry Companion has no Instant Process to stop");
         require(!WorkOrderConditions.get(WorkOrderConditions.COLD_START).families().contains("melter"), "the Melter takes no Cold Start");
         MachineTraits traits = new MachineTraits(Rarity.MAGIC, 0, List.of(feeding.definition().roll(1, RandomSource.create(4L))), List.of());

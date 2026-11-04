@@ -1,0 +1,53 @@
+{
+    "family": "melter",
+    "type": "melt",
+    "filter": "item",
+    "weight": 1,
+    "parts": {
+        "min": 1,
+        "max": 1
+    },
+    "options": [
+        {
+            "item": "minecraft:lava",
+            "stage": 1
+        }
+    ],
+    "tiers": [
+        {
+            "count": {
+                "min": 4000,
+                "max": 6000,
+                "step": 500
+            }
+        },
+        {
+            "count": {
+                "min": 5000,
+                "max": 7500,
+                "step": 500
+            }
+        },
+        {
+            "count": {
+                "min": 6000,
+                "max": 9000,
+                "step": 500
+            }
+        },
+        {
+            "count": {
+                "min": 7000,
+                "max": 10500,
+                "step": 500
+            }
+        },
+        {
+            "count": {
+                "min": 8000,
+                "max": 12000,
+                "step": 500
+            }
+        }
+    ]
+}

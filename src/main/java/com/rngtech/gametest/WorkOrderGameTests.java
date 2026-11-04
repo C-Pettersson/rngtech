@@ -11,6 +11,7 @@ import com.rngtech.content.blockentity.BatteryAssemblerBlockEntity;
 import com.rngtech.content.blockentity.ComponentRecyclerBlockEntity;
 import com.rngtech.content.blockentity.CrusherBlockEntity;
 import com.rngtech.content.blockentity.FurnaceBlockEntity;
+import com.rngtech.content.blockentity.IdentifierBlockEntity;
 import com.rngtech.content.blockentity.MelterBlockEntity;
 import com.rngtech.content.blockentity.MetalPressBlockEntity;
 import com.rngtech.content.blockentity.ResonanceCalibratorBlockEntity;
@@ -24,6 +25,7 @@ import com.rngtech.content.machine.CrushHeadMaterial;
 import com.rngtech.content.machine.CrusherChassisMaterial;
 import com.rngtech.content.machine.FurnaceChassisMaterial;
 import com.rngtech.content.menu.CrusherMenu;
+import com.rngtech.content.menu.DriveBaySlot;
 import com.rngtech.content.menu.MasteryMenuSupport;
 import com.rngtech.content.menu.WorkOrderMenuSupport;
 import com.rngtech.content.recipe.CrusherRecipe;
@@ -485,7 +487,7 @@ public final class WorkOrderGameTests {
         List<Block> blocks = List.of(ModBlocks.crusherChassis(CrusherChassisMaterial.STEEL).get(), ModBlocks.furnaceChassis(FurnaceChassisMaterial.LEAD).get(),
                 ModBlocks.alloyFurnaceChassis(AlloyFurnaceChassisMaterial.TITANIUM).get(), ModBlocks.CRUDE_METAL_PRESS.get(), ModBlocks.MELTER.get(),
                 ModBlocks.resonanceCalibrator(ResonanceCalibratorChassis.IRON).get(), ModBlocks.BATTERY_ASSEMBLER.get(),
-                ModBlocks.componentRecycler(ComponentRecyclerChassis.IRON).get());
+                ModBlocks.componentRecycler(ComponentRecyclerChassis.IRON).get(), ModBlocks.IDENTIFIER.get());
         MachineTraits instant = new MachineTraits(Rarity.MAGIC, 0, List.of(new MachineModifier(ModifierSlot.PREFIX, MachineStat.INSTANT_PROCESS_CHANCE,
                 ModifierOperation.ADD, 25)));
         MachineTraits feeding = new MachineTraits(Rarity.MAGIC, 0, List.of(WorkOrderConditions.get(WorkOrderConditions.HAND_FEEDING).definition()
@@ -520,6 +522,7 @@ public final class WorkOrderGameTests {
             case ResonanceCalibratorBlockEntity calibrator -> calibrator.effectiveStats();
             case BatteryAssemblerBlockEntity assembler -> assembler.effectiveStats();
             case ComponentRecyclerBlockEntity recycler -> recycler.effectiveStats();
+            case IdentifierBlockEntity identifier -> identifier.effectiveStats();
             default -> throw new IllegalArgumentException("No Work Order machine: " + machine);
         };
         return stats.value(MachineStat.INSTANT_PROCESS_CHANCE);
@@ -535,7 +538,7 @@ public final class WorkOrderGameTests {
         MinecraftServer server = helper.getLevel().getServer();
         RegistryOps<JsonElement> ops = server.registryAccess().createSerializationContext(JsonOps.INSTANCE);
         List<String> families = List.of("crusher", "furnace", "alloy_furnace", "metal_press", "melter", "resonance_calibrator", "forestry",
-                "component_assembler", "component_recycler");
+                "component_assembler", "component_recycler", "identifier");
         Set<Integer> bands = new HashSet<>();
         for (JsonElement element : entries(helper, "loot_table/challenges/work_order.json")) {
             JsonObject entry = element.getAsJsonObject();
@@ -574,8 +577,8 @@ public final class WorkOrderGameTests {
                 "rngtech:fortress_heater_element", heat,
                 "rngtech:igloo_basement_thermostat", heat,
                 "rngtech:crying_crucible", Set.of("alloy_furnace"),
-                "rngtech:trial_vault_escapement", Set.of("alloy_furnace", "metal_press", "melter"),
-                "rngtech:witch_bottle_reflux_pump", Set.of("melter", "forestry"),
+                "rngtech:trial_vault_escapement", Set.of("alloy_furnace", "metal_press", "melter", "identifier"),
+                "rngtech:witch_bottle_reflux_pump", Set.of("melter", "forestry", "identifier"),
                 "rngtech:ancient_echo_control_board", Set.of("resonance_calibrator"),
                 "rngtech:trial_vault_tempered_pawl", Set.of("component_recycler"))),
                 "A Unique is favoured on machines its part does not fit: " + favoured);
@@ -635,9 +638,14 @@ public final class WorkOrderGameTests {
         return menu;
     }
 
-    /** The menu index of drive bay {@code bay}; the bays are the menu's last slots. */
+    /** The menu index of drive bay {@code bay}: the bays follow the player inventory, ahead of the jewel slots. */
     private static int bay(CrusherMenu menu, int bay) {
-        return menu.slots.size() - MachineWorkOrders.SLOTS + bay;
+        for (int index = 0; index < menu.slots.size(); index++) {
+            if (menu.getSlot(index) instanceof DriveBaySlot) {
+                return index + bay;
+            }
+        }
+        throw new IllegalStateException("The Crusher menu has no drive bays");
     }
 
     /** Shift-clicks the player's inventory slot {@code slot} and returns whether it went into a bay. */
@@ -653,7 +661,7 @@ public final class WorkOrderGameTests {
     }
 
     private static long loadedBays(CrusherMenu menu) {
-        return menu.slots.subList(bay(menu, 0), menu.slots.size()).stream().filter(Slot::hasItem).count();
+        return menu.slots.subList(bay(menu, 0), bay(menu, 0) + MachineWorkOrders.SLOTS).stream().filter(Slot::hasItem).count();
     }
 
     /** The loaded orders as the Orders tab reads them from the menu's synced data. */

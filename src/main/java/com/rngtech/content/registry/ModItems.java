@@ -1,6 +1,7 @@
 package com.rngtech.content.registry;
 
 import com.rngtech.RNGTech;
+import com.rngtech.content.affixsorter.RuleCoreMaterial;
 import com.rngtech.content.block.MetalPressBlock;
 import com.rngtech.content.cable.EnergyConnectorTier;
 import com.rngtech.content.cable.FluidConnectorTier;
@@ -16,6 +17,7 @@ import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.ReactorChamberMaterial;
 import com.rngtech.content.energy.RecoveryFilterMaterial;
@@ -57,6 +59,7 @@ import com.rngtech.content.item.FurnaceChassisBlockItem;
 import com.rngtech.content.item.GasChemistryPartItem;
 import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.item.ItemConnectorItem;
+import com.rngtech.content.item.JewelItem;
 import com.rngtech.content.item.JobChipItem;
 import com.rngtech.content.item.MachineBlockItem;
 import com.rngtech.content.item.MachineChassisItem;
@@ -75,6 +78,8 @@ import com.rngtech.content.item.RefinementLensItem;
 import com.rngtech.content.item.RefinementModifierItem;
 import com.rngtech.content.item.RequisitionItem;
 import com.rngtech.content.item.ResonanceCalibratorBlockItem;
+import com.rngtech.content.item.RuleCardItem;
+import com.rngtech.content.item.RuleCoreItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolarArrayControllerBlockItem;
 import com.rngtech.content.item.SolarArrayExtenderItem;
@@ -115,6 +120,7 @@ import com.rngtech.rpg.MachinePartType;
 import com.rngtech.rpg.MachineType;
 import com.rngtech.rpg.ModifierLensTag;
 import com.rngtech.rpg.PhaseArrayRules;
+import com.rngtech.rpg.jewel.JewelColour;
 import com.rngtech.rpg.refinement.RefinementModifier;
 import com.rngtech.rpg.refinement.RefinementOperation;
 import com.rngtech.rpg.unique.UniqueCatalog;
@@ -368,6 +374,32 @@ public final class ModItems {
                 }
             }
     );
+    public static final DeferredItem<MachineBlockItem> IDENTIFIER = ITEMS.register(
+            "identifier",
+            () -> new MachineBlockItem(ModBlocks.IDENTIFIER.get(), MachineType.IDENTIFIER, new Item.Properties().stacksTo(1)) {
+                @Override
+                protected int componentStage() {
+                    return 8;
+                }
+            }
+    );
+    public static final DeferredItem<MachineBlockItem> AFFIX_SORTER = ITEMS.register(
+            "affix_sorter",
+            () -> new MachineBlockItem(ModBlocks.AFFIX_SORTER.get(), MachineType.AFFIX_SORTER, new Item.Properties().stacksTo(1)) {
+                @Override
+                protected int componentStage() {
+                    return 8;
+                }
+            }
+    );
+    public static final DeferredItem<RuleCoreItem> EXOTIC_RULE_CORE = ITEMS.register(
+            RuleCoreMaterial.EXOTIC.itemId(),
+            () -> new RuleCoreItem(RuleCoreMaterial.EXOTIC, new Item.Properties().stacksTo(1))
+    );
+    public static final DeferredItem<RuleCardItem> RULE_CARD = ITEMS.register(
+            "rule_card",
+            () -> new RuleCardItem(new Item.Properties().stacksTo(1))
+    );
     public static final DeferredItem<MachineBlockItem> MELTER = ITEMS.register(
             "melter",
             () -> new MachineBlockItem(ModBlocks.MELTER.get(), MachineType.MELTER, new Item.Properties().stacksTo(1)) {
@@ -486,6 +518,13 @@ public final class ModItems {
             "ender_slurry_bucket",
             () -> new BucketItem(
                     ModFluids.ENDER_SLURRY_SOURCE.get(),
+                    new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)
+            )
+    );
+    public static final DeferredItem<BucketItem> IDENTIFYING_FLUID_BUCKET = ITEMS.register(
+            "identifying_fluid_bucket",
+            () -> new BucketItem(
+                    ModFluids.IDENTIFYING_FLUID_SOURCE.get(),
                     new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)
             )
     );
@@ -705,6 +744,7 @@ public final class ModItems {
     public static final Map<HeatCoreMaterial, DeferredItem<SolidFuelBurnerPartItem>> HEAT_CORES =
             registerHeatCores();
     public static final Map<FuelBoxMaterial, DeferredItem<SolidFuelBurnerPartItem>> FUEL_BOXES = registerFuelBoxes();
+    public static final Map<FuelTankMaterial, DeferredItem<SolidFuelBurnerPartItem>> FUEL_TANKS = registerFuelTanks();
     public static final Map<ReactorChamberMaterial, DeferredItem<PotentialReactorPartItem>> REACTOR_CHAMBERS =
             registerReactorChambers();
     public static final Map<RecoveryFilterMaterial, DeferredItem<PotentialReactorPartItem>> RECOVERY_FILTERS =
@@ -748,6 +788,9 @@ public final class ModItems {
             "cavitation_rotor_hub",
             () -> new CalibratedComponentItem(CalibrationFamily.KINETIC, new Item.Properties())
     );
+    /** The uncut stone a Resonance Calibrator cuts into a jewel of the catalyst's colour. */
+    public static final DeferredItem<Item> JEWEL_BLANK = ITEMS.register("jewel_blank", () -> new Item(new Item.Properties()));
+    public static final Map<JewelColour, DeferredItem<JewelItem>> JEWELS = registerJewels();
 
     public static final Map<CrushHeadMaterial, DeferredItem<CrushHeadItem>> CRUSH_HEADS = registerCrushHeads();
     public static final DeferredItem<CrushHeadItem> FLINT_CRUSH_HEAD = crushHead(CrushHeadMaterial.FLINT);
@@ -1086,6 +1129,14 @@ public final class ModItems {
         return item;
     }
 
+    public static DeferredItem<SolidFuelBurnerPartItem> fuelTank(FuelTankMaterial material) {
+        DeferredItem<SolidFuelBurnerPartItem> item = FUEL_TANKS.get(material);
+        if (item == null) {
+            throw new IllegalArgumentException("Unknown fuel tank material: " + material);
+        }
+        return item;
+    }
+
     public static DeferredItem<PotentialReactorPartItem> reactorChamber(ReactorChamberMaterial material) {
         DeferredItem<PotentialReactorPartItem> item = REACTOR_CHAMBERS.get(material);
         if (item == null) {
@@ -1353,6 +1404,18 @@ public final class ModItems {
         return Collections.unmodifiableMap(families);
     }
 
+    private static Map<JewelColour, DeferredItem<JewelItem>> registerJewels() {
+        Map<JewelColour, DeferredItem<JewelItem>> items = new EnumMap<>(JewelColour.class);
+        for (JewelColour colour : JewelColour.values()) {
+            items.put(colour, ITEMS.register(colour.itemId(), () -> new JewelItem(colour, new Item.Properties().stacksTo(1))));
+        }
+        return Collections.unmodifiableMap(items);
+    }
+
+    public static DeferredItem<JewelItem> jewel(JewelColour colour) {
+        return JEWELS.get(colour);
+    }
+
     private static Map<ToolRodMaterial, DeferredItem<ToolRodItem>> registerToolRods() {
         Map<ToolRodMaterial, DeferredItem<ToolRodItem>> items = new EnumMap<>(ToolRodMaterial.class);
         for (ToolRodMaterial material : ToolRodMaterial.values()) {
@@ -1596,6 +1659,18 @@ public final class ModItems {
     private static Map<FuelBoxMaterial, DeferredItem<SolidFuelBurnerPartItem>> registerFuelBoxes() {
         Map<FuelBoxMaterial, DeferredItem<SolidFuelBurnerPartItem>> items = new EnumMap<>(FuelBoxMaterial.class);
         for (FuelBoxMaterial material : FuelBoxMaterial.values()) {
+            DeferredItem<SolidFuelBurnerPartItem> item = ITEMS.register(
+                    material.itemId(),
+                    () -> new SolidFuelBurnerPartItem(material, new Item.Properties().stacksTo(1))
+            );
+            items.put(material, item);
+        }
+        return Collections.unmodifiableMap(items);
+    }
+
+    private static Map<FuelTankMaterial, DeferredItem<SolidFuelBurnerPartItem>> registerFuelTanks() {
+        Map<FuelTankMaterial, DeferredItem<SolidFuelBurnerPartItem>> items = new EnumMap<>(FuelTankMaterial.class);
+        for (FuelTankMaterial material : FuelTankMaterial.values()) {
             DeferredItem<SolidFuelBurnerPartItem> item = ITEMS.register(
                     material.itemId(),
                     () -> new SolidFuelBurnerPartItem(material, new Item.Properties().stacksTo(1))

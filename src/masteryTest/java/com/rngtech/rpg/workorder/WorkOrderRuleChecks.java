@@ -4,6 +4,7 @@ import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.rpg.CorruptionOutcome;
 import com.rngtech.rpg.MachineCorruption;
 import com.rngtech.rpg.MachineStat;
+import com.rngtech.rpg.MachineStatAccumulator;
 import com.rngtech.rpg.MachineTraits;
 import com.rngtech.rpg.ProcessingBalanceSimulation;
 import com.rngtech.rpg.Rarity;
@@ -392,6 +393,10 @@ public final class WorkOrderRuleChecks {
             for (int tier = WorkOrder.MIN_TIER; tier <= WorkOrder.MAX_TIER; tier++) {
                 int stage = WorkOrderFamilies.stageCap(entry.family(), tier);
                 double top = entry.goal(tier).max() / (double) WorkPart.STAT_SCALE;
+                if (stat == MachineStat.OUTPUT_AMOUNT) {
+                    require(top <= 1.0 + MachineStatAccumulator.MAX_OUTPUT_AMOUNT_CEILING / 100.0 + 1e-9,
+                            entry.id() + " Tier " + tier + "'s top target " + top + " stays under the Bonus Output ceiling");
+                }
                 double best = simulation.bestStat(family, stage, stat, REFERENCE_LEVEL);
                 require(top <= best + 1e-9, entry.id() + " Tier " + tier + "'s top target " + top + " is reachable on a Stage " + stage
                         + " reference build, which reaches " + Math.round(best * 100) / 100.0);
@@ -476,7 +481,8 @@ public final class WorkOrderRuleChecks {
                 new WorkObjective(id("melt"), new WorkPart(WorkObjectiveType.MELT, WorkFilter.ANY, 0, "", 5000)), 6, 0, 100, 0))).withActive(0);
         require(WorkOrderRules.progress(melt, new WorkReport(WorkObjectiveType.MELT, 6, 0, "rngtech:lubricant", 1000).withTicks(300))
                 .orders().activeOrder().progress().getFirst() == 1000, "the Melter counts mB, not recipe time");
-        for (String family : List.of("crusher", "furnace", "alloy_furnace", "metal_press", "resonance_calibrator", "component_assembler", "component_recycler")) {
+        for (String family : List.of("crusher", "furnace", "alloy_furnace", "metal_press", "resonance_calibrator", "component_assembler", "component_recycler",
+                "identifier")) {
             require(WorkOrderFamilies.workTicks(family) > 0, family + " counts work");
             for (int tier = WorkOrder.MIN_TIER; tier < WorkOrder.MAX_TIER; tier++) {
                 require(WorkOrderFamilies.jobSpeed(family, tier) > 0 && WorkOrderFamilies.jobSpeed(family, tier) <= WorkOrderFamilies.jobSpeed(family, tier + 1),
@@ -580,7 +586,7 @@ public final class WorkOrderRuleChecks {
                     .anyMatch(file -> read(file).getAsJsonObject("fluid_output").get("id").getAsString().equals(item));
             case CALIBRATE -> jsonFiles(recipes).stream().filter(file -> file.getFileName().toString().startsWith("calibration_"))
                     .anyMatch(file -> read(file).getAsJsonObject("result").getAsJsonObject("stack").get("id").getAsString().equals(item));
-            case HARVEST, RECYCLE -> false;
+            case HARVEST, RECYCLE, IDENTIFY -> false;
         };
     }
 

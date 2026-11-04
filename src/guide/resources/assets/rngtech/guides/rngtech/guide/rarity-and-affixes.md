@@ -57,7 +57,7 @@ A Battery Chassis prefix, shown as **Balanced**. The chassis fills and drains al
 
 ### Fuel Governor
 
-A fixed trait of the Copper, Bronze, and Steel Fuel Boxes in a [Solid Fuel Burner](rngtech:solid-fuel-burner.md). While the burner's storage is full, it pauses the fuel burn instead of wasting it, and keeps exporting stored FE. It is not a rolled affix.
+A fixed trait of the Copper, Bronze, and Steel Fuel Boxes, the Fuel Tanks, and the Gas Jet in a [Fuel Burner](rngtech:fuel-burner.md). While the burner's storage is full, it pauses the fuel burn instead of wasting it, and keeps exporting stored FE. It is not a rolled affix.
 
 ### Power Grace
 

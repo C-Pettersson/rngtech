@@ -49,7 +49,7 @@ Universal Cable is cheap, with 12 per craft, and carries power, fluids, and item
 ## More to build
 
 - Ore processing, alloying, metal forming, recycling, calibration, and fluid and gas chemistry.
-- Nine generators, from the Solid Fuel Burner to the Potential Reactor, plus rolled Battery Cells and the Battery Chassis.
+- Nine generators, from the Fuel Burner to the Potential Reactor, plus rolled Battery Cells and the Battery Chassis.
 - Modular field tools built from a rolled head and rod, including 3×3 hammers and treefellers.
 - A Miner's Companion that deletes cobblestone and other junk as you mine, pulls in drops, and lights the area around you.
 - A Forestry Companion cart that plants and harvests trees along a rail line.

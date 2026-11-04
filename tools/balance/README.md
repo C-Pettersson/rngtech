@@ -21,7 +21,7 @@ A full run at the defaults (1,000 fresh crafts and 500 crafts per other behavior
 
 `energy-scenarios.json` holds what-if scenarios. `current` must stay empty: it is the game as coded. Add another scenario to preview a change before editing the game. Supported keys:
 
-- `solid_fuel_fe_per_burn_tick`: FE per effective burn tick for Solid Fuel Burner fuel.
+- `solid_fuel_fe_per_burn_tick`: FE per effective burn tick for Fuel Burner fuel.
 - `recipe_energy`: recipe energy overrides keyed `<recipe folder>/<recipe id>`, e.g. `gas_combustion/syngas_power`.
 - `solar`: `extender_range_bonus`, `extender_generation`, `controller_flat_once`, `max_range`, `panel_clear_generation`.
 - `corrosion_recipes`: a full replacement Corrosion Cell recipe list with chain costs.
@@ -40,6 +40,8 @@ The task writes `build/energy-balance/energy-balance.json`. For each scenario an
 - `ladder`: the best unrolled sustained setup per stage, and how often a craft of it beats the next stage's best unrolled setup.
 
 Each scenario also has `gearFuel`: FE per item when crafted gear is burned in a Potential Reactor.
+
+`fuel_burner_lava` and `fuel_burner_methane` setups are one rolled Fuel Burner with a Fuel Tank or Gas Jet. FE per input is FE per 1,000 mB. Their `lineNetFet` metric is one Melter on unrolled Titanium Gear feeding burners like this one, and `burnersPerMelter` is how many it takes. The FE/t comes only from the Heat Core, so the fuel value and the fuel multipliers are what these rows test.
 
 `bio_generator_take_off` setups are one rolled Bio Generator exporting Methane instead of burning it (Energy Generation only digests faster there, so Methane per item depends on the fuel alone), by separation (bare pump or a membrane at stability 62 or 100), water-gas shift, Bio Chamber, and retention. FE/t is what the Reformer, Ammonia Synthesizer, and Fuel Cell make from that Methane at base stats, and net also pays those machines. Metrics give Methane per tick and per Rich Biomass, Bio Generators per Fuel Cell, Rich Biomass per minute per Fuel Cell, and the net as a multiple of burning the same gas in place. These setups feed a generator rather than being one, so they stay out of the `ladder`.
 

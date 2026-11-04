@@ -1,5 +1,6 @@
 package com.rngtech.rpg;
 
+import com.rngtech.content.affixsorter.RuleCoreMaterial;
 import com.rngtech.content.calibration.CalibrationGearMaterial;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.CathodeMaterial;
@@ -7,6 +8,7 @@ import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.ReactorChamberMaterial;
 import com.rngtech.content.energy.RecoveryFilterMaterial;
@@ -26,6 +28,7 @@ import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.GasChemistryPartItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.PotentialReactorPartItem;
+import com.rngtech.content.item.RuleCoreItem;
 import com.rngtech.content.item.ServoItem;
 import com.rngtech.content.item.SolarArrayExtenderItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
@@ -451,9 +454,11 @@ public final class ComponentBaseStatCatalog {
             return alloyCrucible(crucible.material());
         }
         if (item instanceof SolidFuelBurnerPartItem part) {
-            return part.partType() == MachinePartType.HEAT_CORE
-                    ? heatCore(part.heatCoreMaterial())
-                    : fuelBox(part.fuelBoxMaterial());
+            return switch (part.partType()) {
+                case HEAT_CORE -> heatCore(part.heatCoreMaterial());
+                case FUEL_TANK -> fuelTank(part.fuelTankMaterial());
+                default -> fuelBox(part.fuelBoxMaterial());
+            };
         }
         if (item instanceof PotentialReactorPartItem part) {
             return switch (part.partType()) {
@@ -477,6 +482,9 @@ public final class ComponentBaseStatCatalog {
         }
         if (item instanceof DisassemblyHeadItem head) {
             return disassemblyHead(head.material());
+        }
+        if (item instanceof RuleCoreItem core) {
+            return ruleCore(core.material());
         }
         if (item instanceof ServoItem servo) {
             return servo(servo.material());
@@ -591,6 +599,15 @@ public final class ComponentBaseStatCatalog {
                 .build();
     }
 
+    static Profile fuelTank(FuelTankMaterial material) {
+        return builder()
+                .add(MachineStat.FLUID_CAPACITY, material.capacity())
+                .more(MachineStat.FUEL_EFFICIENCY, material.fuelEfficiency())
+                .more(MachineStat.FUEL_DURATION, 1.0)
+                .more(MachineStat.STABILITY, material.stability())
+                .build();
+    }
+
     static Profile reactorChamber(ReactorChamberMaterial material) {
         return builder()
                 .add(MachineStat.PROCESSING_LEVEL, material.stage())
@@ -672,6 +689,14 @@ public final class ComponentBaseStatCatalog {
                 .add(MachineStat.PROCESSING_LEVEL, material.stage())
                 .more(MachineStat.PROCESSING_SPEED, material.processingSpeed())
                 .more(MachineStat.STABILITY, material.stability())
+                .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
+                .build();
+    }
+
+    static Profile ruleCore(RuleCoreMaterial material) {
+        return builder()
+                .add(MachineStat.RULE_CAPACITY, material.ruleCapacity())
+                .more(MachineStat.PROCESSING_SPEED, material.processingSpeed())
                 .add(MachineStat.INSTANT_PROCESS_CHANCE, 0.0)
                 .build();
     }
