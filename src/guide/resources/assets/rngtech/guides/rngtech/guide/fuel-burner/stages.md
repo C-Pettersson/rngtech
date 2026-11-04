@@ -1,8 +1,8 @@
 ---
 navigation:
   title: "Stages"
-  parent: solid-fuel-burner.md
-  position: 3
+  parent: fuel-burner.md
+  position: 4
   icon: rngtech:crude_solid_fuel_burner
 ---
 

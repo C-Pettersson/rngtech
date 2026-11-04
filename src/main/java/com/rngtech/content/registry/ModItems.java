@@ -17,6 +17,7 @@ import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.ReactorChamberMaterial;
 import com.rngtech.content.energy.RecoveryFilterMaterial;
@@ -743,6 +744,7 @@ public final class ModItems {
     public static final Map<HeatCoreMaterial, DeferredItem<SolidFuelBurnerPartItem>> HEAT_CORES =
             registerHeatCores();
     public static final Map<FuelBoxMaterial, DeferredItem<SolidFuelBurnerPartItem>> FUEL_BOXES = registerFuelBoxes();
+    public static final Map<FuelTankMaterial, DeferredItem<SolidFuelBurnerPartItem>> FUEL_TANKS = registerFuelTanks();
     public static final Map<ReactorChamberMaterial, DeferredItem<PotentialReactorPartItem>> REACTOR_CHAMBERS =
             registerReactorChambers();
     public static final Map<RecoveryFilterMaterial, DeferredItem<PotentialReactorPartItem>> RECOVERY_FILTERS =
@@ -1123,6 +1125,14 @@ public final class ModItems {
         DeferredItem<SolidFuelBurnerPartItem> item = FUEL_BOXES.get(material);
         if (item == null) {
             throw new IllegalArgumentException("Unknown fuel box material: " + material);
+        }
+        return item;
+    }
+
+    public static DeferredItem<SolidFuelBurnerPartItem> fuelTank(FuelTankMaterial material) {
+        DeferredItem<SolidFuelBurnerPartItem> item = FUEL_TANKS.get(material);
+        if (item == null) {
+            throw new IllegalArgumentException("Unknown fuel tank material: " + material);
         }
         return item;
     }
@@ -1649,6 +1659,18 @@ public final class ModItems {
     private static Map<FuelBoxMaterial, DeferredItem<SolidFuelBurnerPartItem>> registerFuelBoxes() {
         Map<FuelBoxMaterial, DeferredItem<SolidFuelBurnerPartItem>> items = new EnumMap<>(FuelBoxMaterial.class);
         for (FuelBoxMaterial material : FuelBoxMaterial.values()) {
+            DeferredItem<SolidFuelBurnerPartItem> item = ITEMS.register(
+                    material.itemId(),
+                    () -> new SolidFuelBurnerPartItem(material, new Item.Properties().stacksTo(1))
+            );
+            items.put(material, item);
+        }
+        return Collections.unmodifiableMap(items);
+    }
+
+    private static Map<FuelTankMaterial, DeferredItem<SolidFuelBurnerPartItem>> registerFuelTanks() {
+        Map<FuelTankMaterial, DeferredItem<SolidFuelBurnerPartItem>> items = new EnumMap<>(FuelTankMaterial.class);
+        for (FuelTankMaterial material : FuelTankMaterial.values()) {
             DeferredItem<SolidFuelBurnerPartItem> item = ITEMS.register(
                     material.itemId(),
                     () -> new SolidFuelBurnerPartItem(material, new Item.Properties().stacksTo(1))

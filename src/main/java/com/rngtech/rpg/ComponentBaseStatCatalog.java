@@ -8,6 +8,7 @@ import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.ReactorChamberMaterial;
 import com.rngtech.content.energy.RecoveryFilterMaterial;
@@ -453,9 +454,11 @@ public final class ComponentBaseStatCatalog {
             return alloyCrucible(crucible.material());
         }
         if (item instanceof SolidFuelBurnerPartItem part) {
-            return part.partType() == MachinePartType.HEAT_CORE
-                    ? heatCore(part.heatCoreMaterial())
-                    : fuelBox(part.fuelBoxMaterial());
+            return switch (part.partType()) {
+                case HEAT_CORE -> heatCore(part.heatCoreMaterial());
+                case FUEL_TANK -> fuelTank(part.fuelTankMaterial());
+                default -> fuelBox(part.fuelBoxMaterial());
+            };
         }
         if (item instanceof PotentialReactorPartItem part) {
             return switch (part.partType()) {
@@ -590,6 +593,15 @@ public final class ComponentBaseStatCatalog {
     static Profile fuelBox(FuelBoxMaterial material) {
         return builder()
                 .add(MachineStat.INPUT_SLOTS, material.fuelSlots())
+                .more(MachineStat.FUEL_EFFICIENCY, material.fuelEfficiency())
+                .more(MachineStat.FUEL_DURATION, 1.0)
+                .more(MachineStat.STABILITY, material.stability())
+                .build();
+    }
+
+    static Profile fuelTank(FuelTankMaterial material) {
+        return builder()
+                .add(MachineStat.FLUID_CAPACITY, material.capacity())
                 .more(MachineStat.FUEL_EFFICIENCY, material.fuelEfficiency())
                 .more(MachineStat.FUEL_DURATION, 1.0)
                 .more(MachineStat.STABILITY, material.stability())

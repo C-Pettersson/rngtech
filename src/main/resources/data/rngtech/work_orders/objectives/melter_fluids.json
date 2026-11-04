@@ -9,10 +9,6 @@
     },
     "options": [
         {
-            "item": "minecraft:lava",
-            "stage": 1
-        },
-        {
             "item": "rngtech:lubricant",
             "stage": 1
         },

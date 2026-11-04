@@ -3,7 +3,7 @@
 # At 2.0, a Syngas Combustor makes about 480 FE/t and a Fuel Cell about 1,200 FE/t, near the Techopolis Bio
 # Generator's 640 to 1,280 FE/t at Elite Technium. A Vacuum Collapse Generator makes about 2,100 FE/t, near the
 # Techopolis Nuclear Reactor's 2,500 FE/t on Uranium at Ultimate Technium. Fuel burns for the same time, so FE
-# per item doubles too. Stages 1-4 stay at 1.0: the Solid Fuel Burner's 24-96 FE/t already sits beside Actually
+# per item doubles too. Stages 1-4 stay at 1.0: the Fuel Burner's 24-96 FE/t already sits beside Actually
 # Additions' 40-120 FE/t Oil Generator.
 
 [energy]

@@ -1,6 +1,6 @@
 ---
 navigation:
-  title: "Solid Fuel Burner"
+  title: "Fuel Burner"
   parent: power-generation.md
   icon: rngtech:crude_solid_fuel_burner
 categories:
@@ -12,7 +12,7 @@ item_ids:
   - rngtech:steel_solid_fuel_burner
 ---
 
-# Solid Fuel Burner
+# Fuel Burner
 
 <BlockImage id="rngtech:crude_solid_fuel_burner" scale="6" />
 
@@ -25,12 +25,12 @@ item_ids:
 
 - **Type:** Generator
 - **Stages:** 1–4
-- **Power:** Burns solid fuel, generates FE
-- **Gear:** <ItemLink id="rngtech:iron_heat_core" />, <ItemLink id="rngtech:iron_fuel_box" />, <ItemLink id="rngtech:iron_battery_cell" />
+- **Power:** Burns fuel, generates FE
+- **Gear:** <ItemLink id="rngtech:iron_heat_core" />, <ItemLink id="rngtech:iron_fuel_box" /> or **Fuel Tank**, <ItemLink id="rngtech:iron_battery_cell" />
 - **Mastery:** No
 - **Tool:** <ItemLink id="minecraft:wooden_pickaxe" />
 
-The **Solid Fuel Burner** is RNGTech's first real generator. It burns coal, charcoal, wood, and other furnace fuels and turns them into FE. The chassis decides which Gear you can install, and the Gear decides how fast it generates, which fuels it accepts, and how carefully it spends them. See [Power Chains](rngtech:power-chains/stage-1-4-coal.md) for where it fits and what replaces it.
+The **Fuel Burner** is RNGTech's first real generator. It burns coal, charcoal, wood, and other furnace fuels and turns them into FE. With a [Fuel Tank or Gas Jet](rngtech:fuel-burner/fluid-fuels.md), it burns lava or Methane. The chassis decides which Gear you can install, and the Gear decides how fast it generates, which fuels it accepts, and how carefully it spends them. See [Power Chains](rngtech:power-chains/stage-1-4-coal.md) for where it fits and what replaces it.
 
 Each burner you craft rolls its own [rarity and affixes](rngtech:rarity-and-affixes.md). Burners do not have Machine Mastery.
 
@@ -38,33 +38,26 @@ You can read a burner from the outside. Facing its front, the hopper on the righ
 
 ## Usage
 
-- [Generating power](rngtech:solid-fuel-burner/generating-power.md)
-- [Stoke](rngtech:solid-fuel-burner/stoke.md)
-- [Fuel](rngtech:solid-fuel-burner/fuel.md)
-- [Stages](rngtech:solid-fuel-burner/stages.md)
-- [Gear](rngtech:solid-fuel-burner/gear.md)
-
-### Automation
-
-| Side | Behavior |
-|---|---|
-| Any | Inserts fuel into the Fuel Box fuel slots. |
-| Any | Exports FE to adjacent receivers. Does not accept FE. |
-
-Heat Cores, Fuel Boxes, and Battery Cells are installed by hand. Automation cannot reach the Gear slots. The back of the burner has a port plate sized for a Universal Connector, the tidiest place to attach one.
+- [Generating power](rngtech:fuel-burner/generating-power.md)
+- [Stoke](rngtech:fuel-burner/stoke.md)
+- [Fuel](rngtech:fuel-burner/fuel.md)
+- [Fluid fuels](rngtech:fuel-burner/fluid-fuels.md)
+- [Stages](rngtech:fuel-burner/stages.md)
+- [Gear](rngtech:fuel-burner/gear.md)
+- [Automation](rngtech:fuel-burner/automation.md)
 
 ## Screen
 
 The burner screen has four tabs:
 
-- **Process**: fuel slots, burn progress, the stoke gauge, stored FE, and FE/t. Hover for exact values.
-- **Gear**: Heat Core, Fuel Box, and Battery Cell slots.
+- **Process**: fuel slots, or a tank meter and a container slot with a Fuel Tank or Gas Jet, burn progress, the stoke gauge, stored FE, and FE/t. Hover for exact values.
+- **Gear**: Heat Core, Fuel Feed, and Battery Cell slots.
 - **Stats**: the burner's current stats, including traits and installed Gear.
 - **Refinement**: refine the placed burner's traits with a catalyst.
 
 ## Obtaining
 
-- [Crafting](rngtech:solid-fuel-burner/crafting.md)
+- [Crafting](rngtech:fuel-burner/crafting.md)
 
 ### Breaking
 

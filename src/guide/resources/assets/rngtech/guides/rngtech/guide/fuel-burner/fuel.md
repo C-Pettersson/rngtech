@@ -1,7 +1,7 @@
 ---
 navigation:
   title: "Fuel"
-  parent: solid-fuel-burner.md
+  parent: fuel-burner.md
   position: 2
   icon: rngtech:crude_solid_fuel_burner
 ---
@@ -29,4 +29,4 @@ Compact block fuels, which only a Steel Fuel Box accepts:
 
 <ItemLink id="minecraft:coal_block" />, <ItemLink id="minecraft:dried_kelp_block" />
 
-With JEI installed, click the fuel line on the Process tab to open the Solid Fuel Burning category, which groups fuels by tier and form.
+With JEI installed, click the fuel line on the Process tab to open the fuel categories, which group fuels by tier and form.

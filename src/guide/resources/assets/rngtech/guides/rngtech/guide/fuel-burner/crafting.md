@@ -1,8 +1,8 @@
 ---
 navigation:
   title: "Crafting"
-  parent: solid-fuel-burner.md
-  position: 5
+  parent: fuel-burner.md
+  position: 7
   icon: rngtech:crude_solid_fuel_burner
 ---
 

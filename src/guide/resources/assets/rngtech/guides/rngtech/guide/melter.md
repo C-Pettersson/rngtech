@@ -20,7 +20,7 @@ item_ids:
 - **Mastery:** Yes
 - **Tool:** <ItemLink id="minecraft:wooden_pickaxe" />
 
-The **Melter** is a Stage 6 machine that turns two items and a fluid, usually water, into a new fluid. Its main job is making Lubricant, which later Servo and frame recipes need. It also makes Electrolyte Solution in bulk for the [Component Assembler](rngtech:component-assembler.md), methane from algae for gas chemistry, lava, and Ender Slurry for the [Vacuum Collapse Generator](rngtech:vacuum-collapse-generator.md)'s Void Catalyst.
+The **Melter** is a Stage 6 machine that turns two items and a fluid, usually water, into a new fluid. Its main job is making Lubricant, which later Servo and frame recipes need. It also makes Electrolyte Solution in bulk for the [Component Assembler](rngtech:component-assembler.md), methane from algae for gas chemistry, lava for the [Fuel Burner](rngtech:fuel-burner/fluid-fuels.md), and Ender Slurry for the [Vacuum Collapse Generator](rngtech:vacuum-collapse-generator.md)'s Void Catalyst.
 
 The Melter runs on FE and needs a Heat Core, a Crush Head, and a Fluid Pump installed. Like every RNGTech machine, each Melter you craft rolls its own [rarity and affixes](rngtech:rarity-and-affixes.md), and it can level up through [Machine Mastery](rngtech:machine-mastery.md).
 

@@ -8,7 +8,7 @@ navigation:
 
 # Recycling
 
-Put the item to recycle in the input slot. When it finishes, its returns go to the three output slots. Each recyclable item has its own fixed return list; the Recycler never reverses arbitrary crafting recipes, and no return is ever larger than what the original craft used. Common returns:
+Put the item to recycle in the input slot. A Compressor Tank, Fuel Tank, or Gas Jet that holds fluid does not fit, so empty or purge it first. When it finishes, its returns go to the three output slots. Each recyclable item has its own fixed return list; the Recycler never reverses arbitrary crafting recipes, and no return is ever larger than what the original craft used. Common returns:
 
 | Item recycled | Guaranteed return | With a Recovery Filter |
 |---|---|---|

@@ -41,7 +41,7 @@ MODELS = ASSETS / "models"
 TEXTURES = ASSETS / "textures/block"
 TEX = "rngtech:block/furnace/"
 ALLOY_TEX = "rngtech:block/alloy_furnace/"
-# Heat Cores are the same item in a Solid Fuel Burner, so they keep the Burner's fin textures.
+# Heat Cores are the same item in a Fuel Burner, so they keep the Burner's fin textures.
 CORE_TEX = "rngtech:block/solid_fuel_burner/heat_core/"
 FACES = ("north", "south", "east", "west", "up", "down")
 SIDES = ("north", "south", "east", "west")

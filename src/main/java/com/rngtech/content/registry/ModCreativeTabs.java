@@ -14,6 +14,7 @@ import com.rngtech.content.energy.CavitationRotorMaterial;
 import com.rngtech.content.energy.CollapseNozzleMaterial;
 import com.rngtech.content.energy.ContainmentLiningMaterial;
 import com.rngtech.content.energy.FuelBoxMaterial;
+import com.rngtech.content.energy.FuelTankMaterial;
 import com.rngtech.content.energy.HeatCoreMaterial;
 import com.rngtech.content.energy.ReactorChamberMaterial;
 import com.rngtech.content.energy.RecoveryFilterMaterial;
@@ -236,6 +237,9 @@ public final class ModCreativeTabs {
                         }
                         for (FuelBoxMaterial material : FuelBoxMaterial.values()) {
                             output.accept(ModItems.fuelBox(material).get());
+                        }
+                        for (FuelTankMaterial material : FuelTankMaterial.values()) {
+                            output.accept(ModItems.fuelTank(material).get());
                         }
                         for (ReactorChamberMaterial material : ReactorChamberMaterial.values()) {
                             output.accept(ModItems.reactorChamber(material).get());

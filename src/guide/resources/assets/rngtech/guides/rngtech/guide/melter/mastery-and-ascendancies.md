@@ -8,7 +8,7 @@ navigation:
 
 # Mastery and Ascendancies
 
-Each completed melt earns Melter Mastery XP, and you spend the points on the shared [Machine Mastery](rngtech:machine-mastery.md) tree. The lava recipe earns none, and nothing is earned while the Melter is missing Gear, too cold, blocked by a full tank, or out of power. Melters choose between the **Pressure Vessel** and **Twin Crucible** [ascendancies](rngtech:machine-mastery.md#ascendancies).
+Each completed melt earns Melter Mastery XP, and you spend the points on the shared [Machine Mastery](rngtech:machine-mastery.md) tree. Nothing is earned while the Melter is missing Gear, too cold, blocked by a full tank, or out of power. Melters choose between the **Pressure Vessel** and **Twin Crucible** [ascendancies](rngtech:machine-mastery.md#ascendancies).
 
 A melt whose whole output a Nullite Servo voids earns no XP. Changing your Mastery allocation restarts the current melt, but keeps items, tanks, and Gear.
 

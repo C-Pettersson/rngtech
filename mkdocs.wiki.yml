@@ -83,7 +83,7 @@ nav:
       - Corrosion Cell: corrosion-cell.md
       - Potential Reactor: potential-reactor.md
       - Solar Panel: solar-panel.md
-      - Solid Fuel Burner: solid-fuel-burner.md
+      - Fuel Burner: fuel-burner.md
       - Syngas Combustor: syngas-combustor.md
       - Vacuum Collapse Generator: vacuum-collapse-generator.md
   - Energy storage:

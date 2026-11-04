@@ -927,6 +927,9 @@ async function knownComponentStageEntries() {
     await appendEnumStages(entries, path.join(ENERGY_SRC, "FuelBoxMaterial.java"), (entry) => [
         stageEntry(`${entry.name}_fuel_box`, javaNumber(entry.args[0]), "FuelBoxMaterial")
     ]);
+    await appendEnumStages(entries, path.join(ENERGY_SRC, "FuelTankMaterial.java"), (entry) => [
+        stageEntry(entry.args[0].replaceAll('"', ""), javaNumber(entry.args[1]), "FuelTankMaterial")
+    ]);
     await appendEnumStages(entries, path.join(ENERGY_SRC, "ReactorChamberMaterial.java"), (entry) => [
         stageEntry(`${entry.name}_reactor_chamber`, javaNumber(entry.args[0]), "ReactorChamberMaterial")
     ]);
@@ -1735,6 +1738,8 @@ function stageItemCategory(id, materialItemIds) {
             || local.endsWith("_battery_cell")
             || local.endsWith("_heat_core")
             || local.endsWith("_fuel_box")
+            || local.endsWith("_fuel_tank")
+            || local === "steel_gas_jet"
             || local.endsWith("_reactor_chamber")
             || local.endsWith("_recovery_filter")
             || local.endsWith("_containment_lining")
@@ -1904,6 +1909,9 @@ function modifierProfileIdForItem(id) {
     }
     if (local.endsWith("_fuel_box")) {
         return "fuel_box";
+    }
+    if (local.endsWith("_fuel_tank") || local === "steel_gas_jet") {
+        return "fuel_tank";
     }
     if (local === "bio_chamber") {
         return "bio_chamber";

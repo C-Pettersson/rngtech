@@ -276,7 +276,7 @@
 	quest.14A8140EBDA3865E.title: "Dormant Machines"
 	quest.152F570B1A4F2B63.quest_desc: ["The &eAscension Catalyst&r makes a Magic item Rare and adds one affix. The item needs 5 RP or more. It costs 4 RP."]
 	quest.17CCC098655F7B05.quest_desc: [
-		"The &eSteel Solid Fuel Burner&r accepts Gear up to Stage 4 and has the highest stability."
+		"The &eSteel Fuel Burner&r accepts Gear up to Stage 4 and has the highest stability."
 		"Its recipe needs a &eCalibrated Thermal Component&r with 55 or more stability."
 		"A &eSteel Heat Core&r gives 96 &bFE/t&r. A &eSteel Fuel Box&r also burns block fuels, such as Blocks of Coal."
 	]
@@ -408,7 +408,7 @@
 	quest.278F57CB04C541E1.quest_subtitle: "Collect the pay."
 	quest.278F57CB04C541E1.title: "Job Done"
 	quest.2A87820D10501CE9.quest_desc: [
-		"Optional. Each Solid Fuel Burner accepts Gear up to its own stage."
+		"Optional. Each Fuel Burner accepts Gear up to its own stage."
 		"A better Heat Core gives more &bFE/t&r and burns higher fuel tiers."
 	]
 	quest.2AB169CEEBB9FA40.quest_desc: [
@@ -481,7 +481,7 @@
 	quest.3034E1FAD40A48B2.quest_subtitle: "Uniques are sidegrades that you find."
 	quest.3034E1FAD40A48B2.title: "Read: Uniques"
 	quest.321FEE7AFB102523.quest_desc: [
-		"The &eAlloy Solid Fuel Burner&r accepts Gear up to Stage 3. Its Fuel Reserve keeps the last fuel item in the slot."
+		"The &eAlloy Fuel Burner&r accepts Gear up to Stage 3. Its Fuel Reserve keeps the last fuel item in the slot."
 		"Its recipe needs a &eCalibrated Thermal Component&r with 45 or more stability."
 		"A &eBronze Heat Core&r gives 64 &bFE/t&r and loses no heat."
 	]
@@ -630,7 +630,7 @@
 		"Early machines push &bFE&r into the machines that touch them. You do not need cables yet."
 		""
 		"1. Craft a &eMachine Frame&r and an &eIron Battery Cell&r."
-		"2. Place a &eCrude Solid Fuel Burner&r."
+		"2. Place a &eCrude Fuel Burner&r."
 		"3. Place an &eIron Crusher Chassis&r next to the burner."
 		"4. Crush raw metal, then smelt the output in the &eFurnace&r."
 		""
@@ -739,11 +739,11 @@
 	quest.37A6C9E1284B5D1B.quest_subtitle: "Heat, steady power, and the first failures."
 	quest.37A6C9E1284B5D1B.title: "Stage 3-4: Stability"
 	quest.37A6C9E1284B5D1C.quest_desc: [
-		"The &eCrude Solid Fuel Burner&r is your first real &bFE&r source. It burns coal, charcoal, planks, and other furnace fuels."
+		"The &eCrude Fuel Burner&r is your first real &bFE&r source. It burns coal, charcoal, planks, and other furnace fuels."
 		"The burner needs all 3 Gear parts before it burns fuel. With an &eIron Heat Core&r, it makes 24 &bFE/t&r."
 		""
 		"&aBuild:&r"
-		"1. Place a &eCrude Solid Fuel Burner&r."
+		"1. Place a &eCrude Fuel Burner&r."
 		"2. Install an &eIron Heat Core&r in the Gear tab."
 		"3. Install an &eIron Fuel Box&r."
 		"4. Install the &eIron Battery Cell&r from the previous quest."
@@ -1149,12 +1149,12 @@
 		"&aUse:&r"
 		"- Burn it in the &eBio Generator&r."
 		""
-		"&7&oNote: Rich Biomass is not furnace fuel. It does not burn in a Solid Fuel Burner.&r"
+		"&7&oNote: Rich Biomass is not furnace fuel. It does not burn in a Fuel Burner.&r"
 	]
 	quest.37A6C9E1284B5D40.quest_subtitle: "Prepared biomass, higher fuel value."
 	quest.37A6C9E1284B5D40.title: "Rich Biomass"
 	quest.37A6C9E1284B5D42.quest_desc: [
-		"The &eCopper Solid Fuel Burner&r accepts Gear up to Stage 2."
+		"The &eCopper Fuel Burner&r accepts Gear up to Stage 2."
 		"A &eCopper Heat Core&r gives 40 &bFE/t&r. A &eCopper Fuel Box&r adds the Fuel Governor, which pauses the burner when the cell is full."
 	]
 	quest.37A6C9E1284B5D45.quest_desc: [
@@ -1739,7 +1739,7 @@
 	quest.5E554A3E956A8F68.quest_desc: ["Insert the &eStability Modifier Lens&r in the focus slot of the Affix Forge. It makes Stability affixes 3 times as likely."]
 	quest.5FCF4CF08C2ECD07.quest_desc: [
 		"Calibrate a &eCopper Casing&r with the &eThermal Calibration Pattern&r and Glowstone Dust."
-		"The &eBronze Furnace Chassis&r and the &eAlloy Solid Fuel Burner&r need 45 or more stability. Steel machines need 55 or more."
+		"The &eBronze Furnace Chassis&r and the &eAlloy Fuel Burner&r need 45 or more stability. Steel machines need 55 or more."
 	]
 	quest.6019B5AA53D9F0CD.quest_desc: [
 		"The &eDispatch Terminal&r lists six jobs of mixed tiers and machines."
@@ -1758,7 +1758,7 @@
 		"- Grow algae fuel in the &eAlgae Photobioreactor&r."
 		"- Dissolve metal plates in the &eCorrosion Cell&r."
 		"- Collect sunlight with &eSolar Panels&r. They need circuits."
-		"- Burn solid fuel in a better &eSolid Fuel Burner&r."
+		"- Burn solid fuel in a better &eFuel Burner&r."
 	]
 	quest.61F18F2CD460DDD9.quest_subtitle: "More ways to make power."
 	quest.61F18F2CD460DDD9.title: "Generators"
@@ -2468,7 +2468,7 @@
 		"- Install it in the Gear tab of the &eTool Bench&r."
 		""
 		"&aUse:&r"
-		"- Supply &bFE&r to any side of the bench, for example from a &eCrude Solid Fuel Burner&r next to it."
+		"- Supply &bFE&r to any side of the bench, for example from a &eCrude Fuel Burner&r next to it."
 		"- Put a tool with a Battery Cell in the Tool slot."
 		"- The &eCrude Energy Connector&r moves up to 64 &bFE/t&r."
 		"- The bench also charges a &eMiner's Companion&r in the Tool slot."

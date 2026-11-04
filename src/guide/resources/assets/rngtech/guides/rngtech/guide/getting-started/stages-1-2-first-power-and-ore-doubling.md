@@ -11,7 +11,7 @@ navigation:
 Your first factory goal is to get more than one ingot per ore. Early machines pass power to whatever they touch, so you can build this without cables.
 
 1. Craft a <ItemLink id="rngtech:machine_frame" /> and an <ItemLink id="rngtech:iron_battery_cell" />. Battery Cells go in a machine's Gear tab.
-2. Build a <ItemLink id="rngtech:crude_solid_fuel_burner" /> and install an <ItemLink id="rngtech:iron_heat_core" />, an <ItemLink id="rngtech:iron_fuel_box" />, and a Battery Cell. It burns coal, charcoal, and wood and pushes FE into neighbouring machines. See [Solid Fuel Burner](rngtech:solid-fuel-burner.md).
+2. Build a <ItemLink id="rngtech:crude_solid_fuel_burner" /> and install an <ItemLink id="rngtech:iron_heat_core" />, an <ItemLink id="rngtech:iron_fuel_box" />, and a Battery Cell. It burns coal, charcoal, and wood and pushes FE into neighbouring machines. See [Fuel Burner](rngtech:fuel-burner.md).
 3. Build an <ItemLink id="rngtech:iron_crusher_chassis" /> with an <ItemLink id="rngtech:iron_crush_head" /> and a Battery Cell, and place it next to the burner. See [Crusher](rngtech:crusher.md).
 4. Crush raw metal before you smelt it. One raw metal gives 2 crushed, and a Silk Touch ore block gives 3. Crush the crushed material again into dust for faster, cheaper smelting. See [Stages](rngtech:stages.md#from-ore-to-ingot) for the whole chain.
 5. Build the <ItemLink id="rngtech:furnace" />. It burns ordinary furnace fuel and reaches the heat that crushed ore and dust need. Electric Furnaces come later, once you can make circuits. See [Furnace](rngtech:furnace.md).

@@ -2975,6 +2975,20 @@ public final class ModifierEligibilityProfiles {
                     MachineStat.FUEL_DURATION
             )
     );
+    public static final ModifierEligibilityProfile FUEL_TANK = profile(
+            "fuel_tank",
+            Set.of(
+                    ModifierCapability.HAS_GEAR_STATS,
+                    ModifierCapability.HAS_FUEL_SLOT,
+                    ModifierCapability.HAS_FLUID_STORAGE,
+                    ModifierCapability.HAS_STABILITY
+            ),
+            affixes(
+                    MachineStat.FUEL_EFFICIENCY,
+                    MachineStat.FUEL_DURATION,
+                    MachineStat.FLUID_CAPACITY
+            )
+    );
     public static final ModifierEligibilityProfile BIO_CHAMBER = profile(
             "bio_chamber",
             Set.of(
@@ -3353,6 +3367,7 @@ public final class ModifierEligibilityProfiles {
                 HEAT_CORE,
                 SERVO,
                 FUEL_BOX,
+                FUEL_TANK,
                 BIO_CHAMBER,
                 REACTOR_CHAMBER,
                 RECOVERY_FILTER,
@@ -3469,6 +3484,7 @@ public final class ModifierEligibilityProfiles {
             case BIO_CHAMBER -> BIO_CHAMBER;
             case SERVO -> SERVO;
             case FUEL_BOX -> FUEL_BOX;
+            case FUEL_TANK -> FUEL_TANK;
             case REACTOR_CHAMBER -> REACTOR_CHAMBER;
             case RECOVERY_FILTER -> RECOVERY_FILTER;
             case CONTAINMENT_LINING -> CONTAINMENT_LINING;

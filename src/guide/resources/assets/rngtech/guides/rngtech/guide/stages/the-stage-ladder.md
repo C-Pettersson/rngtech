@@ -11,7 +11,7 @@ navigation:
 | Stage | Name | Main materials | What opens up |
 |---:|---|---|---|
 | 0 | Primitive | Wood, flint, stone | [Tool Bench](rngtech:tool-bench.md) and flint tools, the Wooden Crusher, the fuel-burning [Furnace](rngtech:furnace.md), Potato Battery Cells. |
-| 1 | Iron | Iron | The first powered machines: [Solid Fuel Burner](rngtech:solid-fuel-burner.md), Iron [Crusher](rngtech:crusher.md), Iron [Battery Chassis](rngtech:battery-chassis.md), Iron [Resonance Calibrator](rngtech:resonance-calibrator.md), [Solar Panels](rngtech:solar-panel.md). |
+| 1 | Iron | Iron | The first powered machines: [Fuel Burner](rngtech:fuel-burner.md), Iron [Crusher](rngtech:crusher.md), Iron [Battery Chassis](rngtech:battery-chassis.md), Iron [Resonance Calibrator](rngtech:resonance-calibrator.md), [Solar Panels](rngtech:solar-panel.md). |
 | 2 | Copper | Copper | Faster energy transfer and heat. Copper machine sets, the [Wooden Dehumidifier](rngtech:wooden-dehumidifier.md). |
 | 3 | Bronze | Bronze, tin, zinc, gold | The first alloy. Basic Electric Circuits, the Crude [Metal Press](rngtech:metal-press.md), the Bronze [Alloy Furnace](rngtech:alloy-furnace.md), the Gold [Crusher](rngtech:crusher/stages.md) and [Furnace](rngtech:furnace/stages.md) bodies, and the first [jewels](rngtech:jewels.md). |
 | 4 | Steel | Steel, invar, nickel, lead, silver | Stable midgame machines, the Steel Metal Press, the Lead Furnace, the [Corrosion Cell](rngtech:corrosion-cell.md). The first recoverable processing failures. |
