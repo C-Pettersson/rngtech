@@ -69,16 +69,20 @@ The Affix Forge has no item or energy automation. Everything goes through its sc
 
 - [Crafting the consumables](rngtech:affix-forge/crafting-the-consumables.md)
 
-## Screen
-
-The Affix Forge has a single screen with the target, catalyst, and focus slots, the three upgrade slots, the RP readout, the current-affix list, the outcome preview, and the Reforge button. Hover the RP readout for the exact value, and a lens preview for the matching candidates.
-
-With JEI installed, the catalysts are listed under the Affix Forging category.
-
 ## Obtaining
 
-- [Crafting](rngtech:affix-forge/crafting.md)
+### Crafting
+
+<RecipesFor id="rngtech:affix_forge" />
+
+- Requires the Copper material to be enabled.
+
+The forge does not roll rarity or affixes itself. Its recipe needs the Copper material to be enabled.
 
 ### Breaking
 
 Mine a placed Affix Forge with a pickaxe. It drops itself and everything inside it, including installed upgrades.
+
+## More
+
+- [Screen](rngtech:affix-forge/screen.md)

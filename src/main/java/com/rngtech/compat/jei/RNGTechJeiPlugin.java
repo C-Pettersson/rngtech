@@ -91,10 +91,12 @@ import com.rngtech.rpg.unique.UniqueStatReaders;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.handlers.IGuiClickableArea;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.recipe.IFocusFactory;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
+import mezz.jei.api.registration.IIngredientAliasRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -128,6 +130,13 @@ public final class RNGTechJeiPlugin implements IModPlugin {
     @Override
     public ResourceLocation getPluginUid() {
         return PLUGIN_UID;
+    }
+
+    @Override
+    public void registerIngredientAliases(IIngredientAliasRegistration registration) {
+        Map<String, List<ItemStack>> terms = JeiSearchTerms.all();
+        terms.forEach((term, stacks) -> registration.addAliases(VanillaTypes.ITEM_STACK, stacks, term));
+        JeiSearchQuery.setPhrases(terms.keySet());
     }
 
     @Override

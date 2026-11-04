@@ -21,3 +21,5 @@ navigation:
 | 8 | Exotic | Naquadah, netherite | The top machine sets, Exotic Battery Cells, the [Phase Array](rngtech:phase-array.md). |
 
 Modpacks can disable materials, change recipes, and swap the Exotic material, so check the recipe tables in your pack.
+
+With JEI installed, type `@rngtech stage 3` in the search bar to list all Stage 3 items. Change the number to see a different stage. Add a machine to narrow the list. For example, `@rngtech stage 3 gear crusher` lists Stage 3 Gear that fits a Crusher. See [Gear](rngtech:gear/the-gear-tab.md).
