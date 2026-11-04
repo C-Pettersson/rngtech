@@ -63,6 +63,7 @@ public final class MasteryChecks {
         checks += com.rngtech.rpg.workorder.WorkOrderStorageChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderRuleChecks.run();
         checks += com.rngtech.content.affixsorter.AffixSorterChecks.run();
+        checks += com.rngtech.compat.jei.JeiSearchChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderTemplateChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderConditionChecks.run();
         checks += com.rngtech.rpg.workorder.WorkOrderRefinementChecks.run();

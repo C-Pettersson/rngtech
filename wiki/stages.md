@@ -117,6 +117,8 @@ Stage is not the same as affix **tier**. Tier describes how strong one affix is;
 
 Modpacks can disable materials, change recipes, and swap the Exotic material, so check the recipe tables in your pack.
 
+With JEI installed, type `@rngtech stage 3` in the search bar to list all Stage 3 items. Change the number to see a different stage. Add a machine to narrow the list. For example, `@rngtech stage 3 gear crusher` lists Stage 3 Gear that fits a Crusher. See [Gear](gear.md#the-gear-tab).
+
 ## Materials by stage
 
 Each stage has natural metals you mine and alloys you mix. Ingots set the stage: plates, gears, rods, coils, and casings are recipe forms of the same metal and do not change its stage.

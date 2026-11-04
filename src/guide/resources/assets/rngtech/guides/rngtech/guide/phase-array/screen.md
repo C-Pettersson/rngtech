@@ -23,4 +23,4 @@ The Cradle has one screen. Its item area at the top right reads like a furnace: 
 - **The cell sockets** sit beside your inventory, nine of them. Each ring dims as its cell empties.
 - **Three lights** at the top right show blocked, waiting for input, and live.
 
-Hover anything for its exact values, and an empty slot for what goes in it. In the world, Jade on the Cradle names the chosen operation and, with no line, the first block it lacks. With JEI installed, the operations are listed under the Phase Array category.
+Hover anything for its exact values, and an empty slot for what goes in it. In the world, Jade on the Cradle names the chosen operation and, with no line, the first block it lacks. With JEI installed, the operations are listed under the Phase Array category. Type `@rngtech phase array` in the search bar to list the line's blocks and Glyphs.
