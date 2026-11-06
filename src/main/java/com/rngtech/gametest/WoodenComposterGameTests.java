@@ -12,12 +12,15 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 /** The Wooden Composter's catalyst slot: Rich Biomass at the crafting grid's ratios, with one kind of item in the output. */
 @GameTestHolder(RNGTech.MOD_ID)
@@ -101,22 +104,52 @@ public final class WoodenComposterGameTests {
         helper.succeed();
     }
 
-    /** A Composter saved before the catalyst slot loads its items and gains the slot. */
+    /** A save from before the catalyst slot, with 27 input slots: everything lands on today's slots. */
     @GameTest(template = MachineTestSupport.EMPTY)
-    public static void oldSaveGainsTheCatalystSlot(GameTestHelper helper) {
-        WoodenComposterBlockEntity composter = composter(helper, UNITS_PER_BATCH);
-        composter.getInventory().setStackInSlot(WoodenComposterBlockEntity.SLOT_OUTPUT, new ItemStack(ModItems.COMPOSTED_BIOMASS.get(), 3));
-        CompoundTag saved = composter.saveWithoutMetadata(helper.getLevel().registryAccess());
-        saved.getCompound("Inventory").putInt("Size", WoodenComposterBlockEntity.SLOT_CATALYST);
-        saved.remove("CatalystCharges");
+    public static void saveWithoutCatalystSlotMoves(GameTestHelper helper) {
+        WoodenComposterBlockEntity composter = composter(helper, 0);
+        ItemStackHandler legacy = new ItemStackHandler(30);
+        legacy.setStackInSlot(0, new ItemStack(Items.WHEAT_SEEDS, 10));
+        legacy.setStackInSlot(25, new ItemStack(Items.WHEAT_SEEDS, 5));
+        legacy.setStackInSlot(27, new ItemStack(ModItems.COMPOSTED_BIOMASS.get(), 3));
+        legacy.setStackInSlot(28, new ItemStack(Items.WATER_BUCKET));
+        legacy.setStackInSlot(29, new ItemStack(Items.BUCKET, 2));
 
-        composter.loadWithComponents(saved, helper.getLevel().registryAccess());
+        load(helper, composter, legacy);
 
-        check(composter.getInventory().getSlots() == WoodenComposterBlockEntity.SLOT_COUNT, "Expected the new slot count: " + composter.getInventory().getSlots());
-        check(output(composter).getCount() == 3, "The output should survive: " + output(composter));
-        check(composter.getInventory().getStackInSlot(0).getCount() == UNITS_PER_BATCH, "The compost should survive");
-        check(composter.getInventory().insertItem(WoodenComposterBlockEntity.SLOT_CATALYST, new ItemStack(Items.BONE_MEAL), false).isEmpty(), "The new slot should work");
+        check(composter.getInventory().getSlots() == WoodenComposterBlockEntity.SLOT_COUNT, "Expected today's slot count: " + composter.getInventory().getSlots());
+        check(composter.getInventory().getStackInSlot(0).getCount() == 15, "The stack past the new inputs should merge: " + composter.getInventory().getStackInSlot(0));
+        check(output(composter).is(ModItems.COMPOSTED_BIOMASS.get()) && output(composter).getCount() == 3, "The output should move: " + output(composter));
+        check(composter.getInventory().getStackInSlot(WoodenComposterBlockEntity.SLOT_WATER_INPUT_CONTAINER).is(Items.WATER_BUCKET), "The water bucket should move");
+        check(composter.getInventory().getStackInSlot(WoodenComposterBlockEntity.SLOT_WATER_OUTPUT_CONTAINER).getCount() == 2, "The empty buckets should move");
+        check(composter.getInventory().insertItem(WoodenComposterBlockEntity.SLOT_CATALYST, new ItemStack(Items.BONE_MEAL), false).isEmpty(), "The catalyst slot should work");
         helper.succeed();
+    }
+
+    /** A save with 27 inputs and a catalyst: the catalyst moves, and stacks with no room drop instead of vanishing. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void saveWithFullInputsDropsWhatNoLongerFits(GameTestHelper helper) {
+        WoodenComposterBlockEntity composter = composter(helper, 0);
+        ItemStackHandler legacy = new ItemStackHandler(31);
+        for (int slot = 0; slot < 27; slot++) {
+            legacy.setStackInSlot(slot, new ItemStack(Items.WHEAT_SEEDS, 64));
+        }
+        legacy.setStackInSlot(30, new ItemStack(Items.BONE_MEAL, 7));
+
+        load(helper, composter, legacy);
+
+        check(catalyst(composter).is(Items.BONE_MEAL) && catalyst(composter).getCount() == 7, "The catalyst should move: " + catalyst(composter));
+        WoodenComposterBlockEntity.serverTick(helper.getLevel(), composter.getBlockPos(), composter.getBlockState(), composter);
+        int dropped = helper.getLevel().getEntitiesOfClass(ItemEntity.class, new AABB(composter.getBlockPos()).inflate(3.0D), entity -> entity.getItem().is(Items.WHEAT_SEEDS))
+                .stream().mapToInt(entity -> entity.getItem().getCount()).sum();
+        check(dropped == 3 * 64, "Three stacks should drop, got " + dropped);
+        helper.succeed();
+    }
+
+    private static void load(GameTestHelper helper, WoodenComposterBlockEntity composter, ItemStackHandler legacy) {
+        CompoundTag saved = composter.saveWithoutMetadata(helper.getLevel().registryAccess());
+        saved.put("Inventory", legacy.serializeNBT(helper.getLevel().registryAccess()));
+        composter.loadWithComponents(saved, helper.getLevel().registryAccess());
     }
 
     private static WoodenComposterBlockEntity composter(GameTestHelper helper, int seeds) {

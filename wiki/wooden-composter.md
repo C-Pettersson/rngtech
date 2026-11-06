@@ -36,7 +36,7 @@ Mine a placed Wooden Composter with a pickaxe. It drops itself, and the items in
 
 ### Composting
 
-Put compostable items in the 27 input slots. Every 8 compost units make one Composted Biomass. Most items count as 1 unit; prepared inputs such as {{ item('rngtech:compost_feedstock') }} count as 2.
+Put compostable items in the 24 input slots. Every 8 compost units make one Composted Biomass. Most items count as 1 unit; prepared inputs such as {{ item('rngtech:compost_feedstock') }} count as 2.
 
 | Condition | Time per Composted Biomass |
 |---|---:|
@@ -58,6 +58,8 @@ Put a catalyst in the catalyst slot, next to the output slot, to make {{ item('r
 |---|---:|
 | Bone Meal, Gunpowder, or Organic Reagent | 1 |
 | [Urea](ammonia-synthesizer.md#using-urea) | 4 |
+
+A [Crusher](crusher.md) turns one Bone into 4 Bone Meal, one more than a crafting grid gives.
 
 The Composter takes the Urea when a batch finishes, and the Urea pays for that batch and the next three. If you break the Composter, it loses any batches that the Urea has not made yet. The first status square lights when the next batch makes Rich Biomass.
 
@@ -97,7 +99,7 @@ The Wooden Composter has no FE input or output.
 
 ## Screen
 
-The Wooden Composter has one working tab, **Process**. It shows the 27 input slots, the catalyst slot, the output slot, the water tank with its container slots and purge button, progress, and status squares for the next batch and the bulk and variety bonuses. Hover for exact values.
+The Wooden Composter has one working tab, **Process**. It shows the 24 input slots, the catalyst slot, the output slot, the water tank with its container slots and purge button, progress, and status squares for the next batch and the bulk and variety bonuses. Hover for exact values.
 
 ## Data values
 

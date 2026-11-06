@@ -247,6 +247,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Crushing a potato or carrot into Organic Reagent is deliberately energy-negative (`546 FE` burned minus `600 FE` crushing, against `120 FE` for the raw crop). Organic Reagent is a convenience fuel, not a power gain.
 - Crushing seeds into Compost Feedstock before composting is deliberately energy-positive, to reward the Crusher step.
 - The Wooden Composter's catalyst slot uses the crafting grid's ratios, so Rich Biomass from it costs the same as crafting it. It saves the crafting step and nothing else. Keep the two in step.
+- Crushing a Bone gives `4` Bone Meal against the grid's `3`, to pay for the Crusher's FE. It has no bonus output, and it is the only recipe that makes Bone Meal: Forestry treats growth as a free world source only while no recipe makes Bones or feeds growth from a renewable input.
 - Composted, Rich, and algae biomass are Bio Generator-only fuels. Do not tag them as vanilla furnace, Fuel Burner, or broad modded fuel.
 - Specific fuel families beat broader tags for Bio Chamber power bonuses: saplings and seeds use their own stats, not Plant Power.
 - The Bio Generator is a small biogas plant: digester, gas holder, gas engine. Its rated `20`-day retention reproduces the pre-digester burner exactly, with the same FE/t and FE per item for every fuel and stat roll. Fuel tables, JEI values, and the energy balance anchors stay at rated.

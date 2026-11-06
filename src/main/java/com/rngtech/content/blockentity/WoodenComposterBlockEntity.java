@@ -37,18 +37,21 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class WoodenComposterBlockEntity extends BlockEntity
         implements MenuProvider, PurgeableFluidStorage, MachineInfoProvider {
-    public static final int INPUT_SLOT_COUNT = 27;
-    public static final int SLOT_OUTPUT = 27;
-    public static final int SLOT_WATER_INPUT_CONTAINER = 28;
-    public static final int SLOT_WATER_OUTPUT_CONTAINER = 29;
-    public static final int SLOT_CATALYST = 30;
-    public static final int SLOT_COUNT = 31;
+    public static final int INPUT_SLOT_COUNT = 24;
+    public static final int SLOT_OUTPUT = 24;
+    public static final int SLOT_WATER_INPUT_CONTAINER = 25;
+    public static final int SLOT_WATER_OUTPUT_CONTAINER = 26;
+    public static final int SLOT_CATALYST = 27;
+    public static final int SLOT_COUNT = 28;
+    /** Composters once had 27 input slots, then the output, the two water slots, and, later, a catalyst slot. */
+    private static final int LEGACY_INPUT_SLOT_COUNT = 27;
 
     public static final int STATUS_READY = 0;
     public static final int STATUS_NO_INPUT = 1;
@@ -158,12 +161,14 @@ public class WoodenComposterBlockEntity extends BlockEntity
     private int progress;
     private boolean wateredBatch;
     private int catalystCharges;
+    private final List<ItemStack> legacyOverflow = new ArrayList<>();
 
     public WoodenComposterBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.WOODEN_COMPOSTER.get(), pos, blockState);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, WoodenComposterBlockEntity composter) {
+        composter.dropLegacyOverflow(level);
         boolean changed = composter.drainWaterInputContainer();
         changed |= composter.tickComposting();
         WoodenComposterBlock.setComposting(level, pos, state, composter.isActivelyComposting());
@@ -293,14 +298,61 @@ public class WoodenComposterBlockEntity extends BlockEntity
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        // Composters saved before the catalyst slot stored a smaller inventory; the handler takes its size from the tag.
         CompoundTag saved = tag.getCompound("Inventory");
-        saved.putInt("Size", SLOT_COUNT);
-        inventory.deserializeNBT(registries, saved);
+        if (saved.getInt("Size") > SLOT_COUNT) {
+            loadLegacyInventory(saved, registries);
+        } else {
+            inventory.deserializeNBT(registries, saved);
+        }
         waterTank.readFromNBT(registries, tag.getCompound("WaterTank"));
         progress = Math.max(0, tag.getInt("Progress"));
         wateredBatch = tag.getBoolean("WateredBatch");
         catalystCharges = Math.max(0, tag.getInt("CatalystCharges"));
+    }
+
+    /** Moves a save with more input slots onto today's slots. Stacks that no longer fit drop on the next tick. */
+    private void loadLegacyInventory(CompoundTag saved, HolderLookup.Provider registries) {
+        ItemStackHandler legacy = new ItemStackHandler();
+        legacy.deserializeNBT(registries, saved);
+        inventory.setSize(SLOT_COUNT);
+        int[] moved = {SLOT_OUTPUT, SLOT_WATER_INPUT_CONTAINER, SLOT_WATER_OUTPUT_CONTAINER, SLOT_CATALYST};
+        for (int index = 0; index < moved.length && LEGACY_INPUT_SLOT_COUNT + index < legacy.getSlots(); index++) {
+            inventory.setStackInSlot(moved[index], legacy.getStackInSlot(LEGACY_INPUT_SLOT_COUNT + index).copy());
+        }
+        for (int slot = 0; slot < INPUT_SLOT_COUNT; slot++) {
+            inventory.setStackInSlot(slot, legacy.getStackInSlot(slot).copy());
+        }
+        for (int slot = INPUT_SLOT_COUNT; slot < LEGACY_INPUT_SLOT_COUNT; slot++) {
+            ItemStack rest = legacy.getStackInSlot(slot).copy();
+            for (int target = 0; target < INPUT_SLOT_COUNT && !rest.isEmpty(); target++) {
+                rest = mergeInto(target, rest);
+            }
+            if (!rest.isEmpty()) {
+                legacyOverflow.add(rest);
+            }
+        }
+    }
+
+    private ItemStack mergeInto(int slot, ItemStack stack) {
+        ItemStack existing = inventory.getStackInSlot(slot);
+        if (existing.isEmpty()) {
+            inventory.setStackInSlot(slot, stack);
+            return ItemStack.EMPTY;
+        }
+        if (!ItemStack.isSameItemSameComponents(existing, stack)) {
+            return stack;
+        }
+        int moved = Math.min(stack.getCount(), existing.getMaxStackSize() - existing.getCount());
+        existing.grow(moved);
+        stack.shrink(moved);
+        return stack;
+    }
+
+    private void dropLegacyOverflow(Level level) {
+        for (ItemStack stack : legacyOverflow) {
+            Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), stack);
+        }
+        legacyOverflow.clear();
     }
 
     private boolean tickComposting() {

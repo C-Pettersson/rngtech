@@ -2304,6 +2304,7 @@
   "rngtech.forestry_cart.stat_tooltip.leaf_collection_disabled": "Leaf drops disabled. Shears status: %s.",
   "rngtech.wooden_composter.inputs": "Input",
   "rngtech.wooden_composter.output": "Output",
+  "rngtech.wooden_composter.catalyst": "Catalyst",
   "rngtech.wooden_composter.water": "Water",
   "rngtech.wooden_composter.status.ready": "Ready",
   "rngtech.wooden_composter.status.no_input": "Needs Biomass",

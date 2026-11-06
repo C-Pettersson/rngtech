@@ -15,6 +15,8 @@ Put a catalyst in the catalyst slot, next to the output slot, to make **Rich Bio
 | Bone Meal, Gunpowder, or Organic Reagent | 1 |
 | [Urea](rngtech:ammonia-synthesizer.md#using-urea) | 4 |
 
+A [Crusher](rngtech:crusher.md) turns one Bone into 4 Bone Meal, one more than a crafting grid gives.
+
 The Composter takes the Urea when a batch finishes, and the Urea pays for that batch and the next three. If you break the Composter, it loses any batches that the Urea has not made yet. The first status square lights when the next batch makes Rich Biomass.
 
 The output slot holds one kind of item:

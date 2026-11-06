@@ -56,7 +56,7 @@ The Wooden Composter has no FE input or output.
 
 ## Screen
 
-The Wooden Composter has one working tab, **Process**. It shows the 27 input slots, the catalyst slot, the output slot, the water tank with its container slots and purge button, progress, and status squares for the next batch and the bulk and variety bonuses. Hover for exact values.
+The Wooden Composter has one working tab, **Process**. It shows the 24 input slots, the catalyst slot, the output slot, the water tank with its container slots and purge button, progress, and status squares for the next batch and the bulk and variety bonuses. Hover for exact values.
 
 ## Obtaining
 
