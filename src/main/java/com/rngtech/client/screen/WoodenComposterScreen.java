@@ -22,6 +22,8 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
     private static final int INPUT_Y = 30;
     private static final int OUTPUT_X = 195;
     private static final int OUTPUT_Y = 48;
+    private static final int CATALYST_X = 174;
+    private static final int CATALYST_Y = 48;
     private static final int WATER_INPUT_X = 184;
     private static final int WATER_INPUT_Y = 76;
     private static final int WATER_OUTPUT_X = 206;
@@ -40,10 +42,12 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
     private static final int STATUS_X = 118;
     private static final int STATUS_Y = 101;
     private static final int STATUS_SIZE = 12;
+    private static final int RICH_STATUS_X = 102;
     private static final int BULK_STATUS_X = 134;
     private static final int VARIETY_STATUS_X = 150;
     private static final int BULK_BONUS = 0xFF7DA84B;
     private static final int VARIETY_BONUS = 0xFFD3A33A;
+    private static final int RICH_BATCH = 0xFF4F7D2E;
 
     private final MachineTabs tabs;
 
@@ -128,6 +132,7 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
             }
         }
         renderSlotFrame(guiGraphics, OUTPUT_X - 1, OUTPUT_Y - 1);
+        renderSlotFrame(guiGraphics, CATALYST_X - 1, CATALYST_Y - 1);
         renderSlotFrame(guiGraphics, WATER_INPUT_X - 1, WATER_INPUT_Y - 1);
         renderSlotFrame(guiGraphics, WATER_OUTPUT_X - 1, WATER_OUTPUT_Y - 1);
     }
@@ -163,6 +168,7 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
     }
 
     private void renderBonusStatusSquares(GuiGraphics guiGraphics) {
+        renderStatusSquare(guiGraphics, RICH_STATUS_X, menu.nextBatchRich() ? RICH_BATCH : PANEL_DARK);
         renderStatusSquare(guiGraphics, BULK_STATUS_X, menu.bulkBonusActive() ? BULK_BONUS : PANEL_DARK);
         renderStatusSquare(guiGraphics, VARIETY_STATUS_X, menu.varietyBonusActive() ? VARIETY_BONUS : PANEL_DARK);
     }
@@ -176,7 +182,7 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
 
     private int statusColor() {
         return switch (menu.statusCode()) {
-            case WoodenComposterBlockEntity.STATUS_OUTPUT_FULL -> 0xFFB45B4A;
+            case WoodenComposterBlockEntity.STATUS_OUTPUT_FULL, WoodenComposterBlockEntity.STATUS_OUTPUT_MIXED -> 0xFFB45B4A;
             case WoodenComposterBlockEntity.STATUS_NO_INPUT -> PANEL_DARK;
             case WoodenComposterBlockEntity.STATUS_COMPOSTING -> menu.wateredBatch() ? WATER : COMPOST;
             default -> COMPOST;
@@ -186,6 +192,7 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
     private Component statusComponent() {
         return switch (menu.statusCode()) {
             case WoodenComposterBlockEntity.STATUS_OUTPUT_FULL -> Component.translatable("rngtech.wooden_composter.status.output_full");
+            case WoodenComposterBlockEntity.STATUS_OUTPUT_MIXED -> Component.translatable("rngtech.wooden_composter.status.output_mixed");
             case WoodenComposterBlockEntity.STATUS_NO_INPUT -> Component.translatable("rngtech.wooden_composter.status.no_input");
             case WoodenComposterBlockEntity.STATUS_COMPOSTING -> Component.translatable("rngtech.wooden_composter.status.composting");
             default -> Component.translatable("rngtech.wooden_composter.status.ready");
@@ -254,6 +261,36 @@ public class WoodenComposterScreen extends AbstractContainerScreen<WoodenCompost
                 STATUS_SIZE,
                 Component.translatable("rngtech.wooden_composter.tooltip.status", statusComponent())
         );
+        CompactValueText.renderTooltipIfHovered(
+                guiGraphics,
+                font,
+                leftPos,
+                topPos,
+                mouseX,
+                mouseY,
+                RICH_STATUS_X,
+                STATUS_Y,
+                STATUS_SIZE,
+                STATUS_SIZE,
+                menu.nextBatchRich()
+                        ? Component.translatable("rngtech.wooden_composter.tooltip.rich_batch", menu.catalystCharges())
+                        : Component.translatable("rngtech.wooden_composter.tooltip.composted_batch")
+        );
+        if (menu.getSlot(WoodenComposterBlockEntity.SLOT_CATALYST).getItem().isEmpty()) {
+            CompactValueText.renderTooltipIfHovered(
+                    guiGraphics,
+                    font,
+                    leftPos,
+                    topPos,
+                    mouseX,
+                    mouseY,
+                    CATALYST_X,
+                    CATALYST_Y,
+                    16,
+                    16,
+                    Component.translatable("rngtech.wooden_composter.tooltip.catalyst")
+            );
+        }
         CompactValueText.renderTooltipIfHovered(
                 guiGraphics,
                 font,

@@ -8,14 +8,11 @@
   "type": "rngtech:trait_shaped",
   "category": "misc",
   "pattern": [
-    "CCC",
+    "HKH",
     "RMR",
     "SSS"
   ],
   "key": {
-    "C": {
-      "tag": "c:ingots/copper"
-    },
     "M": {
       "tag": "rngtech:machine_frames/base"
     },
@@ -24,6 +21,12 @@
     },
     "S": {
       "item": "minecraft:smooth_stone"
+    },
+    "H": {
+      "item": "rngtech:copper_casing"
+    },
+    "K": {
+      "item": "rngtech:copper_coil"
     }
   },
   "result": {

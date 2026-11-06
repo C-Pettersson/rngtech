@@ -54,7 +54,6 @@ import com.rngtech.content.menu.ResonanceCalibratorMenu;
 import com.rngtech.content.menu.SilicaGelDehumidifierMenu;
 import com.rngtech.content.menu.SolidFuelBurnerMenu;
 import com.rngtech.content.menu.VacuumCollapseGeneratorMenu;
-import com.rngtech.content.menu.WoodenComposterMenu;
 import com.rngtech.content.menu.WoodenDehumidifierMenu;
 import com.rngtech.content.recipe.AlgaeGrowthRecipe;
 import com.rngtech.content.recipe.AlloyFurnaceRecipe;
@@ -703,15 +702,7 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 5,
                 36
         );
-        registration.addRecipeTransferHandler(
-                WoodenComposterMenu.class,
-                ModMenus.WOODEN_COMPOSTER.get(),
-                JeiRecipeTypes.WOODEN_COMPOSTER,
-                0,
-                1,
-                30,
-                36
-        );
+        registration.addRecipeTransferHandler(new WoodenComposterRecipeTransferInfo());
         registration.addRecipeTransferHandler(
                 WoodenDehumidifierMenu.class,
                 ModMenus.WOODEN_DEHUMIDIFIER.get(),

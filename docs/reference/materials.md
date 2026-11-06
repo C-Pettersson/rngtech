@@ -30,7 +30,6 @@ Code-backed catalog behavior includes:
 - Metal Press plate recipes for all registered material plate forms, using one matching ingot, a Plate Mold, and the material's heat gate.
 - Metal Press casing recipes for the downstream-used casing forms, using four matching ingots, a Casing Mold, and the material's heat gate.
 - Metal Press gear recipes for every registered material gear form, using three matching ingots, a Gear Mold, and the material's heat gate.
-- Manual crushed-to-dust recipes for iron, copper, tin, and gold.
 - `rngtech:crusher` crushed-to-dust recipes for non-alloy crushed materials. This second Crusher pass is faster and cheaper overall than direct crushed smelting.
 - Direct `rngtech:furnace` crushed-to-ingot recipes for non-alloy crushed materials. These are hopper-friendly fallback recipes at `600` ticks and `7,200 FE`, making them much slower and more expensive than the Crusher-to-dust chain.
 - Crusher ingot-to-dust recipes for Iron, Copper, and Tin, supporting ordinary non-alloy dust use and pack compatibility without making alloy dusts part of default progression.

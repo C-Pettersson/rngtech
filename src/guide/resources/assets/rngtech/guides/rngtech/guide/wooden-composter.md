@@ -27,6 +27,7 @@ Unlike most RNGTech machines, the Wooden Composter has no rarity, affixes, Gear,
 ## Usage
 
 - [Composting](rngtech:wooden-composter/composting.md)
+- [Rich Biomass](rngtech:wooden-composter/rich-biomass.md)
 
 ### Inputs
 
@@ -42,20 +43,20 @@ These prepared inputs count as 2 compost units each:
 
 ### Using the output
 
-Burn **Composted Biomass** in the [Bio Generator](rngtech:bio-generator.md) for 1,600 FE each before modifiers, or craft it with Bone Meal, Organic Reagent, or Gunpowder into **Rich Biomass**, a denser fuel. One Urea from the [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md#using-urea) turns four Composted Biomass into four Rich Biomass. Composted Biomass is not a furnace fuel and does not burn in the [Fuel Burner](rngtech:fuel-burner.md).
+Burn **Composted Biomass** in the [Bio Generator](rngtech:bio-generator.md) for 1,600 FE each before modifiers, or craft it with Bone Meal, Organic Reagent, or Gunpowder into **Rich Biomass**, a denser fuel. One Urea from the [Ammonia Synthesizer](rngtech:ammonia-synthesizer.md#using-urea) turns four Composted Biomass into four Rich Biomass. The grid recipes cost the same as [the catalyst slot](rngtech:wooden-composter/rich-biomass.md). Composted Biomass is not a furnace fuel and does not burn in the [Fuel Burner](rngtech:fuel-burner.md).
 
 ### Automation
 
 | Side | Behavior |
 |---|---|
-| Top and sides | Insert compostable items and water containers, and fill the water tank. |
-| Bottom | Extracts Composted Biomass and empty containers. |
+| Top and sides | Insert compostable items, catalysts, and water containers, and fill the water tank. |
+| Bottom | Extracts Composted Biomass, Rich Biomass, and empty containers. |
 
 The Wooden Composter has no FE input or output.
 
 ## Screen
 
-The Wooden Composter has one working tab, **Process**. It shows the 27 input slots, the output slot, the water tank with its container slots and purge button, progress, and status squares for the bulk and variety bonuses. Hover for exact values.
+The Wooden Composter has one working tab, **Process**. It shows the 27 input slots, the catalyst slot, the output slot, the water tank with its container slots and purge button, progress, and status squares for the next batch and the bulk and variety bonuses. Hover for exact values.
 
 ## Obtaining
 

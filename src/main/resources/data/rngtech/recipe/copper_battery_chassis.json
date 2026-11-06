@@ -8,8 +8,8 @@
   "type": "rngtech:trait_shaped",
   "category": "redstone",
   "pattern": [
-    "BMB",
-    "MCM",
+    "BKB",
+    "HCH",
     "BRB"
   ],
   "key": {
@@ -19,11 +19,14 @@
     "C": {
       "tag": "rngtech:machine_frames/base"
     },
-    "M": {
-      "tag": "c:ingots/copper"
-    },
     "R": {
       "item": "minecraft:redstone"
+    },
+    "H": {
+      "item": "rngtech:copper_casing"
+    },
+    "K": {
+      "item": "rngtech:copper_coil"
     }
   },
   "result": {

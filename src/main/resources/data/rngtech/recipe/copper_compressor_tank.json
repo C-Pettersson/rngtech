@@ -1,18 +1,30 @@
 {
   "neoforge:conditions": [
-    { "type": "rngtech:material_enabled", "material": "copper" }
+    {
+      "type": "rngtech:material_enabled",
+      "material": "copper"
+    }
   ],
   "type": "rngtech:trait_shaped",
   "category": "redstone",
   "pattern": [
-    "GIG",
+    "GHG",
     "ICI",
-    "GIG"
+    "GHG"
   ],
   "key": {
-    "C": { "item": "rngtech:tank_frame" },
-    "G": { "item": "minecraft:glass" },
-    "I": { "tag": "c:ingots/copper" }
+    "C": {
+      "item": "rngtech:tank_frame"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "I": {
+      "tag": "c:ingots/copper"
+    },
+    "H": {
+      "item": "rngtech:copper_casing"
+    }
   },
   "result": {
     "count": 1,

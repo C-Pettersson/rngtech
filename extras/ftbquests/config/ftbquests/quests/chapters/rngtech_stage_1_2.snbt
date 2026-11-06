@@ -170,6 +170,7 @@
 			]
 			dependency_requirement: "one_completed"
 			id: "37A6C9E1284B5D17"
+			optional: true
 			rewards: [
 				{
 					count: 8
@@ -203,10 +204,11 @@
 				}
 			]
 			x: 6.0d
-			y: 1.0d
+			y: 0.0d
 		}
 		{
-			dependencies: ["37A6C9E1284B5D17"]
+			dependencies: ["37A6C9E1284B5D18"]
+			icon: { id: "rngtech:iron_dust" }
 			id: "37A6C9E1284B5D4D"
 			optional: true
 			rewards: [
@@ -229,25 +231,19 @@
 					type: "item"
 				}
 			]
-			tasks: [
-				{
-					count: 8L
-					id: "37A6C9E1284B5F92"
-					item: { count: 1, id: "rngtech:iron_dust" }
-					type: "item"
-				}
-				{
-					count: 8L
-					id: "37A6C9E1284B5F93"
-					item: { count: 1, id: "rngtech:copper_dust" }
-					type: "item"
-				}
-			]
-			x: 6.0d
-			y: -1.5d
+			tasks: [{
+				id: "37A6C9E1284B5F92"
+				type: "checkmark"
+			}]
+			x: 7.5d
+			y: -0.5d
 		}
 		{
-			dependencies: ["37A6C9E1284B5D17"]
+			dependencies: [
+				"37A6C9E1284B5D17"
+				"1333C98733E8948C"
+			]
+			dependency_requirement: "one_completed"
 			id: "37A6C9E1284B5D18"
 			rewards: [
 				{
@@ -307,7 +303,11 @@
 			y: 1.0d
 		}
 		{
-			dependencies: ["37A6C9E1284B5D17"]
+			dependencies: [
+				"37A6C9E1284B5D1C"
+				"37A6C9E1284B5D3E"
+			]
+			dependency_requirement: "one_completed"
 			id: "1333C98733E8948C"
 			optional: true
 			tasks: [{
@@ -315,8 +315,8 @@
 				item: { count: 1, id: "rngtech:copper_crusher_chassis" }
 				type: "item"
 			}]
-			x: 7.5d
-			y: -1.5d
+			x: 6.0d
+			y: 2.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D3E"]
@@ -475,7 +475,7 @@
 			y: 2.0d
 		}
 		{
-			dependencies: ["37A6C9E1284B5D17"]
+			dependencies: ["37A6C9E1284B5D18"]
 			id: "760227B83533AF3C"
 			optional: true
 			tasks: [{
@@ -483,7 +483,7 @@
 				item: { count: 1, id: "minecraft:comparator" }
 				type: "item"
 			}]
-			x: 6.0d
+			x: 7.5d
 			y: 2.5d
 		}
 	]

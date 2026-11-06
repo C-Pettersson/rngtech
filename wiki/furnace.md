@@ -94,8 +94,8 @@ Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 
 | Stage | Furnace | Notes |
 |---:|---|---|
 | 0 | {{ item('rngtech:furnace') }} | Burns standard furnace fuel. Slow, and reaches 800 heat. |
-| 1 | {{ item('rngtech:iron_furnace_chassis') }} | First electric Furnace. |
-| 2 | {{ item('rngtech:copper_furnace_chassis') }} | Better early heat throughput and energy use. |
+| 1 | {{ item('rngtech:iron_furnace_chassis') }} | First electric Furnace. Cheap to build, and uses less FE than Copper. |
+| 2 | {{ item('rngtech:copper_furnace_chassis') }} | Heats and smelts faster, with a larger buffer. Uses more FE than Iron. |
 | 3 | {{ item('rngtech:gold_furnace_chassis') }} | Copper numbers with one built-in [jewel socket](jewels.md#body-sockets). |
 | 3 | {{ item('rngtech:bronze_furnace_chassis') }} | Smelts Bronze Blend and Steel Blend faster. |
 | 4 | {{ item('rngtech:steel_furnace_chassis') }} | More efficient midgame chassis. |

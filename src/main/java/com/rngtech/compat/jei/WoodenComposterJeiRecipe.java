@@ -10,9 +10,10 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-public record WoodenComposterJeiRecipe(ResourceLocation id, List<ItemStack> inputs, ItemStack output) {
+public record WoodenComposterJeiRecipe(ResourceLocation id, List<ItemStack> inputs, List<ItemStack> catalysts, ItemStack output) {
     public WoodenComposterJeiRecipe {
         inputs = inputs.stream().map(ItemStack::copy).toList();
+        catalysts = catalysts.stream().map(ItemStack::copy).toList();
         output = output.copy();
     }
 
@@ -24,10 +25,23 @@ public record WoodenComposterJeiRecipe(ResourceLocation id, List<ItemStack> inpu
         if (compostables.isEmpty()) {
             return List.of();
         }
-        return List.of(new WoodenComposterJeiRecipe(
-                RNGTech.id("wooden_composter/composted_biomass"),
-                compostables,
-                new ItemStack(ModItems.COMPOSTED_BIOMASS.get())
-        ));
+        List<ItemStack> catalysts = BuiltInRegistries.ITEM.stream()
+                .map(ItemStack::new)
+                .filter(WoodenComposterBlockEntity::isCatalyst)
+                .toList();
+        return List.of(
+                new WoodenComposterJeiRecipe(
+                        RNGTech.id("wooden_composter/composted_biomass"),
+                        compostables,
+                        List.of(),
+                        new ItemStack(ModItems.COMPOSTED_BIOMASS.get())
+                ),
+                new WoodenComposterJeiRecipe(
+                        RNGTech.id("wooden_composter/rich_biomass"),
+                        compostables,
+                        catalysts,
+                        new ItemStack(ModItems.RICH_BIOMASS.get())
+                )
+        );
     }
 }

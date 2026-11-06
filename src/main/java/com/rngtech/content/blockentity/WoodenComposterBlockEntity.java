@@ -47,12 +47,14 @@ public class WoodenComposterBlockEntity extends BlockEntity
     public static final int SLOT_OUTPUT = 27;
     public static final int SLOT_WATER_INPUT_CONTAINER = 28;
     public static final int SLOT_WATER_OUTPUT_CONTAINER = 29;
-    public static final int SLOT_COUNT = 30;
+    public static final int SLOT_CATALYST = 30;
+    public static final int SLOT_COUNT = 31;
 
     public static final int STATUS_READY = 0;
     public static final int STATUS_NO_INPUT = 1;
     public static final int STATUS_OUTPUT_FULL = 2;
     public static final int STATUS_COMPOSTING = 3;
+    public static final int STATUS_OUTPUT_MIXED = 4;
     public static final int PURGE_WATER_TANK = 0;
 
     public static final int COMPOST_UNITS_PER_BATCH = 8;
@@ -60,6 +62,8 @@ public class WoodenComposterBlockEntity extends BlockEntity
     public static final int DRY_COMPOST_TICKS = 2400;
     public static final int WET_COMPOST_TICKS = 1200;
     public static final int WATER_PER_BATCH = 10;
+    /** Rich Biomass batches one Urea pays for, as in the crafting grid. Every other catalyst pays for one. */
+    public static final int UREA_RICH_BATCHES = 4;
     private static final int WATER_CAPACITY = 4 * FluidType.BUCKET_VOLUME;
     public static final int BULK_BONUS_UNIT_THRESHOLD = 200;
     public static final int VARIETY_BONUS_ITEM_THRESHOLD = 5;
@@ -74,13 +78,18 @@ public class WoodenComposterBlockEntity extends BlockEntity
     private static final int DATA_WET_BATCH = 6;
     private static final int DATA_VARIETY_COUNT = 7;
     private static final int DATA_SPEED_BONUS_PERCENT = 8;
-    private static final int DATA_COUNT = 9;
+    private static final int DATA_NEXT_BATCH_RICH = 9;
+    private static final int DATA_CATALYST_CHARGES = 10;
+    private static final int DATA_COUNT = 11;
 
     private final ItemStackHandler inventory = new ItemStackHandler(SLOT_COUNT) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (slot >= 0 && slot < INPUT_SLOT_COUNT) {
                 return isCompostable(stack);
+            }
+            if (slot == SLOT_CATALYST) {
+                return isCatalyst(stack);
             }
             return slot == SLOT_WATER_INPUT_CONTAINER && isFluidInputContainer(stack);
         }
@@ -130,6 +139,8 @@ public class WoodenComposterBlockEntity extends BlockEntity
                 case DATA_WET_BATCH -> wateredBatch ? 1 : 0;
                 case DATA_VARIETY_COUNT -> varietyCount();
                 case DATA_SPEED_BONUS_PERCENT -> speedBonusPercent();
+                case DATA_NEXT_BATCH_RICH -> isNextBatchRich() ? 1 : 0;
+                case DATA_CATALYST_CHARGES -> catalystCharges;
                 default -> 0;
             };
         }
@@ -146,6 +157,7 @@ public class WoodenComposterBlockEntity extends BlockEntity
 
     private int progress;
     private boolean wateredBatch;
+    private int catalystCharges;
 
     public WoodenComposterBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.WOODEN_COMPOSTER.get(), pos, blockState);
@@ -205,7 +217,7 @@ public class WoodenComposterBlockEntity extends BlockEntity
                 )
                 .status(statusKey(status))
                 .progress(progress, currentRequiredTicks())
-                .output(status == STATUS_OUTPUT_FULL
+                .output(status == STATUS_OUTPUT_FULL || status == STATUS_OUTPUT_MIXED
                         ? MachineInfoSnapshot.OutputSummary.OUTPUT_FULL
                         : MachineInfoSnapshot.OutputSummary.NONE)
                 .build();
@@ -214,6 +226,7 @@ public class WoodenComposterBlockEntity extends BlockEntity
     private static String statusKey(int status) {
         String name = switch (status) {
             case STATUS_OUTPUT_FULL -> "output_full";
+            case STATUS_OUTPUT_MIXED -> "output_mixed";
             case STATUS_NO_INPUT -> "no_input";
             default -> "";
         };
@@ -232,6 +245,10 @@ public class WoodenComposterBlockEntity extends BlockEntity
             return 0;
         }
         return stack.is(ModTags.Items.WOODEN_COMPOSTER_PREPARED_INPUTS) ? PREPARED_INPUT_COMPOST_UNITS : 1;
+    }
+
+    public static boolean isCatalyst(ItemStack stack) {
+        return stack.is(ModTags.Items.BIO_GENERATOR_RICH_BIOMASS_CATALYSTS) || stack.is(ModItems.UREA.get());
     }
 
     public static boolean isFluidInputContainer(ItemStack stack) {
@@ -270,19 +287,24 @@ public class WoodenComposterBlockEntity extends BlockEntity
         tag.put("WaterTank", waterTank.writeToNBT(registries, new CompoundTag()));
         tag.putInt("Progress", progress);
         tag.putBoolean("WateredBatch", wateredBatch);
+        tag.putInt("CatalystCharges", catalystCharges);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        inventory.deserializeNBT(registries, tag.getCompound("Inventory"));
+        // Composters saved before the catalyst slot stored a smaller inventory; the handler takes its size from the tag.
+        CompoundTag saved = tag.getCompound("Inventory");
+        saved.putInt("Size", SLOT_COUNT);
+        inventory.deserializeNBT(registries, saved);
         waterTank.readFromNBT(registries, tag.getCompound("WaterTank"));
         progress = Math.max(0, tag.getInt("Progress"));
         wateredBatch = tag.getBoolean("WateredBatch");
+        catalystCharges = Math.max(0, tag.getInt("CatalystCharges"));
     }
 
     private boolean tickComposting() {
-        if (!canOutputCompostedBiomass()) {
+        if (!canOutputBatch()) {
             return false;
         }
         if (availableCompostUnits() < COMPOST_UNITS_PER_BATCH) {
@@ -296,7 +318,7 @@ public class WoodenComposterBlockEntity extends BlockEntity
             return true;
         }
         if (consumeCompostUnits(COMPOST_UNITS_PER_BATCH)) {
-            addCompostedBiomass();
+            addBatchOutput();
         }
         progress = 0;
         wateredBatch = false;
@@ -332,7 +354,10 @@ public class WoodenComposterBlockEntity extends BlockEntity
     }
 
     private int statusCode() {
-        if (!canOutputCompostedBiomass()) {
+        if (inventory.getStackInSlot(SLOT_OUTPUT).is(ModItems.RICH_BIOMASS.get()) && !hasCatalyst()) {
+            return STATUS_OUTPUT_MIXED;
+        }
+        if (!canOutputBatch()) {
             return STATUS_OUTPUT_FULL;
         }
         if (progress > 0) {
@@ -460,23 +485,49 @@ public class WoodenComposterBlockEntity extends BlockEntity
         return isCompostable(stack) && !stack.is(ModTags.Items.WOODEN_COMPOSTER_PREPARED_INPUTS);
     }
 
-    private boolean canOutputCompostedBiomass() {
-        ItemStack result = new ItemStack(ModItems.COMPOSTED_BIOMASS.get());
+    private boolean hasCatalyst() {
+        return catalystCharges > 0 || !inventory.getStackInSlot(SLOT_CATALYST).isEmpty();
+    }
+
+    /** The output slot holds one kind: whatever is in it decides the batch until it is emptied. */
+    private boolean isNextBatchRich() {
+        ItemStack output = inventory.getStackInSlot(SLOT_OUTPUT);
+        return hasCatalyst() && (output.isEmpty() || output.is(ModItems.RICH_BIOMASS.get()));
+    }
+
+    private boolean canOutputBatch() {
         ItemStack output = inventory.getStackInSlot(SLOT_OUTPUT);
         if (output.isEmpty()) {
             return true;
         }
+        ItemStack result = new ItemStack(isNextBatchRich() ? ModItems.RICH_BIOMASS.get() : ModItems.COMPOSTED_BIOMASS.get());
         return ItemStack.isSameItemSameComponents(output, result)
                 && output.getCount() + result.getCount() <= Math.min(output.getMaxStackSize(), inventory.getSlotLimit(SLOT_OUTPUT));
     }
 
-    private void addCompostedBiomass() {
+    private void addBatchOutput() {
+        boolean rich = isNextBatchRich();
+        if (rich) {
+            spendCatalyst();
+        }
         ItemStack output = inventory.getStackInSlot(SLOT_OUTPUT);
         if (output.isEmpty()) {
-            inventory.setStackInSlot(SLOT_OUTPUT, new ItemStack(ModItems.COMPOSTED_BIOMASS.get()));
+            inventory.setStackInSlot(SLOT_OUTPUT, new ItemStack(rich ? ModItems.RICH_BIOMASS.get() : ModItems.COMPOSTED_BIOMASS.get()));
         } else {
             output.grow(1);
         }
+    }
+
+    private void spendCatalyst() {
+        if (catalystCharges <= 0) {
+            ItemStack catalyst = inventory.getStackInSlot(SLOT_CATALYST);
+            catalystCharges = catalyst.is(ModItems.UREA.get()) ? UREA_RICH_BATCHES : 1;
+            catalyst.shrink(1);
+            if (catalyst.isEmpty()) {
+                inventory.setStackInSlot(SLOT_CATALYST, ItemStack.EMPTY);
+            }
+        }
+        catalystCharges--;
     }
 
     private boolean drainWaterInputContainer() {
@@ -530,7 +581,7 @@ public class WoodenComposterBlockEntity extends BlockEntity
     private final class InputItemHandler implements IItemHandler {
         @Override
         public int getSlots() {
-            return INPUT_SLOT_COUNT + 1;
+            return INPUT_SLOT_COUNT + 2;
         }
 
         @Override
@@ -562,7 +613,10 @@ public class WoodenComposterBlockEntity extends BlockEntity
             if (slot < 0 || slot >= getSlots()) {
                 throw new RuntimeException("Slot " + slot + " not in valid range - [0," + getSlots() + ")");
             }
-            return slot < INPUT_SLOT_COUNT ? slot : SLOT_WATER_INPUT_CONTAINER;
+            if (slot < INPUT_SLOT_COUNT) {
+                return slot;
+            }
+            return slot == INPUT_SLOT_COUNT ? SLOT_WATER_INPUT_CONTAINER : SLOT_CATALYST;
         }
     }
 

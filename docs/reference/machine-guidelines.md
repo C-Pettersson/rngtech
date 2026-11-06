@@ -14,6 +14,7 @@ For processing machines:
 - Recipe hardness pressure should use `PROCESSING_LEVEL`. For Crushers, the installed Crush Head supplies the active level and recipes declare `required_processing_level`; under-level work is allowed but takes longer, costs more total FE, and can jam instead of hard-blocking the recipe.
 - If a machine family has staged chassis, the placed chassis should be the machine body. Do not model it as a separate item-only ingredient unless the machine itself is not staged.
 - Chassis stage may gate installed Gear stage, but chassis material should also change base stats or fixed behavior identity so same-stage choices can matter.
+- Stage 1 and Stage 2 are a choice, not a ladder. Iron chassis cost plain ingots and keep an edge: the Crusher has higher yield, the Furnace uses less FE, and the Battery Chassis has no leakage and stronger per-cell bonuses. Copper chassis need Copper Casings and a Copper Coil in place of those ingots, and trade that edge for speed, transfer, or capacity. Compressor Tanks differ only in capacity, so Iron's edge there is its cost. Quests accept either Crusher.
 - Fixed behaviors are material identity. Never offer the same behavior as a rolled affix, not even only where the material lacks it: rolls change degree, and a behavior anything can roll stops being a reason to choose its material. A fixed behavior that does nothing gets implemented as identity, not turned into a roll. Rolled behavior affixes are for behaviors no material owns, such as Balance Mode, Bulk Speed, and Output Guard.
 - Processing speed should increase throughput, not silently make each craft cheaper.
 - Reduced energy usage and output amount are the main ways to cheaper effective processing-machine production.
@@ -245,6 +246,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 
 - Crushing a potato or carrot into Organic Reagent is deliberately energy-negative (`546 FE` burned minus `600 FE` crushing, against `120 FE` for the raw crop). Organic Reagent is a convenience fuel, not a power gain.
 - Crushing seeds into Compost Feedstock before composting is deliberately energy-positive, to reward the Crusher step.
+- The Wooden Composter's catalyst slot uses the crafting grid's ratios, so Rich Biomass from it costs the same as crafting it. It saves the crafting step and nothing else. Keep the two in step.
 - Composted, Rich, and algae biomass are Bio Generator-only fuels. Do not tag them as vanilla furnace, Fuel Burner, or broad modded fuel.
 - Specific fuel families beat broader tags for Bio Chamber power bonuses: saplings and seeds use their own stats, not Plant Power.
 - The Bio Generator is a small biogas plant: digester, gas holder, gas engine. Its rated `20`-day retention reproduces the pre-digester burner exactly, with the same FE/t and FE per item for every fuel and stat roll. Fuel tables, JEI values, and the energy balance anchors stay at rated.
