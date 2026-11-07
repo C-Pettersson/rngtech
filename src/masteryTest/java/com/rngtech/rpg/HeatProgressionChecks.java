@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -48,6 +49,7 @@ public final class HeatProgressionChecks {
         holdingHeatLeavesTransferHeadroom();
         baseGearBuildsNoNewStrain(root);
         stageZeroCoalSmeltsIronAndCopper(root);
+        kilnCoreHoldsTheStageZeroFurnaceAtOneThousand(root);
         ungatedRecipesWorkAtAnyHeat();
         sliderStopsAtTheSafeMaximumWithoutBlastDraft();
         warmupFeelsLikeAFurnace();
@@ -279,6 +281,40 @@ public final class HeatProgressionChecks {
             Run run = simulate(stats, recipe, 0, true);
             require(run.ticks() < MAX_TICKS, "coal smelts " + metal + " dust in the Stage 0 Furnace");
         }
+    }
+
+    /**
+     * The Kiln Core turns the Stage 0 Furnace electric at 1,000 C for Gold and Tin, on the Iron Furnace's FE intake, and no
+     * roll lifts it past that to Steel Blend's 1,100 C. A lower Mastery ceiling still wins.
+     */
+    private static void kilnCoreHoldsTheStageZeroFurnaceAtOneThousand(Path root) {
+        MachineStatAccumulator stats = kiln(null);
+        require(stats.intValue(MachineStat.MAX_TEMPERATURE) == 1000, "the Kiln Core lifts the Stage 0 Furnace to 1,000 C");
+        for (String metal : List.of("gold", "tin")) {
+            Run run = simulate(stats, Recipe.read(root, "furnace/metals/" + metal + "_from_dust"), KILN_CORE_FE_INTAKE, false);
+            require(run.ticks() < MAX_TICKS, "a Stage 0 Furnace with a Kiln Core smelts " + metal + " dust on FE");
+        }
+        MachineStatAccumulator rolled = kiln(body -> {
+            body.apply(new MachineModifier(ModifierSlot.PREFIX, MachineStat.MAX_TEMPERATURE, ModifierOperation.ADD, 400));
+            body.apply(new MachineModifier(ModifierSlot.SUFFIX, MachineStat.MAX_TEMPERATURE, ModifierOperation.INCREASED_PERCENT, 50));
+        });
+        require(rolled.intValue(MachineStat.MAX_TEMPERATURE) == 1000, "Max Temperature rolls stop at the Kiln Core's 1,000 C cap");
+        require(rolled.intValue(MachineStat.MAX_TEMPERATURE) < Recipe.read(root, "furnace/alloy_blends/steel_blend").minimum(),
+                "a rolled Kiln Core cannot reach Steel Blend");
+        MachineStatAccumulator lowHeat = kiln(body -> body.capAbsolute(MachineStat.MAX_TEMPERATURE, 800));
+        require(lowHeat.intValue(MachineStat.MAX_TEMPERATURE) == 800, "a lower Mastery ceiling beats the Kiln Core's cap");
+    }
+
+    /** The Iron Furnace's FE intake: what an early cable feeds a converted kiln. */
+    private static final int KILN_CORE_FE_INTAKE = FurnaceChassisMaterial.IRON.energyTransfer();
+
+    private static MachineStatAccumulator kiln(Consumer<MachineStatAccumulator> body) {
+        MachineStatAccumulator stats = furnace(FurnaceChassisMaterial.PRIMITIVE, null);
+        if (body != null) {
+            body.accept(stats);
+        }
+        ComponentBaseStatCatalog.applyContribution(stats, ComponentBaseStatCatalog.kilnCore(), MachineTraits.EMPTY);
+        return stats;
     }
 
     // ---------------------------------------------------------------------------------------------------------------

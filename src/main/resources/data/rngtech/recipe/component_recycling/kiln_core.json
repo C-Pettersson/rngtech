@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:kiln_core"
+    },
+    "minimum_processing_level": 2,
+    "processing_ticks": 104,
+    "energy": 940,
+    "outputs": [
+        {
+            "stack": {
+                "id": "rngtech:copper_coil",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:smooth_stone",
+                "count": 2
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "rngtech:basic_electric_circuit",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}

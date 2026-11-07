@@ -121,7 +121,7 @@ public final class FurnaceVisualGameTests {
         });
     }
 
-    /** The Stage 0 Furnace shows its fire while fuel burns, and has no Gear to show. */
+    /** The Stage 0 Furnace shows its fire while fuel burns, and shows no Gear while none is installed. */
     @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 600)
     public static void stageZeroFurnaceShowsItsFire(GameTestHelper helper) {
         FurnaceBlockEntity furnace = MachineTestSupport.place(helper, MACHINE, ModBlocks.FURNACE.get(), FurnaceBlockEntity.class);
@@ -134,6 +134,29 @@ public final class FurnaceVisualGameTests {
             check(state.input(0) == Items.RAW_COPPER && state.heat(0) > 300, "The oven should warm up for its Raw Copper: " + state.key());
             check(state.heatCore().isEmpty() && state.cell().isEmpty(), "A Stage 0 Furnace has no Gear to show: " + state.key());
             check(state.nitrogen() < 0.0F, "A Stage 0 Furnace has no Nitrogen tank: " + state.key());
+        });
+    }
+
+    /**
+     * A Stage 0 Furnace with a Kiln Core shows the core, takes FE instead of fuel, reaches 1,000 heat and no more, and
+     * smelts Raw Gold, which it cannot do without the core.
+     */
+    @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 3600)
+    public static void kilnCoreLetsTheStageZeroFurnaceSmeltGold(GameTestHelper helper) {
+        FurnaceBlockEntity furnace = MachineTestSupport.place(helper, MACHINE, ModBlocks.FURNACE.get(), FurnaceBlockEntity.class);
+        furnace.getGearInventory().setStackInSlot(0, new ItemStack(ModItems.KILN_CORE.get()));
+        furnace.getInventory().setStackInSlot(FurnaceBlockEntity.SLOT_INPUT_START, new ItemStack(Items.RAW_GOLD, 2));
+        check(furnace.runsOnEnergy(), "A Kiln Core should make the Stage 0 Furnace run on FE");
+        check(!furnace.getInventory().isItemValid(FurnaceBlockEntity.SLOT_FUEL, new ItemStack(Items.COAL)),
+                "A kiln running on FE should refuse fuel");
+        MachineTestSupport.powerEachTick(helper, furnace.getEnergyStorage(null));
+
+        helper.succeedWhen(() -> {
+            FurnaceVisualState state = furnace.currentVisualState();
+            check(state.heatCore().equals(FurnaceVisualState.KILN_CORE), "The kiln should show its Kiln Core: " + state.key());
+            check(state.maxHeat() == 1000, "The Kiln Core should hold the kiln at 1,000 heat: " + state.key());
+            check(furnace.getInventory().getStackInSlot(FurnaceBlockEntity.SLOT_OUTPUT_START).is(Items.GOLD_INGOT),
+                    "The kiln should smelt Raw Gold: " + state.key());
         });
     }
 

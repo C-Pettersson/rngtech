@@ -61,6 +61,7 @@ import com.rngtech.content.item.GlyphItem;
 import com.rngtech.content.item.ItemConnectorItem;
 import com.rngtech.content.item.JewelItem;
 import com.rngtech.content.item.JobChipItem;
+import com.rngtech.content.item.KilnCoreItem;
 import com.rngtech.content.item.MachineBlockItem;
 import com.rngtech.content.item.MachineChassisItem;
 import com.rngtech.content.item.MalformedIngotItem;
@@ -688,6 +689,10 @@ public final class ModItems {
     );
     public static final Map<SolarArrayExtenderMaterial, DeferredItem<SolarArrayExtenderItem>> SOLAR_ARRAY_EXTENDERS =
             registerSolarArrayExtenders();
+    public static final DeferredItem<KilnCoreItem> KILN_CORE = ITEMS.register(
+            "kiln_core",
+            () -> new KilnCoreItem(new Item.Properties().stacksTo(1))
+    );
     public static final DeferredItem<BioChamberItem> BIO_CHAMBER = ITEMS.register(
             "bio_chamber",
             () -> new BioChamberItem(new Item.Properties().stacksTo(1))

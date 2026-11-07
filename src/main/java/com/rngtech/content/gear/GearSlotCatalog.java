@@ -163,7 +163,7 @@ public final class GearSlotCatalog {
                         0,
                         1,
                         machineParts(MachineType.FURNACE),
-                        Component.translatable("rngtech.gear_guide.future_component_slot").withStyle(ChatFormatting.GRAY)
+                        Component.translatable("rngtech.gear_guide.kiln_core_slot").withStyle(ChatFormatting.GRAY)
                 ));
             }
             specs.add(spec(material.blockId(), item(ModItems.furnaceChassis(material).get()), slots));

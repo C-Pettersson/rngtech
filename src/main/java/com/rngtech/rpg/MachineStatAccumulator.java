@@ -28,6 +28,7 @@ import java.util.function.Supplier;
 public final class MachineStatAccumulator {
     public static final double FURNACE_BASE_MAX_TEMPERATURE = 600.0;
     public static final double PRIMITIVE_FURNACE_MAX_TEMPERATURE = 800.0;
+    public static final double KILN_CORE_MAX_TEMPERATURE = 1000.0;
     public static final Component NO_BATTERY_SOURCE = Component.translatable("rngtech.stat.breakdown.source.no_battery");
     private static final ThreadLocal<Boolean> RECORDING = ThreadLocal.withInitial(() -> false);
     private static final Component BASE_SOURCE = Component.translatable("rngtech.stat.breakdown.source.base");

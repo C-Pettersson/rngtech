@@ -2933,6 +2933,24 @@ public final class ModifierEligibilityProfiles {
             ),
             POWER_GRACE_BEHAVIOR
     );
+    public static final ModifierEligibilityProfile KILN_CORE = profile(
+            "kiln_core",
+            Set.of(
+                    ModifierCapability.HAS_MASTERY_ATTRIBUTES,
+                    ModifierCapability.HAS_GEAR_STATS,
+                    ModifierCapability.HAS_FE_STORAGE,
+                    ModifierCapability.HAS_FE_INPUT,
+                    ModifierCapability.HAS_HEAT
+            ),
+            affixes(
+                    MachineStat.ENERGY_USAGE,
+                    MachineStat.ENERGY_CAPACITY,
+                    MachineStat.HEAT_ISOLATION,
+                    MachineStat.HEAT_TRANSFER,
+                    MachineStat.THERMAL_CONDUCTIVITY,
+                    MachineStat.THERMAL_MASS
+            )
+    );
     public static final ModifierEligibilityProfile SERVO = profile(
             "servo",
             Set.of(
@@ -3365,6 +3383,7 @@ public final class ModifierEligibilityProfiles {
                 CRUSH_HEAD,
                 ALLOY_CRUCIBLE,
                 HEAT_CORE,
+                KILN_CORE,
                 SERVO,
                 FUEL_BOX,
                 FUEL_TANK,
@@ -3481,6 +3500,7 @@ public final class ModifierEligibilityProfiles {
             case CRUSH_HEAD -> CRUSH_HEAD;
             case ALLOY_CRUCIBLE -> ALLOY_CRUCIBLE;
             case HEAT_CORE -> HEAT_CORE;
+            case KILN_CORE -> KILN_CORE;
             case BIO_CHAMBER -> BIO_CHAMBER;
             case SERVO -> SERVO;
             case FUEL_BOX -> FUEL_BOX;

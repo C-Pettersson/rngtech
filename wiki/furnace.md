@@ -4,6 +4,7 @@ wiki:
   icon: rngtech:furnace
   ids:
     - rngtech:furnace
+    - rngtech:kiln_core
     - rngtech:iron_furnace_chassis
     - rngtech:copper_furnace_chassis
     - rngtech:gold_furnace_chassis
@@ -35,8 +36,8 @@ wiki:
     fields={
         "Type": "Processing machine",
         "Stages": "0–8",
-        "Power": "Solid fuel (Stage 0), FE (Stages 1–8)",
-        "Gear": "{{ item('rngtech:iron_heat_core', 'Heat Core') }}, {{ item('rngtech:iron_battery_cell', 'Battery Cell') }}",
+        "Power": "Solid fuel (Stage 0), FE (Stage 0 with a Kiln Core, Stages 1–8)",
+        "Gear": "{{ item('rngtech:kiln_core') }} (Stage 0), {{ item('rngtech:iron_heat_core', 'Heat Core') }}, {{ item('rngtech:iron_battery_cell', 'Battery Cell') }}",
         "Mastery": "Yes",
     },
 ) }}
@@ -45,7 +46,7 @@ The **Furnace** is RNGTech's heat-aware smelter. Each recipe needs the machine t
 
 Like every RNGTech machine, each Furnace you craft rolls its own [rarity and affixes](rarity-and-affixes.md), and it can level up through [Machine Mastery](machine-mastery.md).
 
-You can read a Furnace from the outside. The Stage 0 Furnace is a smooth-stone kiln: fuel burns in the fire mouth at the bottom, the item being smelted sits in the oven above it, and smoke rises from the copper-banded chimney while fuel burns. An electric Furnace shows the item it is smelting on the hearth behind its viewport door. As the lane heats up, the chamber and its heating elements glow from dull red through orange to yellow-white. The bar under the door reads like the [heat bar](heat.md#the-overheat-slider) on the Process tab: it fills with the lane's heat against the Heat Core's Max Temperature, a white mark shows the recipe's target and a yellow mark the setpoint when the slider pushes past it, and the fill turns red while the lane overheats. A lane pushed past its target flickers with its wobble. With extra lanes, the items stand side by side on the hearth and the bar reads the hottest lane. The Heat Core sits on the crown as a row of fins in the core's material. Facing the front, the Battery Cell stands in the cradle on the left with its charge meter, the [Nitrogen tank](heat.md#nitrogen-atmosphere) is the gas cylinder behind it, and the cable port is on the back. The window on the cylinder shows how full the tank is, and its valve lights up while a lane uses Nitrogen. The Lead Furnace has four small chambers, one per lane: under each column of doors, the upper half of the bar reads the top chamber and the lower half the bottom one. Each chassis has its own shell metal.
+You can read a Furnace from the outside. The Stage 0 Furnace is a smooth-stone kiln: fuel burns in the fire mouth at the bottom, the item being smelted sits in the oven above it, and smoke rises from the copper-banded chimney while fuel burns. With a Kiln Core installed, a copper heating coil closes the fire mouth and glows while the kiln is hot, and a cable port sits on the back. An electric Furnace shows the item it is smelting on the hearth behind its viewport door. As the lane heats up, the chamber and its heating elements glow from dull red through orange to yellow-white. The bar under the door reads like the [heat bar](heat.md#the-overheat-slider) on the Process tab: it fills with the lane's heat against the Heat Core's Max Temperature, a white mark shows the recipe's target and a yellow mark the setpoint when the slider pushes past it, and the fill turns red while the lane overheats. A lane pushed past its target flickers with its wobble. With extra lanes, the items stand side by side on the hearth and the bar reads the hottest lane. The Heat Core sits on the crown as a row of fins in the core's material. Facing the front, the Battery Cell stands in the cradle on the left with its charge meter, the [Nitrogen tank](heat.md#nitrogen-atmosphere) is the gas cylinder behind it, and the cable port is on the back. The window on the cylinder shows how full the tank is, and its valve lights up while a lane uses Nitrogen. The Lead Furnace has four small chambers, one per lane: under each column of doors, the upper half of the bar reads the top chamber and the lower half the bottom one. Each chassis has its own shell metal.
 
 ## Obtaining
 
@@ -72,6 +73,7 @@ Heat decides your progress. Unmodified electric chassis reach about:
 | Heat Core | Max temperature | Stability | Unlocks |
 |---|---:|---:|---|
 | Stage 0 Furnace (no core) | 800 | — | Iron and Copper |
+| Stage 0 Furnace with a {{ item('rngtech:kiln_core') }} | 1,000 (hard cap) | — | Tin, Zinc, and Gold |
 | {{ item('rngtech:iron_heat_core') }} | 800 | 0.85 | Iron and Copper |
 | {{ item('rngtech:copper_heat_core') }} | 1,000 | 0.90 | Tin, Zinc, and Gold |
 | {{ item('rngtech:bronze_heat_core') }} | 1,200 | 0.95 | Nickel, Lead, and Silver. Its stability is just enough for them. |
@@ -93,7 +95,7 @@ Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 
 
 | Stage | Furnace | Notes |
 |---:|---|---|
-| 0 | {{ item('rngtech:furnace') }} | Burns standard furnace fuel. Slow, and reaches 800 heat. |
+| 0 | {{ item('rngtech:furnace') }} | Burns standard furnace fuel. Slow, and reaches 800 heat. With a Kiln Core, it runs on FE and reaches 1,000 heat. |
 | 1 | {{ item('rngtech:iron_furnace_chassis') }} | First electric Furnace. Cheap to build, and uses less FE than Copper. |
 | 2 | {{ item('rngtech:copper_furnace_chassis') }} | Heats and smelts faster, with a larger buffer. Uses more FE than Iron. |
 | 3 | {{ item('rngtech:gold_furnace_chassis') }} | Copper numbers with one built-in [jewel socket](jewels.md#body-sockets). |
@@ -120,14 +122,23 @@ Electric Furnaces have a Gear tab with:
 
 The Stage 0 Furnace burns fuel from a slot on its Process tab and does not need Gear to run. Its Efficiency, Fuel Efficiency, and Fuel Duration stats all make each fuel item burn longer, so one item smelts more.
 
+The Stage 0 Furnace has one optional Gear slot for the {{ item('rngtech:kiln_core') }}. The Kiln Core fits no other machine. It turns the kiln into a slow electric Furnace, so you can keep your first Furnace when you move to FE:
+
+- The kiln takes FE on any side and stops burning fuel. It keeps a small internal FE buffer and has no Battery Cell slot. Take out the core to burn fuel again.
+- Its Max Temperature goes from 800 to 1,000, so it can smelt Gold and Tin.
+- 1,000 is a hard cap. Affixes, Mastery, and refinement cannot lift the kiln above it, so Steel Blend and the Stage 4 metals stay out of reach. A Mastery cap that is lower, such as Low Heat Specialist, still applies.
+- The kiln smelts 25% more slowly than it does on fuel, and it was already slow. Each smelt costs more FE than in an electric Furnace, and the kiln has no overheat slider or Nitrogen tank.
+
+{{ crafting('rngtech:kiln_core') }}
+
 ### Automation
 
 | Side | Behavior |
 |---|---|
 | Top | Inserts into the input lane(s). Accepts only items with a Furnace recipe. |
 | Bottom | Extracts finished output. |
-| Sides | Fuel on Stage 0, Battery Cells on electric stages. |
-| Any | Electric stages accept FE, for example from a [Universal Cable](universal-cable.md), and Nitrogen for the [Nitrogen atmosphere](heat.md#nitrogen-atmosphere). |
+| Sides | Fuel on Stage 0 without a Kiln Core, Battery Cells on electric stages. |
+| Any | Electric stages accept FE, for example from a [Universal Cable](universal-cable.md), and Nitrogen for the [Nitrogen atmosphere](heat.md#nitrogen-atmosphere). A Stage 0 Furnace with a Kiln Core accepts FE but not Nitrogen. |
 
 Automation fills the input lanes in order: lane 1 takes a full stack before lane 2 gets anything, so a slow feed into a Lead Furnace keeps one lane busy while the others sit idle. The **Even Feed** keystone on the [Machine Mastery](machine-mastery.md) tree changes that. With it, each item that arrives through automation goes to the emptiest lane that can hold it, so a hopper trickle or a full stack from a cable spreads across every lane. It does not change which items the Furnace accepts, and a lane never holds two kinds of item. Items you place by hand still go where you put them. Even Feed sits right on a road, 15 points from the Furnace start, and has no downside beyond the points it costs.
 
@@ -137,7 +148,7 @@ Smelting ores, raw metals, crushed ores, and alloy blends earns Furnace Mastery 
 
 Two keystones cap your heat in exchange for speed or savings. Each cap only stops Gear from going higher; it never raises a weaker Heat Core. Compare the caps with the heat column in the [recipe table](#furnace-recipes).
 
-- **Flash Annealing** caps Max Temperature at 1,000 heat. It gives 100% more Processing Speed, with 50% more Energy Usage and 50% less Fuel Efficiency. An electric Furnace smelts twice as fast, and each smelt costs 1.5 times the FE. A Stage 0 Furnace smelts twice as fast for the same fuel per smelt.
+- **Flash Annealing** caps Max Temperature at 1,000 heat. It gives 100% more Processing Speed, with 50% more Energy Usage and 50% less Fuel Efficiency. An electric Furnace smelts twice as fast, and each smelt costs 1.5 times the FE. A Stage 0 Furnace on fuel smelts twice as fast for the same fuel per smelt. With a Kiln Core, it works like an electric Furnace.
 - **Low Heat Specialist** caps Max Temperature at 800 heat, enough for Iron and Copper. It gives 50% less Energy Usage and 100% more Fuel Efficiency, so each smelt costs half the FE or fuel at the same speed.
 
 Other Furnace keystones:

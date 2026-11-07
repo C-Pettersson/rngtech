@@ -1,0 +1,33 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "rngtech:material_enabled",
+            "material": "copper"
+        }
+    ],
+    "type": "rngtech:trait_shaped",
+    "category": "equipment",
+    "pattern": [
+        "SCS",
+        "RBR",
+        "SCS"
+    ],
+    "key": {
+        "B": {
+            "tag": "rngtech:circuits/basic"
+        },
+        "C": {
+            "item": "rngtech:copper_coil"
+        },
+        "R": {
+            "item": "minecraft:redstone"
+        },
+        "S": {
+            "item": "minecraft:smooth_stone"
+        }
+    },
+    "result": {
+        "count": 1,
+        "id": "rngtech:kiln_core"
+    }
+}

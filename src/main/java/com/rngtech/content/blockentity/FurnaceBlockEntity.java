@@ -6,6 +6,7 @@ import com.rngtech.content.block.FurnaceBlock;
 import com.rngtech.content.gear.IdentifyingItemHandler;
 import com.rngtech.content.item.BatteryCellItem;
 import com.rngtech.content.item.GearParts;
+import com.rngtech.content.item.KilnCoreItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.SolidFuelBurnerPartItem;
 import com.rngtech.content.item.UniquePartItem;
@@ -174,7 +175,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 return false;
             }
             if (slot == SLOT_FUEL) {
-                return isElectric() ? isBatteryCell(stack) : isFuel(stack);
+                return isElectric() ? isBatteryCell(stack) : isFuel(stack) && !hasKilnCore();
             }
             int lane = inputLane(slot);
             return lane >= 0 && lane < activeProcessingSlots();
@@ -551,8 +552,8 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
                 Math.max(0, effectiveStats().intValue(MachineStat.MAX_TEMPERATURE)),
                 wobbleDisplay(),
                 getBlockState().getValue(BaseMachineBlock.ACTIVE),
-                !isElectric() && hasBurnTime() && totalBurnTime > 0 ? Math.min(1.0F, burnTime / (float) totalBurnTime) : 0.0F,
-                usesHeatCores() ? heatCoreKey(gearInventory.getStackInSlot(0)) : "",
+                !runsOnEnergy() && hasBurnTime() && totalBurnTime > 0 ? Math.min(1.0F, burnTime / (float) totalBurnTime) : 0.0F,
+                heatCoreKey(gearInventory.getStackInSlot(0)),
                 hasCell ? ((BatteryCellItem) cell.getItem()).material().getSerializedName() : "",
                 hasCell && energyCapacity() > 0 ? energyStored() / (float) energyCapacity() : -1.0F,
                 isElectric() ? atmosphere.amount() / (float) InertAtmosphere.CAPACITY : -1.0F,
@@ -563,6 +564,9 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     private String heatCoreKey(ItemStack stack) {
         if (!isAllowedGearComponent(0, stack)) {
             return "";
+        }
+        if (stack.getItem() instanceof KilnCoreItem) {
+            return FurnaceVisualState.KILN_CORE;
         }
         if (stack.getItem() instanceof SolidFuelBurnerPartItem part && part.heatCoreMaterial() != null) {
             return part.heatCoreMaterial().getSerializedName();
@@ -613,6 +617,16 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         return furnaceMaterial().electric();
     }
 
+    /** A Stage 0 Furnace with a Kiln Core in its Gear slot: it heats with FE instead of fuel. */
+    public boolean hasKilnCore() {
+        return !isElectric() && gearInventory.getStackInSlot(0).getItem() instanceof KilnCoreItem;
+    }
+
+    /** Electric chassis, and the Stage 0 Furnace once a Kiln Core is installed, pay for heat in FE. */
+    public boolean runsOnEnergy() {
+        return isElectric() || hasKilnCore();
+    }
+
     public boolean usesHeatCores() {
         return furnaceMaterial().usesHeatCores();
     }
@@ -631,7 +645,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         int status = statusCode(baseStats);
         int lane = machineInfoLane(baseStats);
         FurnaceRecipe recipe = lane < 0 ? null : findRecipeWithoutGates(lane);
-        long energyDemand = isElectric() && hasEnergyDemandStatus(status) ? totalActiveEnergyDemand(baseStats) : 0;
+        long energyDemand = runsOnEnergy() && hasEnergyDemandStatus(status) ? totalActiveEnergyDemand(baseStats) : 0;
         long energyRate = energyDemand > 0 ? -energyDemand : 0;
         int connectorDemand = (int) Math.min(Integer.MAX_VALUE, energyDemand);
         AdjacentEnergyConnector.Info connector = AdjacentEnergyConnector.forSink(level, worldPosition);
@@ -1178,7 +1192,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private void refundClosedLoopEnergy(FurnaceRecipe recipe, MachineStatAccumulator stats) {
-        if (!isElectric() || !FurnacePassiveTree.usesClosedLoopRecuperator(machineProgression())) {
+        if (!runsOnEnergy() || !FurnacePassiveTree.usesClosedLoopRecuperator(machineProgression())) {
             return;
         }
         int refund = Math.max(1, (int) Math.ceil(recipe.heat() * HeatEngine.energyRate(stats) * CLOSED_LOOP_REFUND));
@@ -1326,7 +1340,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     /** FE/t the lanes' heaters spent last tick: on wall loss when {@code holding}, otherwise on heating chambers and inputs. */
     private int heatEnergy(int part) {
-        if (!isElectric()) {
+        if (!runsOnEnergy()) {
             return 0;
         }
         double total = 0.0;
@@ -1366,14 +1380,14 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     /** FE the lane's heater drew last tick. */
     private int currentEnergyCostPerTick(int lane) {
-        if (!isElectric() || lane >= activeProcessingSlots()) {
+        if (!runsOnEnergy() || lane >= activeProcessingSlots()) {
             return 0;
         }
         return (int) Math.ceil(heat[lane].lastHeat() * HeatEngine.energyRate(statsForLane(lane)));
     }
 
     private int laneEnergyStatus(int lane) {
-        if (isElectric()) {
+        if (runsOnEnergy()) {
             // A lane still taking heat while short of power is underpowered, not out of power.
             return !starved[lane] ? STATUS_READY
                     : energyStored() > 0 || heat[lane].lastAbsorbed() > 0.0 ? STATUS_POWER_LIMITED : STATUS_NO_POWER;
@@ -1383,7 +1397,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
     /** FE one item costs at the setpoint: its own heat plus its share of the wall loss during the cycle. */
     private int currentEnergyCostPerCraft(int lane) {
-        if (!isElectric()) {
+        if (!runsOnEnergy()) {
             return 0;
         }
         FurnaceRecipe recipe = findNextRecipe(lane);
@@ -1520,7 +1534,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private HeatEngine.HeatSupply heatSupply(int lane, MachineStatAccumulator stats) {
-        return isElectric() ? HeatEngine.electric(heat[lane], stats, this::drawEnergy) : HeatEngine.fuel(heat[lane], this::burnFuel);
+        return runsOnEnergy() ? HeatEngine.electric(heat[lane], stats, this::drawEnergy) : HeatEngine.fuel(heat[lane], this::burnFuel);
     }
 
     /** Takes up to {@code amount} FE from the internal buffer and the Battery Cell. */
@@ -1543,7 +1557,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     /** Instant Process pays the whole batch's heat at once, without the wall loss of a full cycle. */
     private boolean payInstant(int lane, FurnaceRecipe recipe, MachineStatAccumulator stats, HeatEngine.HeatSupply supply) {
         double needed = recipe.heat() * (double) laneBatch(lane, recipe, stats);
-        if (isElectric()) {
+        if (runsOnEnergy()) {
             int energyCost = (int) Math.ceil(needed * HeatEngine.energyRate(stats));
             if (consumeWorkingEnergy(energyCost, true) < energyCost) {
                 return false;
@@ -1619,7 +1633,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private int internalEnergyCapacity() {
-        if (!isElectric()) {
+        if (!runsOnEnergy()) {
             return 0;
         }
         return Math.max(1, (int) Math.round(effectiveStats().value(MachineStat.ENERGY_CAPACITY)));
@@ -1630,7 +1644,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private int receiveInternalEnergy(int toReceive, boolean simulate) {
-        if (!isElectric() || toReceive <= 0) {
+        if (!runsOnEnergy() || toReceive <= 0) {
             return 0;
         }
 
@@ -1643,7 +1657,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
     }
 
     private int consumeWorkingEnergy(int toConsume, boolean simulate) {
-        if (!isElectric() || toConsume <= 0) {
+        if (!runsOnEnergy() || toConsume <= 0) {
             return 0;
         }
 
@@ -2142,7 +2156,7 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
 
         @Override
         public boolean canReceive() {
-            if (!isElectric()) {
+            if (!runsOnEnergy()) {
                 return false;
             }
             if (internalEnergyStored() < internalEnergyCapacity()) {

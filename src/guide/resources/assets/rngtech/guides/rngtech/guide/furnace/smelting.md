@@ -17,6 +17,7 @@ Heat decides your progress. Unmodified electric chassis reach about:
 | Heat Core | Max temperature | Stability | Unlocks |
 |---|---:|---:|---|
 | Stage 0 Furnace (no core) | 800 | — | Iron and Copper |
+| Stage 0 Furnace with a <ItemLink id="rngtech:kiln_core" /> | 1,000 (hard cap) | — | Tin, Zinc, and Gold |
 | <ItemLink id="rngtech:iron_heat_core" /> | 800 | 0.85 | Iron and Copper |
 | <ItemLink id="rngtech:copper_heat_core" /> | 1,000 | 0.90 | Tin, Zinc, and Gold |
 | <ItemLink id="rngtech:bronze_heat_core" /> | 1,200 | 0.95 | Nickel, Lead, and Silver. Its stability is just enough for them. |

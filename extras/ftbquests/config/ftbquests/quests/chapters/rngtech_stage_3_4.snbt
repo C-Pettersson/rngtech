@@ -146,6 +146,27 @@
 		}
 		{
 			dependencies: ["4F5AA1D34A0C1A4C"]
+			id: "2C4E7A91B3D5F017"
+			optional: true
+			rewards: [{
+				count: 4
+				id: "2C4E7A91B3D5F019"
+				item: {
+					count: 1
+					id: "minecraft:redstone"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "2C4E7A91B3D5F018"
+				item: { count: 1, id: "rngtech:kiln_core" }
+				type: "item"
+			}]
+			x: 5.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["4F5AA1D34A0C1A4C"]
 			id: "37A6C9E1284B5D32"
 			optional: true
 			rewards: [

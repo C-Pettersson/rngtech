@@ -17,6 +17,7 @@
         "generators",
         "heat_core",
         "jewels",
+        "kiln_core",
         "mastery_attributes",
         "phase_array",
         "processing_machines",

@@ -109,6 +109,7 @@ public class FurnaceRenderer implements BlockEntityRenderer<FurnaceBlockEntity> 
             HEAT_CORE_MODELS.put(material.getSerializedName(), part("heat_core_" + material.getSerializedName()));
         }
         HEAT_CORE_MODELS.put("unique", part("heat_core_unique"));
+        HEAT_CORE_MODELS.put(FurnaceVisualState.KILN_CORE, part("kiln_core"));
     }
 
     private final ModelBlockRenderer modelRenderer;
@@ -159,8 +160,9 @@ public class FurnaceRenderer implements BlockEntityRenderer<FurnaceBlockEntity> 
         poseStack.translate(-0.5F, 0.0F, -0.5F);
 
         VertexConsumer cutout = bufferSource.getBuffer(Sheets.cutoutBlockSheet());
+        // The Stage 0 Furnace's Kiln Core shows as its fire grate and back port.
+        renderPart(poseStack, cutout, HEAT_CORE_MODELS.get(state.heatCore()), packedLight, packedOverlay);
         if (material.electric()) {
-            renderPart(poseStack, cutout, HEAT_CORE_MODELS.get(state.heatCore()), packedLight, packedOverlay);
             if (!state.cell().isEmpty()) {
                 renderCell(poseStack, cutout, state.cell(), packedLight, packedOverlay);
             }
@@ -350,7 +352,10 @@ public class FurnaceRenderer implements BlockEntityRenderer<FurnaceBlockEntity> 
         }
     }
 
-    /** The Stage 0 kiln: a fuel bed and flames in the fire mouth while it burns, and the oven glowing with its heat. */
+    /**
+     * The Stage 0 kiln: a fuel bed and flames in the fire mouth while it burns, or its Kiln Core coil glowing there, and the
+     * oven glowing with its heat.
+     */
     private static void renderKiln(
             MultiBufferSource bufferSource, PoseStack.Pose pose, FurnaceVisualState state,
             FurnaceVisualState.Animation animation, float time, int overlay
@@ -372,6 +377,10 @@ public class FurnaceRenderer implements BlockEntityRenderer<FurnaceBlockEntity> 
         float heat = animation.heat[state.hottestLane()];
         if (FurnaceGlow.strength(heat) > 0.0F) {
             FurnaceGlow.chamberGlow(bufferSource.getBuffer(RenderType.eyes(GLOW)), pose, OVEN, FurnaceGlow.glow(heat, 0.6F), overlay);
+            // A Kiln Core heats with FE: its copper coil glows in the fire mouth instead of a fire.
+            if (FurnaceVisualState.KILN_CORE.equals(state.heatCore())) {
+                FurnaceGlow.chamberGlow(bufferSource.getBuffer(RenderType.eyes(GLOW)), pose, FIRE_MOUTH, FurnaceGlow.glow(heat, 0.8F), overlay);
+            }
         }
     }
 

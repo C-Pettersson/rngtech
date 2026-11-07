@@ -178,7 +178,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
                 FurnaceBlockEntity.SLOT_FUEL,
                 FUEL_SLOT_X,
                 furnace.isElectric() ? BATTERY_SLOT_Y : FUEL_SLOT_Y,
-                () -> selectedTab == (furnace.isElectric() ? TAB_GEAR : TAB_PROCESSING)
+                () -> furnace.isElectric() ? selectedTab == TAB_GEAR : selectedTab == TAB_PROCESSING && showsFuelSlot()
         ));
         for (int lane = 0; lane < MAX_PROCESSING_SLOTS; lane++) {
             final int slotLane = lane;
@@ -290,6 +290,16 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
 
     public boolean isElectric() {
         return furnace.isElectric();
+    }
+
+    /** Whether the machine pays for heat in FE: electric chassis, and a Stage 0 Furnace with a Kiln Core. */
+    public boolean runsOnEnergy() {
+        return furnace.runsOnEnergy();
+    }
+
+    /** A Stage 0 Furnace hides its empty fuel slot once a Kiln Core powers it, but still shows leftover fuel to take out. */
+    public boolean showsFuelSlot() {
+        return !furnace.runsOnEnergy() || !furnace.getInventory().getStackInSlot(FurnaceBlockEntity.SLOT_FUEL).isEmpty();
     }
 
     public boolean usesHeatCores() {
@@ -722,7 +732,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
             if (!moveItemStackTo(stack, FurnaceBlockEntity.SLOT_FUEL, FurnaceBlockEntity.SLOT_FUEL + 1, false)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!furnace.isElectric() && FurnaceBlockEntity.isFuel(stack)) {
+        } else if (!furnace.runsOnEnergy() && FurnaceBlockEntity.isFuel(stack)) {
             if (!moveItemStackTo(stack, FurnaceBlockEntity.SLOT_FUEL, FurnaceBlockEntity.SLOT_FUEL + 1, false)) {
                 return ItemStack.EMPTY;
             }
@@ -812,13 +822,13 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
     @Override public double masteryAttribute(MachineStat stat) { return MasteryMenuSupport.attribute(data, DATA_MACHINE_PROGRESSION_START, stat); }
     @Override public boolean masterySupports(MachineStat stat) {
         return masteryFamily().supports(stat) && switch (stat) {
-            case FUEL_DURATION, FUEL_EFFICIENCY -> !isElectric();
-            case ENERGY_USAGE, ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT -> isElectric();
+            case FUEL_DURATION, FUEL_EFFICIENCY -> !runsOnEnergy();
+            case ENERGY_USAGE, ENERGY_CAPACITY, ENERGY_CAPACITY_FLAT -> runsOnEnergy();
             default -> true;
         };
     }
     @Override public boolean masterySupportsBehavior(String behavior) {
-        return masteryFamily().supportsBehavior(behavior) && (!behavior.equals("CLOSED_LOOP_RECUPERATOR") || isElectric());
+        return masteryFamily().supportsBehavior(behavior) && (!behavior.equals("CLOSED_LOOP_RECUPERATOR") || runsOnEnergy());
     }
     @Override public MachineMasteryFamily masteryFamily() { return MachineMasteryFamily.FURNACE; }
     @Override public MachineProgressionState masterySnapshot() {

@@ -12,7 +12,7 @@ Smelting ores, raw metals, crushed ores, and alloy blends earns Furnace Mastery 
 
 Two keystones cap your heat in exchange for speed or savings. Each cap only stops Gear from going higher; it never raises a weaker Heat Core. Compare the caps with the heat column in the [recipe table](rngtech:furnace.md).
 
-- **Flash Annealing** caps Max Temperature at 1,000 heat. It gives 100% more Processing Speed, with 50% more Energy Usage and 50% less Fuel Efficiency. An electric Furnace smelts twice as fast, and each smelt costs 1.5 times the FE. A Stage 0 Furnace smelts twice as fast for the same fuel per smelt.
+- **Flash Annealing** caps Max Temperature at 1,000 heat. It gives 100% more Processing Speed, with 50% more Energy Usage and 50% less Fuel Efficiency. An electric Furnace smelts twice as fast, and each smelt costs 1.5 times the FE. A Stage 0 Furnace on fuel smelts twice as fast for the same fuel per smelt. With a Kiln Core, it works like an electric Furnace.
 - **Low Heat Specialist** caps Max Temperature at 800 heat, enough for Iron and Copper. It gives 50% less Energy Usage and 100% more Fuel Efficiency, so each smelt costs half the FE or fuel at the same speed.
 
 Other Furnace keystones:

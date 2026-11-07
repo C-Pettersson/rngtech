@@ -7,6 +7,7 @@ categories:
   - "Processing"
 item_ids:
   - rngtech:furnace
+  - rngtech:kiln_core
   - rngtech:iron_furnace_chassis
   - rngtech:copper_furnace_chassis
   - rngtech:gold_furnace_chassis
@@ -39,8 +40,8 @@ item_ids:
 
 - **Type:** Processing machine
 - **Stages:** 0–8
-- **Power:** Solid fuel (Stage 0), FE (Stages 1–8)
-- **Gear:** <ItemLink id="rngtech:iron_heat_core" />, <ItemLink id="rngtech:iron_battery_cell" />
+- **Power:** Solid fuel (Stage 0), FE (Stage 0 with a Kiln Core, Stages 1–8)
+- **Gear:** <ItemLink id="rngtech:kiln_core" /> (Stage 0), <ItemLink id="rngtech:iron_heat_core" />, <ItemLink id="rngtech:iron_battery_cell" />
 - **Mastery:** Yes
 - **Tool:** <ItemLink id="minecraft:wooden_pickaxe" />
 
@@ -48,7 +49,7 @@ The **Furnace** is RNGTech's heat-aware smelter. Each recipe needs the machine t
 
 Like every RNGTech machine, each Furnace you craft rolls its own [rarity and affixes](rngtech:rarity-and-affixes.md), and it can level up through [Machine Mastery](rngtech:machine-mastery.md).
 
-You can read a Furnace from the outside. The Stage 0 Furnace is a smooth-stone kiln: fuel burns in the fire mouth at the bottom, the item being smelted sits in the oven above it, and smoke rises from the copper-banded chimney while fuel burns. An electric Furnace shows the item it is smelting on the hearth behind its viewport door. As the lane heats up, the chamber and its heating elements glow from dull red through orange to yellow-white. The bar under the door reads like the [heat bar](rngtech:heat/the-overheat-slider.md) on the Process tab: it fills with the lane's heat against the Heat Core's Max Temperature, a white mark shows the recipe's target and a yellow mark the setpoint when the slider pushes past it, and the fill turns red while the lane overheats. A lane pushed past its target flickers with its wobble. With extra lanes, the items stand side by side on the hearth and the bar reads the hottest lane. The Heat Core sits on the crown as a row of fins in the core's material. Facing the front, the Battery Cell stands in the cradle on the left with its charge meter, the [Nitrogen tank](rngtech:heat/nitrogen-atmosphere.md) is the gas cylinder behind it, and the cable port is on the back. The window on the cylinder shows how full the tank is, and its valve lights up while a lane uses Nitrogen. The Lead Furnace has four small chambers, one per lane: under each column of doors, the upper half of the bar reads the top chamber and the lower half the bottom one. Each chassis has its own shell metal.
+You can read a Furnace from the outside. The Stage 0 Furnace is a smooth-stone kiln: fuel burns in the fire mouth at the bottom, the item being smelted sits in the oven above it, and smoke rises from the copper-banded chimney while fuel burns. With a Kiln Core installed, a copper heating coil closes the fire mouth and glows while the kiln is hot, and a cable port sits on the back. An electric Furnace shows the item it is smelting on the hearth behind its viewport door. As the lane heats up, the chamber and its heating elements glow from dull red through orange to yellow-white. The bar under the door reads like the [heat bar](rngtech:heat/the-overheat-slider.md) on the Process tab: it fills with the lane's heat against the Heat Core's Max Temperature, a white mark shows the recipe's target and a yellow mark the setpoint when the slider pushes past it, and the fill turns red while the lane overheats. A lane pushed past its target flickers with its wobble. With extra lanes, the items stand side by side on the hearth and the bar reads the hottest lane. The Heat Core sits on the crown as a row of fins in the core's material. Facing the front, the Battery Cell stands in the cradle on the left with its charge meter, the [Nitrogen tank](rngtech:heat/nitrogen-atmosphere.md) is the gas cylinder behind it, and the cable port is on the back. The window on the cylinder shows how full the tank is, and its valve lights up while a lane uses Nitrogen. The Lead Furnace has four small chambers, one per lane: under each column of doors, the upper half of the bar reads the top chamber and the lower half the bottom one. Each chassis has its own shell metal.
 
 ## Usage
 

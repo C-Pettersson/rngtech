@@ -404,7 +404,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
     private void drawProcessingLabels(GuiGraphics guiGraphics) {
         Component input = Component.translatable(menu.activeProcessingSlots() > 1 ? "rngtech.processing.inputs" : "rngtech.processing.input");
         guiGraphics.drawString(font, input, 55 - font.width(input) / 2, 28, TEXT_MUTED, false);
-        if (!menu.isElectric()) {
+        if (!menu.isElectric() && menu.showsFuelSlot()) {
             Component fuel = Component.translatable("rngtech.processing.fuel");
             guiGraphics.drawString(font, fuel, FUEL_FRAME_X - 3 - font.width(fuel), FUEL_FRAME_Y + 5, TEXT_MUTED, false);
         }
@@ -440,7 +440,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
                 renderSlotFrame(guiGraphics, PROCESS_INPUT_X[slot] - 1, PROCESS_INPUT_Y[slot] - 1);
                 renderSlotFrame(guiGraphics, PROCESS_OUTPUT_X[slot] - 1, PROCESS_OUTPUT_Y[slot] - 1);
             }
-            if (!menu.isElectric()) {
+            if (!menu.isElectric() && menu.showsFuelSlot()) {
                 renderSlotFrame(guiGraphics, FUEL_FRAME_X, FUEL_FRAME_Y);
             }
         } else if (menu.selectedTab() == FurnaceMenu.TAB_GEAR) {
@@ -488,15 +488,17 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
             }
         }
 
-        if (menu.isElectric()) {
+        if (menu.runsOnEnergy()) {
             renderVerticalBar(guiGraphics, ENERGY_BAR_X, menu.energyProgress(), ENERGY);
+        }
+        if (menu.isElectric()) {
             nitrogenGauge.render(guiGraphics, leftPos, topPos, menu.nitrogen(), menu.nitrogenUse());
         }
         HeatReadout.renderBar(guiGraphics, leftPos + HEAT_BAR_X, topPos + BAR_Y, BAR_WIDTH, BAR_HEIGHT, BAR_FILL_HEIGHT, heatBands());
         if (menu.hasFailureRecipe()) {
             renderVerticalBar(guiGraphics, FAILURE_BAR_X, menu.failureProgress(), FAILURE);
         }
-        if (!menu.isElectric()) {
+        if (!menu.runsOnEnergy()) {
             guiGraphics.fill(x + FUEL_BAR_X, y + FUEL_BAR_Y, x + FUEL_BAR_X + FUEL_BAR_WIDTH, y + FUEL_BAR_Y + FUEL_BAR_HEIGHT, 0xFF5F5F5F);
             guiGraphics.fill(
                     x + FUEL_BAR_X + 1,
@@ -608,7 +610,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
             return;
         }
 
-        if (menu.isElectric()) {
+        if (menu.runsOnEnergy()) {
             CompactValueText.renderTooltipIfHovered(
                     guiGraphics,
                     font,
@@ -682,7 +684,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
                 );
             }
         }
-        if (!menu.isElectric()) {
+        if (!menu.runsOnEnergy()) {
             CompactValueText.renderTooltipIfHovered(
                     guiGraphics,
                     font,
@@ -732,7 +734,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
     private Component laneProgressText(int lane) {
         int ticks = menu.processingTicks(lane);
         if (menu.activeProcessingSlots() > 1) {
-            if (menu.isElectric() && ticks > 0) {
+            if (menu.runsOnEnergy() && ticks > 0) {
                 return Component.translatable(
                         "rngtech.furnace.tooltip.progress.lane_energy",
                         lane + 1,
@@ -747,7 +749,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
                     ? Component.translatable("rngtech.furnace.tooltip.progress.lane.empty", lane + 1)
                     : Component.translatable("rngtech.furnace.tooltip.progress.lane", lane + 1, menu.progress(lane), ticks);
         }
-        if (menu.isElectric() && ticks > 0) {
+        if (menu.runsOnEnergy() && ticks > 0) {
             return Component.translatable(
                     "rngtech.furnace.tooltip.progress.energy",
                     menu.progress(lane),
@@ -775,7 +777,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
 
     private List<Component> heatTooltipLines() {
         return HeatReadout.lines(heatTooltip(), menu.heatSlider(), menu.targetTemperature(), menu.setpoint(), menu.heatFactor(), menu.wobble(),
-                menu.inputEnergy(), menu.heatingEnergy(), menu.holdingEnergy(), menu.isElectric());
+                menu.inputEnergy(), menu.heatingEnergy(), menu.holdingEnergy(), menu.runsOnEnergy());
     }
 
     private Component heatTooltip() {
@@ -882,15 +884,15 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
     }
 
     private String[] statLabelKeys() {
-        return menu.isElectric() ? ELECTRIC_STAT_LABEL_KEYS : FUEL_STAT_LABEL_KEYS;
+        return menu.runsOnEnergy() ? ELECTRIC_STAT_LABEL_KEYS : FUEL_STAT_LABEL_KEYS;
     }
 
     private int[] statDataIndices() {
-        return menu.isElectric() ? ELECTRIC_STAT_DATA_INDICES : FUEL_STAT_DATA_INDICES;
+        return menu.runsOnEnergy() ? ELECTRIC_STAT_DATA_INDICES : FUEL_STAT_DATA_INDICES;
     }
 
     private MachineStat[] statTypes() {
-        return menu.isElectric() ? ELECTRIC_STAT_TYPES : FUEL_STAT_TYPES;
+        return menu.runsOnEnergy() ? ELECTRIC_STAT_TYPES : FUEL_STAT_TYPES;
     }
 
     private boolean isIntegralStat(int dataIndex) {

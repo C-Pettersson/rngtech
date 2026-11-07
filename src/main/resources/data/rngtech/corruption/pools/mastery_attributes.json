@@ -9,6 +9,7 @@
         "resonance_calibrator",
         "crush_head",
         "heat_core",
+        "kiln_core",
         "servo",
         "fluid_pump",
         "alloy_crucible",

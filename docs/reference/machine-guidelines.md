@@ -194,6 +194,7 @@ Design intent and balance rules behind shipped machines that the code does not s
 - Crushed material smelts directly for early hopper lines, but at `3x` the time and `1.5x` the FE of dust, so the dust step stays worthwhile.
 - Steel comes from the Alloy Furnace, as Steel Blend or direct ingots. Do not add a Furnace Steel Dust smelt.
 - The Stage 0 solid-fuel Furnace is deliberately slow (`0.54x` base speed).
+- The Kiln Core converts the Stage 0 Furnace into a poor electric Furnace, so players need not break their first Furnace when they reach FE. It stays worse than the Iron Furnace on speed (`0.54x` body times the core's `0.75x`, the same penalty as an electric Furnace without a Battery Cell, about `0.41x`) and FE per smelt (`1.25x` Energy Usage, no Battery Cell, slider, or Nitrogen); its edge is `1000` heat, the Copper band, for Gold and Tin. The `1000` is a hard ceiling, not a bonus, because Steel Blend (`1100`) needs no stability, so only heat can keep a rolled kiln off the Steel path. It rolls no Max Temperature or Temperature Stability. Fluxed Blend lowering Steel Blend to `1000` on a kiln is accepted as a clever use of the mechanics, not a bug.
 - Lead is a Stage 4 four-lane sidegrade at half per-lane speed. The Aluminum Heat Core is a low-heat (`850`), fast-transfer sidegrade: flat Max Temperature rolls can lift it over early heat bands, but its identity stays low-heat and fast.
 
 ### Alloy Furnace

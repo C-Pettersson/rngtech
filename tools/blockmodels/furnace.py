@@ -398,6 +398,18 @@ def kiln_elements():
     return elements
 
 
+def kiln_core_elements():
+    """The Kiln Core, drawn only while installed: a copper grate across the fire mouth and the cable port on the back."""
+    (fx0, fy0, fz0), (fx1, fy1, _) = FIRE_MOUTH
+    bar_z = (fz0 - 0.25, fz0 + 0.25)
+    elements = [box((x, fy0, bar_z[0]), (x + 0.5, fy1, bar_z[1]), "copper", faces=("north", "east", "west"))
+                for x in (6.25, 7.75, 9.25)]
+    elements.append(box((fx0, fy1 - 0.75, bar_z[0]), (fx1, fy1 - 0.25, bar_z[1]), "copper", faces=("north", "up", "down")))
+    elements.append(box(*PORT, {"south": "port", "*": "copper"}, faces=("south", "east", "west", "up", "down"),
+                        uv={"south": [0, 0, 16, 16]}))
+    return elements
+
+
 def kiln_item_elements():
     (fx0, fy0, fz0), (fx1, _, fz1) = FIRE_MOUTH
     return [box((fx0 + 0.5, fy0, fz0 + 1.0), (fx1 - 0.5, fy0 + 1.0, fz1 - 1.0), "coal", faces=("north", "up"))]
@@ -669,6 +681,10 @@ def write_furnace_models() -> None:
     parts = MODELS / "block/furnace"
     job_lamp.write_part(parts / "job_lamp.json", *JOB_LAMP, JOB_LAMP_FACES)
     job_lamp.write_part(parts / "kiln_job_lamp.json", *KILN_JOB_LAMP, FRONT_FACES)
+    write_json(parts / "kiln_core.json", {
+        "textures": {"particle": TEX + "kiln/copper", "copper": TEX + "kiln/copper", "port": TEX + "port"},
+        "elements": kiln_core_elements(),
+    })
     write_json(parts / "heat_core.json", {"textures": {"particle": "#core"}, "elements": fin_elements()})
     for material in HEAT_CORES:
         write_json(parts / f"heat_core_{material}.json", {"parent": "rngtech:block/furnace/heat_core", "textures": {"core": CORE_TEX + material}})

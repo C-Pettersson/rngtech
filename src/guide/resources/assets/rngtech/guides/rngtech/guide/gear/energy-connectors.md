@@ -2,7 +2,7 @@
 navigation:
   title: "Energy Connectors"
   parent: gear.md
-  position: 15
+  position: 16
   icon: rngtech:iron_heat_core
 ---
 

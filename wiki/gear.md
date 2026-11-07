@@ -195,6 +195,12 @@ The [Furnace](furnace.md) page lists the temperature each core reaches, and the 
 
 {{ crafting('rngtech:iron_heat_core') }}
 
+### Kiln Core
+
+The {{ item('rngtech:kiln_core') }} is Stage 0 Gear for the Stage 0 [Furnace](furnace.md) only. It turns the kiln into a slow electric Furnace that runs on FE, with 25% less Processing Speed, and lifts it to 1,000 heat with a hard cap. Its affixes improve FE use, the FE buffer, and heat flow.
+
+**Used in:** Stage 0 [Furnace](furnace.md) (optional).
+
 ### Alloy Crucibles
 
 The crucible sets how many input slots an [Alloy Furnace](alloy-furnace.md) has and adds mixing stability and speed.

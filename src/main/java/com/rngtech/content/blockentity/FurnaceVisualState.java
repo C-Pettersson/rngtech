@@ -45,6 +45,8 @@ public record FurnaceVisualState(
         boolean atmosphere
 ) {
     public static final int LANES = 4;
+    /** The heat core key a Stage 0 Furnace syncs while its Kiln Core is installed. */
+    public static final String KILN_CORE = "kiln_core";
     public static final int CHARGE_SEGMENTS = 8;
     public static final FurnaceVisualState IDLE = new FurnaceVisualState(
             1,

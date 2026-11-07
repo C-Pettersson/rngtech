@@ -1080,6 +1080,7 @@ function staticStageEntries() {
         stageEntry("furnace_machine_chassis", 0, "static stage catalog"),
         stageEntry("washer_machine_chassis", 0, "static stage catalog"),
         stageEntry("wooden_composter", 0, "static stage catalog"),
+        stageEntry("kiln_core", 0, "static stage catalog"),
         stageEntry("solid_fuel_burner_machine_chassis", 1, "static stage catalog"),
         stageEntry("forming_hammer", 1, "static stage catalog"),
         stageEntry("tiny_anvil", 1, "static stage catalog"),
@@ -1737,6 +1738,7 @@ function stageItemCategory(id, materialItemIds) {
             || local.endsWith("_rule_core")
             || local.endsWith("_battery_cell")
             || local.endsWith("_heat_core")
+            || local === "kiln_core"
             || local.endsWith("_fuel_box")
             || local.endsWith("_fuel_tank")
             || local === "steel_gas_jet"
@@ -1915,6 +1917,9 @@ function modifierProfileIdForItem(id) {
     }
     if (local === "bio_chamber") {
         return "bio_chamber";
+    }
+    if (local === "kiln_core") {
+        return "kiln_core";
     }
     if (local.endsWith("_reactor_chamber")) {
         return "reactor_chamber";
