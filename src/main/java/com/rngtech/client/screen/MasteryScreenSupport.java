@@ -67,8 +67,11 @@ public final class MasteryScreenSupport<N extends PassiveNode> {
     private static final int MASTERY_VIEW_BOTTOM_PADDING = 10;
     private static final int MASTERY_CONTENT_PADDING = 24;
     private static final int MASTERY_SCROLL_STEP = 18;
-    private static final int MASTERY_SCREEN_MARGIN_X = 2 * MachineTabs.ICON_RAIL_SPACE;
-    private static final int MASTERY_SCREEN_MARGIN_Y = 56;
+    // Keeps the expanded panel clear of corner overlays such as two rows of FTB Library sidebar buttons
+    private static final int MASTERY_SCREEN_SIDE_MARGIN = Math.max(MachineTabs.ICON_RAIL_SPACE, 32);
+    private static final int MASTERY_SCREEN_TOP_MARGIN = 40;
+    private static final int MASTERY_SCREEN_MARGIN_X = 2 * MASTERY_SCREEN_SIDE_MARGIN;
+    private static final int MASTERY_SCREEN_MARGIN_Y = 2 * MASTERY_SCREEN_TOP_MARGIN;
     private static final int MASTERY_EXPAND_BUTTON_SIZE = 12;
     private static final int MASTERY_EXPAND_BUTTON_MARGIN = 8;
     private static final int MASTERY_EXPAND_BUTTON_Y = 16;
