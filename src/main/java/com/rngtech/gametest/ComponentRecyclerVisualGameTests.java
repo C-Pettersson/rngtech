@@ -72,7 +72,7 @@ public final class ComponentRecyclerVisualGameTests {
         });
     }
 
-    /** The Crude Recycler shows its input on the runner stone and its returns, and runs while its Hand Crank turns. */
+    /** The Crude Recycler shows its input under the runner stone and its returns, and runs while its Hand Crank turns. */
     @GameTest(template = MachineTestSupport.EMPTY, timeoutTicks = 400)
     public static void crudeRecyclerTurnsWithItsCrank(GameTestHelper helper) {
         ComponentRecyclerBlockEntity recycler = recycler(helper, ComponentRecyclerChassis.CRUDE);
@@ -88,7 +88,7 @@ public final class ComponentRecyclerVisualGameTests {
         helper.succeedWhen(() -> {
             ComponentRecyclerVisualState state = recycler.currentVisualState();
             check(state.outputs().get(0).is(Items.FLINT), "Waiting for the first returns: " + state);
-            check(seenRunning[0], "The runner should turn with the input on it while the crank turns");
+            check(seenRunning[0], "The runner should turn over the input while the crank turns");
             check(state.cranks() > 0, "Each crank should turn the runner a step: " + state);
             check(state.head().isEmpty() && state.filter().isEmpty() && state.cell().isEmpty(), "The Crude Recycler has no Gear: " + state);
         });

@@ -59,7 +59,7 @@ METER = ((12.5, 6.0, 11.0), (12.75, 10.5, 14.0))
 CAGE = ((0.75, 2.0, 10.5), (3.25, 10.0, 14.5))
 # Crude Recycler: a cobblestone quern bed in a plank crate, and the runner stone turned by the Hand Crank.
 QUERN_BED = ((3.0, 2.0, 4.0), (13.0, 5.0, 13.0))
-RUNNER_Y0, RUNNER_Y1, RUNNER_R = 5.0, 7.0, 3.5
+RUNNER_Y0, RUNNER_Y1, RUNNER_R = 6.5, 8.5, 3.5
 LID_Y0 = 14.5
 # Job Chip lamp on the roof header, across from the status lamp.
 JOB_LAMP = ((3.25, 12.75, 0.0), (5.0, 13.25, 0.25))

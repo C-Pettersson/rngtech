@@ -8,7 +8,7 @@ import java.util.Locale;
 
 public enum FurnaceChassisMaterial implements StringRepresentable {
     PRIMITIVE("furnace", 0, false, 0, 0, 0.75, 0.54, 0.85, 1.0, 1.0, 1, 1),
-    IRON("iron_furnace_chassis", 1, true, 400, 48, 1.00, 1.00, 1.00, 1.15, 1.0, 1, 1),
+    IRON("iron_furnace_chassis", 1, true, 400, 48, 1.00, 1.00, 1.00, 1.00, 1.0, 1, 1),
     COPPER("copper_furnace_chassis", 2, true, 500, 72, 1.08, 1.05, 1.02, 1.05, 1.0, 1, 1),
     /** A Copper-era body with a jewel setting: the socket is its upgrade, not its numbers. */
     GOLD("gold_furnace_chassis", 3, true, 500, 72, 1.08, 1.05, 1.02, 1.05, 1.0, 1, 1),

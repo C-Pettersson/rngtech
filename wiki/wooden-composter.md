@@ -36,7 +36,7 @@ Mine a placed Wooden Composter with a pickaxe. It drops itself, and the items in
 
 ### Composting
 
-Put compostable items in the 27 input slots. Every 8 compost units make one Composted Biomass. Most items count as 1 unit; prepared inputs such as {{ item('rngtech:compost_feedstock') }} count as 2.
+Put compostable items in the 24 input slots. Every 8 compost units make one Composted Biomass. Most items count as 1 unit; prepared inputs such as {{ item('rngtech:compost_feedstock') }} count as 2.
 
 | Condition | Time per Composted Biomass |
 |---|---:|
@@ -49,6 +49,24 @@ Two bonuses each add 10% composting speed:
 - **Variety**: at least 5 different compostable items in the input slots.
 
 The water tank holds 4,000 mB. Fill it by putting water buckets or other water containers in the water slot, or pipe water in. If you need to empty it, use the purge button on the Process tab or right-click the Composter with a {{ item('rngtech:purge_bucket') }}. Each purge voids up to 1,000 mB.
+
+### Rich Biomass
+
+Put a catalyst in the catalyst slot, next to the output slot, to make {{ item('rngtech:rich_biomass') }} directly. The batch uses the same compost units, time, and water.
+
+| Catalyst | Batches per item |
+|---|---:|
+| Bone Meal, Gunpowder, or Organic Reagent | 1 |
+| [Urea](ammonia-synthesizer.md#using-urea) | 4 |
+
+A [Crusher](crusher.md) turns one Bone into 4 Bone Meal, one more than a crafting grid gives.
+
+The Composter takes the Urea when a batch finishes, and the Urea pays for that batch and the next three. If you break the Composter, it loses any batches that the Urea has not made yet. The first status square lights when the next batch makes Rich Biomass.
+
+The output slot holds one kind of item:
+
+- **Composted Biomass in the output slot:** the Composter continues to make Composted Biomass and keeps the catalyst. Empty the slot to change to Rich Biomass.
+- **Rich Biomass in the output slot and no catalyst left:** the Composter stops. Empty the slot or add a catalyst.
 
 ### Inputs
 
@@ -68,20 +86,20 @@ Crushing seeds in a [Crusher](crusher.md) turns each seed into one Compost Feeds
 
 ### Using the output
 
-Burn {{ item('rngtech:composted_biomass') }} in the [Bio Generator](bio-generator.md) for 1,600 FE each before modifiers, or craft it with Bone Meal, Organic Reagent, or Gunpowder into {{ item('rngtech:rich_biomass') }}, a denser fuel. One Urea from the [Ammonia Synthesizer](ammonia-synthesizer.md#using-urea) turns four Composted Biomass into four Rich Biomass. Composted Biomass is not a furnace fuel and does not burn in the [Fuel Burner](fuel-burner.md).
+Burn {{ item('rngtech:composted_biomass') }} in the [Bio Generator](bio-generator.md) for 1,600 FE each before modifiers, or craft it with Bone Meal, Organic Reagent, or Gunpowder into {{ item('rngtech:rich_biomass') }}, a denser fuel. One Urea from the [Ammonia Synthesizer](ammonia-synthesizer.md#using-urea) turns four Composted Biomass into four Rich Biomass. The grid recipes cost the same as [the catalyst slot](#rich-biomass). Composted Biomass is not a furnace fuel and does not burn in the [Fuel Burner](fuel-burner.md).
 
 ### Automation
 
 | Side | Behavior |
 |---|---|
-| Top and sides | Insert compostable items and water containers, and fill the water tank. |
-| Bottom | Extracts Composted Biomass and empty containers. |
+| Top and sides | Insert compostable items, catalysts, and water containers, and fill the water tank. |
+| Bottom | Extracts Composted Biomass, Rich Biomass, and empty containers. |
 
 The Wooden Composter has no FE input or output.
 
 ## Screen
 
-The Wooden Composter has one working tab, **Process**. It shows the 27 input slots, the output slot, the water tank with its container slots and purge button, progress, and status squares for the bulk and variety bonuses. Hover for exact values.
+The Wooden Composter has one working tab, **Process**. It shows the 24 input slots, the catalyst slot, the output slot, the water tank with its container slots and purge button, progress, and status squares for the next batch and the bulk and variety bonuses. Hover for exact values.
 
 ## Data values
 

@@ -123,8 +123,8 @@ Super Output is a separate chance for one extra copy of the base output. On a Cr
 | Stage | Crusher | Notes |
 |---:|---|---|
 | 0 | {{ item('rngtech:wooden_crusher_chassis') }} | Primitive body: weak buffer, slow, and uses more energy. |
-| 1 | {{ item('rngtech:iron_crusher_chassis') }} | Baseline powered Crusher. |
-| 2 | {{ item('rngtech:copper_crusher_chassis') }} | Better energy use, smaller buffer. |
+| 1 | {{ item('rngtech:iron_crusher_chassis') }} | Baseline powered Crusher. Cheap to build, with 1.05× base Output Amount. |
+| 2 | {{ item('rngtech:copper_crusher_chassis') }} | Faster, with better energy use. Smaller buffer and 1× base Output Amount. |
 | 3 | {{ item('rngtech:gold_crusher_chassis') }} | Copper numbers with one built-in [jewel socket](jewels.md#body-sockets). |
 | 3 | {{ item('rngtech:bronze_crusher_chassis') }} | More output, higher energy use. |
 | 4 | {{ item('rngtech:steel_crusher_chassis') }} | Durable and efficient but slower. Has Output Guard. |

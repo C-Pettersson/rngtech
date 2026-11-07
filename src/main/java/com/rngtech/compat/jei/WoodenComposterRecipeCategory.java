@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 public final class WoodenComposterRecipeCategory implements IRecipeCategory<WoodenComposterJeiRecipe> {
     private static final int HEIGHT = 76;
     private static final int INPUT_X = 18;
+    private static final int CATALYST_X = 40;
     private static final int OUTPUT_X = 132;
     private static final int SLOT_Y = 20;
     private static final int ARROW_X = 72;
@@ -79,6 +80,14 @@ public final class WoodenComposterRecipeCategory implements IRecipeCategory<Wood
                             WoodenComposterBlockEntity.PREPARED_INPUT_COMPOST_UNITS
                     ));
                 });
+        if (!recipe.catalysts().isEmpty()) {
+            JeiCategoryUi.slot(builder, RecipeIngredientRole.INPUT, CATALYST_X, SLOT_Y)
+                    .addItemStacks(recipe.catalysts())
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable(
+                            "rngtech.jei.wooden_composter.catalyst",
+                            WoodenComposterBlockEntity.UREA_RICH_BATCHES
+                    )));
+        }
         JeiCategoryUi.slot(builder, RecipeIngredientRole.OUTPUT, OUTPUT_X, SLOT_Y)
                 .addItemStack(recipe.output())
                 .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("rngtech.processing.output")));

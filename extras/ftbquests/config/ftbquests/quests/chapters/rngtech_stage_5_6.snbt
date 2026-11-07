@@ -330,11 +330,6 @@
 					type: "item"
 				}
 				{
-					id: "7106E7A1B10F0113"
-					item: { count: 1, id: "rngtech:coal_dust" }
-					type: "item"
-				}
-				{
 					id: "7106E7A1B10F0114"
 					item: { count: 1, id: "minecraft:water_bucket" }
 					type: "item"
