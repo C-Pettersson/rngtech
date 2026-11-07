@@ -52,7 +52,6 @@ Future work on machines that already ship. Design intent for their current behav
 
 ### Furnace and Machine Chassis
 
-- Furnace-specific Gear for the Stage 0 Furnace, which already keeps a saved component slot.
 - Enchant-style chassis behavior.
 
 ### Modular Field Tools

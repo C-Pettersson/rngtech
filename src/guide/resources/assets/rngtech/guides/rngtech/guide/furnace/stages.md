@@ -10,7 +10,7 @@ navigation:
 
 | Stage | Furnace | Notes |
 |---:|---|---|
-| 0 | <ItemLink id="rngtech:furnace" /> | Burns standard furnace fuel. Slow, and reaches 800 heat. |
+| 0 | <ItemLink id="rngtech:furnace" /> | Burns standard furnace fuel. Slow, and reaches 800 heat. With a Kiln Core, it runs on FE and reaches 1,000 heat. |
 | 1 | <ItemLink id="rngtech:iron_furnace_chassis" /> | First electric Furnace. |
 | 2 | <ItemLink id="rngtech:copper_furnace_chassis" /> | Better early heat throughput and energy use. |
 | 3 | <ItemLink id="rngtech:gold_furnace_chassis" /> | Copper numbers with one built-in [jewel socket](rngtech:jewels.md#body-sockets). |

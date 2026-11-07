@@ -2,7 +2,7 @@
 navigation:
   title: "Cavitation Rotors"
   parent: gear.md
-  position: 11
+  position: 12
   icon: rngtech:iron_heat_core
 ---
 

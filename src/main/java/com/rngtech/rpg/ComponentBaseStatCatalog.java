@@ -26,6 +26,7 @@ import com.rngtech.content.item.CrushHeadItem;
 import com.rngtech.content.item.DisassemblyHeadItem;
 import com.rngtech.content.item.FluidPumpItem;
 import com.rngtech.content.item.GasChemistryPartItem;
+import com.rngtech.content.item.KilnCoreItem;
 import com.rngtech.content.item.MachinePartItem;
 import com.rngtech.content.item.PotentialReactorPartItem;
 import com.rngtech.content.item.RuleCoreItem;
@@ -84,10 +85,21 @@ public final class ComponentBaseStatCatalog {
             Map<MachineStat, MergeRule> mergeRules,
             List<MachineStat> summaryStats,
             Map<MachineStat, Double> hostMore,
-            Map<MachineStat, String> gates
+            Map<MachineStat, String> gates,
+            Map<MachineStat, Double> ceilings
     ) {
         Profile(MachineStatAccumulator baseStats, Map<MachineStat, MergeRule> mergeRules, List<MachineStat> summaryStats) {
             this(baseStats, mergeRules, summaryStats, Map.of(), Map.of());
+        }
+
+        Profile(
+                MachineStatAccumulator baseStats,
+                Map<MachineStat, MergeRule> mergeRules,
+                List<MachineStat> summaryStats,
+                Map<MachineStat, Double> hostMore,
+                Map<MachineStat, String> gates
+        ) {
+            this(baseStats, mergeRules, summaryStats, hostMore, gates, Map.of());
         }
     }
 
@@ -289,6 +301,7 @@ public final class ComponentBaseStatCatalog {
             }
         }
         profile.hostMore().forEach((stat, value) -> applyMore(target, stat, value));
+        profile.ceilings().forEach(target::capAbsolute);
 
         // Corruption stats the part does not carry, such as a Crush Head's Jam Recovery, act on the host directly.
         for (MachineModifier corrupted : corruptionEffects(traits)) {
@@ -447,6 +460,9 @@ public final class ComponentBaseStatCatalog {
         if (item instanceof BioChamberItem) {
             return bioChamber();
         }
+        if (item instanceof KilnCoreItem) {
+            return kilnCore();
+        }
         if (item instanceof CrushHeadItem head) {
             return crushHead(head.material());
         }
@@ -544,6 +560,26 @@ public final class ComponentBaseStatCatalog {
                 .more(MachineStat.ENERGY_GENERATION, 1.0)
                 .more(MachineStat.FUEL_DURATION, 1.0)
                 .buildWithoutSummary();
+    }
+
+    /**
+     * The Stage 0 Furnace's electric conversion: it heats with FE from a small buffer, wastefully, at 800 + 200 heat, and
+     * nothing lifts the kiln past 1,000. It smelts 25% slower, like an electric Furnace without a Battery Cell, which the
+     * kiln never has.
+     */
+    static Profile kilnCore() {
+        double bonus = MachineStatAccumulator.KILN_CORE_MAX_TEMPERATURE - MachineStatAccumulator.PRIMITIVE_FURNACE_MAX_TEMPERATURE;
+        return builder()
+                .add(MachineStat.MAX_TEMPERATURE, bonus)
+                .add(MachineStat.ENERGY_CAPACITY, 400.0)
+                .more(MachineStat.ENERGY_USAGE, 1.25)
+                .more(MachineStat.PROCESSING_SPEED, 0.75)
+                .more(MachineStat.HEAT_ISOLATION, 1.0)
+                .more(MachineStat.HEAT_TRANSFER, 1.0)
+                .more(MachineStat.THERMAL_CONDUCTIVITY, 1.0)
+                .more(MachineStat.THERMAL_MASS, 1.0)
+                .ceiling(MachineStat.MAX_TEMPERATURE, MachineStatAccumulator.KILN_CORE_MAX_TEMPERATURE)
+                .build();
     }
 
     static Profile crushHead(CrushHeadMaterial material) {
@@ -881,6 +917,7 @@ public final class ComponentBaseStatCatalog {
         private final Map<MachineStat, Double> values = new EnumMap<>(MachineStat.class);
         private final Map<MachineStat, MergeRule> mergeRules = new EnumMap<>(MachineStat.class);
         private final List<MachineStat> summaryStats = new ArrayList<>();
+        private final Map<MachineStat, Double> ceilings = new EnumMap<>(MachineStat.class);
 
         private ProfileBuilder add(MachineStat stat, double value) {
             return stat(stat, value, MergeRule.ADD);
@@ -894,6 +931,12 @@ public final class ComponentBaseStatCatalog {
             return stat(stat, percent, MergeRule.INCREASED);
         }
 
+        /** Caps the host's final value, after every other bonus; the lowest ceiling wins. */
+        private ProfileBuilder ceiling(MachineStat stat, double value) {
+            ceilings.put(stat, value);
+            return this;
+        }
+
         private ProfileBuilder stat(MachineStat stat, double value, MergeRule rule) {
             values.put(stat, value);
             mergeRules.put(stat, rule);
@@ -905,7 +948,10 @@ public final class ComponentBaseStatCatalog {
             return new Profile(
                     MachineStatAccumulator.componentBase(values),
                     Map.copyOf(mergeRules),
-                    List.copyOf(summaryStats)
+                    List.copyOf(summaryStats),
+                    Map.of(),
+                    Map.of(),
+                    Map.copyOf(ceilings)
             );
         }
 

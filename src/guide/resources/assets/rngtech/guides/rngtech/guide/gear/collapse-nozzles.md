@@ -2,7 +2,7 @@
 navigation:
   title: "Collapse Nozzles"
   parent: gear.md
-  position: 12
+  position: 13
   icon: rngtech:iron_heat_core
 ---
 

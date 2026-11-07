@@ -2,7 +2,7 @@
 navigation:
   title: "Void Chambers and Dimensional Stabilizers"
   parent: gear.md
-  position: 13
+  position: 14
   icon: rngtech:iron_heat_core
 ---
 

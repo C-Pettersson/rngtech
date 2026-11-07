@@ -2,7 +2,7 @@
 navigation:
   title: "Resonance Calibrator parts"
   parent: gear.md
-  position: 10
+  position: 11
   icon: rngtech:iron_heat_core
 ---
 

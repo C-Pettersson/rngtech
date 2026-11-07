@@ -2,7 +2,7 @@
 navigation:
   title: "Servos"
   parent: gear.md
-  position: 8
+  position: 9
   icon: rngtech:iron_heat_core
 ---
 

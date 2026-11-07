@@ -232,6 +232,7 @@ public final class ModCreativeTabs {
                         for (CrushHeadMaterial material : CrushHeadMaterial.values()) {
                             output.accept(ModItems.crushHead(material).get());
                         }
+                        output.accept(ModItems.KILN_CORE.get());
                         for (HeatCoreMaterial material : HeatCoreMaterial.values()) {
                             output.accept(ModItems.heatCore(material).get());
                         }

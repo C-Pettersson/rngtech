@@ -59,8 +59,9 @@ public final class RollReadChecks {
                 MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY, MachineStat.OUTPUT_AMOUNT, MachineStat.SUPER_OUTPUT_CHANCE,
                 MachineStat.INSTANT_PROCESS_CHANCE, MachineStat.CRUSHER_SALVAGE_CHANCE, MachineStat.NO_BATTERY_OUTPUT_RETENTION,
                 MachineStat.OUTPUT_GUARD_GRACE, MachineStat.CRUSHER_INPUT_FILTER, MachineStat.HIGH_HARDNESS_ENERGY_MITIGATION);
+        // A Stage 0 Furnace with a Kiln Core reads FE stats instead of fuel ones.
         reads("furnace", Set.of(HEAT, ATTRIBUTES, BATCHING), MachineStat.EFFICIENCY, MachineStat.FUEL_EFFICIENCY,
-                MachineStat.FUEL_DURATION, MachineStat.PROCESSING_SPEED, MachineStat.INPUT_SLOTS, MachineStat.INSTANT_PROCESS_CHANCE,
+                MachineStat.FUEL_DURATION, MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY, MachineStat.PROCESSING_SPEED, MachineStat.INPUT_SLOTS, MachineStat.INSTANT_PROCESS_CHANCE,
                 MachineStat.SUPER_OUTPUT_CHANCE);
         reads("electric_furnace", Set.of(HEAT, ATTRIBUTES, BATCHING), MachineStat.ENERGY_USAGE, MachineStat.ENERGY_CAPACITY,
                 MachineStat.PROCESSING_SPEED, MachineStat.INPUT_SLOTS, MachineStat.INSTANT_PROCESS_CHANCE, MachineStat.SUPER_OUTPUT_CHANCE);
@@ -279,6 +280,7 @@ public final class RollReadChecks {
                         MachineStat.MAX_TEMPERATURE, MachineStat.STRAIN_RECOVERY)));
                 return hosts;
             });
+            case KILN_CORE -> List.of(merged(ComponentBaseStatCatalog.kilnCore(), "furnace"));
             case BIO_CHAMBER -> List.of(merged(ComponentBaseStatCatalog.bioChamber(), "bio_generator"));
             case ALLOY_CRUCIBLE -> each(AlloyCrucibleMaterial.values(), material -> merged(ComponentBaseStatCatalog.alloyCrucible(material),
                     "alloy_furnace"));

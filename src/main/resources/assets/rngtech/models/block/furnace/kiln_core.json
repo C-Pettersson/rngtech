@@ -1,0 +1,136 @@
+{
+  "textures": {
+    "particle": "rngtech:block/furnace/kiln/copper",
+    "copper": "rngtech:block/furnace/kiln/copper",
+    "port": "rngtech:block/furnace/port"
+  },
+  "elements": [
+    {
+      "from": [
+        6.25,
+        1.0,
+        0.75
+      ],
+      "to": [
+        6.75,
+        4.5,
+        1.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        }
+      }
+    },
+    {
+      "from": [
+        7.75,
+        1.0,
+        0.75
+      ],
+      "to": [
+        8.25,
+        4.5,
+        1.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        }
+      }
+    },
+    {
+      "from": [
+        9.25,
+        1.0,
+        0.75
+      ],
+      "to": [
+        9.75,
+        4.5,
+        1.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        }
+      }
+    },
+    {
+      "from": [
+        5.0,
+        3.75,
+        0.75
+      ],
+      "to": [
+        11.0,
+        4.25,
+        1.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      }
+    },
+    {
+      "from": [
+        4.0,
+        4.0,
+        15.0
+      ],
+      "to": [
+        12.0,
+        12.0,
+        16.0
+      ],
+      "faces": {
+        "south": {
+          "texture": "#port",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      }
+    }
+  ]
+}

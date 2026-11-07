@@ -113,6 +113,13 @@ Every Gear part is its own item with its own [rarity and affixes](rngtech:rarity
 
 - [Crush Heads](rngtech:gear/crush-heads.md)
 - [Heat Cores](rngtech:gear/heat-cores.md)
+
+### Kiln Core
+
+The <ItemLink id="rngtech:kiln_core" /> is Stage 0 Gear for the Stage 0 [Furnace](rngtech:furnace.md) only. It turns the kiln into a slow electric Furnace that runs on FE, with 25% less Processing Speed, and lifts it to 1,000 heat with a hard cap. Its affixes improve FE use, the FE buffer, and heat flow.
+
+**Used in:** Stage 0 [Furnace](rngtech:furnace.md) (optional).
+
 - [Alloy Crucibles](rngtech:gear/alloy-crucibles.md)
 - [Fuel Boxes](rngtech:gear/fuel-boxes.md)
 
@@ -123,24 +130,7 @@ The <ItemLink id="rngtech:bio_chamber" /> adds power, fuel duration, and fuel ef
 **Used in:** [Bio Generator](rngtech:bio-generator.md) (required) and [Algae Photobioreactor](rngtech:algae-photobioreactor.md) (required), where it scales algae output.
 
 - [Potential Reactor parts](rngtech:gear/potential-reactor-parts.md)
-
-### Disassembly Heads
-
-A Disassembly Head sets the processing level and speed of a powered [Component Recycler](rngtech:component-recycler.md). Recycling recipes need a head of at least their level.
-
-| Disassembly Head | Stage |
-|---|---:|
-| <ItemLink id="rngtech:iron_disassembly_head" /> | 1 |
-| <ItemLink id="rngtech:copper_disassembly_head" /> | 2 |
-| <ItemLink id="rngtech:bronze_disassembly_head" /> | 3 |
-| <ItemLink id="rngtech:steel_disassembly_head" /> | 4 |
-| <ItemLink id="rngtech:aluminum_disassembly_head" /> | 5 |
-| <ItemLink id="rngtech:titanium_disassembly_head" /> | 6 |
-| <ItemLink id="rngtech:tungstensteel_disassembly_head" /> | 7 |
-| <ItemLink id="rngtech:exotic_disassembly_head" /> | 8 |
-
-**Used in:** [Component Recycler](rngtech:component-recycler.md) (required, up to the chassis stage).
-
+- [Disassembly Heads](rngtech:gear/disassembly-heads.md)
 - [Servos](rngtech:gear/servos.md)
 - [Fluid Pumps](rngtech:gear/fluid-pumps.md)
 

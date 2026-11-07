@@ -1,0 +1,75 @@
+{
+    "hosts": [
+        "kiln_core"
+    ],
+    "blessed": [
+        {
+            "id": "energy_usage",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "energy_usage",
+                    "operation": "decreased_percent",
+                    "value": 15
+                }
+            ]
+        },
+        {
+            "id": "energy_capacity",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "energy_capacity",
+                    "operation": "increased_percent",
+                    "value": 25
+                }
+            ]
+        },
+        {
+            "id": "heat_transfer",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "heat_transfer",
+                    "operation": "increased_percent",
+                    "value": 10
+                }
+            ]
+        },
+        {
+            "id": "heat_isolation",
+            "weight": 30,
+            "modifiers": [
+                {
+                    "stat": "heat_isolation",
+                    "operation": "increased_percent",
+                    "value": 15
+                }
+            ]
+        }
+    ],
+    "blighted": [
+        {
+            "id": "heat_transfer",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "heat_transfer",
+                    "operation": "less",
+                    "value": 0.8
+                }
+            ]
+        },
+        {
+            "id": "energy_usage",
+            "weight": 50,
+            "modifiers": [
+                {
+                    "stat": "energy_usage",
+                    "operation": "increased_percent",
+                    "value": 25
+                }
+            ]
+        }
+    ]
+}

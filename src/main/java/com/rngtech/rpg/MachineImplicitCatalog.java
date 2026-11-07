@@ -207,6 +207,9 @@ public final class MachineImplicitCatalog {
                 && part.machineType() == MachineType.BIO_GENERATOR) {
             return identity("bio_chamber", Rarity.NORMAL, 0, List.of());
         }
+        if (item instanceof MachinePartItem part && part.partType() == MachinePartType.KILN_CORE) {
+            return identity("kiln_core", Rarity.NORMAL, 4, List.of());
+        }
         if (item instanceof PotentialReactorPartItem part) {
             return switch (part.partType()) {
                 case REACTOR_CHAMBER -> reactorChamber(part.chamberMaterial());

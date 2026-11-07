@@ -433,6 +433,19 @@
 	]
 	quest.2AB169CEEBB9FA40.quest_subtitle: "Move Mastery to a better machine."
 	quest.2AB169CEEBB9FA40.title: "Soul Transfer"
+	quest.2C4E7A91B3D5F017.quest_desc: [
+		"Optional. The &eKiln Core&r turns your Stage 0 Furnace into a slow electric Furnace. You do not have to break down your first Furnace."
+		"It reaches 1,000 °C. This is enough for Tin, Zinc, and Gold."
+		""
+		"&aBuild:&r"
+		"1. Craft a &eKiln Core&r."
+		"2. Install it in the Gear tab of the Stage 0 Furnace."
+		"3. Supply &bFE&r on any side. With the core installed, the kiln does not burn fuel."
+		""
+		"&7&oNote: The kiln stays slow. Affixes cannot raise it above 1,000 °C.&r"
+	]
+	quest.2C4E7A91B3D5F017.quest_subtitle: "Keep your first Furnace."
+	quest.2C4E7A91B3D5F017.title: "Kiln Core"
 	quest.2C5B42CFDFA5C13B.quest_desc: [
 		"The &eAluminum Compressor Tank&r stores 64,000 mB loose and 1,024,000 mB compressed. It accepts Gear up to Stage 5."
 		"Craft it from a &ePressure Tank Frame&r, 4 glass, and 4 aluminum ingots."

@@ -3,6 +3,7 @@ package com.rngtech.rpg;
 public enum MachinePartType {
     CRUSH_HEAD,
     HEAT_CORE,
+    KILN_CORE,
     BIO_CHAMBER,
     ALLOY_CRUCIBLE,
     SERVO,
