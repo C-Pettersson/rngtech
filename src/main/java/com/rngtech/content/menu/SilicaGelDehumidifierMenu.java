@@ -18,7 +18,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class SilicaGelDehumidifierMenu extends AbstractContainerMenu {
     private static final int DATA_WATER = 0;
@@ -63,10 +62,10 @@ public class SilicaGelDehumidifierMenu extends AbstractContainerMenu {
 
         ItemStackHandler inventory = dehumidifier.getInventory();
         for (int lane = 0; lane < SilicaGelDehumidifierBlockEntity.LANE_COUNT; lane++) {
-            addSlot(new SlotItemHandler(inventory, SilicaGelDehumidifierBlockEntity.SLOT_DRY_START + lane, 41, 29 + lane * 24));
+            addSlot(new MachineSlot(inventory, SilicaGelDehumidifierBlockEntity.SLOT_DRY_START + lane, 41, 29 + lane * 24));
         }
         for (int lane = 0; lane < SilicaGelDehumidifierBlockEntity.LANE_COUNT; lane++) {
-            addSlot(new SlotItemHandler(inventory, SilicaGelDehumidifierBlockEntity.SLOT_SATURATED_START + lane, 151, 29 + lane * 24));
+            addSlot(new MachineSlot(inventory, SilicaGelDehumidifierBlockEntity.SLOT_SATURATED_START + lane, 151, 29 + lane * 24));
         }
 
         addPlayerInventory(playerInventory);

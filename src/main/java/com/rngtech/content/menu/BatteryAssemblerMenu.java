@@ -35,7 +35,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -116,18 +115,18 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
         RefinementMenuSupport.setMachineDisplay(refinementTarget, assembler.getBlockState().getBlock(), machineTraits);
 
         ItemStackHandler processInventory = assembler.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_INPUT_0, 57, 29, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_INPUT_1, 79, 29, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_INPUT_2, 101, 29, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_INPUT_3, 123, 29, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_ELECTROLYTE_INPUT, 57, 75, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_OUTPUT_0, 189, 29, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_OUTPUT_1, 211, 29, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_OUTPUT_2, 189, 51, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_OUTPUT_3, 211, 51, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_INPUT_0, 57, 29, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_INPUT_1, 79, 29, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_INPUT_2, 101, 29, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_INPUT_3, 123, 29, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_ELECTROLYTE_INPUT, 57, 75, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_OUTPUT_0, 189, 29, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_OUTPUT_1, 211, 29, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_OUTPUT_2, 189, 51, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, BatteryAssemblerBlockEntity.SLOT_OUTPUT_3, 211, 51, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = assembler.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, BatteryAssemblerBlockEntity.SLOT_BATTERY_CELL, 112, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, BatteryAssemblerBlockEntity.SLOT_BATTERY_CELL, 112, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 assembler.getRefinementInventory(),
@@ -492,20 +491,6 @@ public class BatteryAssemblerMenu extends AbstractContainerMenu implements StatB
     private static Fluid fluidById(int id) {
         Fluid fluid = BuiltInRegistries.FLUID.byId(id);
         return fluid == null ? Fluids.EMPTY : fluid;
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

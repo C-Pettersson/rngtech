@@ -16,7 +16,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class DebugTankMenu extends AbstractContainerMenu {
     public static final int BUTTON_CLEAR = 0;
@@ -50,8 +49,8 @@ public class DebugTankMenu extends AbstractContainerMenu {
         addDataSlots(data);
 
         ItemStackHandler inventory = tank.getContainerInventory();
-        addSlot(new SlotItemHandler(inventory, DebugTankBlockEntity.SLOT_FLUID_INPUT_CONTAINER, 62, 35));
-        addSlot(new SlotItemHandler(inventory, DebugTankBlockEntity.SLOT_FLUID_OUTPUT_CONTAINER, 98, 35));
+        addSlot(new MachineSlot(inventory, DebugTankBlockEntity.SLOT_FLUID_INPUT_CONTAINER, 62, 35));
+        addSlot(new MachineSlot(inventory, DebugTankBlockEntity.SLOT_FLUID_OUTPUT_CONTAINER, 98, 35));
 
         addPlayerInventory(playerInventory);
     }

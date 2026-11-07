@@ -126,21 +126,21 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
         this.cart = cart;
         this.data = data;
 
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 cart.gearInventory(),
                 ForestryCartEntity.SLOT_BATTERY_CELL,
                 43,
                 52,
                 () -> selectedTab == TAB_CART
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 cart.gearInventory(),
                 ForestryCartEntity.SLOT_TOOL,
                 73,
                 52,
                 () -> selectedTab == TAB_CART
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 cart.gearInventory(),
                 ForestryCartEntity.SLOT_SHEARS,
                 103,
@@ -149,7 +149,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
         ));
 
         for (int slot = 0; slot < ForestryCartEntity.SAPLING_SLOT_COUNT; slot++) {
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     cart.cargoInventory(),
                     ForestryCartEntity.SAPLING_SLOT_START + slot,
                     43 + slot * 18,
@@ -158,7 +158,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
             ));
         }
         for (int slot = 0; slot < ForestryCartEntity.OUTPUT_SLOT_COUNT; slot++) {
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     cart.cargoInventory(),
                     ForestryCartEntity.OUTPUT_SLOT_START + slot,
                     92 + slot * 18,
@@ -167,7 +167,7 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
             ));
         }
 
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 cart.gearInventory(),
                 ForestryCartEntity.SLOT_PUMP,
                 13,
@@ -623,26 +623,6 @@ public class ForestryCartMenu extends AbstractContainerMenu implements MasteryMe
             return cart;
         }
         throw new IllegalStateException("Expected forestry cart entity with id " + entityId);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(
-                net.neoforged.neoforge.items.IItemHandler itemHandler,
-                int index,
-                int xPosition,
-                int yPosition,
-                BooleanSupplier activeSupplier
-        ) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

@@ -25,7 +25,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -138,15 +137,15 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
         RefinementMenuSupport.setMachineDisplay(refinementTarget, ModBlocks.CAVITATION_GENERATOR.get(), machineTraits);
 
         ItemStackHandler processInventory = generator.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, CavitationGeneratorBlockEntity.SLOT_FLUID_INPUT_CONTAINER, 29, 62, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, CavitationGeneratorBlockEntity.SLOT_DAMAGED_ROTOR, 193, 62, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, CavitationGeneratorBlockEntity.SLOT_FLUID_INPUT_CONTAINER, 29, 62, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, CavitationGeneratorBlockEntity.SLOT_DAMAGED_ROTOR, 193, 62, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = generator.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_ROTOR, 19, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_NOZZLE, 53, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_HEAT_CORE, 87, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_BATTERY_CELL, 121, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_SERVO, 155, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_ROTOR, 19, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_NOZZLE, 53, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_HEAT_CORE, 87, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_BATTERY_CELL, 121, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, CavitationGeneratorBlockEntity.SLOT_SERVO, 155, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 generator.getRefinementInventory(),
@@ -579,20 +578,6 @@ public class CavitationGeneratorMenu extends AbstractContainerMenu implements St
             return generator;
         }
         throw new IllegalStateException("Expected cavitation generator block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

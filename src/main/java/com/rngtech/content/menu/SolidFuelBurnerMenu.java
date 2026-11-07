@@ -24,7 +24,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -110,14 +109,14 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
         RefinementMenuSupport.setMachineDisplay(refinementTarget, burner.block().asItem(), machineTraits);
 
         ItemStackHandler fuelInventory = burner.getFuelInventory();
-        addSlot(new TabbedSlot(fuelInventory, 0, 51, 55, () -> selectedTab == TAB_PROCESSING && fuelSlotActive(0)));
-        addSlot(new TabbedSlot(fuelInventory, 1, 73, 55, () -> selectedTab == TAB_PROCESSING && fuelSlotActive(1)));
+        addSlot(new MachineSlot(fuelInventory, 0, 51, 55, () -> selectedTab == TAB_PROCESSING && fuelSlotActive(0)));
+        addSlot(new MachineSlot(fuelInventory, 1, 73, 55, () -> selectedTab == TAB_PROCESSING && fuelSlotActive(1)));
 
         ItemStackHandler gearInventory = burner.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, SolidFuelBurnerBlockEntity.SLOT_HEAT_CORE, 44, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, SolidFuelBurnerBlockEntity.SLOT_BATTERY_CELL, 80, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX, 116, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(burner.getFluidContainerInventory(), 0, 72, 62, () -> selectedTab == TAB_PROCESSING && burnsFluid()));
+        addSlot(new MachineSlot(gearInventory, SolidFuelBurnerBlockEntity.SLOT_HEAT_CORE, 44, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, SolidFuelBurnerBlockEntity.SLOT_BATTERY_CELL, 80, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, SolidFuelBurnerBlockEntity.SLOT_FUEL_BOX, 116, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(burner.getFluidContainerInventory(), 0, 72, 62, () -> selectedTab == TAB_PROCESSING && burnsFluid()));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 burner.getRefinementInventory(),
@@ -468,20 +467,6 @@ public class SolidFuelBurnerMenu extends AbstractContainerMenu implements StatBr
             return burner;
         }
         throw new IllegalStateException("Expected solid fuel burner block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

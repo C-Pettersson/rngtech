@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class WoodenDehumidifierMenu extends AbstractContainerMenu {
     public static final int BUTTON_CYCLE_OUTPUT = 0;
@@ -73,9 +72,9 @@ public class WoodenDehumidifierMenu extends AbstractContainerMenu {
         addDataSlots(data);
 
         ItemStackHandler inventory = dehumidifier.getInventory();
-        addSlot(new SlotItemHandler(inventory, WoodenDehumidifierBlockEntity.SLOT_CONVERSION_INPUT, 61, 55));
-        addSlot(new SlotItemHandler(inventory, WoodenDehumidifierBlockEntity.SLOT_EMPTY_CONTAINER, 177, 79));
-        addSlot(new SlotItemHandler(inventory, WoodenDehumidifierBlockEntity.SLOT_FILLED_CONTAINER, 199, 79));
+        addSlot(new MachineSlot(inventory, WoodenDehumidifierBlockEntity.SLOT_CONVERSION_INPUT, 61, 55));
+        addSlot(new MachineSlot(inventory, WoodenDehumidifierBlockEntity.SLOT_EMPTY_CONTAINER, 177, 79));
+        addSlot(new MachineSlot(inventory, WoodenDehumidifierBlockEntity.SLOT_FILLED_CONTAINER, 199, 79));
 
         addPlayerInventory(playerInventory);
     }

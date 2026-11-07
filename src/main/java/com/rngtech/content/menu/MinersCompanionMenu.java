@@ -68,11 +68,11 @@ public class MinersCompanionMenu extends AbstractContainerMenu {
         this.filterInventory = createFilterInventory();
         loadFromStack();
 
-        addSlot(new TabbedSlot(gearInventory, SLOT_CRUSH_HEAD, 8, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, SLOT_BATTERY_CELL, 42, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, SLOT_RECOVERY_FILTER, 76, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, SLOT_MAGNET, 110, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, SLOT_MINING_LAMP, 144, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, SLOT_CRUSH_HEAD, 8, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, SLOT_BATTERY_CELL, 42, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, SLOT_RECOVERY_FILTER, 76, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, SLOT_MAGNET, 110, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, SLOT_MINING_LAMP, 144, 48, () -> selectedTab == TAB_GEAR));
         for (int index = 0; index < FILTER_SLOT_COUNT; index++) {
             int slotIndex = index;
             int row = index / 5;
@@ -458,21 +458,7 @@ public class MinersCompanionMenu extends AbstractContainerMenu {
         }
     }
 
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
-    }
-
-    private final class GhostFilterSlot extends SlotItemHandler {
+    final class GhostFilterSlot extends SlotItemHandler {
         private final int filterIndex;
         private final BooleanSupplier activeSupplier;
 

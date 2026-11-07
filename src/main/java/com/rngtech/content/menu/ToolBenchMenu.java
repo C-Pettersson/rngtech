@@ -21,7 +21,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -63,23 +62,23 @@ public class ToolBenchMenu extends AbstractContainerMenu {
         access = ContainerLevelAccess.create(bench.getLevel(), bench.getBlockPos());
 
         ItemStackHandler inventory = bench.getInventory();
-        addSlot(new TabbedSlot(inventory, ToolBenchBlockEntity.SLOT_TOOL, 25, 43, () -> selectedTab == TAB_ASSEMBLY));
-        addSlot(new TabbedSlot(inventory, ToolBenchBlockEntity.SLOT_HEAD, 72, 30, () -> selectedTab == TAB_ASSEMBLY));
-        addSlot(new TabbedSlot(inventory, ToolBenchBlockEntity.SLOT_ROD, 72, 56, () -> selectedTab == TAB_ASSEMBLY));
-        addSlot(new TabbedSlot(inventory, ToolBenchBlockEntity.SLOT_BATTERY_CELL, 119, 43, () -> selectedTab == TAB_ASSEMBLY));
-        addSlot(new TabbedSlot(inventory, ToolBenchBlockEntity.SLOT_TINY_ANVIL, 83, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(inventory, ToolBenchBlockEntity.SLOT_REPAIR_MATERIAL, 119, 69, () -> selectedTab == TAB_ASSEMBLY));
-        addSlot(new TabbedSlot(inventory, ToolBenchBlockEntity.SLOT_REFINEMENT_CONSUMABLE, 101, 32, () -> selectedTab == TAB_REFINEMENT));
-        addSlot(new TabbedSlot(inventory, ToolBenchBlockEntity.SLOT_ENERGY_CONNECTOR, 119, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(inventory, ToolBenchBlockEntity.SLOT_TOOL, 14, 32, () -> selectedTab == TAB_REFINEMENT));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(inventory, ToolBenchBlockEntity.SLOT_TOOL, 25, 43, () -> selectedTab == TAB_ASSEMBLY));
+        addSlot(new MachineSlot(inventory, ToolBenchBlockEntity.SLOT_HEAD, 72, 30, () -> selectedTab == TAB_ASSEMBLY));
+        addSlot(new MachineSlot(inventory, ToolBenchBlockEntity.SLOT_ROD, 72, 56, () -> selectedTab == TAB_ASSEMBLY));
+        addSlot(new MachineSlot(inventory, ToolBenchBlockEntity.SLOT_BATTERY_CELL, 119, 43, () -> selectedTab == TAB_ASSEMBLY));
+        addSlot(new MachineSlot(inventory, ToolBenchBlockEntity.SLOT_TINY_ANVIL, 83, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(inventory, ToolBenchBlockEntity.SLOT_REPAIR_MATERIAL, 119, 69, () -> selectedTab == TAB_ASSEMBLY));
+        addSlot(new MachineSlot(inventory, ToolBenchBlockEntity.SLOT_REFINEMENT_CONSUMABLE, 101, 32, () -> selectedTab == TAB_REFINEMENT));
+        addSlot(new MachineSlot(inventory, ToolBenchBlockEntity.SLOT_ENERGY_CONNECTOR, 119, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(inventory, ToolBenchBlockEntity.SLOT_TOOL, 14, 32, () -> selectedTab == TAB_REFINEMENT));
+        addSlot(new MachineSlot(
                 inventory,
                 ToolBenchBlockEntity.SLOT_HEAD,
                 43,
                 32,
                 () -> selectedTab == TAB_REFINEMENT && !hasValidToolForRefinement()
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 inventory,
                 ToolBenchBlockEntity.SLOT_ROD,
                 72,
@@ -305,20 +304,6 @@ public class ToolBenchMenu extends AbstractContainerMenu {
             return bench;
         }
         throw new IllegalStateException("Expected tool bench block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

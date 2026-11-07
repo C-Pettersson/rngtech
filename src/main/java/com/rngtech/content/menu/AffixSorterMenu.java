@@ -23,7 +23,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -87,20 +86,20 @@ public class AffixSorterMenu extends AbstractContainerMenu implements StatBreakd
         RefinementMenuSupport.setMachineDisplay(refinementTarget, sorter.getBlockState().getBlock(), machineTraits);
 
         ItemStackHandler processInventory = sorter.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, AffixSorterBlockEntity.SLOT_INPUT, 45, 52, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, AffixSorterBlockEntity.SLOT_INPUT, 45, 52, () -> selectedTab == TAB_PROCESSING));
         for (int slot = 0; slot < AffixSorterBlockEntity.BUFFER_SLOTS; slot++) {
-            addSlot(new TabbedSlot(processInventory, AffixSorterBlockEntity.SLOT_PASS_START + slot, 141 + slot * 18, 30,
+            addSlot(new MachineSlot(processInventory, AffixSorterBlockEntity.SLOT_PASS_START + slot, 141 + slot * 18, 30,
                     () -> selectedTab == TAB_PROCESSING));
         }
         for (int slot = 0; slot < AffixSorterBlockEntity.BUFFER_SLOTS; slot++) {
-            addSlot(new TabbedSlot(processInventory, AffixSorterBlockEntity.SLOT_REJECT_START + slot, 141 + slot * 18, 74,
+            addSlot(new MachineSlot(processInventory, AffixSorterBlockEntity.SLOT_REJECT_START + slot, 141 + slot * 18, 74,
                     () -> selectedTab == TAB_PROCESSING));
         }
 
         ItemStackHandler gearInventory = sorter.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, AffixSorterBlockEntity.SLOT_BATTERY_CELL, 56, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, AffixSorterBlockEntity.SLOT_RULE_CORE, 92, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, AffixSorterBlockEntity.SLOT_SERVO, 128, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, AffixSorterBlockEntity.SLOT_BATTERY_CELL, 56, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, AffixSorterBlockEntity.SLOT_RULE_CORE, 92, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, AffixSorterBlockEntity.SLOT_SERVO, 128, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 sorter.getRefinementInventory(),
@@ -344,20 +343,6 @@ public class AffixSorterMenu extends AbstractContainerMenu implements StatBreakd
             return sorter;
         }
         throw new IllegalStateException("Expected affix sorter block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

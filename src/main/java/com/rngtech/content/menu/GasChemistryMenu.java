@@ -28,7 +28,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -101,12 +100,12 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
         this.data = data;
         this.gasChemistry = gasChemistry;
         RefinementMenuSupport.setMachineDisplay(refinementTarget, machineBlock(), traits);
-        addSlot(new TabbedSlot(gasChemistry.getProcessInventory(), GasChemistryBlockEntity.SLOT_PROCESS_INPUT, GASIFIER_INPUT_SLOT_X, 50, () -> selectedTab == TAB_PROCESSING && gasChemistry.hasInputSlot()));
-        addSlot(new TabbedSlot(gasChemistry.getProcessInventory(), GasChemistryBlockEntity.SLOT_PROCESS_OUTPUT, GASIFIER_OUTPUT_SLOT_X, 50, () -> selectedTab == TAB_PROCESSING && gasChemistry.hasInputSlot()));
-        addSlot(new TabbedSlot(gasChemistry.getGearInventory(), GasChemistryBlockEntity.SLOT_HEAT_CORE, 46, 48, () -> selectedTab == TAB_GEAR && hasHeatCoreSlot()));
-        addSlot(new TabbedSlot(gasChemistry.getGearInventory(), GasChemistryBlockEntity.SLOT_BATTERY_CELL, 82, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gasChemistry.getGearInventory(), GasChemistryBlockEntity.SLOT_SERVO, 118, 48, () -> selectedTab == TAB_GEAR && hasServoSlot()));
-        addSlot(new TabbedSlot(gasChemistry.getGearInventory(), GasChemistryBlockEntity.SLOT_CATALYST_BED, 154, 48, () -> selectedTab == TAB_GEAR && hasCatalystSlot()));
+        addSlot(new MachineSlot(gasChemistry.getProcessInventory(), GasChemistryBlockEntity.SLOT_PROCESS_INPUT, GASIFIER_INPUT_SLOT_X, 50, () -> selectedTab == TAB_PROCESSING && gasChemistry.hasInputSlot()));
+        addSlot(new MachineSlot(gasChemistry.getProcessInventory(), GasChemistryBlockEntity.SLOT_PROCESS_OUTPUT, GASIFIER_OUTPUT_SLOT_X, 50, () -> selectedTab == TAB_PROCESSING && gasChemistry.hasInputSlot()));
+        addSlot(new MachineSlot(gasChemistry.getGearInventory(), GasChemistryBlockEntity.SLOT_HEAT_CORE, 46, 48, () -> selectedTab == TAB_GEAR && hasHeatCoreSlot()));
+        addSlot(new MachineSlot(gasChemistry.getGearInventory(), GasChemistryBlockEntity.SLOT_BATTERY_CELL, 82, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gasChemistry.getGearInventory(), GasChemistryBlockEntity.SLOT_SERVO, 118, 48, () -> selectedTab == TAB_GEAR && hasServoSlot()));
+        addSlot(new MachineSlot(gasChemistry.getGearInventory(), GasChemistryBlockEntity.SLOT_CATALYST_BED, 154, 48, () -> selectedTab == TAB_GEAR && hasCatalystSlot()));
         addSlot(RefinementMenuSupport.consumableSlot(gasChemistry.getRefinementInventory(), 0, RefinementMenuSupport.REFINEMENT_CONSUMABLE_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
         addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
         jewelInventoryStart = slots.size();
@@ -482,20 +481,6 @@ public class GasChemistryMenu extends AbstractContainerMenu implements StatBreak
             return gasChemistry;
         }
         throw new IllegalStateException("Expected gas chemistry block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int x, int y, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, x, y);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

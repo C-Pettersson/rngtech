@@ -25,7 +25,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -111,13 +110,13 @@ public class CorrosionCellMenu extends AbstractContainerMenu implements StatBrea
         RefinementMenuSupport.setMachineDisplay(refinementTarget, ModBlocks.CORROSION_CELL.get().asItem(), machineTraits);
 
         ItemStackHandler processInventory = cell.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, CorrosionCellBlockEntity.SLOT_PLATE, 17, 33, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, CorrosionCellBlockEntity.SLOT_ELECTROLYTE, 40, 79, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, CorrosionCellBlockEntity.SLOT_RESIDUE, 176, 71, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, CorrosionCellBlockEntity.SLOT_PLATE, 17, 33, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, CorrosionCellBlockEntity.SLOT_ELECTROLYTE, 40, 79, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, CorrosionCellBlockEntity.SLOT_RESIDUE, 176, 71, () -> selectedTab == TAB_PROCESSING));
 
-        addSlot(new TabbedSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_BATTERY_CELL, 53, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_FLUID_PUMP, 95, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_CATHODE, 137, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_BATTERY_CELL, 53, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_FLUID_PUMP, 95, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(cell.getGearInventory(), CorrosionCellBlockEntity.SLOT_CATHODE, 137, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 cell.getRefinementInventory(),
@@ -459,20 +458,6 @@ public class CorrosionCellMenu extends AbstractContainerMenu implements StatBrea
             return cell;
         }
         throw new IllegalStateException("Expected corrosion cell block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

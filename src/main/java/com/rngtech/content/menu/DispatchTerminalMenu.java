@@ -14,7 +14,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.SplittableRandom;
 
@@ -48,17 +47,7 @@ public class DispatchTerminalMenu extends AbstractContainerMenu {
         this.board = board;
         access = ContainerLevelAccess.create(board.getLevel(), board.getBlockPos());
         for (int slot = 0; slot < OFFERS; slot++) {
-            addSlot(new SlotItemHandler(board.offers(), slot, ROW_LEFT + ICON_X, rowTop(slot) + ICON_Y) {
-                @Override
-                public boolean mayPlace(ItemStack stack) {
-                    return false;
-                }
-
-                @Override
-                public boolean mayPickup(Player player) {
-                    return false;
-                }
-            });
+            addSlot(new MachineSlot(board.offers(), slot, ROW_LEFT + ICON_X, rowTop(slot) + ICON_Y).locked());
         }
     }
 

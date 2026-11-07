@@ -21,7 +21,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -103,7 +102,7 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
         BooleanSupplier supply = () -> selectedTab == TAB_SUPPLY;
         for (int index = 0; index <= ForestryCartStationBlockEntity.PLANTABLES_EXTRA_COUNT; index++) {
             int handlerSlot = index == 0 ? ForestryCartStationBlockEntity.SLOT_SAPLING : ForestryCartStationBlockEntity.SLOT_PLANTABLES_EXTRA_START + index - 1;
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     processInventory,
                     handlerSlot,
                     PLANTABLES_X + (index % PLANTABLES_COLUMNS) * 18,
@@ -112,7 +111,7 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
             ));
         }
         for (int slot = 0; slot < ForestryCartStationBlockEntity.OUTPUT_SLOT_COUNT; slot++) {
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     processInventory,
                     ForestryCartStationBlockEntity.SLOT_OUTPUT_START + slot,
                     OUTPUT_X + (slot % 3) * 18,
@@ -120,15 +119,15 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
                     processing
             ));
         }
-        addSlot(new TabbedSlot(processInventory, ForestryCartStationBlockEntity.SLOT_SHEARS_INPUT, SHEARS_X, SUPPLY_ROW_Y, supply));
-        addSlot(new TabbedSlot(processInventory, ForestryCartStationBlockEntity.SLOT_FERTILIZER_INPUT, FERTILIZER_X, SUPPLY_ROW_Y, supply));
-        addSlot(new TabbedSlot(processInventory, ForestryCartStationBlockEntity.SLOT_TOOL_INPUT, TOOL_X, SUPPLY_ROW_Y, supply));
+        addSlot(new MachineSlot(processInventory, ForestryCartStationBlockEntity.SLOT_SHEARS_INPUT, SHEARS_X, SUPPLY_ROW_Y, supply));
+        addSlot(new MachineSlot(processInventory, ForestryCartStationBlockEntity.SLOT_FERTILIZER_INPUT, FERTILIZER_X, SUPPLY_ROW_Y, supply));
+        addSlot(new MachineSlot(processInventory, ForestryCartStationBlockEntity.SLOT_TOOL_INPUT, TOOL_X, SUPPLY_ROW_Y, supply));
 
         ItemStackHandler connectorInventory = station.getConnectorInventory();
-        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_STATION_BATTERY_CELL, 75, 52, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_ENERGY_CONNECTOR, 99, 52, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_ITEM_CONNECTOR, 123, 52, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_FLUID_CONNECTOR, 147, 52, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_STATION_BATTERY_CELL, 75, 52, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_ENERGY_CONNECTOR, 99, 52, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_ITEM_CONNECTOR, 123, 52, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(connectorInventory, ForestryCartStationBlockEntity.SLOT_FLUID_CONNECTOR, 147, 52, () -> selectedTab == TAB_GEAR));
 
         addPlayerInventory(playerInventory);
         addDataSlots(data);
@@ -329,26 +328,6 @@ public class ForestryCartStationMenu extends AbstractContainerMenu {
             return station;
         }
         throw new IllegalStateException("Expected forestry cart station block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(
-                net.neoforged.neoforge.items.IItemHandler itemHandler,
-                int index,
-                int xPosition,
-                int yPosition,
-                BooleanSupplier activeSupplier
-        ) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

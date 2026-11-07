@@ -242,15 +242,15 @@ public final class RefinementMenuSupport {
     }
 
     public static SlotItemHandler targetDisplaySlot(ItemStackHandler itemHandler, int x, int y, BooleanSupplier activeSupplier) {
-        return new DisplaySlot(itemHandler, 0, x, y, activeSupplier);
+        return new MachineSlot(itemHandler, 0, x, y, activeSupplier).locked();
     }
 
     public static SlotItemHandler consumableSlot(ItemStackHandler itemHandler, int index, int x, int y, BooleanSupplier activeSupplier) {
-        return new ConsumableSlot(itemHandler, index, x, y, activeSupplier);
+        return new MachineSlot(itemHandler, index, x, y, activeSupplier).accepting(RefinementMenuSupport::isConsumable);
     }
 
     public static SlotItemHandler modifierSlot(ItemStackHandler itemHandler, int index, int x, int y, BooleanSupplier activeSupplier) {
-        return new ModifierSlot(itemHandler, index, x, y, activeSupplier);
+        return new MachineSlot(itemHandler, index, x, y, activeSupplier).accepting(RefinementMenuSupport::isModifier);
     }
 
     private static RefinementModifier modifier(ItemStackHandler inventory) {
@@ -283,68 +283,6 @@ public final class RefinementMenuSupport {
 
     private static void showFailure(Player player, String messageKey) {
         player.displayClientMessage(Component.translatable(messageKey), true);
-    }
-
-    private static final class DisplaySlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private DisplaySlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean mayPlace(ItemStack stack) {
-            return false;
-        }
-
-        @Override
-        public boolean mayPickup(Player player) {
-            return false;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
-    }
-
-    private static final class ConsumableSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private ConsumableSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean mayPlace(ItemStack stack) {
-            return isConsumable(stack);
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
-    }
-
-    private static final class ModifierSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private ModifierSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean mayPlace(ItemStack stack) {
-            return isModifier(stack);
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private RefinementMenuSupport() {

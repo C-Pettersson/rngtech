@@ -40,7 +40,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -142,17 +141,17 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
         RefinementMenuSupport.setMachineDisplay(refinementTarget, melter.getBlockState().getBlock(), machineTraits);
 
         ItemStackHandler processInventory = melter.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, MelterBlockEntity.SLOT_PRIMARY_INPUT, 58, 29, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, MelterBlockEntity.SLOT_SECONDARY_INPUT, 82, 29, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, MelterBlockEntity.SLOT_FLUID_INPUT_CONTAINER, 38, 81, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, MelterBlockEntity.SLOT_FLUID_OUTPUT_CONTAINER, 176, 81, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, MelterBlockEntity.SLOT_PRIMARY_INPUT, 58, 29, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, MelterBlockEntity.SLOT_SECONDARY_INPUT, 82, 29, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, MelterBlockEntity.SLOT_FLUID_INPUT_CONTAINER, 38, 81, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, MelterBlockEntity.SLOT_FLUID_OUTPUT_CONTAINER, 176, 81, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = melter.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, MelterBlockEntity.SLOT_HEAT_CORE, 20, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, MelterBlockEntity.SLOT_CRUSH_HEAD, 68, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, MelterBlockEntity.SLOT_BATTERY_CELL, 116, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, MelterBlockEntity.SLOT_SERVO, 164, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, MelterBlockEntity.SLOT_FLUID_PUMP, 212, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, MelterBlockEntity.SLOT_HEAT_CORE, 20, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, MelterBlockEntity.SLOT_CRUSH_HEAD, 68, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, MelterBlockEntity.SLOT_BATTERY_CELL, 116, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, MelterBlockEntity.SLOT_SERVO, 164, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, MelterBlockEntity.SLOT_FLUID_PUMP, 212, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 melter.getRefinementInventory(),
@@ -648,20 +647,6 @@ public class MelterMenu extends AbstractContainerMenu implements MasteryMenuView
             return melter;
         }
         throw new IllegalStateException("Expected melter block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

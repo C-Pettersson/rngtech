@@ -23,7 +23,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -77,10 +76,10 @@ public class AmmoniaSynthesizerMenu extends AbstractContainerMenu implements Sta
         this.data = data;
         this.synthesizer = synthesizer;
         RefinementMenuSupport.setMachineDisplay(refinementTarget, ModBlocks.AMMONIA_SYNTHESIZER.get(), traits);
-        addSlot(new TabbedSlot(synthesizer.getGearInventory(), AmmoniaSynthesizerBlockEntity.SLOT_CATALYST_BED, 80, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(synthesizer.getGearInventory(), AmmoniaSynthesizerBlockEntity.SLOT_CATALYST_BED, 80, 48, () -> selectedTab == TAB_GEAR));
         addSlot(RefinementMenuSupport.consumableSlot(synthesizer.getRefinementInventory(), 0, RefinementMenuSupport.REFINEMENT_CONSUMABLE_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
         addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
-        addSlot(new TabbedSlot(synthesizer.getUreaOutput(), AmmoniaSynthesizerBlockEntity.SLOT_UREA, 196, 45, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(synthesizer.getUreaOutput(), AmmoniaSynthesizerBlockEntity.SLOT_UREA, 196, 45, () -> selectedTab == TAB_PROCESSING));
         jewelInventoryStart = slots.size();
         addPlayerInventory(playerInventory);
         jewelSlotStart = slots.size();
@@ -327,20 +326,6 @@ public class AmmoniaSynthesizerMenu extends AbstractContainerMenu implements Sta
             return synthesizer;
         }
         throw new IllegalStateException("Expected ammonia synthesizer block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int x, int y, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, x, y);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

@@ -16,7 +16,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class AffixForgeMenu extends AbstractContainerMenu {
     private static final int FORGE_SLOT_COUNT = AffixForgeBlockEntity.SLOT_COUNT;
@@ -42,22 +41,12 @@ public class AffixForgeMenu extends AbstractContainerMenu {
         access = ContainerLevelAccess.create(affixForge.getLevel(), affixForge.getBlockPos());
 
         ItemStackHandler inventory = affixForge.getInventory();
-        addSlot(new SlotItemHandler(inventory, AffixForgeBlockEntity.SLOT_TARGET, 14, 32));
-        addSlot(new SlotItemHandler(inventory, AffixForgeBlockEntity.SLOT_CONSUMABLE, 43, 32) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return affixForge.isRefinementConsumable(stack);
-            }
-        });
-        addSlot(new SlotItemHandler(inventory, AffixForgeBlockEntity.SLOT_MODIFIER, 72, 32) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return affixForge.isFocusItem(stack);
-            }
-        });
-        addSlot(new SlotItemHandler(inventory, AffixForgeBlockEntity.SLOT_LENS_ARRAY, 14, UPGRADE_SLOT_Y));
-        addSlot(new SlotItemHandler(inventory, AffixForgeBlockEntity.SLOT_MODIFIER_SOCKET, 43, UPGRADE_SLOT_Y));
-        addSlot(new SlotItemHandler(inventory, AffixForgeBlockEntity.SLOT_RESONANCE_MATRIX, 72, UPGRADE_SLOT_Y));
+        addSlot(new MachineSlot(inventory, AffixForgeBlockEntity.SLOT_TARGET, 14, 32));
+        addSlot(new MachineSlot(inventory, AffixForgeBlockEntity.SLOT_CONSUMABLE, 43, 32).accepting(affixForge::isRefinementConsumable));
+        addSlot(new MachineSlot(inventory, AffixForgeBlockEntity.SLOT_MODIFIER, 72, 32).accepting(affixForge::isFocusItem));
+        addSlot(new MachineSlot(inventory, AffixForgeBlockEntity.SLOT_LENS_ARRAY, 14, UPGRADE_SLOT_Y));
+        addSlot(new MachineSlot(inventory, AffixForgeBlockEntity.SLOT_MODIFIER_SOCKET, 43, UPGRADE_SLOT_Y));
+        addSlot(new MachineSlot(inventory, AffixForgeBlockEntity.SLOT_RESONANCE_MATRIX, 72, UPGRADE_SLOT_Y));
         addPlayerInventory(playerInventory);
     }
 

@@ -22,7 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -115,13 +114,13 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
         RefinementMenuSupport.setMachineDisplay(refinementTarget, ModBlocks.VACUUM_COLLAPSE_GENERATOR.get(), machineTraits);
 
         ItemStackHandler processInventory = generator.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, VacuumCollapseGeneratorBlockEntity.SLOT_INPUT, 43, 52, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, VacuumCollapseGeneratorBlockEntity.SLOT_RESIDUE, 195, 52, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, VacuumCollapseGeneratorBlockEntity.SLOT_INPUT, 43, 52, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, VacuumCollapseGeneratorBlockEntity.SLOT_RESIDUE, 195, 52, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = generator.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, VacuumCollapseGeneratorBlockEntity.SLOT_VOID_CHAMBER, 25, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, VacuumCollapseGeneratorBlockEntity.SLOT_COLLAPSE_NOZZLE, 75, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, VacuumCollapseGeneratorBlockEntity.SLOT_DIMENSIONAL_STABILIZER, 125, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, VacuumCollapseGeneratorBlockEntity.SLOT_VOID_CHAMBER, 25, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, VacuumCollapseGeneratorBlockEntity.SLOT_COLLAPSE_NOZZLE, 75, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, VacuumCollapseGeneratorBlockEntity.SLOT_DIMENSIONAL_STABILIZER, 125, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 generator.getRefinementInventory(),
@@ -428,20 +427,6 @@ public class VacuumCollapseGeneratorMenu extends AbstractContainerMenu implement
             return generator;
         }
         throw new IllegalStateException("Expected vacuum collapse generator block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

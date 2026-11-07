@@ -38,7 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -137,35 +136,35 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
         RefinementMenuSupport.setMachineDisplay(refinementTarget, calibrator.getBlockState().getBlock(), machineTraits);
 
         ItemStackHandler processInventory = calibrator.getProcessInventory();
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 processInventory,
                 ResonanceCalibratorBlockEntity.SLOT_INPUT,
                 38,
                 42,
                 () -> selectedTab == TAB_PROCESSING
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 processInventory,
                 ResonanceCalibratorBlockEntity.SLOT_PATTERN,
                 0,
                 0,
                 () -> false
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 processInventory,
                 ResonanceCalibratorBlockEntity.SLOT_CATALYST,
                 80,
                 42,
                 () -> selectedTab == TAB_PROCESSING
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 processInventory,
                 ResonanceCalibratorBlockEntity.SLOT_STABILIZER,
                 108,
                 42,
                 () -> selectedTab == TAB_PROCESSING
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 processInventory,
                 ResonanceCalibratorBlockEntity.SLOT_OUTPUT,
                 176,
@@ -174,28 +173,28 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
         ));
 
         ItemStackHandler gearInventory = calibrator.getGearInventory();
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 gearInventory,
                 ResonanceCalibratorBlockEntity.SLOT_BATTERY_CELL,
                 30,
                 48,
                 () -> selectedTab == TAB_GEAR
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 gearInventory,
                 ResonanceCalibratorBlockEntity.SLOT_RESONANCE_COIL,
                 70,
                 48,
                 () -> selectedTab == TAB_GEAR
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 gearInventory,
                 ResonanceCalibratorBlockEntity.SLOT_CONTROL_BOARD,
                 110,
                 48,
                 () -> selectedTab == TAB_GEAR
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 gearInventory,
                 ResonanceCalibratorBlockEntity.SLOT_STABILIZER_MATRIX,
                 150,
@@ -203,7 +202,7 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
                 () -> selectedTab == TAB_GEAR
         ));
         for (int index = 0; index < ResonanceCalibratorBlockEntity.PATTERN_SLOT_COUNT; index++) {
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     gearInventory,
                     ResonanceCalibratorBlockEntity.SLOT_PATTERN_STORAGE + index,
                     24 + index * 36,
@@ -663,20 +662,6 @@ public class ResonanceCalibratorMenu extends AbstractContainerMenu implements Ma
             return calibrator;
         }
         throw new IllegalStateException("Expected resonance calibrator block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

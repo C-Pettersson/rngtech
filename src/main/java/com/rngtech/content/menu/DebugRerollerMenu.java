@@ -15,7 +15,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class DebugRerollerMenu extends AbstractContainerMenu {
     public static final int BUTTON_REROLL = 0;
@@ -38,7 +37,7 @@ public class DebugRerollerMenu extends AbstractContainerMenu {
         access = ContainerLevelAccess.create(reroller.getLevel(), reroller.getBlockPos());
 
         ItemStackHandler inventory = reroller.getInventory();
-        addSlot(new SlotItemHandler(inventory, DebugRerollerBlockEntity.SLOT_TARGET, 48, 42));
+        addSlot(new MachineSlot(inventory, DebugRerollerBlockEntity.SLOT_TARGET, 48, 42));
         addPlayerInventory(playerInventory);
     }
 
