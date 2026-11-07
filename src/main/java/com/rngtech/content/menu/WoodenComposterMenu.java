@@ -65,7 +65,7 @@ public class WoodenComposterMenu extends AbstractContainerMenu {
         ItemStackHandler inventory = composter.getInventory();
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < WoodenComposterBlockEntity.INPUT_SLOT_COUNT / 3; column++) {
-                addSlot(new MachineSlot(inventory, column + row * (WoodenComposterBlockEntity.INPUT_SLOT_COUNT / 3), 9 + column * 18, 31 + row * 18));
+                addSlot(new MachineGridSlot(inventory, column + row * (WoodenComposterBlockEntity.INPUT_SLOT_COUNT / 3), 9 + column * 18, 31 + row * 18));
             }
         }
         addSlot(new MachineSlot(inventory, WoodenComposterBlockEntity.SLOT_OUTPUT, 161, 49));

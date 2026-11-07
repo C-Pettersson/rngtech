@@ -9,6 +9,9 @@ const EXEMPT_LIST = path.join(SOURCE_ROOT, "com/rngtech/content/menu/SortExemptS
 /** Menus whose item-handler slots may stay sortable. The Debug Chest is a plain chest. */
 const SORTABLE_MENUS = ["DebugChestMenu.java"];
 
+/** Slot classes that sort mods may sort on purpose: input grids whose slots all take the same items. */
+const SORTABLE_SLOT_CLASSES = ["MachineGridSlot"];
+
 const RAW_SLOT = /new SlotItemHandler\(/g;
 const SLOT_CLASS = /class\s+(\w+)\s+extends\s+SlotItemHandler\b/g;
 
@@ -45,7 +48,7 @@ export async function findSortableMachineSlots() {
             }
         }
         for (const match of source.matchAll(SLOT_CLASS)) {
-            if (!new RegExp(`\\b${match[1]}\\.class\\b`).test(exemptSource)) {
+            if (!SORTABLE_SLOT_CLASSES.includes(match[1]) && !new RegExp(`\\b${match[1]}\\.class\\b`).test(exemptSource)) {
                 findings.push(`${relative}:${lineOf(source, match.index)}: ${match[1]} is not listed in SortExemptSlots`);
             }
         }
