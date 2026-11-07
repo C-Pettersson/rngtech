@@ -22,7 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -80,9 +79,9 @@ public class AmmoniaFuelCellMenu extends AbstractContainerMenu implements StatBr
         this.data = data;
         this.fuelCell = fuelCell;
         RefinementMenuSupport.setMachineDisplay(refinementTarget, ModBlocks.AMMONIA_FUEL_CELL.get(), traits);
-        addSlot(new TabbedSlot(fuelCell.getProcessInventory(), AmmoniaFuelCellBlockEntity.SLOT_RESIDUE, 195, 61, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(fuelCell.getGearInventory(), AmmoniaFuelCellBlockEntity.SLOT_MEMBRANE, 66, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(fuelCell.getGearInventory(), AmmoniaFuelCellBlockEntity.SLOT_BATTERY_CELL, 126, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(fuelCell.getProcessInventory(), AmmoniaFuelCellBlockEntity.SLOT_RESIDUE, 195, 61, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(fuelCell.getGearInventory(), AmmoniaFuelCellBlockEntity.SLOT_MEMBRANE, 66, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(fuelCell.getGearInventory(), AmmoniaFuelCellBlockEntity.SLOT_BATTERY_CELL, 126, 48, () -> selectedTab == TAB_GEAR));
         addSlot(RefinementMenuSupport.consumableSlot(fuelCell.getRefinementInventory(), 0, RefinementMenuSupport.REFINEMENT_CONSUMABLE_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
         addSlot(RefinementMenuSupport.targetDisplaySlot(refinementTarget, RefinementMenuSupport.REFINEMENT_TARGET_SLOT_X, RefinementMenuSupport.REFINEMENT_SLOT_Y, () -> selectedTab == TAB_REFINEMENT));
         jewelInventoryStart = slots.size();
@@ -324,20 +323,6 @@ public class AmmoniaFuelCellMenu extends AbstractContainerMenu implements StatBr
             return fuelCell;
         }
         throw new IllegalStateException("Expected ammonia fuel cell block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int x, int y, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, x, y);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

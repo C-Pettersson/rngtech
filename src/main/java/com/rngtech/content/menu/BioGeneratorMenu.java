@@ -22,7 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -125,13 +124,13 @@ public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreak
         this.generator = generator;
         RefinementMenuSupport.setMachineDisplay(refinementTarget, ModBlocks.BIO_GENERATOR.get().asItem(), machineTraits);
 
-        addSlot(new TabbedSlot(generator.getFuelInventory(), BioGeneratorBlockEntity.SLOT_FUEL, 53, 55, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(generator.getFuelInventory(), BioGeneratorBlockEntity.SLOT_FUEL, 53, 55, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = generator.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, BioGeneratorBlockEntity.SLOT_BATTERY_CELL, GEAR_SLOT_X[0], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, BioGeneratorBlockEntity.SLOT_BIO_CHAMBER, GEAR_SLOT_X[1], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, BioGeneratorBlockEntity.SLOT_GAS_LINE_A, GEAR_SLOT_X[2], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, BioGeneratorBlockEntity.SLOT_GAS_LINE_B, GEAR_SLOT_X[3], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, BioGeneratorBlockEntity.SLOT_BATTERY_CELL, GEAR_SLOT_X[0], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, BioGeneratorBlockEntity.SLOT_BIO_CHAMBER, GEAR_SLOT_X[1], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, BioGeneratorBlockEntity.SLOT_GAS_LINE_A, GEAR_SLOT_X[2], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, BioGeneratorBlockEntity.SLOT_GAS_LINE_B, GEAR_SLOT_X[3], GEAR_SLOT_Y, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 generator.getRefinementInventory(),
@@ -526,20 +525,6 @@ public class BioGeneratorMenu extends AbstractContainerMenu implements StatBreak
             return generator;
         }
         throw new IllegalStateException("Expected bio generator block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

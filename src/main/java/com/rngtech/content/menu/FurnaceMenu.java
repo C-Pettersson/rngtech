@@ -38,7 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -165,7 +164,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
         ItemStackHandler inventory = furnace.getInventory();
         for (int lane = 0; lane < MAX_PROCESSING_SLOTS; lane++) {
             final int slotLane = lane;
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     inventory,
                     FurnaceBlockEntity.SLOT_INPUT_START + lane,
                     PROCESS_INPUT_X[lane],
@@ -173,7 +172,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
                     () -> selectedTab == TAB_PROCESSING && slotLane < activeProcessingSlots()
             ));
         }
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 inventory,
                 FurnaceBlockEntity.SLOT_FUEL,
                 FUEL_SLOT_X,
@@ -182,7 +181,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
         ));
         for (int lane = 0; lane < MAX_PROCESSING_SLOTS; lane++) {
             final int slotLane = lane;
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     inventory,
                     FurnaceBlockEntity.SLOT_OUTPUT_START + lane,
                     PROCESS_OUTPUT_X[lane],
@@ -192,7 +191,7 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
         }
         for (int slot = 0; slot < MAX_GEAR_SLOTS; slot++) {
             final int gearSlot = slot;
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     furnace.getGearInventory(),
                     slot,
                     GEAR_X[slot],
@@ -789,20 +788,6 @@ public class FurnaceMenu extends AbstractContainerMenu implements MasteryMenuVie
             return furnace;
         }
         throw new IllegalStateException("Expected furnace block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

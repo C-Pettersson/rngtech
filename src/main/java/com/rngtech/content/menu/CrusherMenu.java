@@ -38,7 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -137,10 +136,10 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
         RefinementMenuSupport.setMachineDisplay(refinementTarget, crusher.getBlockState().getBlock(), machineTraits);
 
         ItemStackHandler inventory = crusher.getInventory();
-        this.addSlot(new TabbedSlot(inventory, CrusherBlockEntity.SLOT_INPUT_A, 56, 52, () -> selectedTab == TAB_PROCESSING));
-        this.addSlot(new TabbedSlot(inventory, CrusherBlockEntity.SLOT_FUEL, 80, 48, () -> selectedTab == TAB_GEAR));
-        this.addSlot(new TabbedSlot(inventory, CrusherBlockEntity.SLOT_CRUSH_HEAD, 44, 48, () -> selectedTab == TAB_GEAR));
-        this.addSlot(new TabbedSlot(inventory, CrusherBlockEntity.SLOT_OUTPUT, 170, 52, () -> selectedTab == TAB_PROCESSING));
+        this.addSlot(new MachineSlot(inventory, CrusherBlockEntity.SLOT_INPUT_A, 56, 52, () -> selectedTab == TAB_PROCESSING));
+        this.addSlot(new MachineSlot(inventory, CrusherBlockEntity.SLOT_FUEL, 80, 48, () -> selectedTab == TAB_GEAR));
+        this.addSlot(new MachineSlot(inventory, CrusherBlockEntity.SLOT_CRUSH_HEAD, 44, 48, () -> selectedTab == TAB_GEAR));
+        this.addSlot(new MachineSlot(inventory, CrusherBlockEntity.SLOT_OUTPUT, 170, 52, () -> selectedTab == TAB_PROCESSING));
         this.addSlot(RefinementMenuSupport.consumableSlot(
                 crusher.getRefinementInventory(),
                 0,
@@ -595,20 +594,6 @@ public class CrusherMenu extends AbstractContainerMenu implements MasteryMenuVie
             return crusher;
         }
         throw new IllegalStateException("Expected crusher block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

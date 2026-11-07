@@ -21,7 +21,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.Predicate;
 
@@ -53,12 +52,8 @@ public class DormantMachineMenu extends AbstractContainerMenu {
         this.data = data;
         this.cells = core == null ? new ItemStackHandler(DormantCore.CELL_SLOTS) : core.cells();
         for (int slot = 0; slot < DormantCore.CELL_SLOTS; slot++) {
-            addSlot(new SlotItemHandler(cells, slot, CELL_X + slot % 3 * CELL_SPACING, CELL_Y + slot / 3 * CELL_SPACING) {
-                @Override
-                public boolean mayPlace(ItemStack stack) {
-                    return BatteryCellItem.isBatteryCell(stack);
-                }
-            });
+            addSlot(new MachineSlot(cells, slot, CELL_X + slot % 3 * CELL_SPACING, CELL_Y + slot / 3 * CELL_SPACING)
+                    .accepting(BatteryCellItem::isBatteryCell));
         }
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 9; column++) {

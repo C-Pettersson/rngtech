@@ -37,7 +37,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -152,16 +151,16 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
         RefinementMenuSupport.setMachineDisplay(refinementTarget, press.getBlockState().getBlock(), machineTraits);
 
         ItemStackHandler processInventory = press.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, MetalPressBlockEntity.SLOT_INPUT, 56, 52, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, MetalPressBlockEntity.SLOT_OUTPUT, 170, 52, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, MetalPressBlockEntity.SLOT_INPUT, 56, 52, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, MetalPressBlockEntity.SLOT_OUTPUT, 170, 52, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = press.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, MetalPressBlockEntity.SLOT_HEAT_CORE, 30, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, MetalPressBlockEntity.SLOT_SERVO, 78, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, MetalPressBlockEntity.SLOT_HEAT_CORE, 30, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, MetalPressBlockEntity.SLOT_SERVO, 78, 48, () -> selectedTab == TAB_GEAR));
         for (int index = 0; index < MetalPressBlockEntity.MOLD_SLOT_COUNT; index++) {
-            addSlot(new TabbedSlot(gearInventory, MetalPressBlockEntity.SLOT_MOLD + index, 24 + index * 44, 76, () -> selectedTab == TAB_GEAR));
+            addSlot(new MachineSlot(gearInventory, MetalPressBlockEntity.SLOT_MOLD + index, 24 + index * 44, 76, () -> selectedTab == TAB_GEAR));
         }
-        addSlot(new TabbedSlot(gearInventory, MetalPressBlockEntity.SLOT_BATTERY_CELL, 126, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, MetalPressBlockEntity.SLOT_BATTERY_CELL, 126, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 press.getRefinementInventory(),
@@ -711,20 +710,6 @@ public class MetalPressMenu extends AbstractContainerMenu implements MasteryMenu
             return press;
         }
         throw new IllegalStateException("Expected metal press block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

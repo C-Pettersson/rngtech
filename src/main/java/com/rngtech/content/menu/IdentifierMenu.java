@@ -39,7 +39,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -103,14 +102,14 @@ public class IdentifierMenu extends AbstractContainerMenu implements MasteryMenu
         RefinementMenuSupport.setMachineDisplay(refinementTarget, identifier.getBlockState().getBlock(), machineTraits);
 
         ItemStackHandler processInventory = identifier.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, IdentifierBlockEntity.SLOT_INPUT, 72, 52, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, IdentifierBlockEntity.SLOT_OUTPUT, 150, 52, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, IdentifierBlockEntity.SLOT_FLUID_CONTAINER, 22, 86, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, IdentifierBlockEntity.SLOT_INPUT, 72, 52, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, IdentifierBlockEntity.SLOT_OUTPUT, 150, 52, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, IdentifierBlockEntity.SLOT_FLUID_CONTAINER, 22, 86, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = identifier.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, IdentifierBlockEntity.SLOT_BATTERY_CELL, 56, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, IdentifierBlockEntity.SLOT_FLUID_PUMP, 92, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, IdentifierBlockEntity.SLOT_SERVO, 128, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, IdentifierBlockEntity.SLOT_BATTERY_CELL, 56, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, IdentifierBlockEntity.SLOT_FLUID_PUMP, 92, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, IdentifierBlockEntity.SLOT_SERVO, 128, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 identifier.getRefinementInventory(),
@@ -459,20 +458,6 @@ public class IdentifierMenu extends AbstractContainerMenu implements MasteryMenu
             return identifier;
         }
         throw new IllegalStateException("Expected identifier block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

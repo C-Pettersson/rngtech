@@ -20,7 +20,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -104,7 +103,7 @@ public class BatteryChassisMenu extends AbstractContainerMenu implements StatBre
 
         for (int slot = 0; slot < physicalCellSlotCount; slot++) {
             int slotIndex = slot;
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     cellInventory,
                     slot,
                     cellSlotX(slot),
@@ -439,20 +438,6 @@ public class BatteryChassisMenu extends AbstractContainerMenu implements StatBre
             return chassis;
         }
         throw new IllegalStateException("Expected battery chassis block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

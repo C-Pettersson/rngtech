@@ -104,7 +104,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
 
         addEnergySlot(connector, 0);
         for (int moduleIndex = 0; moduleIndex < FLUID_MODULE_COUNT; moduleIndex++) {
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     connector.getInventory(),
                     UniversalConnectorBlockEntity.fluidConnectorSlot(moduleIndex),
                     30,
@@ -113,7 +113,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
             ));
         }
         for (int moduleIndex = 0; moduleIndex < ITEM_MODULE_COUNT; moduleIndex++) {
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     connector.getInventory(),
                     UniversalConnectorBlockEntity.itemConnectorSlot(moduleIndex),
                     30,
@@ -121,7 +121,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
                     () -> selectedTab == TAB_ITEM
             ));
         }
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 connector.getInventory(),
                 UniversalConnectorBlockEntity.SLOT_RESERVED_CONNECTOR,
                 30,
@@ -573,7 +573,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
 
     /** Menu slot numbers match the connector inventory, so the Energy rows are added where their slots sit. */
     private void addEnergySlot(UniversalConnectorAccess connector, int moduleIndex) {
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 connector.getInventory(),
                 UniversalConnectorBlockEntity.energyConnectorSlot(moduleIndex),
                 30,
@@ -689,27 +689,7 @@ public class UniversalConnectorMenu extends AbstractContainerMenu {
         throw new IllegalStateException(errorMessage);
     }
 
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(
-                ItemStackHandler itemHandler,
-                int index,
-                int xPosition,
-                int yPosition,
-                BooleanSupplier activeSupplier
-        ) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
-    }
-
-    private static final class GhostFilterSlot extends SlotItemHandler {
+    static final class GhostFilterSlot extends SlotItemHandler {
         private final UniversalConnectorAccess connector;
         private final boolean fluidFilter;
         private final int moduleIndex;

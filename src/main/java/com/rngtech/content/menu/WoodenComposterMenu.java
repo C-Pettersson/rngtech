@@ -18,7 +18,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class WoodenComposterMenu extends AbstractContainerMenu {
     private static final int DATA_PROGRESS = 0;
@@ -66,13 +65,13 @@ public class WoodenComposterMenu extends AbstractContainerMenu {
         ItemStackHandler inventory = composter.getInventory();
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < WoodenComposterBlockEntity.INPUT_SLOT_COUNT / 3; column++) {
-                addSlot(new SlotItemHandler(inventory, column + row * (WoodenComposterBlockEntity.INPUT_SLOT_COUNT / 3), 9 + column * 18, 31 + row * 18));
+                addSlot(new MachineGridSlot(inventory, column + row * (WoodenComposterBlockEntity.INPUT_SLOT_COUNT / 3), 9 + column * 18, 31 + row * 18));
             }
         }
-        addSlot(new SlotItemHandler(inventory, WoodenComposterBlockEntity.SLOT_OUTPUT, 161, 49));
-        addSlot(new SlotItemHandler(inventory, WoodenComposterBlockEntity.SLOT_WATER_INPUT_CONTAINER, 161, 77));
-        addSlot(new SlotItemHandler(inventory, WoodenComposterBlockEntity.SLOT_WATER_OUTPUT_CONTAINER, 202, 77));
-        addSlot(new SlotItemHandler(inventory, WoodenComposterBlockEntity.SLOT_CATALYST, 202, 49));
+        addSlot(new MachineSlot(inventory, WoodenComposterBlockEntity.SLOT_OUTPUT, 161, 49));
+        addSlot(new MachineSlot(inventory, WoodenComposterBlockEntity.SLOT_WATER_INPUT_CONTAINER, 161, 77));
+        addSlot(new MachineSlot(inventory, WoodenComposterBlockEntity.SLOT_WATER_OUTPUT_CONTAINER, 202, 77));
+        addSlot(new MachineSlot(inventory, WoodenComposterBlockEntity.SLOT_CATALYST, 202, 49));
 
         addPlayerInventory(playerInventory);
     }

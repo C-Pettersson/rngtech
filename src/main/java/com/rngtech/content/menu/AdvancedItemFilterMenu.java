@@ -327,7 +327,7 @@ public class AdvancedItemFilterMenu extends AbstractContainerMenu {
         }
     }
 
-    private final class GhostSampleSlot extends SlotItemHandler {
+    final class GhostSampleSlot extends SlotItemHandler {
         private final int sampleIndex;
 
         private GhostSampleSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, int sampleIndex) {

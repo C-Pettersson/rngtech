@@ -24,7 +24,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -109,14 +108,14 @@ public class CompressorTankMenu extends AbstractContainerMenu implements StatBre
         RefinementMenuSupport.setMachineDisplay(refinementTarget, tank.getBlockState().getBlock(), machineTraits);
 
         ItemStackHandler processInventory = tank.getProcessInventory();
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 processInventory,
                 CompressorTankBlockEntity.SLOT_FLUID_INPUT_CONTAINER,
                 85,
                 81,
                 () -> selectedTab == TAB_PROCESSING
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 processInventory,
                 CompressorTankBlockEntity.SLOT_FLUID_OUTPUT_CONTAINER,
                 117,
@@ -125,11 +124,11 @@ public class CompressorTankMenu extends AbstractContainerMenu implements StatBre
         ));
 
         ItemStackHandler gearInventory = tank.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, CompressorTankBlockEntity.SLOT_BATTERY_CELL, 32, 48, this::gearTabActive));
-        addSlot(new TabbedSlot(gearInventory, CompressorTankBlockEntity.SLOT_SERVO_0, 68, 48, this::gearTabActive));
-        addSlot(new TabbedSlot(gearInventory, CompressorTankBlockEntity.SLOT_SERVO_1, 104, 48, this::gearTabActive));
-        addSlot(new TabbedSlot(gearInventory, CompressorTankBlockEntity.SLOT_SERVO_2, 140, 48, this::gearTabActive));
-        addSlot(new TabbedSlot(gearInventory, CompressorTankBlockEntity.SLOT_SERVO_3, 176, 48, this::gearTabActive));
+        addSlot(new MachineSlot(gearInventory, CompressorTankBlockEntity.SLOT_BATTERY_CELL, 32, 48, this::gearTabActive));
+        addSlot(new MachineSlot(gearInventory, CompressorTankBlockEntity.SLOT_SERVO_0, 68, 48, this::gearTabActive));
+        addSlot(new MachineSlot(gearInventory, CompressorTankBlockEntity.SLOT_SERVO_1, 104, 48, this::gearTabActive));
+        addSlot(new MachineSlot(gearInventory, CompressorTankBlockEntity.SLOT_SERVO_2, 140, 48, this::gearTabActive));
+        addSlot(new MachineSlot(gearInventory, CompressorTankBlockEntity.SLOT_SERVO_3, 176, 48, this::gearTabActive));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 tank.getRefinementInventory(),
@@ -458,20 +457,6 @@ public class CompressorTankMenu extends AbstractContainerMenu implements StatBre
             return tank;
         }
         throw new IllegalStateException("Expected compressor tank block entity at " + pos + ", found " + blockEntity);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier visible;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier visible) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.visible = visible;
-        }
-
-        @Override
-        public boolean isActive() {
-            return visible.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

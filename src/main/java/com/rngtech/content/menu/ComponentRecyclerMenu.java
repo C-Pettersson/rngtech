@@ -29,7 +29,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -110,15 +109,15 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
         RefinementMenuSupport.setMachineDisplay(refinementTarget, recycler.getBlockState().getBlock(), machineTraits);
 
         ItemStackHandler processInventory = recycler.getProcessInventory();
-        addSlot(new TabbedSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_INPUT, 45, 52, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_OUTPUT_PRIMARY, 177, 30, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_OUTPUT_SECONDARY, 177, 52, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_OUTPUT_TERTIARY, 177, 74, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_INPUT, 45, 52, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_OUTPUT_PRIMARY, 177, 30, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_OUTPUT_SECONDARY, 177, 52, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(processInventory, ComponentRecyclerBlockEntity.SLOT_OUTPUT_TERTIARY, 177, 74, () -> selectedTab == TAB_PROCESSING));
 
         ItemStackHandler gearInventory = recycler.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, ComponentRecyclerBlockEntity.SLOT_BATTERY_CELL, 56, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, ComponentRecyclerBlockEntity.SLOT_DISASSEMBLY_HEAD, 92, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, ComponentRecyclerBlockEntity.SLOT_RECOVERY_FILTER, 128, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, ComponentRecyclerBlockEntity.SLOT_BATTERY_CELL, 56, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, ComponentRecyclerBlockEntity.SLOT_DISASSEMBLY_HEAD, 92, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, ComponentRecyclerBlockEntity.SLOT_RECOVERY_FILTER, 128, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 recycler.getRefinementInventory(),
@@ -454,20 +453,6 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
             return recycler;
         }
         throw new IllegalStateException("Expected component recycler block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

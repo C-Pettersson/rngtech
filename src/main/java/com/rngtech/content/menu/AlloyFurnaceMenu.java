@@ -37,7 +37,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -154,7 +153,7 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
         ItemStackHandler processInventory = furnace.getProcessInventory();
         for (int slot = 0; slot < AlloyFurnaceBlockEntity.MAX_INPUT_SLOTS; slot++) {
             final int inputSlot = slot;
-            addSlot(new TabbedSlot(
+            addSlot(new MachineSlot(
                     processInventory,
                     AlloyFurnaceBlockEntity.SLOT_INPUT_START + slot,
                     INPUT_X[slot],
@@ -162,7 +161,7 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
                     () -> selectedTab == TAB_PROCESSING && inputSlot < activeInputSlots()
             ));
         }
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 processInventory,
                 AlloyFurnaceBlockEntity.SLOT_OUTPUT,
                 204,
@@ -171,10 +170,10 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
         ));
 
         ItemStackHandler gearInventory = furnace.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, AlloyFurnaceBlockEntity.SLOT_HEAT_CORE, 44, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, AlloyFurnaceBlockEntity.SLOT_CRUCIBLE, 92, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, AlloyFurnaceBlockEntity.SLOT_BATTERY_CELL, 140, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(gearInventory, AlloyFurnaceBlockEntity.SLOT_SERVO, 188, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, AlloyFurnaceBlockEntity.SLOT_HEAT_CORE, 44, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, AlloyFurnaceBlockEntity.SLOT_CRUCIBLE, 92, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, AlloyFurnaceBlockEntity.SLOT_BATTERY_CELL, 140, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(gearInventory, AlloyFurnaceBlockEntity.SLOT_SERVO, 188, 48, () -> selectedTab == TAB_GEAR));
 
         addSlot(RefinementMenuSupport.consumableSlot(
                 furnace.getRefinementInventory(),
@@ -713,20 +712,6 @@ public class AlloyFurnaceMenu extends AbstractContainerMenu implements MasteryMe
             return furnace;
         }
         throw new IllegalStateException("Expected alloy furnace block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {

@@ -1,5 +1,6 @@
 package com.rngtech;
 
+import com.rngtech.compat.inventorysorter.InventorySorterCompat;
 import com.rngtech.content.blockentity.CableBlockEntity;
 import com.rngtech.content.blockentity.MachineStatsCache;
 import com.rngtech.content.blockentity.RecipeCache;
@@ -76,6 +77,7 @@ public final class RNGTech {
         ModCreativeTabs.register(modBus);
 
         modBus.addListener(this::commonSetup);
+        modBus.addListener(InventorySorterCompat::enqueue);
         modBus.addListener(ModCapabilities::register);
         modBus.addListener(ModDataMaps::register);
         modBus.addListener(ModNetworking::register);

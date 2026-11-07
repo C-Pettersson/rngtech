@@ -23,7 +23,6 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 /** The Phase Cradle's one-panel menu: target, Glyph, donor, output, nine cell sockets, and the player's inventory. */
 public class PhaseCradleMenu extends AbstractContainerMenu {
@@ -86,66 +85,20 @@ public class PhaseCradleMenu extends AbstractContainerMenu {
         ItemStackHandler items = cradle == null ? new ItemStackHandler(ITEM_SLOTS) : cradle.getItems();
         ItemStackHandler cells = cradle == null ? new ItemStackHandler(PhaseCradleBlockEntity.CELL_SLOTS) : cradle.getCells();
         ItemStackHandler seats = cradle == null ? new ItemStackHandler(PhaseCradleBlockEntity.GLYPH_SEATS) : cradle.getSeats();
-        addSlot(new SlotItemHandler(items, PhaseCradleBlockEntity.SLOT_TARGET, TARGET_X, TARGET_Y) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return RefinementTargets.canPhase(stack);
-            }
-
-            @Override
-            public int getMaxStackSize() {
-                return 1;
-            }
-        });
-        addSlot(new SlotItemHandler(items, PhaseCradleBlockEntity.SLOT_GLYPH, GLYPH_X, GLYPH_Y) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return GlyphItem.isGlyph(stack);
-            }
-        });
-        addSlot(new SlotItemHandler(items, PhaseCradleBlockEntity.SLOT_DONOR, DONOR_X, DONOR_Y) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return RefinementTargets.canPhase(stack);
-            }
-
-            @Override
-            public int getMaxStackSize() {
-                return 1;
-            }
-        });
-        addSlot(new SlotItemHandler(items, PhaseCradleBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y) {
-            @Override
-            public boolean mayPlace(ItemStack stack) {
-                return false;
-            }
-        });
+        addSlot(new MachineSlot(items, PhaseCradleBlockEntity.SLOT_TARGET, TARGET_X, TARGET_Y).accepting(RefinementTargets::canPhase).singleItem());
+        addSlot(new MachineSlot(items, PhaseCradleBlockEntity.SLOT_GLYPH, GLYPH_X, GLYPH_Y).accepting(GlyphItem::isGlyph));
+        addSlot(new MachineSlot(items, PhaseCradleBlockEntity.SLOT_DONOR, DONOR_X, DONOR_Y).accepting(RefinementTargets::canPhase).singleItem());
+        addSlot(new MachineSlot(items, PhaseCradleBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y).accepting(stack -> false));
         for (int slot = 0; slot < PhaseCradleBlockEntity.CELL_SLOTS; slot++) {
-            addSlot(new SlotItemHandler(cells, slot, CELL_X + slot % 3 * CELL_SPACING, CELL_Y + slot / 3 * CELL_SPACING) {
-                @Override
-                public boolean mayPlace(ItemStack stack) {
-                    return BatteryCellItem.isBatteryCell(stack);
-                }
-
-                @Override
-                public int getMaxStackSize() {
-                    return 1;
-                }
-            });
+            addSlot(new MachineSlot(cells, slot, CELL_X + slot % 3 * CELL_SPACING, CELL_Y + slot / 3 * CELL_SPACING)
+                    .accepting(BatteryCellItem::isBatteryCell)
+                    .singleItem());
         }
         for (int seat = 0; seat < PhaseCradleBlockEntity.GLYPH_SEATS; seat++) {
             int tierSeat = seat;
-            addSlot(new SlotItemHandler(seats, seat, SEAT_X, SEAT_Y + seat * SEAT_SPACING) {
-                @Override
-                public boolean mayPlace(ItemStack stack) {
-                    return PhaseCradleBlockEntity.acceptsSeat(tierSeat, stack);
-                }
-
-                @Override
-                public int getMaxStackSize() {
-                    return 1;
-                }
-            });
+            addSlot(new MachineSlot(seats, seat, SEAT_X, SEAT_Y + seat * SEAT_SPACING)
+                    .accepting(stack -> PhaseCradleBlockEntity.acceptsSeat(tierSeat, stack))
+                    .singleItem());
         }
         for (int row = 0; row < 3; row++) {
             for (int column = 0; column < 9; column++) {

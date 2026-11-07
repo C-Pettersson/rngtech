@@ -23,7 +23,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 import java.util.function.BooleanSupplier;
 
@@ -87,29 +86,29 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu implements S
         addDataSlots(data);
 
         ItemStackHandler inventory = reactor.getInventory();
-        addSlot(new TabbedSlot(inventory, AlgaePhotobioreactorBlockEntity.SLOT_OUTPUT, 139, 66, () -> selectedTab == TAB_PROCESSING));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(inventory, AlgaePhotobioreactorBlockEntity.SLOT_OUTPUT, 139, 66, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(
                 inventory,
                 AlgaePhotobioreactorBlockEntity.SLOT_WATER_INPUT_CONTAINER,
                 9,
                 66,
                 () -> selectedTab == TAB_PROCESSING
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 inventory,
                 AlgaePhotobioreactorBlockEntity.SLOT_WATER_OUTPUT_CONTAINER,
                 31,
                 66,
                 () -> selectedTab == TAB_PROCESSING
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 inventory,
                 AlgaePhotobioreactorBlockEntity.SLOT_CARBON_INPUT_CONTAINER,
                 55,
                 66,
                 () -> selectedTab == TAB_PROCESSING
         ));
-        addSlot(new TabbedSlot(
+        addSlot(new MachineSlot(
                 inventory,
                 AlgaePhotobioreactorBlockEntity.SLOT_CARBON_OUTPUT_CONTAINER,
                 77,
@@ -118,8 +117,8 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu implements S
         ));
 
         ItemStackHandler gearInventory = reactor.getGearInventory();
-        addSlot(new TabbedSlot(gearInventory, AlgaePhotobioreactorBlockEntity.SLOT_BIO_CHAMBER, 110, 48, () -> selectedTab == TAB_GEAR));
-        addSlot(new TabbedSlot(inventory, AlgaePhotobioreactorBlockEntity.SLOT_UREA, 163, 66, () -> selectedTab == TAB_PROCESSING));
+        addSlot(new MachineSlot(gearInventory, AlgaePhotobioreactorBlockEntity.SLOT_BIO_CHAMBER, 110, 48, () -> selectedTab == TAB_GEAR));
+        addSlot(new MachineSlot(inventory, AlgaePhotobioreactorBlockEntity.SLOT_UREA, 163, 66, () -> selectedTab == TAB_PROCESSING));
 
         addPlayerInventory(playerInventory);
     }
@@ -360,20 +359,6 @@ public class AlgaePhotobioreactorMenu extends AbstractContainerMenu implements S
             return reactor;
         }
         throw new IllegalStateException("Expected algae photobioreactor block entity at " + pos);
-    }
-
-    private static final class TabbedSlot extends SlotItemHandler {
-        private final BooleanSupplier activeSupplier;
-
-        private TabbedSlot(ItemStackHandler itemHandler, int index, int xPosition, int yPosition, BooleanSupplier activeSupplier) {
-            super(itemHandler, index, xPosition, yPosition);
-            this.activeSupplier = activeSupplier;
-        }
-
-        @Override
-        public boolean isActive() {
-            return activeSupplier.getAsBoolean();
-        }
     }
 
     private static final class TabbedInventorySlot extends Slot {
