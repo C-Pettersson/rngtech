@@ -522,44 +522,24 @@
 		}
 		{
 			dependencies: ["7106E7A1B10F0220"]
+			icon: { id: "rngtech:raw_tin" }
 			id: "7106E7A1B10F0222"
 			optional: true
-			rewards: [{
-				count: 4
-				id: "7106E7A1B10F0224"
-				item: {
-					count: 1
-					id: "rngtech:raw_tin"
-				}
-				type: "item"
-			}]
 			tasks: [{
-				count: 4L
 				id: "7106E7A1B10F0223"
-				item: { count: 1, id: "rngtech:raw_tin" }
-				type: "item"
+				type: "checkmark"
 			}]
 			x: 15.5d
 			y: -10.5d
 		}
 		{
 			dependencies: ["7106E7A1B10F0220"]
+			icon: { id: "rngtech:raw_zinc" }
 			id: "7106E7A1B10F0225"
 			optional: true
-			rewards: [{
-				count: 4
-				id: "7106E7A1B10F0227"
-				item: {
-					count: 1
-					id: "rngtech:raw_zinc"
-				}
-				type: "item"
-			}]
 			tasks: [{
-				count: 4L
 				id: "7106E7A1B10F0226"
-				item: { count: 1, id: "rngtech:raw_zinc" }
-				type: "item"
+				type: "checkmark"
 			}]
 			x: 15.5d
 			y: -9.0d
@@ -604,66 +584,36 @@
 		}
 		{
 			dependencies: ["7106E7A1B10F0230"]
+			icon: { id: "rngtech:raw_nickel" }
 			id: "7106E7A1B10F0232"
 			optional: true
-			rewards: [{
-				count: 4
-				id: "7106E7A1B10F0234"
-				item: {
-					count: 1
-					id: "rngtech:raw_nickel"
-				}
-				type: "item"
-			}]
 			tasks: [{
-				count: 4L
 				id: "7106E7A1B10F0233"
-				item: { count: 1, id: "rngtech:raw_nickel" }
-				type: "item"
+				type: "checkmark"
 			}]
 			x: 19.5d
 			y: -10.5d
 		}
 		{
 			dependencies: ["7106E7A1B10F0230"]
+			icon: { id: "rngtech:raw_lead" }
 			id: "7106E7A1B10F0235"
 			optional: true
-			rewards: [{
-				count: 4
-				id: "7106E7A1B10F0237"
-				item: {
-					count: 1
-					id: "rngtech:raw_lead"
-				}
-				type: "item"
-			}]
 			tasks: [{
-				count: 4L
 				id: "7106E7A1B10F0236"
-				item: { count: 1, id: "rngtech:raw_lead" }
-				type: "item"
+				type: "checkmark"
 			}]
 			x: 19.5d
 			y: -7.5d
 		}
 		{
 			dependencies: ["7106E7A1B10F0230"]
+			icon: { id: "rngtech:raw_silver" }
 			id: "7106E7A1B10F0238"
 			optional: true
-			rewards: [{
-				count: 4
-				id: "7106E7A1B10F023A"
-				item: {
-					count: 1
-					id: "rngtech:raw_silver"
-				}
-				type: "item"
-			}]
 			tasks: [{
-				count: 4L
 				id: "7106E7A1B10F0239"
-				item: { count: 1, id: "rngtech:raw_silver" }
-				type: "item"
+				type: "checkmark"
 			}]
 			x: 19.5d
 			y: -9.0d
@@ -686,44 +636,24 @@
 		}
 		{
 			dependencies: ["7106E7A1B10F0240"]
+			icon: { id: "rngtech:raw_aluminum" }
 			id: "7106E7A1B10F0242"
 			optional: true
-			rewards: [{
-				count: 4
-				id: "7106E7A1B10F0244"
-				item: {
-					count: 1
-					id: "rngtech:raw_aluminum"
-				}
-				type: "item"
-			}]
 			tasks: [{
-				count: 4L
 				id: "7106E7A1B10F0243"
-				item: { count: 1, id: "rngtech:raw_aluminum" }
-				type: "item"
+				type: "checkmark"
 			}]
 			x: 23.5d
 			y: -10.0d
 		}
 		{
 			dependencies: ["7106E7A1B10F0240"]
+			icon: { id: "rngtech:raw_osmium" }
 			id: "7106E7A1B10F0245"
 			optional: true
-			rewards: [{
-				count: 4
-				id: "7106E7A1B10F0247"
-				item: {
-					count: 1
-					id: "rngtech:raw_osmium"
-				}
-				type: "item"
-			}]
 			tasks: [{
-				count: 4L
 				id: "7106E7A1B10F0246"
-				item: { count: 1, id: "rngtech:raw_osmium" }
-				type: "item"
+				type: "checkmark"
 			}]
 			x: 23.5d
 			y: -8.0d
@@ -752,22 +682,12 @@
 		}
 		{
 			dependencies: ["7106E7A1B10F0260"]
+			icon: { id: "rngtech:raw_titanium" }
 			id: "7106E7A1B10F0262"
 			optional: true
-			rewards: [{
-				count: 4
-				id: "7106E7A1B10F0264"
-				item: {
-					count: 1
-					id: "rngtech:raw_titanium"
-				}
-				type: "item"
-			}]
 			tasks: [{
-				count: 4L
 				id: "7106E7A1B10F0263"
-				item: { count: 1, id: "rngtech:raw_titanium" }
-				type: "item"
+				type: "checkmark"
 			}]
 			x: 29.5d
 			y: -9.0d
@@ -785,44 +705,24 @@
 		}
 		{
 			dependencies: ["7106E7A1B10F0270"]
+			icon: { id: "rngtech:raw_tungsten" }
 			id: "7106E7A1B10F0272"
 			optional: true
-			rewards: [{
-				count: 4
-				id: "7106E7A1B10F0274"
-				item: {
-					count: 1
-					id: "rngtech:raw_tungsten"
-				}
-				type: "item"
-			}]
 			tasks: [{
-				count: 4L
 				id: "7106E7A1B10F0273"
-				item: { count: 1, id: "rngtech:raw_tungsten" }
-				type: "item"
+				type: "checkmark"
 			}]
 			x: 33.5d
 			y: -10.0d
 		}
 		{
 			dependencies: ["7106E7A1B10F0270"]
+			icon: { id: "rngtech:raw_platinum" }
 			id: "7106E7A1B10F0275"
 			optional: true
-			rewards: [{
-				count: 4
-				id: "7106E7A1B10F0277"
-				item: {
-					count: 1
-					id: "rngtech:raw_platinum"
-				}
-				type: "item"
-			}]
 			tasks: [{
-				count: 4L
 				id: "7106E7A1B10F0276"
-				item: { count: 1, id: "rngtech:raw_platinum" }
-				type: "item"
+				type: "checkmark"
 			}]
 			x: 33.5d
 			y: -8.0d
@@ -855,22 +755,12 @@
 		}
 		{
 			dependencies: ["7106E7A1B10F0290"]
+			icon: { id: "rngtech:raw_naquadah" }
 			id: "7106E7A1B10F0292"
 			optional: true
-			rewards: [{
-				count: 4
-				id: "7106E7A1B10F0294"
-				item: {
-					count: 1
-					id: "rngtech:raw_naquadah"
-				}
-				type: "item"
-			}]
 			tasks: [{
-				count: 4L
 				id: "7106E7A1B10F0293"
-				item: { count: 1, id: "rngtech:raw_naquadah" }
-				type: "item"
+				type: "checkmark"
 			}]
 			x: 39.5d
 			y: -9.0d

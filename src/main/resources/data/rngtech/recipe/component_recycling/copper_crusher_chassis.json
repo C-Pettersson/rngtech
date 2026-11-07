@@ -16,7 +16,7 @@
         },
         {
             "stack": {
-                "id": "minecraft:copper_ingot",
+                "id": "rngtech:copper_casing",
                 "count": 1
             },
             "requires_filter": false

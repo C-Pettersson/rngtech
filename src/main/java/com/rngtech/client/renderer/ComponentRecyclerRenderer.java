@@ -42,8 +42,9 @@ import java.util.Map;
  * Draws the working parts of a Component Recycler: the installed Disassembly Head as a claw that turns on its spindle,
  * faster for a shorter craft, and dips onto the item on the turntable while it works; the Recovery Filter cartridge in
  * its cage; the Battery Cell lying in its cradle with a charge meter beside it; and each output slot's returns standing
- * in its tray. The Crude Recycler turns its runner stone, with the input on it, while its Hand Crank turns. Positions
- * are in model pixels and match tools/blockmodels/component_recycler.py.
+ * in its tray. The Crude Recycler turns its runner stone while its Hand Crank turns, over an input that stays on the
+ * quern bed and wears down as the job advances. Positions are in model pixels and match
+ * tools/blockmodels/component_recycler.py.
  */
 public class ComponentRecyclerRenderer implements BlockEntityRenderer<ComponentRecyclerBlockEntity> {
     private static final Map<String, ModelResourceLocation> CLAW_MODELS = new HashMap<>();
@@ -64,10 +65,13 @@ public class ComponentRecyclerRenderer implements BlockEntityRenderer<ComponentR
     /** The Hand Crank turns a quarter turn clockwise per crank, and its shaft turns the runner stone with it. */
     private static final float RUNNER_TURNS_PER_CRANK = 1.0F / 4.0F;
     private static final float RUNNER_EASE_PER_TICK = 0.3F;
-    private static final float RUNNER_TOP = 7.0F;
     private static final float RUNNER_Z = 8.0F;
-    /** The Crude Recycler's input rides the runner stone this far out from the drive shaft. */
-    private static final float RUNNER_ORBIT = 1.9F;
+    // The Crude Recycler's input lies on the quern bed under the stone's front rim, its back edge raised to the stone.
+    private static final float QUERN_TOP = 5.0F;
+    private static final float GRIND_Z = 5.75F;
+    private static final float GRIND_TILT = 12.0F;
+    /** What is left of the input's size when the job finishes. */
+    private static final float GRIND_MIN_SIZE = 0.55F;
     // Battery Cell lying along z in the east cradle. Its part model is 6 pixels wide and 10 tall.
     private static final float CELL_X = 14.0F;
     private static final float CELL_Y = 4.25F;
@@ -91,7 +95,7 @@ public class ComponentRecyclerRenderer implements BlockEntityRenderer<ComponentR
     private static final float RETURN_SIZE = 6.0F;
     private static final float RETURN_LEAN = -8.0F;
     private static final float INPUT_SIZE = 9.0F;
-    private static final float CRUDE_INPUT_SIZE = 6.0F;
+    private static final float CRUDE_INPUT_SIZE = 5.0F;
     private static final float SURFACE = 0.02F;
     private static final int LED_COLOR = 0x8CF07A;
 
@@ -178,9 +182,9 @@ public class ComponentRecyclerRenderer implements BlockEntityRenderer<ComponentR
         poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
         if (!state.input().isEmpty()) {
             if (manual) {
-                float radians = turn * Mth.DEG_TO_RAD;
-                renderInput(state.input(), CRUDE_INPUT_SIZE, TABLE_X + RUNNER_ORBIT * Mth.sin(radians), RUNNER_TOP,
-                        RUNNER_Z + RUNNER_ORBIT * Mth.cos(radians), turn, blockEntity, poseStack, bufferSource, packedLight,
+                float shake = working ? Mth.sin(time * 1.7F) * 0.1F : 0.0F;
+                float size = CRUDE_INPUT_SIZE * Mth.lerp(state.wear(), 1.0F, GRIND_MIN_SIZE);
+                renderGrinding(state.input(), size, TABLE_X + shake, blockEntity, poseStack, bufferSource, packedLight,
                         packedOverlay, seed);
             } else {
                 float shake = working ? Mth.sin(time * 1.7F) * 0.1F : 0.0F;
@@ -263,7 +267,25 @@ public class ComponentRecyclerRenderer implements BlockEntityRenderer<ComponentR
         modelRenderer.renderModel(poseStack.last(), consumer, null, model, 1.0F, 1.0F, 1.0F, light, overlay, ModelData.EMPTY, RenderType.cutout());
     }
 
-    /** The item being recycled, lying on the turntable or runner stone: flat items lie flat, block items sit as a cube. */
+    /** The Crude Recycler's input, still under the turning stone: flat items lean up to it, block items reach into it. */
+    private void renderGrinding(
+            ItemStack stack, float size, float x, ComponentRecyclerBlockEntity blockEntity, PoseStack poseStack,
+            MultiBufferSource bufferSource, int light, int overlay, int seed
+    ) {
+        boolean block = stack.getItem() instanceof BlockItem;
+        float rise = block ? size / 4.0F : 0.25F + size / 2.0F * Mth.sin(GRIND_TILT * Mth.DEG_TO_RAD);
+        poseStack.pushPose();
+        poseStack.translate(x, QUERN_TOP + rise, GRIND_Z);
+        poseStack.mulPose(Axis.YP.rotationDegrees(((seed & 0xF) - 7.5F) * 1.2F));
+        if (!block) {
+            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F - GRIND_TILT));
+        }
+        poseStack.scale(size, size, size);
+        itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, light, overlay, poseStack, bufferSource, blockEntity.getLevel(), seed);
+        poseStack.popPose();
+    }
+
+    /** The item being recycled, lying on the turntable: flat items lie flat, block items sit as a cube. */
     private void renderInput(
             ItemStack stack, float size, float x, float floor, float z, float yaw, ComponentRecyclerBlockEntity blockEntity,
             PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay, int seed

@@ -22,6 +22,7 @@ import java.util.List;
  *                   {@value #PILE}
  * @param craftTicks the length of the current craft, which sets how fast the claw turns; 0 while idle
  * @param cranks     Hand Crank turns since the Crude Recycler loaded, each of which turns its runner stone a step
+ * @param wear       how far the Crude Recycler has ground its input, from 0 to 1; moves only with {@code cranks}
  */
 public record ComponentRecyclerVisualState(
         String head,
@@ -32,13 +33,14 @@ public record ComponentRecyclerVisualState(
         List<ItemStack> outputs,
         boolean running,
         int craftTicks,
-        int cranks
+        int cranks,
+        float wear
 ) {
     public static final int OUTPUTS = 3;
     public static final int PILE = 3;
     public static final int CHARGE_SEGMENTS = 4;
     public static final ComponentRecyclerVisualState IDLE = new ComponentRecyclerVisualState(
-            "", "", "", -1.0F, ItemStack.EMPTY, List.of(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY), false, 0, 0);
+            "", "", "", -1.0F, ItemStack.EMPTY, List.of(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY), false, 0, 0, 0.0F);
 
     /** One copy of a stack, counted as the copies to draw: one for any items, up to {@value #PILE} for a full stack. */
     public static ItemStack pile(ItemStack stack) {
@@ -82,6 +84,7 @@ public record ComponentRecyclerVisualState(
         tag.putBoolean("Running", running);
         tag.putInt("CraftTicks", craftTicks);
         tag.putInt("Cranks", cranks);
+        tag.putFloat("Wear", wear);
         return tag;
     }
 
@@ -103,7 +106,8 @@ public record ComponentRecyclerVisualState(
                 List.copyOf(outputs),
                 tag.getBoolean("Running"),
                 tag.getInt("CraftTicks"),
-                tag.getInt("Cranks")
+                tag.getInt("Cranks"),
+                tag.getFloat("Wear")
         );
     }
 

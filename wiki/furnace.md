@@ -70,18 +70,18 @@ Each metal smelts at its own pace: low-melting Lead and Tin in half the time of 
 
 Heat decides your progress. Unmodified electric chassis reach about:
 
-| Heat Core | Max temperature | Unlocks |
-|---|---:|---|
-| Stage 0 Furnace (no core) | 800 | Iron and Copper |
-| Stage 0 Furnace with a {{ item('rngtech:kiln_core') }} | 1,000 (hard cap) | Gold, Tin, and other early metals |
-| {{ item('rngtech:iron_heat_core') }} | 800 | Iron and Copper |
-| {{ item('rngtech:copper_heat_core') }} | 1,000 | Bronze ingredients and other early metals |
-| {{ item('rngtech:bronze_heat_core') }} | 1,200 | Mid-tier metals |
-| {{ item('rngtech:steel_heat_core') }} | 1,400 | Stage 4 metals |
-| {{ item('rngtech:sparksteel_heat_core') }} | 1,600 | High-heat metals |
-| {{ item('rngtech:titanium_heat_core') }} | 1,800 | Late-game metals |
-| {{ item('rngtech:exotic_heat_core') }} | 2,200 | Every metal recipe |
-| {{ item('rngtech:aluminum_heat_core') }} | 850 | Low-heat Stage 5 sidegrade that heats up much faster |
+| Heat Core | Max temperature | Stability | Unlocks |
+|---|---:|---:|---|
+| Stage 0 Furnace (no core) | 800 | — | Iron and Copper |
+| Stage 0 Furnace with a {{ item('rngtech:kiln_core') }} | 1,000 (hard cap) | — | Tin, Zinc, and Gold |
+| {{ item('rngtech:iron_heat_core') }} | 800 | 0.85 | Iron and Copper |
+| {{ item('rngtech:copper_heat_core') }} | 1,000 | 0.90 | Tin, Zinc, and Gold |
+| {{ item('rngtech:bronze_heat_core') }} | 1,200 | 0.95 | Nickel, Lead, and Silver. Its stability is just enough for them. |
+| {{ item('rngtech:steel_heat_core') }} | 1,400 | 1.08 | Aluminum and Osmium |
+| {{ item('rngtech:sparksteel_heat_core') }} | 1,600 | 1.12 | Titanium |
+| {{ item('rngtech:titanium_heat_core') }} | 1,800 | 1.18 | Tungsten and Platinum |
+| {{ item('rngtech:exotic_heat_core') }} | 2,200 | 1.30 | Every metal recipe, including Naquadah and Netherite |
+| {{ item('rngtech:aluminum_heat_core') }} | 850 | 0.86 | Iron and Copper. A low-heat Stage 5 sidegrade that heats up much faster. |
 
 Vanilla ores and raw metals go through the same heat gates as RNGTech metals, so you cannot skip heat progression by smelting them directly.
 
@@ -96,8 +96,8 @@ Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 
 | Stage | Furnace | Notes |
 |---:|---|---|
 | 0 | {{ item('rngtech:furnace') }} | Burns standard furnace fuel. Slow, and reaches 800 heat. With a Kiln Core, it runs on FE and reaches 1,000 heat. |
-| 1 | {{ item('rngtech:iron_furnace_chassis') }} | First electric Furnace. |
-| 2 | {{ item('rngtech:copper_furnace_chassis') }} | Better early heat throughput and energy use. |
+| 1 | {{ item('rngtech:iron_furnace_chassis') }} | First electric Furnace. Cheap to build, and uses less FE than Copper. |
+| 2 | {{ item('rngtech:copper_furnace_chassis') }} | Heats and smelts faster, with a larger buffer. Uses more FE than Iron. |
 | 3 | {{ item('rngtech:gold_furnace_chassis') }} | Copper numbers with one built-in [jewel socket](jewels.md#body-sockets). |
 | 3 | {{ item('rngtech:bronze_furnace_chassis') }} | Smelts Bronze Blend and Steel Blend faster. |
 | 4 | {{ item('rngtech:steel_furnace_chassis') }} | More efficient midgame chassis. |

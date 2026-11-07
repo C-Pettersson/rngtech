@@ -168,7 +168,7 @@ function coverageFailures(bounds, declarations) {
 
 /**
  * A world source, such as tree growth, is safe only while no recipe makes what feeds it, so a recipe that outputs one
- * of its `notMadeByRecipes` items fails the audit.
+ * of its `notMadeByRecipes` items fails the audit. `allowedRecipes` names a recipe that may, because its own input is listed too.
  */
 async function worldSourceFailures(bounds, reactions, tags) {
     const failures = [];
@@ -181,7 +181,7 @@ async function worldSourceFailures(bounds, reactions, tags) {
         }
         for (const reaction of reactions) {
             for (const node of reaction.outputs.keys()) {
-                if (fed.has(node)) {
+                if (fed.has(node) && !source.allowedRecipes?.[node]?.includes(reaction.id)) {
                     failures.push(`World source ${name} assumes no recipe makes ${node}, but ${reaction.id} does`);
                 }
             }

@@ -87,6 +87,7 @@
 		"4. Craft 3 &eCopper Dust&r, 1 &eTin Dust&r, and 1 &eCoal Dust&r into 2 &eBronze Blend&r."
 		"5. Smelt the &eBronze Blend&r in the &eFurnace&r. It needs 700 °C."
 		""
+		"&7&oNote: Dust from other mods also works in the Bronze Blend recipe.&r"
 		"&7&oNote: Hammer Bronze Ingots into Bronze Plates with the Forming Hammer. The next machines need Bronze Plates.&r"
 	]
 	quest.06CF355466851823.quest_subtitle: "Bronze starts in a crafting grid."
@@ -210,13 +211,14 @@
 		"Its recipe needs Calibrated Structural, Conductive, and Logic Components with 45% or more stability."
 	]
 	quest.1333C98733E8948C.quest_desc: [
-		"Optional. The &eCopper Crusher Chassis&r is a Stage 2 sidegrade. It works faster and uses less &bFE&r than the Iron Crusher, but has a smaller &bFE&r buffer."
+		"The &eCopper Crusher Chassis&r is the other choice for your first powered Crusher. It costs more than the Iron Crusher, because it needs Copper Casings and a Copper Coil."
+		"It works faster and uses less &bFE&r, but it has a smaller &bFE&r buffer and gives less crushed material."
 		""
 		"&aBuild:&r"
 		"- Craft a &eCopper Crusher Chassis&r."
-		"- Optional: craft a &eCopper Crush Head&r. It has hardness 2, the same as the &eIron Crush Head&r."
+		"- Install a Crush Head and a Battery Cell. A &eCopper Crush Head&r has hardness 2, the same as the &eIron Crush Head&r."
 	]
-	quest.1333C98733E8948C.quest_subtitle: "Faster and more efficient, smaller buffer."
+	quest.1333C98733E8948C.quest_subtitle: "Faster, but a smaller buffer and less yield."
 	quest.1333C98733E8948C.title: "Copper Crusher"
 	quest.135EB1E2D3366D98.quest_desc: [
 		"From now on, recipes need heat. A machine with enough heat can still fail when its heat control is poor."
@@ -644,7 +646,7 @@
 		""
 		"1. Craft a &eMachine Frame&r and an &eIron Battery Cell&r."
 		"2. Place a &eCrude Fuel Burner&r."
-		"3. Place an &eIron Crusher Chassis&r next to the burner."
+		"3. Place an &eIron Crusher Chassis&r or a &eCopper Crusher Chassis&r next to the burner."
 		"4. Crush raw metal, then smelt the output in the &eFurnace&r."
 		""
 		"&7&oNote: When a machine works badly, check its Gear first.&r"
@@ -665,6 +667,7 @@
 		"- The Crusher accepts &bFE&r on any side."
 		""
 		"&7&oNote: The Iron Crush Head has hardness 2. A harder recipe takes more time and FE for each level above the head. It can also jam and gives no bonus output.&r"
+		"&7&oNote: The Iron Crusher gives 5% more crushed material than the Copper Crusher. You need only one of them to continue.&r"
 	]
 	quest.37A6C9E1284B5D17.quest_subtitle: "The Crush Head sets the hardness."
 	quest.37A6C9E1284B5D17.title: "Iron Crusher"
@@ -1257,7 +1260,7 @@
 	quest.37A6C9E1284B5D4A.quest_subtitle: "Modules decide what the Cable moves."
 	quest.37A6C9E1284B5D4A.title: "Connector Modules"
 	quest.37A6C9E1284B5D4D.quest_desc: [
-		"Optional. Crush the crushed material again to get dust."
+		"Optional. Crush the crushed material again to get dust. Click the checkmark when you have done this."
 		""
 		"&aBuild:&r"
 		"- Crush &eCrushed Iron&r into &eIron Dust&r."
@@ -2118,10 +2121,10 @@
 	]
 	quest.7106E7A1B10F0220.quest_subtitle: "This band is ore hardness 2."
 	quest.7106E7A1B10F0220.title: "Copper and Bronze Reach"
-	quest.7106E7A1B10F0222.quest_desc: ["Collect 4 &eRaw Tin&r. The quest does not take the items. The reward gives you 4 more &eRaw Tin&r."]
+	quest.7106E7A1B10F0222.quest_desc: ["Mine some &eRaw Tin&r. Raw Tin from other mods also counts. Click the checkmark when you have it."]
 	quest.7106E7A1B10F0222.quest_subtitle: "This quest is optional."
 	quest.7106E7A1B10F0222.title: "Raw Tin Sample"
-	quest.7106E7A1B10F0225.quest_desc: ["Collect 4 &eRaw Zinc&r. The quest does not take the items. The reward gives you 4 more &eRaw Zinc&r."]
+	quest.7106E7A1B10F0225.quest_desc: ["Mine some &eRaw Zinc&r. Raw Zinc from other mods also counts. Click the checkmark when you have it."]
 	quest.7106E7A1B10F0225.quest_subtitle: "This quest is optional."
 	quest.7106E7A1B10F0225.title: "Raw Zinc Sample"
 	quest.7106E7A1B10F0228.quest_desc: ["Collect 4 &eRaw Gold&r. The quest does not take the items. The reward gives you 4 more &eRaw Gold&r."]
@@ -2138,13 +2141,13 @@
 	]
 	quest.7106E7A1B10F0230.quest_subtitle: "This band is ore hardness 3."
 	quest.7106E7A1B10F0230.title: "Steel Reach"
-	quest.7106E7A1B10F0232.quest_desc: ["Collect 4 &eRaw Nickel&r. The quest does not take the items. The reward gives you 4 more &eRaw Nickel&r."]
+	quest.7106E7A1B10F0232.quest_desc: ["Mine some &eRaw Nickel&r. Raw Nickel from other mods also counts. Click the checkmark when you have it."]
 	quest.7106E7A1B10F0232.quest_subtitle: "This quest is optional."
 	quest.7106E7A1B10F0232.title: "Raw Nickel Sample"
-	quest.7106E7A1B10F0235.quest_desc: ["Collect 4 &eRaw Lead&r. The quest does not take the items. The reward gives you 4 more &eRaw Lead&r."]
+	quest.7106E7A1B10F0235.quest_desc: ["Mine some &eRaw Lead&r. Raw Lead from other mods also counts. Click the checkmark when you have it."]
 	quest.7106E7A1B10F0235.quest_subtitle: "This quest is optional."
 	quest.7106E7A1B10F0235.title: "Raw Lead Sample"
-	quest.7106E7A1B10F0238.quest_desc: ["Collect 4 &eRaw Silver&r. The quest does not take the items. The reward gives you 4 more &eRaw Silver&r."]
+	quest.7106E7A1B10F0238.quest_desc: ["Mine some &eRaw Silver&r. Raw Silver from other mods also counts. Click the checkmark when you have it."]
 	quest.7106E7A1B10F0238.quest_subtitle: "This quest is optional."
 	quest.7106E7A1B10F0238.title: "Raw Silver Sample"
 	quest.7106E7A1B10F0240.quest_desc: [
@@ -2157,12 +2160,12 @@
 	quest.7106E7A1B10F0240.quest_subtitle: "This band is ore hardness 4."
 	quest.7106E7A1B10F0240.title: "Steel with Diamond Tip"
 	quest.7106E7A1B10F0242.quest_desc: [
-		"Collect 4 &eRaw Aluminum&r. The quest does not take the items. The reward gives you 4 more &eRaw Aluminum&r."
+		"Mine some &eRaw Aluminum&r. Raw Aluminum from other mods also counts. Click the checkmark when you have it."
 		"This quest opens the Aluminum Foothold quest."
 	]
 	quest.7106E7A1B10F0242.quest_subtitle: "This quest is optional."
 	quest.7106E7A1B10F0242.title: "Raw Aluminum Sample"
-	quest.7106E7A1B10F0245.quest_desc: ["Collect 4 &eRaw Osmium&r. The quest does not take the items. The reward gives you 4 more &eRaw Osmium&r."]
+	quest.7106E7A1B10F0245.quest_desc: ["Mine some &eRaw Osmium&r. Raw Osmium from other mods also counts. Click the checkmark when you have it."]
 	quest.7106E7A1B10F0245.quest_subtitle: "This quest is optional."
 	quest.7106E7A1B10F0245.title: "Raw Osmium Sample"
 	quest.7106E7A1B10F0250.quest_desc: [
@@ -2181,7 +2184,7 @@
 	]
 	quest.7106E7A1B10F0260.quest_subtitle: "This band is ore hardness 5."
 	quest.7106E7A1B10F0260.title: "Titanium Reach"
-	quest.7106E7A1B10F0262.quest_desc: ["Collect 4 &eRaw Titanium&r. The quest does not take the items. The reward gives you 4 more &eRaw Titanium&r."]
+	quest.7106E7A1B10F0262.quest_desc: ["Mine some &eRaw Titanium&r. Raw Titanium from other mods also counts. Click the checkmark when you have it."]
 	quest.7106E7A1B10F0262.quest_subtitle: "This quest is optional."
 	quest.7106E7A1B10F0262.title: "Raw Titanium Sample"
 	quest.7106E7A1B10F0270.quest_desc: [
@@ -2193,10 +2196,10 @@
 	]
 	quest.7106E7A1B10F0270.quest_subtitle: "This band is ore hardness 6."
 	quest.7106E7A1B10F0270.title: "Tungsten and Platinum Reach"
-	quest.7106E7A1B10F0272.quest_desc: ["Collect 4 &eRaw Tungsten&r. The quest does not take the items. The reward gives you 4 more &eRaw Tungsten&r."]
+	quest.7106E7A1B10F0272.quest_desc: ["Mine some &eRaw Tungsten&r. Raw Tungsten from other mods also counts. Click the checkmark when you have it."]
 	quest.7106E7A1B10F0272.quest_subtitle: "This quest is optional."
 	quest.7106E7A1B10F0272.title: "Raw Tungsten Sample"
-	quest.7106E7A1B10F0275.quest_desc: ["Collect 4 &eRaw Platinum&r. The quest does not take the items. The reward gives you 4 more &eRaw Platinum&r."]
+	quest.7106E7A1B10F0275.quest_desc: ["Mine some &eRaw Platinum&r. Raw Platinum from other mods also counts. Click the checkmark when you have it."]
 	quest.7106E7A1B10F0275.quest_subtitle: "This quest is optional."
 	quest.7106E7A1B10F0275.title: "Raw Platinum Sample"
 	quest.7106E7A1B10F0280.quest_desc: [
@@ -2213,7 +2216,7 @@
 	]
 	quest.7106E7A1B10F0290.quest_subtitle: "This band is ore hardness 8."
 	quest.7106E7A1B10F0290.title: "Exotic Reach"
-	quest.7106E7A1B10F0292.quest_desc: ["Collect 4 &eRaw Naquadah&r. The quest does not take the items. The reward gives you 4 more &eRaw Naquadah&r."]
+	quest.7106E7A1B10F0292.quest_desc: ["Mine some &eRaw Naquadah&r. Raw Naquadah from other mods also counts. Click the checkmark when you have it."]
 	quest.7106E7A1B10F0292.quest_subtitle: "This quest is optional."
 	quest.7106E7A1B10F0292.title: "Raw Naquadah Sample"
 	quest.7106E7A1B10F0300.quest_desc: [

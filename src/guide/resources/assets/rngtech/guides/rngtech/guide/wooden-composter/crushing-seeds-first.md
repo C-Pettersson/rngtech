@@ -2,7 +2,7 @@
 navigation:
   title: "Crushing seeds first"
   parent: wooden-composter.md
-  position: 1
+  position: 2
   icon: rngtech:wooden_composter
 ---
 

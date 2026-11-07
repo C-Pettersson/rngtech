@@ -44,7 +44,7 @@ Returns are always physical parts only. A recycled item's rarity, affixes, and R
 
 You can read a powered Recycler from the outside. The installed Disassembly Head hangs in the open front as a claw in the head's material; with no head you see only the bare spindle. While the Recycler works, the claw turns, faster when a craft is shorter, and reaches down onto the item on the turntable, throwing off sparks and bits of the item. Each output slot has its own tray under the grated floor, and its returns stand in it. Facing the front, the Battery Cell lies in the cradle on the left of the back cabinet with a charge meter beside it, and an installed Recovery Filter stands as a cartridge in the cage on the right. Each chassis has its own casing. FE still enters on any of the four sides, but the cable port is drawn on the back.
 
-The {{ item('rngtech:crude_recycler') }} is a plank crate instead. Through its front window you can see a flint-studded stone on a cobblestone bed, with the item to recycle lying on it and its returns standing in front. The stone turns while you turn the Hand Crank on the lid.
+The {{ item('rngtech:crude_recycler') }} is a plank crate instead. Through its front window you can see a flint-studded stone above a cobblestone bed. The item to recycle lies on the bed, under the front of the stone, and its returns stand in front. The stone turns while you turn the Hand Crank on the lid, and the item wears down as the job continues.
 
 ## Obtaining
 

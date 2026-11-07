@@ -30,7 +30,9 @@ public class WoodenComposterMenu extends AbstractContainerMenu {
     private static final int DATA_WET_BATCH = 6;
     private static final int DATA_VARIETY_COUNT = 7;
     private static final int DATA_SPEED_BONUS_PERCENT = 8;
-    private static final int DATA_COUNT = 9;
+    private static final int DATA_NEXT_BATCH_RICH = 9;
+    private static final int DATA_CATALYST_CHARGES = 10;
+    private static final int DATA_COUNT = 11;
 
     private static final int PLAYER_INVENTORY_START = WoodenComposterBlockEntity.SLOT_COUNT;
     private static final int HOTBAR_END = PLAYER_INVENTORY_START + 36;
@@ -63,13 +65,14 @@ public class WoodenComposterMenu extends AbstractContainerMenu {
 
         ItemStackHandler inventory = composter.getInventory();
         for (int row = 0; row < 3; row++) {
-            for (int column = 0; column < 9; column++) {
-                addSlot(new SlotItemHandler(inventory, column + row * 9, 9 + column * 18, 31 + row * 18));
+            for (int column = 0; column < WoodenComposterBlockEntity.INPUT_SLOT_COUNT / 3; column++) {
+                addSlot(new SlotItemHandler(inventory, column + row * (WoodenComposterBlockEntity.INPUT_SLOT_COUNT / 3), 9 + column * 18, 31 + row * 18));
             }
         }
-        addSlot(new SlotItemHandler(inventory, WoodenComposterBlockEntity.SLOT_OUTPUT, 195, 48));
-        addSlot(new SlotItemHandler(inventory, WoodenComposterBlockEntity.SLOT_WATER_INPUT_CONTAINER, 184, 76));
-        addSlot(new SlotItemHandler(inventory, WoodenComposterBlockEntity.SLOT_WATER_OUTPUT_CONTAINER, 206, 76));
+        addSlot(new SlotItemHandler(inventory, WoodenComposterBlockEntity.SLOT_OUTPUT, 161, 49));
+        addSlot(new SlotItemHandler(inventory, WoodenComposterBlockEntity.SLOT_WATER_INPUT_CONTAINER, 161, 77));
+        addSlot(new SlotItemHandler(inventory, WoodenComposterBlockEntity.SLOT_WATER_OUTPUT_CONTAINER, 202, 77));
+        addSlot(new SlotItemHandler(inventory, WoodenComposterBlockEntity.SLOT_CATALYST, 202, 49));
 
         addPlayerInventory(playerInventory);
     }
@@ -120,6 +123,14 @@ public class WoodenComposterMenu extends AbstractContainerMenu {
         return data.get(DATA_SPEED_BONUS_PERCENT);
     }
 
+    public boolean nextBatchRich() {
+        return data.get(DATA_NEXT_BATCH_RICH) != 0;
+    }
+
+    public int catalystCharges() {
+        return data.get(DATA_CATALYST_CHARGES);
+    }
+
     public boolean bulkBonusActive() {
         return availableItems() >= WoodenComposterBlockEntity.BULK_BONUS_UNIT_THRESHOLD;
     }
@@ -151,6 +162,10 @@ public class WoodenComposterMenu extends AbstractContainerMenu {
 
         if (index < PLAYER_INVENTORY_START) {
             if (!moveItemStackTo(stack, PLAYER_INVENTORY_START, HOTBAR_END, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (WoodenComposterBlockEntity.isCatalyst(stack)) {
+            if (!moveItemStackTo(stack, WoodenComposterBlockEntity.SLOT_CATALYST, WoodenComposterBlockEntity.SLOT_CATALYST + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (WoodenComposterBlockEntity.isCompostable(stack)) {

@@ -139,7 +139,7 @@ Ore moves up a processing chain. Each step costs a machine and some FE, and pays
 3. **Crush again** (optional). Each crushed item gives 1 dust in a quick second pass.
 4. **Smelt** the crushed material or dust in the Furnace for 1 ingot each.
 
-Smelting crushed material directly is slow, which makes it an easy hopper chain. Crushing it into dust first is the better route: for Iron and Copper, the dust route takes 260 ticks and 6,000 FE per ingot across both machines, against 600 ticks and 7,200 FE for crushed material.
+Smelting crushed material directly is slow, which makes it an easy hopper chain. Crushing it into dust first is the better route. For Iron and Copper, the dust route takes 260 ticks per ingot across both machines: 1,200 FE in the Crusher and 2,880 heat in the Furnace. Crushed material takes 600 ticks and 4,320 heat, and the longer smelt loses more heat through the Furnace walls.
 
 Each metal also has its own pace. Soft, low-melting Lead and Tin process in half the time, while hard metals take much longer: Titanium takes three times as long to crush and smelt, and Tungsten smelts four times slower. FE per craft stays the same, so slow metals just tie up your machines longer. The recipe tables on the [Crusher](rngtech:crusher.md) and [Furnace](rngtech:furnace.md) pages list each time.
 

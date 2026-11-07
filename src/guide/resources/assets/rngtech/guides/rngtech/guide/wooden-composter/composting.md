@@ -8,7 +8,7 @@ navigation:
 
 # Composting
 
-Put compostable items in the 27 input slots. Every 8 compost units make one Composted Biomass. Most items count as 1 unit; prepared inputs such as **Compost Feedstock** count as 2.
+Put compostable items in the 24 input slots. Every 8 compost units make one Composted Biomass. Most items count as 1 unit; prepared inputs such as **Compost Feedstock** count as 2.
 
 | Condition | Time per Composted Biomass |
 |---|---:|

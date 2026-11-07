@@ -19,7 +19,7 @@
 				type: "checkmark"
 			}]
 			x: -3.0d
-			y: 2.0d
+			y: 0.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D1B"]
@@ -36,7 +36,7 @@
 			tasks: [
 				{
 					id: "5D7D55244CDA22EA"
-					item: { count: 1, id: "rngtech:tin_dust" }
+					item: { count: 1, id: "rngtech:bronze_blend" }
 					type: "item"
 				}
 				{
@@ -46,11 +46,10 @@
 				}
 			]
 			x: -1.5d
-			y: 1.5d
+			y: 0.0d
 		}
 		{
 			dependencies: [
-				"06CF355466851823"
 				"37A6C9E1284B5D19"
 				"42BFA6CFEA87EC68"
 			]
@@ -93,7 +92,7 @@
 				}
 			]
 			x: 1.0d
-			y: 1.0d
+			y: 0.0d
 		}
 		{
 			dependencies: ["135EB1E2D3366D98"]
@@ -124,7 +123,7 @@
 				type: "item"
 			}]
 			x: 4.0d
-			y: 1.0d
+			y: 0.0d
 		}
 		{
 			dependencies: ["4F5AA1D34A0C1A4C"]
@@ -142,8 +141,8 @@
 					type: "item"
 				}
 			]
-			x: 6.0d
-			y: 0.5d
+			x: 5.5d
+			y: -1.0d
 		}
 		{
 			dependencies: ["4F5AA1D34A0C1A4C"]
@@ -163,8 +162,8 @@
 				item: { count: 1, id: "rngtech:kiln_core" }
 				type: "item"
 			}]
-			x: 5.0d
-			y: 2.5d
+			x: 5.5d
+			y: 0.0d
 		}
 		{
 			dependencies: ["4F5AA1D34A0C1A4C"]
@@ -202,8 +201,8 @@
 					type: "item"
 				}
 			]
-			x: 6.0d
-			y: 1.5d
+			x: 5.5d
+			y: 1.0d
 		}
 		{
 			dependencies: ["5FCF4CF08C2ECD07"]
@@ -240,8 +239,8 @@
 					type: "item"
 				}
 			]
-			x: 19.0d
-			y: 3.5d
+			x: 22.0d
+			y: 6.0d
 		}
 		{
 			dependencies: [
@@ -255,8 +254,8 @@
 				id: "37A6C9E1284B5F97"
 				type: "checkmark"
 			}]
-			x: 8.0d
-			y: 1.0d
+			x: 7.0d
+			y: 0.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D34"]
@@ -265,14 +264,11 @@
 				id: "37A6C9E1284B5F34"
 				type: "checkmark"
 			}]
-			x: 9.0d
-			y: 1.0d
+			x: 8.5d
+			y: 0.0d
 		}
 		{
-			dependencies: [
-				"37A6C9E1284B5D23"
-				"59C090170DAE7A69"
-			]
+			dependencies: ["59C090170DAE7A69"]
 			id: "37A6C9E1284B5D24"
 			rewards: [
 				{
@@ -312,8 +308,8 @@
 					type: "item"
 				}
 			]
-			x: 12.0d
-			y: 1.0d
+			x: 13.0d
+			y: 0.0d
 		}
 		{
 			dependencies: ["434B80FD3A2F478A"]
@@ -332,7 +328,7 @@
 				type: "item"
 			}]
 			x: 19.0d
-			y: 1.0d
+			y: 0.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D24"]
@@ -350,15 +346,14 @@
 				item: { count: 1, id: "rngtech:reinforced_machine_frame" }
 				type: "item"
 			}]
-			x: 17.0d
-			y: -0.5d
+			x: 17.5d
+			y: 2.0d
 		}
 		{
 			dependencies: [
 				"46A1F2C0DE100020"
 				"46A1F2C0DE100010"
 				"101F072E97133585"
-				"5FCF4CF08C2ECD07"
 				"1427760B7576D8D6"
 				"08CA89C63A70CEDE"
 			]
@@ -402,8 +397,8 @@
 					type: "item"
 				}
 			]
-			x: 22.0d
-			y: 1.0d
+			x: 25.0d
+			y: 0.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D1B"]
@@ -413,8 +408,8 @@
 				id: "37A6C9E1284B5F2D"
 				type: "checkmark"
 			}]
-			x: 1.0d
-			y: 4.0d
+			x: 0.0d
+			y: 2.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D20"]
@@ -462,8 +457,8 @@
 					type: "item"
 				}
 			]
-			x: 3.0d
-			y: 4.0d
+			x: 1.5d
+			y: 2.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D20"]
@@ -501,8 +496,8 @@
 					type: "item"
 				}
 			]
-			x: 3.0d
-			y: 5.0d
+			x: 1.5d
+			y: 3.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D22"]
@@ -513,8 +508,8 @@
 				item: { count: 1, id: "rngtech:copper_component_recycler" }
 				type: "item"
 			}]
-			x: 5.0d
-			y: 5.0d
+			x: 3.0d
+			y: 3.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D1B"]
@@ -524,8 +519,8 @@
 				id: "4930BDE1CE45FD13"
 				type: "checkmark"
 			}]
-			x: 1.0d
-			y: 7.0d
+			x: 0.0d
+			y: 5.0d
 		}
 		{
 			dependencies: ["2A87820D10501CE9"]
@@ -536,14 +531,12 @@
 				item: { count: 1, id: "rngtech:copper_solid_fuel_burner" }
 				type: "item"
 			}]
-			x: 6.0d
-			y: 10.0d
+			x: 16.0d
+			y: 7.0d
 		}
 		{
 			dependencies: [
-				"37A6C9E1284B5D23"
 				"61F18F2CD460DDD9"
-				"59C090170DAE7A69"
 				"46A1F2C0DE100020"
 			]
 			id: "7106E7A1B10F0050"
@@ -574,8 +567,8 @@
 					type: "item"
 				}
 			]
-			x: 5.0d
-			y: 7.0d
+			x: 13.0d
+			y: 5.0d
 		}
 		{
 			dependencies: ["61F18F2CD460DDD9", "4F5AA1D34A0C1A4C"]
@@ -607,8 +600,8 @@
 					type: "item"
 				}
 			]
-			x: 1.0d
-			y: 8.5d
+			x: 4.0d
+			y: 4.0d
 		}
 		{
 			dependencies: ["7106E7A1B10F0010"]
@@ -619,8 +612,8 @@
 				id: "7106E7A1B10F0041"
 				type: "checkmark"
 			}]
-			x: 2.5d
-			y: 8.5d
+			x: 5.5d
+			y: 3.0d
 		}
 		{
 			dependencies: ["4F5AA1D34A0C1A4C"]
@@ -631,8 +624,8 @@
 				item: { count: 1, id: "rngtech:crude_solar_panel" }
 				type: "item"
 			}]
-			x: 6.0d
-			y: -1.0d
+			x: 5.5d
+			y: -3.0d
 		}
 		{
 			dependencies: ["3A8FCB54EB8B1E89", "724590047E493088"]
@@ -643,8 +636,8 @@
 				item: { count: 1, id: "rngtech:copper_solar_panel" }
 				type: "item"
 			}]
-			x: 8.0d
-			y: -1.0d
+			x: 14.5d
+			y: -3.0d
 		}
 		{
 			dependencies: ["3A8FCB54EB8B1E89"]
@@ -655,8 +648,8 @@
 				item: { count: 1, id: "rngtech:gold_solar_panel" }
 				type: "item"
 			}]
-			x: 8.0d
-			y: -2.5d
+			x: 7.0d
+			y: -4.0d
 		}
 		{
 			dependencies: ["06CF355466851823"]
@@ -681,13 +674,10 @@
 				type: "dimension"
 			}]
 			x: -0.5d
-			y: 0.5d
+			y: -1.0d
 		}
 		{
-			dependencies: [
-				"37A6C9E1284B5D24"
-				"724590047E493088"
-			]
+			dependencies: ["724590047E493088"]
 			id: "1FACE973E783CB4C"
 			rewards: [{
 				exclude_from_claim_all: true
@@ -718,8 +708,8 @@
 					type: "item"
 				}
 			]
-			x: 14.0d
-			y: 1.0d
+			x: 16.0d
+			y: 0.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D24"]
@@ -737,8 +727,8 @@
 					type: "item"
 				}
 			]
-			x: 13.0d
-			y: 2.5d
+			x: 14.5d
+			y: 0.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D49"]
@@ -748,7 +738,7 @@
 				type: "checkmark"
 			}]
 			x: 2.5d
-			y: 1.0d
+			y: 0.0d
 		}
 		{
 			dependencies: ["7106E7A1B10F0010"]
@@ -775,8 +765,8 @@
 					type: "item"
 				}
 			]
-			x: 1.0d
-			y: 10.0d
+			x: 5.5d
+			y: 4.0d
 		}
 		{
 			dependencies: ["4653761EC24BB69A"]
@@ -787,8 +777,8 @@
 				item: { count: 1, id: "rngtech:carbon_exhaust_bucket" }
 				type: "item"
 			}]
-			x: 2.5d
-			y: 11.0d
+			x: 7.0d
+			y: 4.0d
 		}
 		{
 			dependencies: ["61F18F2CD460DDD9"]
@@ -797,8 +787,8 @@
 				id: "394041CF7190669D"
 				type: "checkmark"
 			}]
-			x: 5.5d
-			y: 8.5d
+			x: 13.0d
+			y: 6.0d
 		}
 		{
 			dependencies: ["2A87820D10501CE9", "5FCF4CF08C2ECD07"]
@@ -809,11 +799,14 @@
 				item: { count: 1, id: "rngtech:alloy_solid_fuel_burner" }
 				type: "item"
 			}]
-			x: 7.0d
-			y: 9.5d
+			x: 16.0d
+			y: 5.0d
 		}
 		{
-			dependencies: ["2A87820D10501CE9", "59C090170DAE7A69", "5FCF4CF08C2ECD07"]
+			dependencies: [
+				"2A87820D10501CE9"
+				"5FCF4CF08C2ECD07"
+			]
 			id: "17CCC098655F7B05"
 			optional: true
 			tasks: [{
@@ -821,8 +814,8 @@
 				item: { count: 1, id: "rngtech:steel_solid_fuel_burner" }
 				type: "item"
 			}]
-			x: 7.5d
-			y: 8.5d
+			x: 22.0d
+			y: 7.0d
 		}
 		{
 			dependencies: ["1FACE973E783CB4C"]
@@ -832,8 +825,8 @@
 				item: { count: 1, id: "rngtech:calibrated_thermal_component" }
 				type: "item"
 			}]
-			x: 17.0d
-			y: 3.0d
+			x: 20.5d
+			y: 6.0d
 		}
 		{
 			dependencies: ["1FACE973E783CB4C"]
@@ -843,8 +836,8 @@
 				item: { count: 1, id: "rngtech:calibrated_logic_component" }
 				type: "item"
 			}]
-			x: 17.0d
-			y: 1.0d
+			x: 17.5d
+			y: 0.0d
 		}
 		{
 			dependencies: ["1FACE973E783CB4C"]
@@ -861,8 +854,8 @@
 					type: "item"
 				}
 			]
-			x: 17.0d
-			y: 2.0d
+			x: 17.5d
+			y: -2.0d
 		}
 		{
 			dependencies: ["37A6C9E1284B5D23"]
@@ -885,7 +878,7 @@
 				}
 			]
 			x: 10.0d
-			y: 2.0d
+			y: 0.0d
 		}
 		{
 			dependencies: ["2DD5120E11128BFD"]
@@ -902,8 +895,8 @@
 					type: "item"
 				}
 			]
-			x: 11.0d
-			y: 2.0d
+			x: 11.5d
+			y: 0.0d
 		}
 		{
 			dependencies: ["59C090170DAE7A69"]
@@ -919,11 +912,14 @@
 				item: { count: 1, id: "rngtech:steel_pick_head" }
 				type: "item"
 			}]
-			x: 13.5d
-			y: 5.5d
+			x: 22.0d
+			y: 5.0d
 		}
 		{
-			dependencies: ["2DD5120E11128BFD", "7431964561B74763", "37A6C9E1284B5D33"]
+			dependencies: [
+				"7431964561B74763"
+				"37A6C9E1284B5D33"
+			]
 			id: "1427760B7576D8D6"
 			tasks: [{
 				count: 3L
@@ -931,8 +927,8 @@
 				item: { count: 1, id: "rngtech:invar_ingot" }
 				type: "item"
 			}]
-			x: 17.5d
-			y: -1.5d
+			x: 23.5d
+			y: 4.0d
 		}
 		{
 			dependencies: [
@@ -948,8 +944,8 @@
 				item: { count: 1, id: "rngtech:lead_furnace_chassis" }
 				type: "item"
 			}]
-			x: 19.0d
-			y: -0.5d
+			x: 23.5d
+			y: 2.0d
 		}
 		{
 			dependencies: ["025813A9EAA3189B", "46A1F2C0DE100010"]
@@ -960,8 +956,8 @@
 				item: { count: 1, id: "rngtech:solar_array_controller" }
 				type: "item"
 			}]
-			x: 20.0d
-			y: 2.0d
+			x: 20.5d
+			y: -3.0d
 		}
 		{
 			dependencies: ["1FACE973E783CB4C"]
@@ -978,8 +974,8 @@
 					type: "item"
 				}
 			]
-			x: 14.0d
-			y: -0.5d
+			x: 17.5d
+			y: -1.0d
 		}
 		{
 			dependencies: ["46A1F2C0DE100010", "46A1F2C0DE100020"]
@@ -1002,8 +998,8 @@
 					type: "item"
 				}
 			]
-			x: 21.0d
-			y: 3.0d
+			x: 19.0d
+			y: 1.0d
 		}
 	]
 }

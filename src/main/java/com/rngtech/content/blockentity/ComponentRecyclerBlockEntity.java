@@ -387,8 +387,18 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
                 List.copyOf(outputs),
                 running,
                 recipe == null ? 0 : processingTicks(recipe, effectiveStats()),
-                manualCranks
+                manualCranks,
+                manualWear()
         );
+    }
+
+    /** Stays where it is between cranks, when the Crude Recycler is not running. */
+    private float manualWear() {
+        if (!isManual() || progress <= 0) {
+            return 0.0F;
+        }
+        ComponentRecyclingRecipe recipe = nextRecipe();
+        return recipe == null ? 0.0F : Math.min(1.0F, progress / (float) manualProcessingTicks(recipe));
     }
 
     public ItemStackHandler getProcessInventory() {
