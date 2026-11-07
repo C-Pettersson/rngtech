@@ -14,17 +14,17 @@ Each metal smelts at its own pace: low-melting Lead and Tin in half the time of 
 
 Heat decides your progress. Unmodified electric chassis reach about:
 
-| Heat Core | Max temperature | Unlocks |
-|---|---:|---|
-| Stage 0 Furnace (no core) | 800 | Iron and Copper |
-| <ItemLink id="rngtech:iron_heat_core" /> | 800 | Iron and Copper |
-| <ItemLink id="rngtech:copper_heat_core" /> | 1,000 | Bronze ingredients and other early metals |
-| <ItemLink id="rngtech:bronze_heat_core" /> | 1,200 | Mid-tier metals |
-| <ItemLink id="rngtech:steel_heat_core" /> | 1,400 | Stage 4 metals |
-| <ItemLink id="rngtech:sparksteel_heat_core" /> | 1,600 | High-heat metals |
-| <ItemLink id="rngtech:titanium_heat_core" /> | 1,800 | Late-game metals |
-| <ItemLink id="rngtech:exotic_heat_core" /> | 2,200 | Every metal recipe |
-| <ItemLink id="rngtech:aluminum_heat_core" /> | 850 | Low-heat Stage 5 sidegrade that heats up much faster |
+| Heat Core | Max temperature | Stability | Unlocks |
+|---|---:|---:|---|
+| Stage 0 Furnace (no core) | 800 | — | Iron and Copper |
+| <ItemLink id="rngtech:iron_heat_core" /> | 800 | 0.85 | Iron and Copper |
+| <ItemLink id="rngtech:copper_heat_core" /> | 1,000 | 0.90 | Tin, Zinc, and Gold |
+| <ItemLink id="rngtech:bronze_heat_core" /> | 1,200 | 0.95 | Nickel, Lead, and Silver. Its stability is just enough for them. |
+| <ItemLink id="rngtech:steel_heat_core" /> | 1,400 | 1.08 | Aluminum and Osmium |
+| <ItemLink id="rngtech:sparksteel_heat_core" /> | 1,600 | 1.12 | Titanium |
+| <ItemLink id="rngtech:titanium_heat_core" /> | 1,800 | 1.18 | Tungsten and Platinum |
+| <ItemLink id="rngtech:exotic_heat_core" /> | 2,200 | 1.30 | Every metal recipe, including Naquadah and Netherite |
+| <ItemLink id="rngtech:aluminum_heat_core" /> | 850 | 0.86 | Iron and Copper. A low-heat Stage 5 sidegrade that heats up much faster. |
 
 Vanilla ores and raw metals go through the same heat gates as RNGTech metals, so you cannot skip heat progression by smelting them directly.
 
