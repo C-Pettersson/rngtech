@@ -18,7 +18,7 @@
     "G": { "item": "minecraft:glass_pane" },
     "P": { "item": "rngtech:solar_panel_frame" },
     "R": { "item": "minecraft:redstone" },
-    "W": { "tag": "rngtech:plates/sparksteel" }
+    "W": { "tag": "c:plates/sparksteel" }
   },
   "result": {
     "count": 1,

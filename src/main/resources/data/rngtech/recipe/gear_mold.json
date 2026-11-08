@@ -18,13 +18,13 @@
   ],
   "key": {
     "B": {
-      "tag": "rngtech:plates/bronze"
+      "tag": "c:plates/bronze"
     },
     "G": {
-      "tag": "rngtech:gears/bronze"
+      "tag": "c:gears/bronze"
     },
     "I": {
-      "tag": "rngtech:ingots/steel"
+      "tag": "c:ingots/steel"
     }
   },
   "result": {

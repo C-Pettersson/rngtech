@@ -8,10 +8,10 @@
                 ],
     "key":  {
                 "P":  {
-                          "tag":  "rngtech:plates/copper"
+                          "tag":  "c:plates/copper"
                       },
                 "G":  {
-                          "tag":  "rngtech:gears/copper"
+                          "tag":  "c:gears/copper"
                       },
                 "M":  {
                           "item":  "rngtech:mechanism"

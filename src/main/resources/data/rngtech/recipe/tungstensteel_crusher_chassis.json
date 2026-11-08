@@ -14,13 +14,13 @@
   ],
   "key": {
     "E": {
-      "ingredient": { "tag": "rngtech:ingots/nullite" }
+      "ingredient": { "tag": "c:ingots/nullite" }
     },
     "M": {
       "ingredient": { "tag": "rngtech:machine_frames/exotic" }
     },
     "W": {
-      "ingredient": { "tag": "rngtech:ingots/tungstensteel" }
+      "ingredient": { "tag": "c:ingots/tungstensteel" }
     },
     "X": {
       "ingredient": { "item": "rngtech:calibrated_kinetic_component" },

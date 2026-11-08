@@ -75,7 +75,10 @@ const VANILLA_TAGS = new Map([
     ["c:obsidians/normal", ["minecraft:obsidian"]],
     // AE2's gems; no vanilla or RNGTech item is in these tags.
     ["c:gems/certus_quartz", []],
-    ["c:gems/fluix", []]
+    ["c:gems/fluix", []],
+    // Other mods' alloy dusts, which the Furnace smelts like blends. RNGTech registers none.
+    ["c:dusts/bronze", []],
+    ["c:dusts/steel", []]
 ]);
 /** Vanilla crafting that turns items RNGTech recipes return into items they consume. */
 const VANILLA_RECIPES = [

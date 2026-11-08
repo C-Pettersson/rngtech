@@ -14,10 +14,10 @@
   ],
   "key": {
     "B": {
-      "tag": "rngtech:ingots/tungstensteel"
+      "tag": "c:ingots/tungstensteel"
     },
     "P": {
-      "tag": "rngtech:plates/tungstensteel"
+      "tag": "c:plates/tungstensteel"
     },
     "R": {
       "item": "minecraft:redstone"

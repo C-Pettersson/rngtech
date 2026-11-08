@@ -18,7 +18,7 @@
   ],
   "key": {
     "B": {
-      "tag": "rngtech:plates/bronze"
+      "tag": "c:plates/bronze"
     },
     "C": {
       "item": "rngtech:copper_coil"
@@ -30,7 +30,7 @@
       "item": "minecraft:glowstone_dust"
     },
     "P": {
-      "tag": "rngtech:plates/copper"
+      "tag": "c:plates/copper"
     }
   },
   "result": {

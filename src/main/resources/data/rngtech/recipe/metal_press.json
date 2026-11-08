@@ -24,7 +24,7 @@
       "tag": "rngtech:machine_frames/base"
     },
     "P": {
-      "tag": "rngtech:plates/steel"
+      "tag": "c:plates/steel"
     },
     "R": {
       "item": "minecraft:redstone"

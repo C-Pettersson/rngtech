@@ -18,10 +18,10 @@
   ],
   "key": {
     "P": {
-      "tag": "rngtech:plates/tungstensteel"
+      "tag": "c:plates/tungstensteel"
     },
     "R": {
-      "tag": "rngtech:rods/steel"
+      "tag": "c:rods/steel"
     }
   },
   "result": {

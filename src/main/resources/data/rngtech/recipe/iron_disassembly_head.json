@@ -8,10 +8,10 @@
                 ],
     "key":  {
                 "P":  {
-                          "tag":  "rngtech:plates/iron"
+                          "tag":  "c:plates/iron"
                       },
                 "G":  {
-                          "tag":  "rngtech:gears/iron"
+                          "tag":  "c:gears/iron"
                       },
                 "M":  {
                           "item":  "rngtech:mechanism"

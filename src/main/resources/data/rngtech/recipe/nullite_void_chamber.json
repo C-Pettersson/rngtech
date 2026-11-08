@@ -20,7 +20,7 @@
             "item": "minecraft:obsidian"
         },
         "P": {
-            "tag": "rngtech:plates/nullite"
+            "tag": "c:plates/nullite"
         },
         "U": {
             "tag": "rngtech:circuits/ultimate"

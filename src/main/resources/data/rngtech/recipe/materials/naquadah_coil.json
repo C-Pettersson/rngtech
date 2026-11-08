@@ -18,13 +18,13 @@
   ],
   "key": {
     "G": {
-      "tag": "rngtech:gears/naquadah"
+      "tag": "c:gears/naquadah"
     },
     "N": {
-      "tag": "rngtech:plates/naquadah"
+      "tag": "c:plates/naquadah"
     },
     "R": {
-      "tag": "rngtech:rods/nullite"
+      "tag": "c:rods/nullite"
     }
   },
   "result": {

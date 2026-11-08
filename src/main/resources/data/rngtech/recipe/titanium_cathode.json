@@ -17,10 +17,10 @@
       "tag": "rngtech:circuits/elite"
     },
     "P": {
-      "tag": "rngtech:plates/titanium"
+      "tag": "c:plates/titanium"
     },
     "R": {
-      "tag": "rngtech:rods/titanium"
+      "tag": "c:rods/titanium"
     }
   },
   "result": {

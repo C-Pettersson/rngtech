@@ -8,7 +8,7 @@
   "type": "rngtech:metal_press",
   "group": "metal_press_plates",
   "ingredient": {
-    "tag": "rngtech:ingots/invar"
+    "tag": "c:ingots/invar"
   },
   "mold": {
     "item": "rngtech:plate_mold"

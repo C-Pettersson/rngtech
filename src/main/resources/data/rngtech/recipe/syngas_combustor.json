@@ -14,7 +14,7 @@
   ],
   "key": {
     "A": {
-      "tag": "rngtech:plates/aluminum"
+      "tag": "c:plates/aluminum"
     },
     "B": {
       "item": "rngtech:bus_bar"

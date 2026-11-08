@@ -7,7 +7,7 @@
   ],
   "type": "rngtech:corrosion_cell",
   "plate": {
-    "tag": "rngtech:plates/titanium"
+    "tag": "c:plates/titanium"
   },
   "electrolyte": {
     "item": "rngtech:electrolyte"
