@@ -1,0 +1,25 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:crude_energy_connector"
+    },
+    "minimum_processing_level": 1,
+    "processing_ticks": 70,
+    "energy": 320,
+    "outputs": [
+        {
+            "stack": {
+                "id": "minecraft:iron_nugget",
+                "count": 4
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:redstone",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}
