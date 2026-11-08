@@ -1,0 +1,14 @@
+{
+    "type": "rngtech:crusher",
+    "ingredient": {
+        "tag": "c:rods/blaze"
+    },
+    "result": {
+        "count": 3,
+        "id": "minecraft:blaze_powder"
+    },
+    "bonus_output": false,
+    "processing_ticks": 60,
+    "energy": 600,
+    "required_processing_level": 1
+}

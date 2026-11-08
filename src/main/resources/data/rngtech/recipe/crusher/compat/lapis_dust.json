@@ -1,0 +1,30 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "neoforge:not",
+            "value": {
+                "type": "neoforge:tag_empty",
+                "tag": "c:gems/lapis"
+            }
+        },
+        {
+            "type": "neoforge:not",
+            "value": {
+                "type": "neoforge:tag_empty",
+                "tag": "c:dusts/lapis"
+            }
+        }
+    ],
+    "type": "rngtech:crusher",
+    "group": "rngtech_compat_dusts",
+    "ingredient": {
+        "tag": "c:gems/lapis"
+    },
+    "result": {
+        "tag": "c:dusts/lapis"
+    },
+    "bonus_output": false,
+    "processing_ticks": 40,
+    "energy": 600,
+    "required_processing_level": 1
+}

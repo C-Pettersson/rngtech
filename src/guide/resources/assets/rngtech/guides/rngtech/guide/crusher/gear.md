@@ -2,7 +2,7 @@
 navigation:
   title: "Gear"
   parent: crusher.md
-  position: 4
+  position: 5
   icon: rngtech:iron_crusher_chassis
 ---
 
