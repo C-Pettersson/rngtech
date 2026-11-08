@@ -14,7 +14,7 @@
   ],
   "key": {
     "B": {
-      "tag": "rngtech:ingots/bronze"
+      "tag": "c:ingots/bronze"
     },
     "C": {
       "item": "rngtech:bronze_casing"

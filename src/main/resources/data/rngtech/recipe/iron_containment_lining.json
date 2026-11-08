@@ -20,7 +20,7 @@
       "tag": "c:ingots/iron"
     },
     "P": {
-      "tag": "rngtech:plates/iron"
+      "tag": "c:plates/iron"
     },
     "S": {
       "item": "rngtech:shielding"

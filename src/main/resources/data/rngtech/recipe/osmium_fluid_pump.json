@@ -20,10 +20,10 @@
       "item": "rngtech:pump_frame"
     },
     "G": {
-      "tag": "rngtech:gears/osmium"
+      "tag": "c:gears/osmium"
     },
     "P": {
-      "tag": "rngtech:plates/osmium"
+      "tag": "c:plates/osmium"
     }
   },
   "result": {

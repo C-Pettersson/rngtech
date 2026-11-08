@@ -17,10 +17,10 @@
       "item": "minecraft:flint"
     },
     "G": {
-      "tag": "rngtech:gears/iron"
+      "tag": "c:gears/iron"
     },
     "P": {
-      "tag": "rngtech:plates/iron"
+      "tag": "c:plates/iron"
     },
     "R": {
       "item": "minecraft:redstone"

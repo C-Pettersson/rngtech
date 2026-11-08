@@ -14,10 +14,10 @@
   ],
   "key": {
     "B": {
-      "tag": "rngtech:ingots/bronze"
+      "tag": "c:ingots/bronze"
     },
     "P": {
-      "tag": "rngtech:plates/bronze"
+      "tag": "c:plates/bronze"
     },
     "R": {
       "item": "minecraft:redstone"

@@ -9,10 +9,10 @@
   "group": "battery_assembly_anodes",
   "ingredients": [
     {
-      "tag": "rngtech:plates/tungstensteel"
+      "tag": "c:plates/tungstensteel"
     },
     {
-      "tag": "rngtech:plates/tungstensteel"
+      "tag": "c:plates/tungstensteel"
     }
   ],
   "fluid_input": {

@@ -9,10 +9,10 @@
   "group": "battery_assembly_anodes",
   "ingredients": [
     {
-      "tag": "rngtech:plates/naquadah"
+      "tag": "c:plates/naquadah"
     },
     {
-      "tag": "rngtech:plates/naquadah"
+      "tag": "c:plates/naquadah"
     }
   ],
   "fluid_input": {

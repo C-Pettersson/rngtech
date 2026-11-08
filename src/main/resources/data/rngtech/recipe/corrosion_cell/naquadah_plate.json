@@ -7,7 +7,7 @@
   ],
   "type": "rngtech:corrosion_cell",
   "plate": {
-    "tag": "rngtech:plates/naquadah"
+    "tag": "c:plates/naquadah"
   },
   "electrolyte": {
     "item": "rngtech:electrolyte"

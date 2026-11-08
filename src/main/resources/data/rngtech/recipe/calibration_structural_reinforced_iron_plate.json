@@ -1,7 +1,7 @@
 {
   "type": "rngtech:calibration",
   "family": "structural",
-  "ingredient": { "tag": "rngtech:plates/iron" },
+  "ingredient": { "tag": "c:plates/iron" },
   "pattern": { "item": "rngtech:structural_calibration_pattern" },
   "catalyst": { "item": "rngtech:stabilization_catalyst" },
   "minimum_stage": 2,

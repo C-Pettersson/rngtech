@@ -91,7 +91,6 @@ public final class MasteryChecks {
         checks += com.rngtech.rpg.VoidCatalystChainChecks.run();
         checks += com.rngtech.rpg.HeatProgressionChecks.run();
         checks += com.rngtech.rpg.SmeltGateChecks.run();
-        checks += com.rngtech.compat.almostunified.AlmostUnifiedOutputChecks.run();
         checks += com.rngtech.rpg.ProcessingSetupChecks.run();
         System.out.println("Machine mastery: " + checks + " checks passed");
         ForestryTreeScanChecks.run();

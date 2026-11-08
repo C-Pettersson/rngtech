@@ -8,7 +8,7 @@
   "type": "rngtech:metal_press",
   "group": "metal_press_item_connectors",
   "ingredient": {
-    "tag": "rngtech:gears/arclite"
+    "tag": "c:gears/arclite"
   },
   "input_count": 1,
   "mold": {

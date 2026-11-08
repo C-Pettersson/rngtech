@@ -12,7 +12,7 @@
   "key": {
     "C": { "item": "rngtech:tank_frame" },
     "G": { "item": "minecraft:glass" },
-    "I": { "tag": "rngtech:ingots/bronze" }
+    "I": { "tag": "c:ingots/bronze" }
   },
   "result": {
     "count": 1,

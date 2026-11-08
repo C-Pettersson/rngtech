@@ -14,10 +14,10 @@
   ],
   "key": {
     "I": {
-      "tag": "rngtech:ingots/bronze"
+      "tag": "c:ingots/bronze"
     },
     "N": {
-      "tag": "rngtech:nuggets/bronze"
+      "tag": "c:nuggets/bronze"
     }
   },
   "result": {

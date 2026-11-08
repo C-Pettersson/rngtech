@@ -20,7 +20,7 @@
       "ingredient": { "tag": "rngtech:machine_frames/advanced" }
     },
     "M": {
-      "ingredient": { "tag": "rngtech:ingots/arclite" }
+      "ingredient": { "tag": "c:ingots/arclite" }
     },
     "R": {
       "ingredient": { "item": "minecraft:redstone" }

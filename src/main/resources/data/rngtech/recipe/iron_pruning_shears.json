@@ -14,10 +14,10 @@
     ],
     "key": {
         "P": {
-            "tag": "rngtech:plates/iron"
+            "tag": "c:plates/iron"
         },
         "R": {
-            "tag": "rngtech:rods/iron"
+            "tag": "c:rods/iron"
         },
         "S": {
             "item": "minecraft:shears"

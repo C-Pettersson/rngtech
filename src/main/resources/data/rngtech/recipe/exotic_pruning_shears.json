@@ -14,10 +14,10 @@
     ],
     "key": {
         "P": {
-            "tag": "rngtech:plates/naquadah"
+            "tag": "c:plates/naquadah"
         },
         "R": {
-            "tag": "rngtech:rods/naquadah"
+            "tag": "c:rods/naquadah"
         },
         "S": {
             "item": "minecraft:shears"

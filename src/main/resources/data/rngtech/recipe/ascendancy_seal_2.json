@@ -42,12 +42,12 @@
     },
     "N": {
       "ingredient": {
-        "tag": "rngtech:plates/nullite"
+        "tag": "c:plates/nullite"
       }
     },
     "T": {
       "ingredient": {
-        "tag": "rngtech:plates/tungstensteel"
+        "tag": "c:plates/tungstensteel"
       }
     }
   },

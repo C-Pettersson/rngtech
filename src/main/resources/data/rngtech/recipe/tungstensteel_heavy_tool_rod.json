@@ -2,10 +2,10 @@
     "type":  "rngtech:trait_shaped",
     "key":  {
                 "R":  {
-                          "tag":  "rngtech:rods/tungstensteel"
+                          "tag":  "c:rods/tungstensteel"
                       },
                 "P":  {
-                          "tag":  "rngtech:plates/tungstensteel"
+                          "tag":  "c:plates/tungstensteel"
                       }
             },
     "category":  "equipment",
