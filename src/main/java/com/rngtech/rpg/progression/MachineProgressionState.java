@@ -17,6 +17,8 @@ public record MachineProgressionState(
     public static final int MIN_LEVEL = 1;
     public static final int MAX_LEVEL = 100;
     public static final int XP_REMAINDER_SCALE = 4;
+    /** Base Mastery XP for a recipe that authors no machine_xp, so all successful work trains the machine. */
+    public static final int DEFAULT_WORK_XP = 1;
     private static final long[] LEVEL_XP = createLevelXp();
     public static final MachineProgressionState EMPTY = new MachineProgressionState(0, 0, 1, List.of(), "", List.of(), false);
     private static final Codec<List<String>> NODES_CODEC = Codec.STRING.sizeLimitedListOf(MegaPassiveTree.MAX_ALLOCATIONS);
@@ -223,7 +225,7 @@ public record MachineProgressionState(
     public static long xpForLevel(int level) { return LEVEL_XP[Mth.clamp(level, 1, MAX_LEVEL) - 1]; }
     public static int xpQuarters(int level, int band) {
         int delta = level - band;
-        return delta <= 0 ? 4 : delta == 1 ? 2 : delta == 2 ? 1 : 0;
+        return delta <= 0 ? 4 : delta == 1 ? 2 : 1;
     }
     public static long workXp(long base, int band) {
         long multiplier = 1L + (long) Math.max(1, band) * Math.max(1, band) / 20;

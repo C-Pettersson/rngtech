@@ -167,7 +167,7 @@ Crush Heads roll their own affixes, and their stats add to the Crusher's. See [G
 
 ### Mastery and Ascendancies
 
-Each completed crushing job earns Crusher Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. Reversible ingot-to-dust recipes earn no XP. Some Crusher keystones change how Gear works, for example removing the Battery Cell slot or allowing a Crush Head one stage higher than the chassis. Crushers choose between the **Rockbreaker** and **Assayer** [ascendancies](machine-mastery.md#ascendancies).
+Each completed crushing job earns Crusher Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. Some Crusher keystones change how Gear works, for example removing the Battery Cell slot or allowing a Crush Head one stage higher than the chassis. Crushers choose between the **Rockbreaker** and **Assayer** [ascendancies](machine-mastery.md#ascendancies).
 
 ### Crusher recipes
 
