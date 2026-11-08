@@ -40,7 +40,7 @@ wiki:
 
 The **Component Recycler** takes RNGTech machines, machine parts, modular tool parts, calibrated components, and Battery Cells apart and gives back some of the materials used to make them. It is how you recover a failed calibration, an outgrown machine, or a Gear part you no longer want.
 
-Returns are always physical parts only. A recycled item's rarity, affixes, and Refinement Potential are lost, so strip valuable items in a [Potential Reactor](potential-reactor.md) first if you want energy for them.
+Returns are always physical parts only. A recycled item's rarity, affixes, and Refinement Potential are lost, so strip valuable items in a [Potential Reactor](potential-reactor.md) first if you want energy for them. A return that is itself Gear, such as the Disassembly Head from a recycled Recycler, comes out Unidentified. Identify it like a newly crafted part.
 
 You can read a powered Recycler from the outside. The installed Disassembly Head hangs in the open front as a claw in the head's material; with no head you see only the bare spindle. While the Recycler works, the claw turns, faster when a craft is shorter, and reaches down onto the item on the turntable, throwing off sparks and bits of the item. Each output slot has its own tray under the grated floor, and its returns stand in it. Facing the front, the Battery Cell lies in the cradle on the left of the back cabinet with a charge meter beside it, and an installed Recovery Filter stands as a cartridge in the cage on the right. Each chassis has its own casing. FE still enters on any of the four sides, but the cable port is drawn on the back.
 

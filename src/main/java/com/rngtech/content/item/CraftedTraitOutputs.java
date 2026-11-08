@@ -24,6 +24,10 @@ import java.util.Locale;
 
 public final class CraftedTraitOutputs {
     public static ItemStack seedIfMissing(ItemStack stack, RandomSource random) {
+        return seedIfMissing(stack);
+    }
+
+    public static ItemStack seedIfMissing(ItemStack stack) {
         if (!canReceiveCraftedTraits(stack)
                 || stack.has(ModDataComponents.UNIDENTIFIED_TRAIT_ROLL.get())) {
             return stack;
