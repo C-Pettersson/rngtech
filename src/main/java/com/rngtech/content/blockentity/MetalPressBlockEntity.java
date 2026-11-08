@@ -1133,9 +1133,6 @@ public class MetalPressBlockEntity extends BaseMachineBlockEntity
             return;
         }
         int xpQuarters = MachineProgressionState.xpQuarters(machineProgression().level(), recipe.machineXpBand());
-        if (xpQuarters <= 0) {
-            return;
-        }
         grantMasteryXp(MachineProgressionState.workXp(recipe.machineXp(), recipe.machineXpBand()), xpQuarters);
     }
 

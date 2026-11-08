@@ -45,6 +45,8 @@ _CRAFTING_TYPES = {
 _IGNORED_KEYS = {"type", "group", "category", "neoforge:conditions", "input_count", "catalyst_count", "show_notification"}
 _OUTPUT_KEYS = {"result", "results", "output", "outputs", "residue", "failure_output", "saturated_output"}
 _LEADING_COLUMNS = ["processing_ticks", "energy", "heat"]
+# Mastery recipe types grant 1 Mastery XP when a recipe authors no machine_xp (MachineProgressionState.DEFAULT_WORK_XP).
+_MASTERY_RECIPE_TYPES = {f"rngtech:{t}" for t in ("furnace", "alloy_furnace", "crusher", "melter", "metal_press", "calibration")}
 _COLUMN_LABELS = {
     "processing_ticks": "Time",
     "energy": "Energy",
@@ -596,6 +598,8 @@ class WikiSite:
             if recipe.get("type") != recipe_type:
                 continue
             inputs, outputs, scalars = self.split_recipe(recipe)
+            if recipe_type in _MASTERY_RECIPE_TYPES:
+                scalars.setdefault("machine_xp", 1)
             if self._matches(inputs, input) and self._matches(outputs, output):
                 rows.append((recipe_id, inputs, outputs, scalars))
         if limit:

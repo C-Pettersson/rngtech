@@ -39,12 +39,12 @@ Other machines, Gear, and cables do not level up.
 
 ## Earning XP
 
-A machine earns XP each time it successfully finishes a job that awards Mastery XP. Recipe tables on the machine pages show a **Mastery XP** column where a recipe gives XP.
+A machine earns XP each time it successfully finishes a job. Every job gives some XP. Recipe tables on the machine pages show the base XP in a **Mastery XP** column. A recipe that does not set an amount gives 1.
 
 | Family | What earns XP |
 |---|---|
 | Crusher | Finished crushing jobs. A dense batch awards XP for each job in it. |
-| Furnace | Smelting ores, raw metals, crushed ores, and alloy blends. Dust-to-ingot smelts, food, and decorative blocks give none. |
+| Furnace | Finished smelts. Ores, raw metals, crushed ores, and alloy blends give more than other smelts. |
 | Alloy Furnace | Finished alloy recipes. |
 | Metal Press | Finished pressing jobs. |
 | Resonance Calibrator | Finished calibrations, counted per lane on multi-lane chassis. |
@@ -52,11 +52,11 @@ A machine earns XP each time it successfully finishes a job that awards Mastery 
 | Identifier | Identified items. Higher-stage items give more XP. |
 | Forestry Companion | Planting, leaf cleanup, and harvesting. |
 
-Failed jobs, idle time, waiting on a full output, and recipes with no XP give nothing.
+Failed jobs, idle time, and waiting on a full output give nothing.
 
 ### Harder work, more XP
 
-Every XP-awarding job has a **work level** from 1 to 98. It comes from how demanding the job is: ore hardness for the Crusher, required processing level for the Melter, target heat for the Furnace, Alloy Furnace, and Metal Press, and required calibrator stage for the Resonance Calibrator. For the Forestry Companion it rises with its Tree Fell Limit.
+Every job has a **work level** from 1 to 98. It comes from how demanding the job is: ore hardness for the Crusher, required processing level for the Melter, target heat for the Furnace, Alloy Furnace, and Metal Press, and required calibrator stage for the Resonance Calibrator. For the Forestry Companion it rises with its Tree Fell Limit.
 
 Higher work levels pay much more XP per job. Once your machine's level passes the work level, the XP falls off:
 
@@ -65,9 +65,9 @@ Higher work levels pay much more XP per job. Once your machine's level passes th
 | At or below | 100% |
 | 1 level above | 50% |
 | 2 levels above | 25% |
-| 3 or more above | 0% |
+| 3 or more above | 25% |
 
-To keep levelling, feed the machine harder work. Fractions of XP are saved, so small amounts are never lost.
+Easy work never stops giving XP, but it gives very little. To level fast, feed the machine harder work. Fractions of XP are saved, so small amounts are never lost.
 
 ## Levels and points
 

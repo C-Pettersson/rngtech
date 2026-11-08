@@ -1048,9 +1048,6 @@ public class AlloyFurnaceBlockEntity extends BaseMachineBlockEntity implements M
             return;
         }
         int xpQuarters = MachineProgressionState.xpQuarters(machineProgression().level(), recipe.machineXpBand());
-        if (xpQuarters <= 0) {
-            return;
-        }
         grantMasteryXp(MachineProgressionState.workXp(recipe.machineXp(), recipe.machineXpBand()), xpQuarters);
     }
 

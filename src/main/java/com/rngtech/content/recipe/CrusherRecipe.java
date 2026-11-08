@@ -151,7 +151,7 @@ public record CrusherRecipe(
                         Codec.BOOL.fieldOf("bonus_output").orElse(true).forGetter(CrusherRecipe::allowsBonusOutput),
                         Codec.intRange(0, Integer.MAX_VALUE)
                                 .fieldOf("machine_xp")
-                                .orElse(0)
+                                .orElse(MachineProgressionState.DEFAULT_WORK_XP)
                                 .forGetter(CrusherRecipe::machineXp),
                         Codec.intRange(0, Integer.MAX_VALUE)
                                 .optionalFieldOf("machine_xp_band")

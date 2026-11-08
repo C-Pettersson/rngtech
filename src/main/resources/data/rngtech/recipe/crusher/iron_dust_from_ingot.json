@@ -16,6 +16,5 @@
     "bonus_output": false,
     "processing_ticks": 30,
     "energy": 600,
-    "required_processing_level": 1,
-    "machine_xp": 0
+    "required_processing_level": 1
 }

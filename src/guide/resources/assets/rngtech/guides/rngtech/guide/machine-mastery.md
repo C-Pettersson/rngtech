@@ -23,12 +23,12 @@ Mastery belongs to the individual machine, not to you. Two Crushers side by side
 
 ## Earning XP
 
-A machine earns XP each time it successfully finishes a job that awards Mastery XP. Recipe tables on the machine pages show a **Mastery XP** column where a recipe gives XP.
+A machine earns XP each time it successfully finishes a job. Every job gives some XP. Recipe tables on the machine pages show the base XP in a **Mastery XP** column. A recipe that does not set an amount gives 1.
 
 | Family | What earns XP |
 |---|---|
 | Crusher | Finished crushing jobs. A dense batch awards XP for each job in it. |
-| Furnace | Smelting ores, raw metals, crushed ores, and alloy blends. Dust-to-ingot smelts, food, and decorative blocks give none. |
+| Furnace | Finished smelts. Ores, raw metals, crushed ores, and alloy blends give more than other smelts. |
 | Alloy Furnace | Finished alloy recipes. |
 | Metal Press | Finished pressing jobs. |
 | Resonance Calibrator | Finished calibrations, counted per lane on multi-lane chassis. |
@@ -36,7 +36,7 @@ A machine earns XP each time it successfully finishes a job that awards Mastery 
 | Identifier | Identified items. Higher-stage items give more XP. |
 | Forestry Companion | Planting, leaf cleanup, and harvesting. |
 
-Failed jobs, idle time, waiting on a full output, and recipes with no XP give nothing.
+Failed jobs, idle time, and waiting on a full output give nothing.
 
 - [Harder work, more XP](rngtech:machine-mastery/harder-work-more-xp.md)
 

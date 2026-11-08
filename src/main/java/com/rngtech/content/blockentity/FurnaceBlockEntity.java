@@ -1209,27 +1209,10 @@ public class FurnaceBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (recipe.machineXp() <= 0) {
             return;
         }
-        MachineProgressionState progression = machineProgression();
-        int xpQuarters = recipeXpQuarters(recipe, progression);
-        if (xpQuarters <= 0) {
-            return;
-        }
+        int xpQuarters = MachineProgressionState.xpQuarters(machineProgression().level(), recipe.machineXpBand());
         grantMasteryXp(MachineProgressionState.workXp(recipe.machineXp(), recipe.machineXpBand()), xpQuarters);
     }
 
-    private static int recipeXpQuarters(FurnaceRecipe recipe, MachineProgressionState progression) {
-        int levelDelta = progression.level() - recipe.machineXpBand();
-        if (levelDelta <= 0) {
-            return MachineProgressionState.XP_REMAINDER_SCALE;
-        }
-        if (levelDelta == 1) {
-            return MachineProgressionState.XP_REMAINDER_SCALE / 2;
-        }
-        if (levelDelta == 2) {
-            return MachineProgressionState.XP_REMAINDER_SCALE / 4;
-        }
-        return 0;
-    }
 
     public boolean unlockPassiveNode(MegaPassiveNode node) {
         return allocateMastery(node);

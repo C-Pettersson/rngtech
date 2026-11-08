@@ -390,9 +390,7 @@ public class IdentifierBlockEntity extends BaseMachineBlockEntity
     private void grantIdentifyXp(int stage) {
         int band = MachineProgressionState.progressionBand(1 + stage * 3);
         int quarters = MachineProgressionState.xpQuarters(machineProgression().level(), band);
-        if (quarters > 0) {
-            grantMasteryXp(MachineProgressionState.workXp(XP_PER_ITEM + stage, band), quarters);
-        }
+        grantMasteryXp(MachineProgressionState.workXp(XP_PER_ITEM + stage, band), quarters);
     }
 
     /** A full Identifying Fluid bucket in the container slot empties into the tank and leaves the bucket behind. */
