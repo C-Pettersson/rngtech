@@ -54,7 +54,8 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
     private static final int DATA_ENERGY_TRANSFER = 11;
     private static final int DATA_STABILITY = 12;
     private static final int DATA_REFINEMENT_POTENTIAL = 13;
-    private static final int DATA_COUNT = 14;
+    private static final int DATA_REQUIRED_STAGE = 14;
+    private static final int DATA_COUNT = 15;
     private static final int STAT_SCALE = 100;
     private static final int PROCESS_SLOT_COUNT = ComponentRecyclerBlockEntity.PROCESS_SLOT_COUNT;
     private static final int GEAR_SLOT_START = PROCESS_SLOT_COUNT;
@@ -238,6 +239,10 @@ public class ComponentRecyclerMenu extends AbstractContainerMenu implements Stat
 
     public int statusCode() {
         return data.get(DATA_STATUS);
+    }
+
+    public int requiredStage() {
+        return data.get(DATA_REQUIRED_STAGE);
     }
 
     public MachineTraits machineTraits() {

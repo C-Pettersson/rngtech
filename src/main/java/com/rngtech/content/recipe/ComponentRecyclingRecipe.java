@@ -1,5 +1,6 @@
 package com.rngtech.content.recipe;
 
+import com.rngtech.content.item.CraftedTraitOutputs;
 import com.rngtech.content.registry.ModItems;
 import com.rngtech.content.registry.ModRecipes;
 
@@ -30,11 +31,13 @@ public record ComponentRecyclingRecipe(
         List<ComponentRecyclingOutput> outputs
 )
         implements Recipe<SingleRecipeInput> {
+    /** Returned Gear comes back Unidentified, as it does from a crafting grid. */
     public List<ItemStack> outputStacks(boolean hasRecoveryFilter) {
         return outputs.stream()
                 .filter(output -> !output.requiresFilter() || hasRecoveryFilter)
                 .map(ComponentRecyclingOutput::copyStack)
                 .filter(stack -> !stack.isEmpty())
+                .map(CraftedTraitOutputs::seedIfMissing)
                 .toList();
     }
 
