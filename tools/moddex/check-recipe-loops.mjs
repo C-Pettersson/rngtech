@@ -62,7 +62,10 @@ const VANILLA_TAGS = new Map([
     ["minecraft:leaves", ["minecraft:oak_leaves", "minecraft:spruce_leaves", "minecraft:birch_leaves"]],
     ["minecraft:saplings", ["minecraft:oak_sapling", "minecraft:spruce_sapling", "minecraft:birch_sapling"]],
     ["minecraft:flowers", ["minecraft:dandelion", "minecraft:poppy"]],
-    ["minecraft:smelts_to_glass", ["minecraft:sand", "minecraft:red_sand"]]
+    ["minecraft:smelts_to_glass", ["minecraft:sand", "minecraft:red_sand"]],
+    // Other mods' alloy dusts, which the Furnace smelts like blends. RNGTech registers none.
+    ["c:dusts/bronze", []],
+    ["c:dusts/steel", []]
 ]);
 /** Vanilla crafting that turns items RNGTech recipes return into items they consume. */
 const VANILLA_RECIPES = [
