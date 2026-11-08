@@ -5,13 +5,16 @@
       "material": "bronze"
     }
   ],
-  "type": "minecraft:crafting_shapeless",
+  "type": "rngtech:trait_shaped",
   "category": "misc",
-  "ingredients": [
-    {
+  "pattern": [
+    "I"
+  ],
+  "key": {
+    "I": {
       "tag": "rngtech:ingots/bronze"
     }
-  ],
+  },
   "result": {
     "count": 9,
     "id": "rngtech:bronze_nugget"
