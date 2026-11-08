@@ -105,6 +105,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
     private static final int DATA_ENERGY_TRANSFER = 11;
     private static final int DATA_STABILITY = 12;
     private static final int DATA_REFINEMENT_POTENTIAL = 13;
+    private static final int DATA_REQUIRED_STAGE = 14;
     private static final int STAT_SCALE = 100;
     private static final int VISUAL_SYNC_INTERVAL = 5;
 
@@ -190,6 +191,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
                 case DATA_ENERGY_TRANSFER -> scaledStat(stats, MachineStat.ENERGY_TRANSFER);
                 case DATA_STABILITY -> scaledStat(stats, MachineStat.STABILITY);
                 case DATA_REFINEMENT_POTENTIAL -> scaledStat(stats, MachineStat.REFINEMENT_POTENTIAL);
+                case DATA_REQUIRED_STAGE -> recipe == null ? 0 : recipe.minimumProcessingLevel();
                 default -> 0;
             };
         }
@@ -200,7 +202,7 @@ public class ComponentRecyclerBlockEntity extends BaseMachineBlockEntity impleme
 
         @Override
         public int getCount() {
-            return DATA_REFINEMENT_POTENTIAL + 1;
+            return DATA_REQUIRED_STAGE + 1;
         }
     };
 
