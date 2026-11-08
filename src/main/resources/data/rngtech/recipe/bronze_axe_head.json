@@ -2,13 +2,13 @@
     "type":  "rngtech:trait_shaped",
     "key":  {
                 "G":  {
-                          "tag":  "rngtech:gears/bronze"
+                          "tag":  "c:gears/bronze"
                       },
                 "R":  {
-                          "tag":  "rngtech:rods/bronze"
+                          "tag":  "c:rods/bronze"
                       },
                 "P":  {
-                          "tag":  "rngtech:plates/bronze"
+                          "tag":  "c:plates/bronze"
                       }
             },
     "category":  "equipment",

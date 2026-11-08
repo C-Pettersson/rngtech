@@ -2,7 +2,7 @@
 navigation:
   title: "Stages"
   parent: crusher.md
-  position: 3
+  position: 4
   icon: rngtech:iron_crusher_chassis
 ---
 

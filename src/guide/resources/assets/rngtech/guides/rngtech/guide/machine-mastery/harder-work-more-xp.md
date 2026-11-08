@@ -8,7 +8,7 @@ navigation:
 
 # Harder work, more XP
 
-Every XP-awarding job has a **work level** from 1 to 98. It comes from how demanding the job is: ore hardness for the Crusher, required processing level for the Melter, target heat for the Furnace, Alloy Furnace, and Metal Press, and required calibrator stage for the Resonance Calibrator. For the Forestry Companion it rises with its Tree Fell Limit.
+Every job has a **work level** from 1 to 98. It comes from how demanding the job is: ore hardness for the Crusher, required processing level for the Melter, target heat for the Furnace, Alloy Furnace, and Metal Press, and required calibrator stage for the Resonance Calibrator. For the Forestry Companion it rises with its Tree Fell Limit.
 
 Higher work levels pay much more XP per job. Once your machine's level passes the work level, the XP falls off:
 
@@ -17,6 +17,6 @@ Higher work levels pay much more XP per job. Once your machine's level passes th
 | At or below | 100% |
 | 1 level above | 50% |
 | 2 levels above | 25% |
-| 3 or more above | 0% |
+| 3 or more above | 25% |
 
-To keep levelling, feed the machine harder work. Fractions of XP are saved, so small amounts are never lost.
+Easy work never stops giving XP, but it gives very little. To level fast, feed the machine harder work. Fractions of XP are saved, so small amounts are never lost.

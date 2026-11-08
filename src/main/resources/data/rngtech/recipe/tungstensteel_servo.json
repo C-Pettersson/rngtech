@@ -21,7 +21,7 @@
       "tag": "rngtech:circuits/ultimate"
     },
     "I": {
-      "tag": "rngtech:ingots/tungstensteel"
+      "tag": "c:ingots/tungstensteel"
     },
     "L": {
       "item": "rngtech:lubricant_bucket"

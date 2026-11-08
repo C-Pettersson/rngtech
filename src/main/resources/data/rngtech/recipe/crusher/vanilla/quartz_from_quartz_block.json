@@ -1,0 +1,14 @@
+{
+    "type": "rngtech:crusher",
+    "ingredient": {
+        "item": "minecraft:quartz_block"
+    },
+    "result": {
+        "count": 4,
+        "id": "minecraft:quartz"
+    },
+    "bonus_output": false,
+    "processing_ticks": 40,
+    "energy": 400,
+    "required_processing_level": 1
+}

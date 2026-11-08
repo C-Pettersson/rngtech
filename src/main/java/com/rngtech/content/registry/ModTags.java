@@ -42,8 +42,9 @@ public final class ModTags {
         /** Pressed items that Bright Anneal anneals and whose calibration then rolls lucky stability. */
         public static final TagKey<Item> ANNEALED_CALIBRATION_INPUTS =
                 TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "annealed_calibration_inputs"));
+        /** Any mod's plates, so the Metal Press anneals the plate a unifier such as AlmostUnified swaps in. */
         public static final TagKey<Item> PLATES =
-                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "materials/form/plate"));
+                TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "plates"));
         public static final TagKey<Item> CRUSHED_MATERIALS =
                 TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(RNGTech.MOD_ID, "materials/form/crushed"));
         /** Ore, raw, and crushed inputs whose smelts feed the Bloomer's ledger. */

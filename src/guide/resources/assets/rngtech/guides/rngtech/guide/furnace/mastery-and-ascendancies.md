@@ -8,7 +8,7 @@ navigation:
 
 # Mastery and Ascendancies
 
-Smelting ores, raw metals, crushed ores, and alloy blends earns Furnace Mastery XP, and you spend the points on the shared [Machine Mastery](rngtech:machine-mastery.md) tree. Reversible dust-to-ingot smelts, food, and decorative blocks earn no XP. Furnaces choose between the **Crucible Keeper** and **Bloomer** [ascendancies](rngtech:machine-mastery.md#ascendancies). Crucible Keeper's Overdrive speeds a lane up only past the recipe's safe maximum, so it needs the **Blast Draft** keystone to let the [overheat slider](rngtech:heat/the-overheat-slider.md) go that far.
+Every finished smelt earns Furnace Mastery XP, and you spend the points on the shared [Machine Mastery](rngtech:machine-mastery.md) tree. Ores, raw metals, crushed ores, and alloy blends earn more than other smelts. Furnaces choose between the **Crucible Keeper** and **Bloomer** [ascendancies](rngtech:machine-mastery.md#ascendancies). Crucible Keeper's Overdrive speeds a lane up only past the recipe's safe maximum, so it needs the **Blast Draft** keystone to let the [overheat slider](rngtech:heat/the-overheat-slider.md) go that far.
 
 Two keystones cap your heat in exchange for speed or savings. Each cap only stops Gear from going higher; it never raises a weaker Heat Core. Compare the caps with the heat column in the [recipe table](rngtech:furnace.md).
 

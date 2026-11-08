@@ -14,10 +14,10 @@
   ],
   "key": {
     "B": {
-      "tag": "rngtech:ingots/invar"
+      "tag": "c:ingots/invar"
     },
     "P": {
-      "tag": "rngtech:plates/invar"
+      "tag": "c:plates/invar"
     },
     "R": {
       "item": "minecraft:redstone"

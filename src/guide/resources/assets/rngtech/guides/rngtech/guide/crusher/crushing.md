@@ -18,3 +18,5 @@ Typical recipes:
 - Harder metals take longer to crush: Lead and Tin crush twice as fast as Iron, Titanium and Tungsten take three times as long, and Naquadah four times.
 - Ingots crush back into dust, but these recipes never get bonus output.
 - Coal gives **Coal Dust**, crops and plants give **Organic Reagent**, and seeds give **Compost Feedstock**.
+- Cobblestone gives <ItemLink id="minecraft:gravel" />, and Gravel gives <ItemLink id="minecraft:sand" />. Sugar Cane gives 2 <ItemLink id="minecraft:sugar" />.
+- Glowstone, Quartz, Amethyst, and Clay blocks break back into 4 of their items. Wool gives 3 String, and a Blaze Rod gives 3 Blaze Powder. These recipes never get bonus output.

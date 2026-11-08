@@ -462,7 +462,7 @@ public class ComponentRecyclerScreen extends AbstractContainerScreen<ComponentRe
             case ComponentRecyclerBlockEntity.STATUS_MISSING_HEAD -> Component.translatable("rngtech.recycler.status.missing_head");
             case ComponentRecyclerBlockEntity.STATUS_NO_INPUT -> Component.translatable("rngtech.recycler.status.no_input");
             case ComponentRecyclerBlockEntity.STATUS_INVALID_RECIPE -> Component.translatable("rngtech.recycler.status.invalid_recipe");
-            case ComponentRecyclerBlockEntity.STATUS_BLOCKED_STAGE -> Component.translatable("rngtech.recycler.status.blocked_stage");
+            case ComponentRecyclerBlockEntity.STATUS_BLOCKED_STAGE -> Component.translatable("rngtech.recycler.status.blocked_stage", menu.requiredStage());
             case ComponentRecyclerBlockEntity.STATUS_OUTPUT_FULL -> Component.translatable("rngtech.recycler.status.output_full");
             case ComponentRecyclerBlockEntity.STATUS_NO_POWER -> Component.translatable("rngtech.recycler.status.no_power");
             case ComponentRecyclerBlockEntity.STATUS_MISSING_CRANK -> Component.translatable("rngtech.recycler.status.missing_crank");

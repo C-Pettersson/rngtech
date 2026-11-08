@@ -20,7 +20,7 @@
       "tag": "c:ingots/copper"
     },
     "P": {
-      "tag": "rngtech:plates/copper"
+      "tag": "c:plates/copper"
     },
     "S": {
       "item": "rngtech:shielding"

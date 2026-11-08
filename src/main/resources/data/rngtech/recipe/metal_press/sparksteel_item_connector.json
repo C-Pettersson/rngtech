@@ -8,7 +8,7 @@
   "type": "rngtech:metal_press",
   "group": "metal_press_item_connectors",
   "ingredient": {
-    "tag": "rngtech:gears/sparksteel"
+    "tag": "c:gears/sparksteel"
   },
   "input_count": 1,
   "mold": {

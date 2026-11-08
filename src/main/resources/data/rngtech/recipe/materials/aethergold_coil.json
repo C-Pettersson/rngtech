@@ -14,10 +14,10 @@
   ],
   "key": {
     "B": {
-      "tag": "rngtech:ingots/aethergold"
+      "tag": "c:ingots/aethergold"
     },
     "P": {
-      "tag": "rngtech:plates/aethergold"
+      "tag": "c:plates/aethergold"
     },
     "R": {
       "item": "minecraft:redstone"

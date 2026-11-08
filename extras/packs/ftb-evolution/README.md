@@ -26,7 +26,6 @@ runs.
 
 4. Optional: add the keys in `optional/rngtech-common-energy.toml` to `config/rngtech-common.toml` (see
    [Energy](#energy)).
-5. Optional: show RNGTech's alloys, plates, gears, and rods in JEI (see [AlmostUnified](#almostunified)).
 
 If the pack already ran RNGTech 2.0.0-alpha.3, remove the kit's old `kubejs/server_scripts/rngtech` folder. A
 config file written by alpha.3 also keeps its old tool policy, so set `vanillaToolBridgePolicy = "TIER_LADDER"`
@@ -66,23 +65,14 @@ Evolution shares many `c:` tags with RNGTech. RNGTech's defaults keep them from 
 - RNGTech recipes take `rngtech:circuits/<tier>`, which holds only RNGTech circuits. Mekanism's control circuits
   are in `c:circuits/*` in Evolution and would skip the Arclite, Titanium, Nullite, Naquadah, and Tungstensteel in
   48 RNGTech recipes. RNGTech circuits stay in the `c:` tags, so other mods still accept them.
-- RNGTech recipes take alloy ingots and nuggets through `rngtech:ingots/<alloy>` and `rngtech:nuggets/<alloy>`, and
-  plates, gears, and rods through `rngtech:plates/<metal>`, `rngtech:gears/<metal>`, and `rngtech:rods/<metal>`.
-  These tags hold only RNGTech items, so FTB Materials, Mekanism, Immersive Engineering, and Modern
-  Industrialization steel, bronze, and plates do not skip the Alloy Furnace or the Metal Press. The items stay in
-  the `c:` tags, and 196 other-mod recipe inputs in Evolution take an RNGTech Steel Plate.
-- RNGTech's AlmostUnified plugin keeps those items in RNGTech recipe outputs. AlmostUnified still turns RNGTech's
-  mined-metal outputs, such as Tin and Titanium ingots, into FTB Materials items.
+- RNGTech recipes take alloys, plates, gears, and rods through `c:` tags. FTB Materials, Mekanism, Immersive
+  Engineering, and Modern Industrialization steel, bronze, and plates work in them. AlmostUnified unifies RNGTech
+  recipes like any other mod's, so the Alloy Furnace makes FTB Materials steel and the Metal Press makes FTB
+  Materials plates. The Metal Press anneals any plate in `c:plates`. RNGTech's own progression gate is its circuits
+  and calibrated parts.
 
-### AlmostUnified
-
-AlmostUnified hides RNGTech's alloys, plates, gears, and rods in JEI, because FTB Materials items are its targets.
-To show them, add these patterns to `ignored_items` in `config/almostunified/unification/materials.json`:
-
-```json
-"rngtech:(bronze|steel|invar|sparksteel|arclite|tungstensteel|nullite|aethergold)_(ingot|nugget)",
-"rngtech:[a-z]+_(plate|gear|rod)"
-```
+If the pack ran RNGTech 2.0.0-alpha.4 to alpha.7 with the old `ignored_items` patterns for RNGTech alloys, plates,
+gears, and rods in `config/almostunified/unification/materials.json`, remove them.
 
 ## Energy
 

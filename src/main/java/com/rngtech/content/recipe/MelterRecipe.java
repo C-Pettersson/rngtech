@@ -214,7 +214,7 @@ public record MelterRecipe(
             private static final MapCodec<MachineXpFields> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                             Codec.intRange(0, Integer.MAX_VALUE)
                                     .fieldOf("machine_xp")
-                                    .orElse(0)
+                                    .orElse(MachineProgressionState.DEFAULT_WORK_XP)
                                     .forGetter(MachineXpFields::machineXp),
                             Codec.intRange(0, Integer.MAX_VALUE)
                                     .optionalFieldOf("machine_xp_band")

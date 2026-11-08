@@ -1,7 +1,7 @@
 {
   "type": "rngtech:corrosion_cell",
   "plate": {
-    "tag": "rngtech:plates/iron"
+    "tag": "c:plates/iron"
   },
   "electrolyte": {
     "item": "rngtech:electrolyte"

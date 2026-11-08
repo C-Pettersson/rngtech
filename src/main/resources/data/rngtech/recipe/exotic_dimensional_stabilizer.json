@@ -20,7 +20,7 @@
             "tag": "rngtech:machine_frames/exotic"
         },
         "P": {
-            "tag": "rngtech:plates/naquadah"
+            "tag": "c:plates/naquadah"
         },
         "U": {
             "tag": "rngtech:circuits/ultimate"

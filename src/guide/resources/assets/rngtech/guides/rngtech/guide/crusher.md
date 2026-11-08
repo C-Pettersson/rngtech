@@ -54,6 +54,7 @@ Each chassis has its own casing, and the rim of its hopper is the metal at the t
 ## Usage
 
 - [Crushing](rngtech:crusher/crushing.md)
+- [Other mods' dusts](rngtech:crusher/other-mods-dusts.md)
 - [Hardness](rngtech:crusher/hardness.md)
 - [Output amount](rngtech:crusher/output-amount.md)
 - [Stages](rngtech:crusher/stages.md)
@@ -68,7 +69,9 @@ Each chassis has its own casing, and the rim of its hopper is the metal at the t
 | Sides | Inserts Battery Cells. |
 | Any | Accepts FE, for example from a [Universal Cable](rngtech:universal-cable.md). |
 
-- [Mastery and Ascendancies](rngtech:crusher/mastery-and-ascendancies.md)
+### Mastery and Ascendancies
+
+Each completed crushing job earns Crusher Mastery XP, and you spend the points on the shared [Machine Mastery](rngtech:machine-mastery.md) tree. Some Crusher keystones change how Gear works, for example removing the Battery Cell slot or allowing a Crush Head one stage higher than the chassis. Crushers choose between the **Rockbreaker** and **Assayer** [ascendancies](rngtech:machine-mastery.md#ascendancies).
 
 ## Obtaining
 

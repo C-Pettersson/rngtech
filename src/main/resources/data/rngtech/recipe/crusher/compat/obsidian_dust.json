@@ -1,0 +1,30 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "neoforge:not",
+            "value": {
+                "type": "neoforge:tag_empty",
+                "tag": "c:obsidians/normal"
+            }
+        },
+        {
+            "type": "neoforge:not",
+            "value": {
+                "type": "neoforge:tag_empty",
+                "tag": "c:dusts/obsidian"
+            }
+        }
+    ],
+    "type": "rngtech:crusher",
+    "group": "rngtech_compat_dusts",
+    "ingredient": {
+        "tag": "c:obsidians/normal"
+    },
+    "result": {
+        "tag": "c:dusts/obsidian"
+    },
+    "bonus_output": false,
+    "processing_ticks": 160,
+    "energy": 3200,
+    "required_processing_level": 4
+}

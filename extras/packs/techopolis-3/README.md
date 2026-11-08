@@ -166,13 +166,6 @@ Hellish tier, the same tier as RNGTech's Stage 8.
   Naquadah have no source, and the Torchflower for the Ignition Catalyst is hard to reach.
 - Replication gives Titanium and Tungsten Ingots matter values, so a late Replicator can copy them. This kit
   leaves that as Techopolis' late-game design.
-- RNGTech recipes take alloys, plates, gears, and rods through RNGTech-only tags, so AllTheOres, Immersive
-  Engineering, Mekanism, and Stellaris steel and plates do not skip RNGTech's Alloy Furnace and Metal Press.
-  RNGTech's AlmostUnified plugin keeps those items as RNGTech items in RNGTech recipe outputs.
-- AlmostUnified hides RNGTech's alloys, plates, gears, and rods in JEI, because AllTheOres items are its targets.
-  To show them, add these patterns to `ignored_items` in `config/almostunified/unification/materials.json`:
-
-    ```json
-    "rngtech:(bronze|steel|invar|sparksteel|arclite|tungstensteel|nullite|aethergold)_(ingot|nugget)",
-    "rngtech:[a-z]+_(plate|gear|rod)"
-    ```
+- RNGTech recipes take alloys, plates, gears, and rods through `c:` tags, so AllTheOres, Immersive Engineering,
+  Mekanism, and Stellaris steel and plates work in them. AlmostUnified unifies RNGTech recipe outputs to AllTheOres
+  items. RNGTech's own progression gate is its circuits and calibrated parts.

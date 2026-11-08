@@ -177,7 +177,7 @@ public final class MasteryChecks {
             require(following.equals(MachineProgressionState.STREAM_CODEC.decode(wire)), "network codec preserves stable allocations and target order");
         } finally { wire.release(); }
         require(original.allocatedNodes().stream().anyMatch(id -> MegaPassiveTree.node(id).index() > 127), "save exercises nodes beyond old mask limit");
-        require(MachineProgressionState.xpQuarters(40, 37) == 0, "outleveled work grants no XP");
+        require(MachineProgressionState.xpQuarters(40, 37) == 1 && MachineProgressionState.xpQuarters(100, 1) == 1, "outleveled work still grants a quarter of its XP");
         require(MachineProgressionState.workXp(10, 78) > MachineProgressionState.workXp(10, 1) * 100, "advanced work accelerates catch-up");
         for (int level = 2; level <= MachineProgressionState.MAX_LEVEL; level++) { require(MachineProgressionState.xpForLevel(level) > MachineProgressionState.xpForLevel(level - 1), "increasing level thresholds"); }
         require(MachineProgressionState.MAX_LEVEL == 100 && MachineProgressionState.EMPTY.forFamily(MachineMasteryFamily.CRUSHER)

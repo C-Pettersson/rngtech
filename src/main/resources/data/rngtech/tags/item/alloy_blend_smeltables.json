@@ -2,6 +2,14 @@
   "replace": false,
   "values": [
     "rngtech:bronze_blend",
-    "rngtech:steel_blend"
+    "rngtech:steel_blend",
+    {
+      "id": "#c:dusts/bronze",
+      "required": false
+    },
+    {
+      "id": "#c:dusts/steel",
+      "required": false
+    }
   ]
 }
