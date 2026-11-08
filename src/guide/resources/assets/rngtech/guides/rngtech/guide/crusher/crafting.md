@@ -2,7 +2,7 @@
 navigation:
   title: "Crafting"
   parent: crusher.md
-  position: 7
+  position: 8
   icon: rngtech:iron_crusher_chassis
 ---
 

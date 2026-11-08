@@ -63,6 +63,19 @@ const VANILLA_TAGS = new Map([
     ["minecraft:saplings", ["minecraft:oak_sapling", "minecraft:spruce_sapling", "minecraft:birch_sapling"]],
     ["minecraft:flowers", ["minecraft:dandelion", "minecraft:poppy"]],
     ["minecraft:smelts_to_glass", ["minecraft:sand", "minecraft:red_sand"]],
+    ["minecraft:wool", ["minecraft:white_wool", "minecraft:black_wool"]],
+    ["c:cobblestones/normal", ["minecraft:cobblestone"]],
+    ["c:gravels", ["minecraft:gravel"]],
+    ["c:rods/blaze", ["minecraft:blaze_rod"]],
+    ["c:gems/quartz", ["minecraft:quartz"]],
+    ["c:gems/lapis", ["minecraft:lapis_lazuli"]],
+    ["c:gems/emerald", ["minecraft:emerald"]],
+    ["c:gems/diamond", ["minecraft:diamond"]],
+    ["c:ender_pearls", ["minecraft:ender_pearl"]],
+    ["c:obsidians/normal", ["minecraft:obsidian"]],
+    // AE2's gems; no vanilla or RNGTech item is in these tags.
+    ["c:gems/certus_quartz", []],
+    ["c:gems/fluix", []],
     // Other mods' alloy dusts, which the Furnace smelts like blends. RNGTech registers none.
     ["c:dusts/bronze", []],
     ["c:dusts/steel", []]
@@ -361,7 +374,8 @@ function recipeOutputs(json) {
         }
         const entries = key === "outputs" ? value.map((entry) => entry.stack ?? entry) : [value.stack ?? value];
         for (const entry of entries) {
-            const id = entry.id ?? entry.item ?? entry.fluid;
+            // A tag result is another mod's item, so no RNGTech recipe consumes it.
+            const id = entry.id ?? entry.item ?? entry.fluid ?? (entry.tag && `#${entry.tag}`);
             if (!id) {
                 continue;
             }

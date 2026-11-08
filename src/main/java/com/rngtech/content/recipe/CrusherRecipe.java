@@ -30,7 +30,7 @@ public record CrusherRecipe(
         Ingredient ingredient,
         int inputCount,
         String malformedMaterial,
-        ItemStack result,
+        TaggedRecipeOutput output,
         int processingTicks,
         int energy,
         int requiredProcessingLevel,
@@ -45,12 +45,16 @@ public record CrusherRecipe(
         machineXpBand = machineXp <= 0 ? 0 : Math.max(1, machineXpBand);
     }
 
+    public ItemStack result() {
+        return output.stack();
+    }
+
     public int baseOutputCount() {
-        return result.getCount();
+        return result().getCount();
     }
 
     public ItemStack outputStack(int count) {
-        ItemStack stack = result.copy();
+        ItemStack stack = result().copy();
         stack.setCount(count);
         return stack;
     }
@@ -65,12 +69,12 @@ public record CrusherRecipe(
 
     @Override
     public boolean matches(SingleRecipeInput input, Level level) {
-        return matchesInput(input.item());
+        return !result().isEmpty() && matchesInput(input.item());
     }
 
     @Override
     public ItemStack assemble(SingleRecipeInput input, HolderLookup.Provider registries) {
-        return result.copy();
+        return result().copy();
     }
 
     @Override
@@ -85,7 +89,7 @@ public record CrusherRecipe(
 
     @Override
     public ItemStack getResultItem(HolderLookup.Provider registries) {
-        return result;
+        return result();
     }
 
     @Override
@@ -132,7 +136,7 @@ public record CrusherRecipe(
                                 .orElse(1)
                                 .forGetter(CrusherRecipe::inputCount),
                         Codec.STRING.optionalFieldOf("malformed_material", "").forGetter(CrusherRecipe::malformedMaterial),
-                        ItemStack.STRICT_CODEC.fieldOf("result").forGetter(CrusherRecipe::result),
+                        TaggedRecipeOutput.CODEC.fieldOf("result").forGetter(CrusherRecipe::output),
                         Codec.intRange(1, Integer.MAX_VALUE)
                                 .fieldOf("processing_ticks")
                                 .orElse(120)
@@ -178,7 +182,7 @@ public record CrusherRecipe(
                                 Ingredient.CONTENTS_STREAM_CODEC.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.STRING_UTF8.decode(buffer),
-                                ItemStack.STREAM_CODEC.decode(buffer),
+                                TaggedRecipeOutput.of(ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer)),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
                                 ByteBufCodecs.VAR_INT.decode(buffer),
@@ -194,7 +198,7 @@ public record CrusherRecipe(
                         Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.ingredient);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.inputCount);
                         ByteBufCodecs.STRING_UTF8.encode(buffer, recipe.malformedMaterial);
-                        ItemStack.STREAM_CODEC.encode(buffer, recipe.result);
+                        ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, recipe.result());
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.processingTicks);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.energy);
                         ByteBufCodecs.VAR_INT.encode(buffer, recipe.requiredProcessingLevel);

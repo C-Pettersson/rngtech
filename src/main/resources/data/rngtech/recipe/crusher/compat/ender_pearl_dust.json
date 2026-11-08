@@ -1,0 +1,30 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "neoforge:not",
+            "value": {
+                "type": "neoforge:tag_empty",
+                "tag": "c:ender_pearls"
+            }
+        },
+        {
+            "type": "neoforge:not",
+            "value": {
+                "type": "neoforge:tag_empty",
+                "tag": "c:dusts/ender_pearl"
+            }
+        }
+    ],
+    "type": "rngtech:crusher",
+    "group": "rngtech_compat_dusts",
+    "ingredient": {
+        "tag": "c:ender_pearls"
+    },
+    "result": {
+        "tag": "c:dusts/ender_pearl"
+    },
+    "bonus_output": false,
+    "processing_ticks": 60,
+    "energy": 900,
+    "required_processing_level": 1
+}

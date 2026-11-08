@@ -2,7 +2,7 @@
 navigation:
   title: "Mastery and Ascendancies"
   parent: crusher.md
-  position: 5
+  position: 6
   icon: rngtech:iron_crusher_chassis
 ---
 

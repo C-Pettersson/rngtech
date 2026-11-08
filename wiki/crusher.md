@@ -74,6 +74,18 @@ Typical recipes:
 - Harder metals take longer to crush: Lead and Tin crush twice as fast as Iron, Titanium and Tungsten take three times as long, and Naquadah four times.
 - Ingots crush back into dust, but these recipes never get bonus output.
 - Coal gives {{ item('rngtech:coal_dust') }}, crops and plants give {{ item('rngtech:organic_reagent') }}, and seeds give {{ item('rngtech:compost_feedstock') }}.
+- Cobblestone gives {{ item('minecraft:gravel') }}, and Gravel gives {{ item('minecraft:sand') }}. Sugar Cane gives 2 {{ item('minecraft:sugar') }}.
+- Glowstone, Quartz, Amethyst, and Clay blocks break back into 4 of their items. Wool gives 3 String, and a Blaze Rod gives 3 Blaze Powder. These recipes never get bonus output.
+
+### Other mods' dusts
+
+Some recipes make a dust that only other mods add. These recipes show in JEI only when a mod in your pack adds that dust:
+
+- Nether Quartz, Lapis Lazuli, Emerald, and Diamond give their gem dust.
+- Certus Quartz and Fluix give their dust.
+- Ender Pearls, Obsidian, and Charcoal give their dust.
+
+When several mods add the same dust, the Crusher makes one of them. If AlmostUnified is in the pack, it makes the item that AlmostUnified chose. These recipes never get bonus output.
 
 ### Hardness
 

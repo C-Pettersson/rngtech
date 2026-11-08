@@ -54,6 +54,7 @@ Each chassis has its own casing, and the rim of its hopper is the metal at the t
 ## Usage
 
 - [Crushing](rngtech:crusher/crushing.md)
+- [Other mods' dusts](rngtech:crusher/other-mods-dusts.md)
 - [Hardness](rngtech:crusher/hardness.md)
 - [Output amount](rngtech:crusher/output-amount.md)
 - [Stages](rngtech:crusher/stages.md)

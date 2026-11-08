@@ -368,6 +368,7 @@ Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` 
 
 - **Other mods' metals:** RNGTech recipes use common tags such as `c:ingots/tin` and `c:ores/tin`, so other mods' tin works in them. Their ores get RNGTech's [ore hardness](#ore-hardness) only when you turn it on.
 - **RNGTech-made items:** RNGTech puts its alloys, plates, gears, rods, and circuits in the common `c:` tags, so other mods' recipes can use them. RNGTech recipes take alloys, plates, gears, and rods through the same `c:` tags. Thus other mods' steel and plates work in RNGTech recipes. Circuits are different. See [Shared tags](#shared-tags).
+- **Other mods' dusts:** some Crusher recipes make a dust by its common tag, such as `c:dusts/quartz`. Each recipe loads only when its input and output tags have items. See [Crusher recipe results](#crusher-recipe-results).
 - **AE2 and Refined Storage:** Universal Cables can link their networks.
 - **JEI and Jade** show RNGTech recipes and machine state.
 - **FTB Quests:** the repository has a ready-made quest line in [extras/ftbquests](https://github.com/c-pettersson/rngtech/tree/main/extras/ftbquests). Copy its `config/ftbquests` into your pack.
@@ -396,6 +397,16 @@ The Metal Press anneals every plate in `c:plates`. Crafted parts count every pla
 
 !!! note "Packs made for 2.0.0-alpha.4 to alpha.7"
     These builds took alloys, plates, gears, and rods through `rngtech:ingots`, `rngtech:nuggets`, `rngtech:plates`, `rngtech:gears`, and `rngtech:rods` tags. These tags are gone. Remove them from your datapacks and scripts. Also remove the AlmostUnified `ignored_items` patterns for RNGTech items.
+
+### Crusher recipe results
+
+A Crusher recipe result can be an item tag instead of an item:
+
+```json
+"result": { "tag": "c:dusts/quartz", "count": 1 }
+```
+
+The Crusher makes one item from the tag. It uses AlmostUnified's chosen item if AlmostUnified is loaded. Otherwise it uses a Minecraft item, then an RNGTech item, then the first item in the tag. If the tag is empty, the recipe does nothing and JEI hides it. Add a `neoforge:not` and `neoforge:tag_empty` condition to skip such a recipe completely.
 
 ## See also
 

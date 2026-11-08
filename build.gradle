@@ -288,6 +288,7 @@ dependencies {
     localRuntime "org.appliedenergistics:appliedenergistics2:${ae2_version}"
     localRuntime "org.appliedenergistics:guideme:${guideme_version}"
     compileOnly "org.apiguardian:apiguardian-api:${apiguardian_version}"
+    compileOnly "com.almostreliable.mods:almostunified-neoforge:${almostunified_version}:api"
     compileOnly "curse.maven:refined-storage-243076:${refined_storage_file_id}"
     localRuntime "curse.maven:refined-storage-243076:${refined_storage_file_id}"
     localRuntime "curse.maven:refined-storage-jei-integration-1230497:${refined_storage_jei_integration_file_id}"
