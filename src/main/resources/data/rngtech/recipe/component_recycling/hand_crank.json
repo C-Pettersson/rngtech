@@ -1,0 +1,32 @@
+{
+    "type": "rngtech:component_recycling",
+    "ingredient": {
+        "item": "rngtech:hand_crank"
+    },
+    "minimum_processing_level": 1,
+    "processing_ticks": 100,
+    "energy": 600,
+    "outputs": [
+        {
+            "stack": {
+                "id": "minecraft:oak_planks",
+                "count": 1
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:stick",
+                "count": 2
+            },
+            "requires_filter": false
+        },
+        {
+            "stack": {
+                "id": "minecraft:iron_ingot",
+                "count": 1
+            },
+            "requires_filter": true
+        }
+    ]
+}
