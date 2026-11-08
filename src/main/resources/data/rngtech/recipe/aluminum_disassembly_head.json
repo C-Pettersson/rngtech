@@ -8,10 +8,10 @@
                 ],
     "key":  {
                 "P":  {
-                          "tag":  "rngtech:plates/aluminum"
+                          "tag":  "c:plates/aluminum"
                       },
                 "G":  {
-                          "tag":  "rngtech:gears/aluminum"
+                          "tag":  "c:gears/aluminum"
                       },
                 "M":  {
                           "item":  "rngtech:mechanism"

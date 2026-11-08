@@ -2,13 +2,13 @@
     "type":  "rngtech:trait_shaped",
     "key":  {
                 "G":  {
-                          "tag":  "rngtech:gears/copper"
+                          "tag":  "c:gears/copper"
                       },
                 "R":  {
-                          "tag":  "rngtech:rods/copper"
+                          "tag":  "c:rods/copper"
                       },
                 "P":  {
-                          "tag":  "rngtech:plates/copper"
+                          "tag":  "c:plates/copper"
                       }
             },
     "category":  "equipment",

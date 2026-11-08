@@ -8,10 +8,12 @@ import com.rngtech.content.blockentity.ComponentRecyclerVisualState;
 import com.rngtech.content.energy.BatteryCellMaterial;
 import com.rngtech.content.energy.RecoveryFilterMaterial;
 import com.rngtech.content.item.BatteryCellItem;
+import com.rngtech.content.item.CraftedTraitOutputs;
 import com.rngtech.content.recycling.ComponentRecyclerChassis;
 import com.rngtech.content.recycling.DisassemblyHeadMaterial;
 import com.rngtech.content.registry.ModBlocks;
 import com.rngtech.content.registry.ModItems;
+import com.rngtech.content.registry.ModRecipes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -21,6 +23,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -106,6 +109,24 @@ public final class ComponentRecyclerVisualGameTests {
             check(!state.running() && state.cranks() == 0, "An uncranked Crude Recycler should stand still: " + state);
             helper.succeed();
         });
+    }
+
+    /** A recycled Recycler returns its Disassembly Head Unidentified, not as a Gear part with no stats. */
+    @GameTest(template = MachineTestSupport.EMPTY)
+    public static void recycledGearReturnsUnidentified(GameTestHelper helper) {
+        ItemStack input = new ItemStack(ModBlocks.componentRecycler(ComponentRecyclerChassis.IRON).get());
+        Item head = ModItems.disassemblyHead(DisassemblyHeadMaterial.IRON).get();
+        ItemStack returned = helper.getLevel().getRecipeManager()
+                .getRecipeFor(ModRecipes.COMPONENT_RECYCLING_TYPE.get(), new SingleRecipeInput(input), helper.getLevel())
+                .orElseThrow()
+                .value()
+                .outputStacks(true)
+                .stream()
+                .filter(stack -> stack.is(head))
+                .findFirst()
+                .orElseThrow();
+        check(CraftedTraitOutputs.isUnidentified(returned), "The returned head should be Unidentified: " + returned);
+        helper.succeed();
     }
 
     private static ComponentRecyclerBlockEntity recycler(GameTestHelper helper, ComponentRecyclerChassis chassis) {

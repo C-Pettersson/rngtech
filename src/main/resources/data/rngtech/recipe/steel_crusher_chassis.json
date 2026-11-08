@@ -14,13 +14,13 @@
   ],
   "key": {
     "I": {
-      "ingredient": { "tag": "rngtech:ingots/invar" }
+      "ingredient": { "tag": "c:ingots/invar" }
     },
     "M": {
       "ingredient": { "tag": "rngtech:machine_frames/reinforced" }
     },
     "S": {
-      "ingredient": { "tag": "rngtech:ingots/steel" }
+      "ingredient": { "tag": "c:ingots/steel" }
     },
     "X": {
       "ingredient": { "item": "rngtech:calibrated_kinetic_component" },

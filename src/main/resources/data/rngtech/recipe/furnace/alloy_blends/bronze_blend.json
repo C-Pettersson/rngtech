@@ -7,9 +7,14 @@
     ],
     "type": "rngtech:furnace",
     "group": "rngtech_alloy_blends",
-    "ingredient": {
-        "item": "rngtech:bronze_blend"
-    },
+    "ingredient": [
+        {
+            "item": "rngtech:bronze_blend"
+        },
+        {
+            "tag": "c:dusts/bronze"
+        }
+    ],
     "result": {
         "id": "rngtech:bronze_ingot"
     },

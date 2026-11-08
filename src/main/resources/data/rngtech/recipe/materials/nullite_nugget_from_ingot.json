@@ -5,13 +5,16 @@
       "material": "nullite"
     }
   ],
-  "type": "minecraft:crafting_shapeless",
+  "type": "rngtech:trait_shaped",
   "category": "misc",
-  "ingredients": [
-    {
-      "tag": "rngtech:ingots/nullite"
-    }
+  "pattern": [
+    "I"
   ],
+  "key": {
+    "I": {
+      "tag": "c:ingots/nullite"
+    }
+  },
   "result": {
     "count": 9,
     "id": "rngtech:nullite_nugget"

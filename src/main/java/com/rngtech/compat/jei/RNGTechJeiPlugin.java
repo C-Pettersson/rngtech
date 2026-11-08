@@ -261,7 +261,9 @@ public final class RNGTechJeiPlugin implements IModPlugin {
                 level.getRecipeManager().getAllRecipesFor(ModRecipes.CALIBRATION_TYPE.get());
         registration.addRecipes(JeiRecipeTypes.CALIBRATION, recipes);
         List<RecipeHolder<CrusherRecipe>> crusherRecipes =
-                level.getRecipeManager().getAllRecipesFor(ModRecipes.CRUSHER_TYPE.get());
+                level.getRecipeManager().getAllRecipesFor(ModRecipes.CRUSHER_TYPE.get()).stream()
+                        .filter(holder -> !holder.value().result().isEmpty())
+                        .toList();
         registration.addRecipes(JeiRecipeTypes.CRUSHER, crusherRecipes);
         List<RecipeHolder<FurnaceRecipe>> furnaceRecipes =
                 level.getRecipeManager().getAllRecipesFor(ModRecipes.FURNACE_TYPE.get());

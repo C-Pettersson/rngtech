@@ -2,10 +2,10 @@
     "type":  "rngtech:trait_shaped",
     "key":  {
                 "R":  {
-                          "tag":  "rngtech:rods/nullite"
+                          "tag":  "c:rods/nullite"
                       },
                 "P":  {
-                          "tag":  "rngtech:plates/nullite"
+                          "tag":  "c:plates/nullite"
                       }
             },
     "category":  "equipment",

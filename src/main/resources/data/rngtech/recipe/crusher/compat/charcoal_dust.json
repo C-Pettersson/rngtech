@@ -1,0 +1,23 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "neoforge:not",
+            "value": {
+                "type": "neoforge:tag_empty",
+                "tag": "c:dusts/charcoal"
+            }
+        }
+    ],
+    "type": "rngtech:crusher",
+    "group": "rngtech_compat_dusts",
+    "ingredient": {
+        "item": "minecraft:charcoal"
+    },
+    "result": {
+        "tag": "c:dusts/charcoal"
+    },
+    "bonus_output": false,
+    "processing_ticks": 60,
+    "energy": 600,
+    "required_processing_level": 0
+}

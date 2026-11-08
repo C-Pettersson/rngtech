@@ -98,11 +98,11 @@ Use shared tags where possible:
 |---|---|
 | Ore | `c:ores/<material>` block and item tags |
 | Raw material | `c:raw_materials/<material>` |
-| Ingot | `c:ingots/<material>`; RNGTech recipes take alloy ingots through `rngtech:ingots/<alloy>` |
+| Ingot | `c:ingots/<material>` |
 | Storage block | `c:storage_blocks/<material>` |
 | Dust | `c:dusts/<material>` |
-| Nugget | `c:nuggets/<material>`; RNGTech recipes take alloy nuggets through `rngtech:nuggets/<alloy>` |
-| Plate, gear, rod | `c:plates/<material>`, `c:gears/<material>`, `c:rods/<material>` for export; RNGTech recipes take `rngtech:plates/<material>`, `rngtech:gears/<material>`, and `rngtech:rods/<material>` so other mods' parts do not skip the Metal Press |
+| Nugget | `c:nuggets/<material>` |
+| Plate, gear, rod | `c:plates/<material>`, `c:gears/<material>`, `c:rods/<material>`, which RNGTech recipes also take; the Metal Press anneals any plate in `c:plates` |
 | Circuit | `c:circuits/<tier>` for export; RNGTech recipes take `rngtech:circuits/<tier>` so other mods' circuits do not skip the circuit chain |
 | Material family | `rngtech:materials/family/<material>` |
 | Material family group | `rngtech:materials/family/<group>` |

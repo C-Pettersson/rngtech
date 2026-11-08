@@ -9,13 +9,13 @@
   ],
   "key": {
     "G": {
-      "tag": "rngtech:gears/aluminum"
+      "tag": "c:gears/aluminum"
     },
     "R": {
-      "tag": "rngtech:rods/aluminum"
+      "tag": "c:rods/aluminum"
     },
     "P": {
-      "tag": "rngtech:plates/aluminum"
+      "tag": "c:plates/aluminum"
     }
   },
   "pattern": [

@@ -1,0 +1,30 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "neoforge:not",
+            "value": {
+                "type": "neoforge:tag_empty",
+                "tag": "c:gems/fluix"
+            }
+        },
+        {
+            "type": "neoforge:not",
+            "value": {
+                "type": "neoforge:tag_empty",
+                "tag": "c:dusts/fluix"
+            }
+        }
+    ],
+    "type": "rngtech:crusher",
+    "group": "rngtech_compat_dusts",
+    "ingredient": {
+        "tag": "c:gems/fluix"
+    },
+    "result": {
+        "tag": "c:dusts/fluix"
+    },
+    "bonus_output": false,
+    "processing_ticks": 60,
+    "energy": 1200,
+    "required_processing_level": 2
+}

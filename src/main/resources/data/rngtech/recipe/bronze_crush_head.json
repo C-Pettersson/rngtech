@@ -14,13 +14,13 @@
   ],
   "key": {
     "B": {
-      "tag": "rngtech:plates/copper"
+      "tag": "c:plates/copper"
     },
     "G": {
-      "tag": "rngtech:gears/bronze"
+      "tag": "c:gears/bronze"
     },
     "P": {
-      "tag": "rngtech:plates/bronze"
+      "tag": "c:plates/bronze"
     },
     "R": {
       "item": "minecraft:redstone"

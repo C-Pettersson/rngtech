@@ -8,10 +8,10 @@
                 ],
     "key":  {
                 "P":  {
-                          "tag":  "rngtech:plates/bronze"
+                          "tag":  "c:plates/bronze"
                       },
                 "G":  {
-                          "tag":  "rngtech:gears/bronze"
+                          "tag":  "c:gears/bronze"
                       },
                 "M":  {
                           "item":  "rngtech:mechanism"

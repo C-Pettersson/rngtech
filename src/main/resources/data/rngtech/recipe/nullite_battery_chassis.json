@@ -20,7 +20,7 @@
       "ingredient": { "tag": "rngtech:machine_frames/exotic" }
     },
     "M": {
-      "ingredient": { "tag": "rngtech:ingots/nullite" }
+      "ingredient": { "tag": "c:ingots/nullite" }
     },
     "R": {
       "ingredient": { "item": "minecraft:redstone" }

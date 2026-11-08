@@ -87,7 +87,7 @@ Vanilla ores and raw metals go through the same heat gates as RNGTech metals, so
 
 Crushed material smelts straight into ingots, which is handy for simple hopper lines, but it takes three times as long and costs 50% more FE than smelting dust. Crush it into dust first for faster, cheaper smelting.
 
-There is no Steel Dust smelting recipe. Steel comes from Steel Blend, which you make in the [Alloy Furnace](alloy-furnace.md) and then smelt here.
+RNGTech has no Steel Dust. Steel comes from Steel Blend, which you make in the [Alloy Furnace](alloy-furnace.md) and then smelt here. Bronze Dust and Steel Dust from other mods smelt the same as Bronze Blend and Steel Blend.
 
 Stage 4 and higher metal recipes also need temperature stability. A Stage 0–3 Furnace will not start one without enough stability. A Stage 4 or higher Furnace starts it anyway, but poor stability or heat above the recipe's safe maximum builds up failure strain. A lane left above the recipe's overheat temperature by a hotter recipe cools down to it before smelting, so switching to a cooler metal costs time instead of ingots. Higher Overheat Tolerance shortens that wait. When strain fills, the input becomes a {{ item('rngtech:malformed_ingot') }} of that metal. Smelt it again to get two nuggets back. On any Furnace, a metal smelt pushed past its overheat temperature with the [overheat slider](heat.md#the-overheat-slider) builds strain the same way. Ancient Debris never fails.
 
@@ -144,7 +144,7 @@ Automation fills the input lanes in order: lane 1 takes a full stack before lane
 
 ### Mastery and Ascendancies
 
-Smelting ores, raw metals, crushed ores, and alloy blends earns Furnace Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. Reversible dust-to-ingot smelts, food, and decorative blocks earn no XP. Furnaces choose between the **Crucible Keeper** and **Bloomer** [ascendancies](machine-mastery.md#ascendancies). Crucible Keeper's Overdrive speeds a lane up only past the recipe's safe maximum, so it needs the **Blast Draft** keystone to let the [overheat slider](heat.md#the-overheat-slider) go that far.
+Every finished smelt earns Furnace Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. Ores, raw metals, crushed ores, and alloy blends earn more than other smelts. Furnaces choose between the **Crucible Keeper** and **Bloomer** [ascendancies](machine-mastery.md#ascendancies). Crucible Keeper's Overdrive speeds a lane up only past the recipe's safe maximum, so it needs the **Blast Draft** keystone to let the [overheat slider](heat.md#the-overheat-slider) go that far.
 
 Two keystones cap your heat in exchange for speed or savings. Each cap only stops Gear from going higher; it never raises a weaker Heat Core. Compare the caps with the heat column in the [recipe table](#furnace-recipes).
 

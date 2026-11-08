@@ -23,7 +23,7 @@
       "item": "minecraft:glass"
     },
     "I": {
-      "tag": "rngtech:ingots/bronze"
+      "tag": "c:ingots/bronze"
     },
     "T": {
       "item": "rngtech:tank_frame"

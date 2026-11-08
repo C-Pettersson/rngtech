@@ -20,10 +20,10 @@
       "item": "rngtech:basic_fluid_connector"
     },
     "G": {
-      "tag": "rngtech:gears/steel"
+      "tag": "c:gears/steel"
     },
     "P": {
-      "tag": "rngtech:plates/steel"
+      "tag": "c:plates/steel"
     }
   },
   "result": {

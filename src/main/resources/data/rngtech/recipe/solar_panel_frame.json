@@ -20,7 +20,7 @@
       "item": "minecraft:glass_pane"
     },
     "P": {
-      "tag": "rngtech:plates/iron"
+      "tag": "c:plates/iron"
     },
     "R": {
       "item": "minecraft:redstone"

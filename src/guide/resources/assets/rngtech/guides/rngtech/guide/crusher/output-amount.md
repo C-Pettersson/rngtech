@@ -2,7 +2,7 @@
 navigation:
   title: "Output amount"
   parent: crusher.md
-  position: 2
+  position: 3
   icon: rngtech:iron_crusher_chassis
 ---
 

@@ -122,7 +122,7 @@ Gear slots, Molds, and the Refinement slot cannot be filled by automation.
 
 ### Mastery and Ascendancies
 
-Each successful plate, gear, casing, or circuit earns press Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. Connector recipes, failures, and paused cycles earn nothing. Presses choose between the **Die Keeper** and **Drop Forge** [ascendancies](machine-mastery.md#ascendancies): Die Keeper swaps Molds automatically, and Drop Forge presses several items per cycle.
+Each successful pressing job earns press Mastery XP, and you spend the points on the shared [Machine Mastery](machine-mastery.md) tree. Failures and paused cycles earn nothing. Presses choose between the **Die Keeper** and **Drop Forge** [ascendancies](machine-mastery.md#ascendancies): Die Keeper swaps Molds automatically, and Drop Forge presses several items per cycle.
 
 The press's speed sits close to its Control start. **Spring Returns** (Processing Speed) and **Hot Air Jackets** (Heat Transfer) are 5 and 6 points away, and a larger Processing Speed cluster ending in **Cam Followers** is 16 points out. The [Resonance Calibrator](resonance-calibrator.md) shares this start, so the Processing Speed nodes help it too.
 

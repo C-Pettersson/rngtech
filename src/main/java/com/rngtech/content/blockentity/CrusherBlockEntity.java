@@ -661,28 +661,10 @@ public class CrusherBlockEntity extends BaseMachineBlockEntity implements MenuPr
         if (completedJobs <= 0 || recipe.machineXp() <= 0) {
             return;
         }
-        MachineProgressionState progression = machineProgression();
-        int xpQuarters = recipeXpQuarters(recipe, progression);
-        if (xpQuarters <= 0) {
-            return;
-        }
+        int xpQuarters = MachineProgressionState.xpQuarters(machineProgression().level(), Math.max(1, recipe.machineXpBand()));
         grantMasteryXp(MachineProgressionState.workXp((long) recipe.machineXp() * completedJobs, recipe.machineXpBand()), xpQuarters);
     }
 
-    private static int recipeXpQuarters(CrusherRecipe recipe, MachineProgressionState progression) {
-        int recipeBand = Math.max(1, recipe.machineXpBand());
-        int levelDelta = progression.level() - recipeBand;
-        if (levelDelta <= 0) {
-            return MachineProgressionState.XP_REMAINDER_SCALE;
-        }
-        if (levelDelta == 1) {
-            return MachineProgressionState.XP_REMAINDER_SCALE / 2;
-        }
-        if (levelDelta == 2) {
-            return MachineProgressionState.XP_REMAINDER_SCALE / 4;
-        }
-        return 0;
-    }
 
     public boolean unlockPassiveNode(MegaPassiveNode node) {
         return allocateMastery(node);
