@@ -1,0 +1,30 @@
+{
+    "neoforge:conditions": [
+        {
+            "type": "neoforge:not",
+            "value": {
+                "type": "neoforge:tag_empty",
+                "tag": "c:gems/diamond"
+            }
+        },
+        {
+            "type": "neoforge:not",
+            "value": {
+                "type": "neoforge:tag_empty",
+                "tag": "c:dusts/diamond"
+            }
+        }
+    ],
+    "type": "rngtech:crusher",
+    "group": "rngtech_compat_dusts",
+    "ingredient": {
+        "tag": "c:gems/diamond"
+    },
+    "result": {
+        "tag": "c:dusts/diamond"
+    },
+    "bonus_output": false,
+    "processing_ticks": 120,
+    "energy": 2400,
+    "required_processing_level": 4
+}

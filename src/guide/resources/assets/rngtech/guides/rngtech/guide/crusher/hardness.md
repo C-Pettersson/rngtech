@@ -2,7 +2,7 @@
 navigation:
   title: "Hardness"
   parent: crusher.md
-  position: 1
+  position: 2
   icon: rngtech:iron_crusher_chassis
 ---
 
