@@ -9,7 +9,7 @@
   "key": {
     "C": { "item": "rngtech:tungstensteel_casing" },
     "O": { "item": "minecraft:obsidian" },
-    "P": { "tag": "rngtech:plates/tungstensteel" }
+    "P": { "tag": "c:plates/tungstensteel" }
   },
   "result": {
     "id": "rngtech:tungstensteel_void_chamber"

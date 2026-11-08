@@ -8,10 +8,10 @@
                 ],
     "key":  {
                 "P":  {
-                          "tag":  "rngtech:plates/tungstensteel"
+                          "tag":  "c:plates/tungstensteel"
                       },
                 "G":  {
-                          "tag":  "rngtech:gears/tungstensteel"
+                          "tag":  "c:gears/tungstensteel"
                       },
                 "M":  {
                           "item":  "rngtech:mechanism"

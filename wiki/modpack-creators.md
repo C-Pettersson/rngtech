@@ -367,7 +367,7 @@ Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` 
 ## Compatibility
 
 - **Other mods' metals:** RNGTech recipes use common tags such as `c:ingots/tin` and `c:ores/tin`, so other mods' tin works in them. Their ores get RNGTech's [ore hardness](#ore-hardness) only when you turn it on.
-- **RNGTech-made items:** RNGTech puts its alloys, plates, gears, rods, and circuits in the common `c:` tags, so other mods' recipes can use them. RNGTech recipes ask for `rngtech:` tags that hold only RNGTech's items, so other mods' items do not skip RNGTech's machines. See [Shared tags](#shared-tags).
+- **RNGTech-made items:** RNGTech puts its alloys, plates, gears, rods, and circuits in the common `c:` tags, so other mods' recipes can use them. RNGTech recipes take alloys, plates, gears, and rods through the same `c:` tags. Thus other mods' steel and plates work in RNGTech recipes. Circuits are different. See [Shared tags](#shared-tags).
 - **Other mods' dusts:** some Crusher recipes make a dust by its common tag, such as `c:dusts/quartz`. Each recipe loads only when its input and output tags have items. See [Crusher recipe results](#crusher-recipe-results).
 - **AE2 and Refined Storage:** Universal Cables can link their networks.
 - **JEI and Jade** show RNGTech recipes and machine state.
@@ -378,23 +378,25 @@ Glyphs (`rngtech:glyph`) have no recipe. Their tier is the `rngtech:glyph_tier` 
 | RNGTech items | Common tags RNGTech adds them to | RNGTech recipes ask for |
 |---|---|---|
 | Ingots, nuggets, dusts, ores, and raw metal of mined metals, such as Tin and Titanium | `c:ingots/tin`, `c:nuggets/tin`, `c:ores/tin`, and the other common tags | The same `c:` tags |
-| Bronze, Steel, Invar, Sparksteel, Arclite, Tungstensteel, Nullite, and Aethergold ingots and nuggets | `c:ingots/steel`, `c:nuggets/steel` | `rngtech:ingots/steel`, `rngtech:nuggets/steel` |
-| Plates, gears, and rods of every metal | `c:plates/steel`, `c:gears/steel`, `c:rods/steel`, plus `c:plates`, `c:gears`, and `c:rods` | `rngtech:plates/steel`, `rngtech:gears/steel`, `rngtech:rods/steel` |
+| Bronze, Steel, Invar, Sparksteel, Arclite, Tungstensteel, Nullite, and Aethergold ingots and nuggets | `c:ingots/steel`, `c:nuggets/steel` | The same `c:` tags |
+| Plates, gears, and rods of every metal | `c:plates/steel`, `c:gears/steel`, `c:rods/steel`, plus `c:plates`, `c:gears`, and `c:rods` | The same `c:` tags |
 | Electric Circuits | `c:circuits/basic` to `ultimate`, plus `c:circuits` | `rngtech:circuits/basic` to `ultimate` |
 
-Each `rngtech:` tag holds only RNGTech's item. Thus another mod's steel or plates do not skip the Alloy Furnace or the Metal Press. To let RNGTech recipes take another mod's item, add that item or its common tag to the `rngtech:` tag. For example, put this in `data/rngtech/tags/item/ingots/steel.json` in a datapack:
+The `rngtech:circuits` tags hold only RNGTech's circuits. Thus another mod's circuits do not skip RNGTech's circuit chain. To let RNGTech recipes take another mod's circuit, add that item to the `rngtech:` tag. For example, put this in `data/rngtech/tags/item/circuits/basic.json` in a datapack:
 
 ```json
 {
-  "values": ["#c:ingots/steel"]
+  "values": ["mekanism:basic_control_circuit"]
 }
 ```
 
-!!! note "AlmostUnified"
-    RNGTech has an AlmostUnified plugin. AlmostUnified still unifies the inputs of RNGTech recipes and their mined-metal outputs. The plugin keeps RNGTech's own alloys, plates, gears, and rods in RNGTech recipe outputs, so RNGTech recipes can always use what RNGTech makes. AlmostUnified hides these items in JEI and EMI, because they are not its chosen items. To show them, add them to `ignored_items` in its unification config.
+The Metal Press anneals every plate in `c:plates`. Crafted parts count every plate in `c:plates` when they check for Annealed plates.
 
-!!! note "Packs made for 2.0.0-alpha.3"
-    Older builds took other mods' alloys through `c:ingots/<alloy>` and `c:nuggets/<alloy>`. If your pack relies on another mod's Steel, Bronze, or Invar in RNGTech recipes, add it to `rngtech:ingots/<alloy>` as above. Older builds did not tag RNGTech plates, gears, and rods under `c:`. AlmostUnified now unifies them in other mods' recipes.
+!!! note "AlmostUnified"
+    AlmostUnified unifies RNGTech recipes like the recipes of other mods. In a pack with FTB Materials, the Alloy Furnace makes FTB Materials steel and the Metal Press makes FTB Materials plates. RNGTech recipes take these items.
+
+!!! note "Packs made for 2.0.0-alpha.4 to alpha.7"
+    These builds took alloys, plates, gears, and rods through `rngtech:ingots`, `rngtech:nuggets`, `rngtech:plates`, `rngtech:gears`, and `rngtech:rods` tags. These tags are gone. Remove them from your datapacks and scripts. Also remove the AlmostUnified `ignored_items` patterns for RNGTech items.
 
 ### Crusher recipe results
 

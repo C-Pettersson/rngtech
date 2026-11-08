@@ -47,7 +47,7 @@
     },
     "S": {
       "ingredient": {
-        "tag": "rngtech:plates/sparksteel"
+        "tag": "c:plates/sparksteel"
       }
     }
   },

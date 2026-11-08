@@ -8,7 +8,7 @@
   ],
   "key": {
     "C": { "item": "rngtech:steel_casing" },
-    "P": { "tag": "rngtech:plates/steel" }
+    "P": { "tag": "c:plates/steel" }
   },
   "result": {
     "id": "rngtech:steel_collapse_nozzle"

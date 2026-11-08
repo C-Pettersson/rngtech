@@ -14,7 +14,7 @@
   ],
   "key": {
     "B": {
-      "ingredient": { "tag": "rngtech:ingots/bronze" }
+      "ingredient": { "tag": "c:ingots/bronze" }
     },
     "M": {
       "ingredient": { "tag": "rngtech:machine_frames/base" }

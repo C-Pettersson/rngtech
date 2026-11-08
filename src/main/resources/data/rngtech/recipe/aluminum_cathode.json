@@ -17,10 +17,10 @@
       "tag": "rngtech:circuits/advanced"
     },
     "P": {
-      "tag": "rngtech:plates/aluminum"
+      "tag": "c:plates/aluminum"
     },
     "R": {
-      "tag": "rngtech:rods/aluminum"
+      "tag": "c:rods/aluminum"
     }
   },
   "result": {

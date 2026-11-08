@@ -20,7 +20,7 @@
     },
     {
       "ingredient": {
-        "tag": "rngtech:ingots/tungstensteel"
+        "tag": "c:ingots/tungstensteel"
       },
       "count": 2
     },

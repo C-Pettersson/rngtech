@@ -20,10 +20,10 @@
       "item": "rngtech:pump_frame"
     },
     "G": {
-      "tag": "rngtech:gears/titanium"
+      "tag": "c:gears/titanium"
     },
     "P": {
-      "tag": "rngtech:plates/titanium"
+      "tag": "c:plates/titanium"
     }
   },
   "result": {

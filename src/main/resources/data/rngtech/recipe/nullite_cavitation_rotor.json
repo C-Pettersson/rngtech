@@ -20,7 +20,7 @@
         },
         "G": {
             "ingredient": {
-                "tag": "rngtech:gears/nullite"
+                "tag": "c:gears/nullite"
             }
         },
         "H": {
@@ -35,7 +35,7 @@
         },
         "P": {
             "ingredient": {
-                "tag": "rngtech:plates/nullite"
+                "tag": "c:plates/nullite"
             }
         },
         "U": {

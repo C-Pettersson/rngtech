@@ -20,7 +20,7 @@
       "item": "rngtech:fuel_chamber"
     },
     "I": {
-      "tag": "rngtech:ingots/steel"
+      "tag": "c:ingots/steel"
     },
     "R": {
       "item": "minecraft:redstone"

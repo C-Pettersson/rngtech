@@ -13,10 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public final class MaterialCatalog {
     private static final String CATALOG_PATH = "/data/rngtech/materials/catalog.json";
@@ -80,11 +78,6 @@ public final class MaterialCatalog {
         return DATA.itemsById().containsKey(itemId);
     }
 
-    /** Whether RNGTech recipes take this item through an RNGTech-only tag, such as {@code rngtech:plates/steel}. */
-    public static boolean isRngtechTagged(String itemId) {
-        return DATA.rngtechTaggedItemIds().contains(itemId);
-    }
-
     private static CatalogData load() {
         try (InputStream stream = MaterialCatalog.class.getResourceAsStream(CATALOG_PATH)) {
             if (stream == null) {
@@ -99,9 +92,7 @@ public final class MaterialCatalog {
                 List<NonStageMaterial> nonStageMaterials = parseNonStageMaterials(requiredArray(root, "non_stage_materials"));
                 List<MaterialItemDefinition> registeredItems =
                         buildRegisteredItems(metalForms, vanillaFormMappings, materialFamilies, genericForms, nonStageMaterials);
-                Set<String> rngtechTaggedItemIds = parseRngtechTaggedItems(root, registeredItems);
-                return new CatalogData(metalForms, materialFamilies, genericForms, nonStageMaterials, vanillaFormMappings, registeredItems,
-                        rngtechTaggedItemIds);
+                return new CatalogData(metalForms, materialFamilies, genericForms, nonStageMaterials, vanillaFormMappings, registeredItems);
             }
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to load material catalog", exception);
@@ -246,38 +237,6 @@ public final class MaterialCatalog {
         return List.copyOf(items);
     }
 
-    private static Set<String> parseRngtechTaggedItems(JsonObject root, List<MaterialItemDefinition> registeredItems) {
-        JsonElement tagsElement = root.get("rngtech_tags");
-        if (tagsElement == null || tagsElement.isJsonNull()) {
-            return Set.of();
-        }
-        Map<String, List<String>> groups = new LinkedHashMap<>();
-        JsonElement groupsElement = root.get("material_groups");
-        if (groupsElement != null && groupsElement.isJsonArray()) {
-            for (JsonElement element : groupsElement.getAsJsonArray()) {
-                JsonObject group = element.getAsJsonObject();
-                groups.put(requiredString(group, "id"), optionalStringList(group, "families"));
-            }
-        }
-        Set<String> tagged = new LinkedHashSet<>();
-        for (JsonElement element : requiredArray(root, "rngtech_tags")) {
-            JsonObject entry = element.getAsJsonObject();
-            List<String> forms = optionalStringList(entry, "forms");
-            String groupId = optionalString(entry, "group");
-            List<String> families = groupId == null ? null : groups.get(groupId);
-            if (groupId != null && families == null) {
-                throw new IllegalStateException("Unknown material group in rngtech_tags: " + groupId);
-            }
-            for (MaterialItemDefinition item : registeredItems) {
-                if (item.kind() == MaterialItemKind.METAL_FORM && forms.contains(item.formId())
-                        && (families == null || families.contains(item.materialId()))) {
-                    tagged.add(item.itemId());
-                }
-            }
-        }
-        return Set.copyOf(tagged);
-    }
-
     private static JsonArray requiredArray(JsonObject object, String member) {
         JsonElement element = object.get(member);
         if (element == null || !element.isJsonArray()) {
@@ -352,7 +311,6 @@ public final class MaterialCatalog {
             List<NonStageMaterial> nonStageMaterials,
             Map<String, Map<String, List<String>>> vanillaFormMappings,
             List<MaterialItemDefinition> registeredItems,
-            Set<String> rngtechTaggedItemIds,
             Map<String, MaterialFamily> materialsById,
             Map<String, MaterialItemDefinition> itemsById
     ) {
@@ -362,8 +320,7 @@ public final class MaterialCatalog {
                 List<GenericMaterialForm> genericForms,
                 List<NonStageMaterial> nonStageMaterials,
                 Map<String, Map<String, List<String>>> vanillaFormMappings,
-                List<MaterialItemDefinition> registeredItems,
-                Set<String> rngtechTaggedItemIds
+                List<MaterialItemDefinition> registeredItems
         ) {
             this(
                     metalForms,
@@ -372,7 +329,6 @@ public final class MaterialCatalog {
                     nonStageMaterials,
                     vanillaFormMappings,
                     registeredItems,
-                    rngtechTaggedItemIds,
                     indexMaterials(materialFamilies),
                     indexItems(registeredItems)
             );
