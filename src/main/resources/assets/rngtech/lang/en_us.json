@@ -2403,7 +2403,7 @@
   "rngtech.recycler.status.missing_head": "Needs Head",
   "rngtech.recycler.status.no_input": "No Input",
   "rngtech.recycler.status.invalid_recipe": "Invalid Recipe",
-  "rngtech.recycler.status.blocked_stage": "Stage Locked",
+  "rngtech.recycler.status.blocked_stage": "Needs Stage %s",
   "rngtech.recycler.status.output_full": "Output Full",
   "rngtech.recycler.status.no_power": "No Power",
   "rngtech.recycler.status.missing_crank": "Needs Crank",
