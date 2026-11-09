@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-/** The heated machines' Nitrogen tank: a thin vertical gauge with the inert atmosphere's effect on hover. */
+/** The heated machines' Nitrogen tank: a thin gauge, vertical or horizontal, with the inert atmosphere's effect on hover. */
 final class NitrogenGauge {
     static final int WIDTH = 10;
     static final int HEIGHT = 50;
@@ -22,10 +22,19 @@ final class NitrogenGauge {
 
     private final int x;
     private final int y;
+    private final int width;
+    private final int height;
 
     NitrogenGauge(int x, int y) {
+        this(x, y, WIDTH, HEIGHT);
+    }
+
+    /** A gauge wider than it is tall fills from the left; otherwise it fills from the bottom. */
+    NitrogenGauge(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
     }
 
     void render(GuiGraphics guiGraphics, int leftPos, int topPos, int amount, int use) {
@@ -35,14 +44,21 @@ final class NitrogenGauge {
     void render(GuiGraphics guiGraphics, int leftPos, int topPos, int amount, int use, boolean hydrogen) {
         int left = leftPos + x;
         int top = topPos + y;
-        guiGraphics.fill(left, top, left + WIDTH, top + HEIGHT, use > 0 ? ACTIVE_RIM : TRACK);
-        guiGraphics.fill(left + 1, top + 1, left + WIDTH - 1, top + HEIGHT - 1, TRACK);
-        int fill = Math.round((HEIGHT - 2) * Math.min(1.0F, amount / (float) InertAtmosphere.CAPACITY));
-        guiGraphics.fill(left + 1, top + HEIGHT - 1 - fill, left + WIDTH - 1, top + HEIGHT - 1, hydrogen ? HYDROGEN : NITROGEN);
+        guiGraphics.fill(left, top, left + width, top + height, use > 0 ? ACTIVE_RIM : TRACK);
+        guiGraphics.fill(left + 1, top + 1, left + width - 1, top + height - 1, TRACK);
+        float share = Math.min(1.0F, amount / (float) InertAtmosphere.CAPACITY);
+        int color = hydrogen ? HYDROGEN : NITROGEN;
+        if (width > height) {
+            int fill = Math.round((width - 2) * share);
+            guiGraphics.fill(left + 1, top + 1, left + 1 + fill, top + height - 1, color);
+        } else {
+            int fill = Math.round((height - 2) * share);
+            guiGraphics.fill(left + 1, top + height - 1 - fill, left + width - 1, top + height - 1, color);
+        }
     }
 
     boolean isOver(double mouseX, double mouseY, int leftPos, int topPos) {
-        return mouseX >= leftPos + x && mouseX < leftPos + x + WIDTH && mouseY >= topPos + y && mouseY < topPos + y + HEIGHT;
+        return mouseX >= leftPos + x && mouseX < leftPos + x + width && mouseY >= topPos + y && mouseY < topPos + y + height;
     }
 
     /** Renders the tooltip when hovered; returns whether it did. */

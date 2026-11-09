@@ -52,7 +52,6 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
     private static final int ENERGY_BAR_X = 2;
     private static final int HEAT_BAR_X = 14;
     private static final int FAILURE_BAR_X = 26;
-    private static final int NITROGEN_GAUGE_X = 222;
     private static final int FUEL_FRAME_X = 55;
     private static final int FUEL_FRAME_Y = 83;
     private static final int BATTERY_FRAME_Y = 65;
@@ -160,7 +159,7 @@ public class FurnaceScreen extends AbstractContainerScreen<FurnaceMenu> implemen
     private final WorkOrdersTab workOrdersTab;
     private final MachineTabs tabs;
     private final HeatSlider heatSlider = new HeatSlider(86, 81, 69);
-    private final NitrogenGauge nitrogenGauge = new NitrogenGauge(NITROGEN_GAUGE_X, BAR_Y);
+    private final NitrogenGauge nitrogenGauge = new NitrogenGauge(FUEL_BAR_X, FUEL_BAR_Y, FUEL_BAR_WIDTH, FUEL_BAR_HEIGHT + 1);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new java.util.HashMap<>();
