@@ -8,7 +8,7 @@ navigation:
 
 # Nitrogen atmosphere
 
-The electric [Furnace](rngtech:furnace.md), the [Alloy Furnace](rngtech:alloy-furnace.md), and the [Metal Press](rngtech:metal-press.md) each have a Nitrogen tank that holds 4,000 mB. Pipe in **Nitrogen Bucket** Nitrogen from any side, for example from a [Cavitation Generator](rngtech:cavitation-generator.md) running the Nitrogen rotor and nozzle. The gauge sits at the right edge of the Process tab.
+The electric [Furnace](rngtech:furnace.md), the [Alloy Furnace](rngtech:alloy-furnace.md), and the [Metal Press](rngtech:metal-press.md) each have a Nitrogen tank that holds 4,000 mB. Pipe in **Nitrogen Bucket** Nitrogen from any side, for example from a [Cavitation Generator](rngtech:cavitation-generator.md) running the Nitrogen rotor and nozzle. The gauge sits at the left edge of the Process tab on the Alloy Furnace and the Metal Press, and below the heat slider on the Furnace.
 
 - **With Blast Draft**, Nitrogen in the tank gives 15% increased Overheat Tolerance, so the overheat temperature sits further above the safe maximum. For a 1,000 °C tin smelt with a 1,150 °C safe maximum, the line moves from 1,150 °C to 1,323 °C. That is more room before wobble spikes build failure strain, and a recipe that cannot fail lets the slider go further, so it crafts faster.
 - **Cost.** A lane uses 1 mB of Nitrogen per tick, but only while it works hotter than its overheat temperature would be without Nitrogen. A lane at or below that line uses none, and a 4-lane Lead Furnace running hot uses up to 4 mB a tick.

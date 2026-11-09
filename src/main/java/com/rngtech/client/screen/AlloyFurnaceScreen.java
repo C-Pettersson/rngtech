@@ -42,6 +42,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
+    private static final int NITROGEN_GAUGE_X = 6;
     private static final int ENERGY_BAR_X = 20;
     private static final int HEAT_BAR_X = 34;
     private static final int FAILURE_BAR_X = 188;
@@ -112,7 +113,7 @@ public class AlloyFurnaceScreen extends AbstractContainerScreen<AlloyFurnaceMenu
     private final MachineTabs tabs;
     private final WorkOrdersTab workOrdersTab;
     private final HeatSlider heatSlider = new HeatSlider(98, 81, 86);
-    private final NitrogenGauge nitrogenGauge = new NitrogenGauge(222, BAR_Y);
+    private final NitrogenGauge nitrogenGauge = new NitrogenGauge(NITROGEN_GAUGE_X, BAR_Y);
 
     public AlloyFurnaceScreen(AlloyFurnaceMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);

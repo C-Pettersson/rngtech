@@ -40,6 +40,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
     private static final int STAT_PANEL_X = 8;
     private static final int STAT_PANEL_Y = 18;
     private static final int STAT_PANEL_WIDTH = 224;
+    private static final int NITROGEN_GAUGE_X = 8;
     private static final int ENERGY_BAR_X = 22;
     private static final int HEAT_BAR_X = 36;
     private static final int BAR_Y = 28;
@@ -116,7 +117,7 @@ public class MetalPressScreen extends AbstractContainerScreen<MetalPressMenu> im
     private final MachineTabs tabs;
     private final WorkOrdersTab workOrdersTab;
     private final HeatSlider heatSlider = new HeatSlider(86, 81, 69);
-    private final NitrogenGauge nitrogenGauge = new NitrogenGauge(222, BAR_Y);
+    private final NitrogenGauge nitrogenGauge = new NitrogenGauge(NITROGEN_GAUGE_X, BAR_Y);
 
     private static Map<MegaPassiveNode, ResourceLocation> createMasteryIconTextures() {
         Map<MegaPassiveNode, ResourceLocation> textures = new HashMap<>();
